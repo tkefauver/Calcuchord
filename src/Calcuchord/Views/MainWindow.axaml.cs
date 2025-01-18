@@ -1,11 +1,11 @@
 using Avalonia.Controls;
+using PropertyChanged;
 
-namespace Calcuchord.Views;
+namespace Calcuchord;
 
-public partial class MainWindow : Window
-{
-    public MainWindow()
-    {
+[DoNotNotify]
+public partial class MainWindow : Window {
+    public MainWindow() {
         InitializeComponent();
     }
 }

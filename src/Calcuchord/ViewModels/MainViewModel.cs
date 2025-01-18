@@ -1,9 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿namespace Calcuchord;
 
-namespace Calcuchord.ViewModels;
-
-public partial class MainViewModel : ViewModelBase
-{
-    [ObservableProperty]
-    private string _greeting = "Welcome to Avalonia!";
+public class MainViewModel : ViewModelBase {
+    public string Greeting => "Welcome to Avalonia!";
 }
