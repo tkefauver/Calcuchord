@@ -1,16 +1,30 @@
-namespace Calcuchord;
+namespace Calcuchord {
+    public enum NoteType {
+        C,
+        D,
+        Eb,
+        E,
+        F,
+        Gb,
+        G,
+        Ab,
+        A,
+        Bb,
+        B,
+        Cb
+    }
 
-public enum NoteType {
-    E,
-    F,
-    Gb,
-    G,
-    Ab,
-    A,
-    Bb,
-    B,
-    C,
-    Cb,
-    D,
-    Eb
+    public enum InstrumentType {
+        Guitar,
+        Ukulele,
+        Piano,
+        Custom
+    }
+
+    public enum MusicPatternType {
+        Chords,
+
+        Scales
+        //Modes
+    }
 }

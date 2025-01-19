@@ -6,7 +6,7 @@ using Avalonia.Android;
 namespace Calcuchord.Android;
 
 [Activity(
-    Label = "Calcuchord.Android",
+    Label = "Calcuchord",
     Theme = "@style/MyTheme.NoActionBar",
     Icon = "@drawable/icon",
     MainLauncher = true,

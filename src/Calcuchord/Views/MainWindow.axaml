@@ -5,7 +5,9 @@
         xmlns:local="clr-namespace:Calcuchord"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Calcuchord.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Width="740"
+        Height="360"
+        Icon="/Assets/Icons/logo.ico"
         Title="Calcuchord">
     <local:MainView />
 </Window>

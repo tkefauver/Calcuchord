@@ -13,6 +13,7 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia"/>
+        <PackageReference Include="Avalonia.ReactiveUI"/>
         <PackageReference Include="Avalonia.Themes.Fluent"/>
         <PackageReference Include="Avalonia.Fonts.Inter"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
@@ -30,12 +31,7 @@
         <PackageReference Include="Material.Icons.Avalonia"/>
         <PackageReference Include="MonkeyPaste.Common.Avalonia"/>
         <PackageReference Include="PropertyChanged.Fody" PrivateAssets="All"/>
+        <PackageReference Include="ReactiveUI"/>
         <PackageReference Include="webview.avalonia"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Assets\Icons\"/>
-        <Folder Include="Assets\Images\"/>
-        <Folder Include="Assets\Svg\"/>
     </ItemGroup>
 </Project>

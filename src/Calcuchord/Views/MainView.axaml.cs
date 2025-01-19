@@ -1,11 +1,19 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using PropertyChanged;
 
-namespace Calcuchord;
+namespace Calcuchord {
+    [DoNotNotify]
+    public partial class MainView : UserControl {
+        public MainView() {
+            InitializeComponent();
+            YoBlock.PointerReleased += YoBlockOnPointerReleased;
 
-[DoNotNotify]
-public partial class MainView : UserControl {
-    public MainView() {
-        InitializeComponent();
+        }
+
+        void YoBlockOnPointerReleased(object sender,PointerReleasedEventArgs e) {
+            var test = Prefs.Instance.Test;
+            Prefs.Instance.Test = "Howdy";
+        }
     }
 }

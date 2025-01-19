@@ -12,5 +12,5 @@
         <local:MainViewModel />
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    <TextBlock x:Name="YoBlock" Text="yo" HorizontalAlignment="Center" VerticalAlignment="Center" />
 </UserControl>

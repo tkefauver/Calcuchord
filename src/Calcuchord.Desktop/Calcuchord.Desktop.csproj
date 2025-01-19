@@ -14,16 +14,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Desktop" />
+        <PackageReference Include="Avalonia.Desktop"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="Avalonia.Diagnostics">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="webview.avalonia.desktop" />
+        <PackageReference Include="Avalonia.ReactiveUI"/>
+        <PackageReference Include="webview.avalonia.desktop"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj" />
+        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
     </ItemGroup>
 </Project>
