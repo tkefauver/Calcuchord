@@ -22,7 +22,7 @@ namespace Calcuchord {
                 return null;
             }
 
-            return new Note(note_tup.nt, reg);
+            return new(note_tup.nt,reg);
         }
 
         static int GetId(Note nt) {
@@ -31,8 +31,8 @@ namespace Calcuchord {
 
         static Note FromId(int id) {
             var register = (int)Math.Floor(id / (double)MAX_NOTE_TYPE);
-            var nt = (NoteType)(id - register);
-            return new Note(nt, register);
+            var nt = (NoteType)(id - (register * MAX_NOTE_TYPE));
+            return new(nt,register);
         }
 
         #endregion
@@ -109,9 +109,10 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public Note() { }
+        public Note() {
+        }
 
-        public Note(NoteType nt, int register) {
+        public Note(NoteType nt,int register) {
             Key = nt;
             Register = register;
         }
@@ -122,6 +123,10 @@ namespace Calcuchord {
 
         public override string ToString() {
             return FullName;
+        }
+
+        public Note Clone() {
+            return new(Key,Register);
         }
 
         #endregion

@@ -99,7 +99,7 @@ namespace Calcuchord {
         #region Members
 
         [DataMember]
-        public string Test { get; set; }
+        public bool IsThemeDark { get; set; }
 
         [DataMember]
         public ObservableCollection<string> ChordBookmarkIds { get; set; } = [];
@@ -107,8 +107,8 @@ namespace Calcuchord {
         [DataMember]
         public ObservableCollection<string> ScaleBookmarkIds { get; set; } = [];
 
-        [DataMember]
-        public ObservableCollection<string> ModeBookmarkIds { get; set; } = [];
+        // [DataMember]
+        // public ObservableCollection<string> ModeBookmarkIds { get; set; } = [];
 
         [DataMember]
         public ObservableCollection<Instrument> Instruments { get; set; } = [];
@@ -126,8 +126,8 @@ namespace Calcuchord {
                 if(_bookmarkLookup == null) {
                     _bookmarkLookup = new() {
                         { MusicPatternType.Chords,ChordBookmarkIds },
-                        { MusicPatternType.Scales,ScaleBookmarkIds },
-                        { MusicPatternType.Modes,ModeBookmarkIds }
+                        { MusicPatternType.Scales,ScaleBookmarkIds }
+                        //{ MusicPatternType.Modes,ModeBookmarkIds }
                     };
                 }
 
@@ -158,8 +158,6 @@ namespace Calcuchord {
             Instruments.CollectionChanged += Coll_OnCollectionChanged;
             ChordBookmarkIds.CollectionChanged += Coll_OnCollectionChanged;
             ScaleBookmarkIds.CollectionChanged += Coll_OnCollectionChanged;
-            ModeBookmarkIds.CollectionChanged += Coll_OnCollectionChanged;
-
         }
 
         #endregion

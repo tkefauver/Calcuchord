@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Calcuchord {
     public class ChordMatchProvider : MatchProviderBase {
@@ -32,9 +31,6 @@ namespace Calcuchord {
         #region Constructors
 
         public ChordMatchProvider(InstrumentTuning tuning) : base(tuning) {
-            if(!tuning.Chords.Any()) {
-
-            }
         }
 
         #endregion

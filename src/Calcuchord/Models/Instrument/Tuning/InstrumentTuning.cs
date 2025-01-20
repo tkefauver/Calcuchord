@@ -95,6 +95,10 @@ namespace Calcuchord {
             }
         }
 
+        public override string ToString() {
+            return $"{Parent.InstrumentType} | {Name}";
+        }
+
         #endregion
 
         #region Protected Variables

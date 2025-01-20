@@ -20,7 +20,11 @@ namespace Calcuchord {
 
         #region Properties
 
+        protected IEnumerable<NoteGroupCollection> Items =>
+            Tuning.Collections[PatternType];
+
         protected abstract MusicPatternType PatternType { get; }
+        protected InstrumentTuning Tuning { get; }
 
         #endregion
 
@@ -30,7 +34,8 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public MatchProviderBase(InstrumentTuning tuning) {
+        protected MatchProviderBase(InstrumentTuning tuning) {
+            Tuning = tuning;
         }
 
         #endregion

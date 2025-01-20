@@ -35,7 +35,11 @@ namespace Calcuchord {
 
         [IgnoreDataMember]
         public override string FullName =>
-            $"[{StringNum}|{FretNum}]" + base.FullName;
+            $"[{StringNum}|{FretNum}] " + base.FullName;
+
+        [IgnoreDataMember]
+        public new InstrumentNote Next =>
+            new(FretNum + 1,StringNum,base.Next);
 
         #endregion
 
@@ -43,10 +47,13 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public InstrumentNote() { }
-        public InstrumentNote(int fretNum, int stringNum, Note n) : this(fretNum, stringNum, n.Key, n.Register) { }
+        public InstrumentNote() {
+        }
 
-        public InstrumentNote(int fretNum, int stringNum, NoteType nt, int register) : base(nt, register) {
+        public InstrumentNote(int fretNum,int stringNum,Note n) : this(fretNum,stringNum,n.Key,n.Register) {
+        }
+
+        public InstrumentNote(int fretNum,int stringNum,NoteType nt,int register) : base(nt,register) {
             FretNum = fretNum;
             StringNum = stringNum;
         }
@@ -54,6 +61,10 @@ namespace Calcuchord {
         #endregion
 
         #region Public Methods
+
+        public new InstrumentNote Clone() {
+            return new(FretNum,StringNum,Key,Register);
+        }
 
         #endregion
 

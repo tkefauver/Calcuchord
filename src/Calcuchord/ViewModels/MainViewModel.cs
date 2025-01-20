@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
@@ -41,7 +42,7 @@ namespace Calcuchord {
             }
         }
 
-        public InstrumentTuningViewModel SelectedTuning =>
+        public TuningViewModel SelectedTuning =>
             SelectedInstrument.SelectedTuning;
 
         #endregion
@@ -79,7 +80,8 @@ namespace Calcuchord {
             }
 
             instl.ForEach(x => Instruments.Add(new(this,x)));
-            OnPropertyChanged(nameof(SelectedInstrument));
+
+            InitInstrumentAsync().FireAndForgetSafeAsync();
         }
 
         #endregion
@@ -94,6 +96,16 @@ namespace Calcuchord {
 
         #region Private Methods
 
+        async Task InitInstrumentAsync() {
+            if(!SelectedTuning.IsLoaded) {
+                await SelectedTuning.InitCollectionsAsync();
+            }
+
+            OnPropertyChanged(nameof(SelectedInstrument));
+            OnPropertyChanged(nameof(SelectedTuning));
+            new ChordSvgBuilder().Test(SelectedTuning.Tuning.Chords.SelectMany(x => x.Groups));
+        }
+
         IEnumerable<Instrument> CreateDefaultInstruments() {
             var instl = new List<Instrument>();
             var std_inst_lookup = new Dictionary<InstrumentType,(string[],int)> {
@@ -102,7 +114,7 @@ namespace Calcuchord {
                 { InstrumentType.Piano,(["C3"],24) }
             };
             foreach(var kvp in std_inst_lookup) {
-                var tuning = new InstrumentTuning(
+                InstrumentTuning tuning = new(
                     "Standard",
                     isDefault: true,
                     isReadOnly: true);
@@ -113,7 +125,7 @@ namespace Calcuchord {
                                 fretNum: 0,
                                 idx,
                                 Note.Parse(x))));
-                var inst = new Instrument(
+                Instrument inst = new(
                     kvp.ToString(),
                     kvp.Key,
                     kvp.Value.Item2,

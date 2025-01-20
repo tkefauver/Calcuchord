@@ -2,7 +2,6 @@ using System.Runtime.Serialization;
 
 namespace Calcuchord {
     public class PatternNote : InstrumentNote {
-
         #region Properties
 
         #region Members
@@ -16,7 +15,7 @@ namespace Calcuchord {
 
         [IgnoreDataMember]
         public override string FullName =>
-            $"F{FingerNum}" + base.FullName;
+            $"F{FingerNum} " + base.FullName;
 
         [IgnoreDataMember]
         public bool IsRoot =>
@@ -31,13 +30,17 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public PatternNote() { }
+        public PatternNote() {
+        }
 
-        public PatternNote(int fingerNum, InstrumentNote inn) : this(fingerNum, inn.FretNum, inn.StringNum, inn.Key,
-            inn.Register) { }
+        public PatternNote(int fingerNum,InstrumentNote inn) : this(
+            fingerNum,inn.FretNum,inn.StringNum,inn.Key,
+            inn.Register) {
+        }
 
-        public PatternNote(int fingerNum, int fretNum, int stringNum, NoteType nt, int register) : base(fretNum,
-            stringNum, nt, register) {
+        public PatternNote(int fingerNum,int fretNum,int stringNum,NoteType nt,int register) : base(
+            fretNum,
+            stringNum,nt,register) {
             FingerNum = fingerNum;
         }
 

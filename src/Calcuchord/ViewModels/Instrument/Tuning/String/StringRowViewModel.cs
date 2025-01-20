@@ -1,5 +1,5 @@
 namespace Calcuchord {
-    public class StringRowViewModel : ViewModelBase<InstrumentTuningViewModel> {
+    public class StringRowViewModel : ViewModelBase<TuningViewModel> {
         #region Private Variables
 
         #endregion
@@ -52,7 +52,7 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public StringRowViewModel(InstrumentTuningViewModel parent, InstrumentNote openNote) : base(parent) {
+        public StringRowViewModel(TuningViewModel parent,InstrumentNote openNote) : base(parent) {
             OpenNote = openNote;
         }
 

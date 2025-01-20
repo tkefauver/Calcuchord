@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
+using MonkeyPaste.Common;
 
 namespace Calcuchord {
     [DataContract]
@@ -41,6 +43,15 @@ namespace Calcuchord {
 
         public NoteGroup() {
             Id = Guid.NewGuid().ToString();
+        }
+
+        public NoteGroup(NoteGroupCollection ngc,int position) : this(ngc,position,[]) {
+        }
+
+        public NoteGroup(NoteGroupCollection ngc,int position,IEnumerable<PatternNote> notes) : this() {
+            Position = position;
+            Notes.AddRange(notes);
+            SetParent(ngc);
         }
 
         #endregion

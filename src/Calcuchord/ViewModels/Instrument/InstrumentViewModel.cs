@@ -28,9 +28,9 @@ namespace Calcuchord {
 
         #region View Models
 
-        public ObservableCollection<InstrumentTuningViewModel> Tunings { get; } = [];
+        public ObservableCollection<TuningViewModel> Tunings { get; } = [];
 
-        public InstrumentTuningViewModel SelectedTuning {
+        public TuningViewModel SelectedTuning {
             get => Tunings.OrderByDescending(x => x.Tuning.LastSelectedDt).FirstOrDefault();
             set {
                 Tunings.ForEach(x => x.IsSelected = value == x);
@@ -70,7 +70,8 @@ namespace Calcuchord {
 
         public InstrumentViewModel(MainViewModel parent,Instrument it) : base(parent) {
             Instrument = it;
-            Tunings.AddRange(Instrument.Tunings.Select(x => new InstrumentTuningViewModel(this,x)));
+            Tunings.AddRange(Instrument.Tunings.Select(x => new TuningViewModel(this,x)));
+            Instrument.RefreshModelTree();
         }
 
         #endregion

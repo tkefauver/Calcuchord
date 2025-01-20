@@ -34,4 +34,9 @@
         <PackageReference Include="ReactiveUI"/>
         <PackageReference Include="webview.avalonia"/>
     </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="AttachedProperties\"/>
+        <Folder Include="Models\Providers\Patterns\"/>
+    </ItemGroup>
 </Project>
