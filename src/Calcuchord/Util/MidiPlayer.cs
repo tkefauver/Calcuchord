@@ -84,14 +84,14 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Protected Variables
+        #region Protected Methods
 
         #endregion
 
         #region Private Methods
 
         void SetStopDt(int noteCount,bool isScale) {
-            var delay = TimeSpan.FromMilliseconds(noteCount * (isScale ? ScaleDelayMs : ChordDelayMs));
+            TimeSpan delay = TimeSpan.FromMilliseconds(noteCount * (isScale ? ScaleDelayMs : ChordDelayMs));
             NextStopDt = DateTime.Now + delay;
             Dispatcher.UIThread.Post(
                 async () => {

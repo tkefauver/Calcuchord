@@ -34,10 +34,6 @@ namespace Calcuchord {
         #region Ignored
 
         [IgnoreDataMember]
-        public override string FullName =>
-            $"[{StringNum}|{FretNum}] " + base.FullName;
-
-        [IgnoreDataMember]
         public new InstrumentNote Next =>
             new(FretNum + 1,StringNum,base.Next);
 
@@ -66,9 +62,13 @@ namespace Calcuchord {
             return new(FretNum,StringNum,Key,Register);
         }
 
+        public override string ToString() {
+            return $"[{StringNum}|{FretNum}] " + base.FullName;
+        }
+
         #endregion
 
-        #region Protected Variables
+        #region Protected Methods
 
         #endregion
 

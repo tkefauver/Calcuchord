@@ -103,7 +103,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Protected Variables
+        #region Protected Methods
 
         #endregion
 
@@ -130,14 +130,14 @@ namespace Calcuchord {
         IEnumerable<NoteGroupCollection> GetFretboardScales(bool isMode) {
             var patterns = isMode ? Modes : Scales;
             var ngcl = new List<NoteGroupCollection>();
-            foreach(var suffix in patterns.Select(x => x.Key)) {
-                for(var cur_key_val = 0; cur_key_val < 12; cur_key_val++) {
-                    var cur_key = (NoteType)cur_key_val;
+            foreach(string suffix in patterns.Select(x => x.Key)) {
+                for(int cur_key_val = 0; cur_key_val < 12; cur_key_val++) {
+                    NoteType cur_key = (NoteType)cur_key_val;
                     var pattern = GenPattern(cur_key,suffix);
                     var pattern_inst_notes = GenNotes(pattern);
                     var blocks = pattern_inst_notes
                         .GroupBy(x => Math.Floor((x.FretNum + 0) / (double)VertScaleFretSpan));
-                    var ngc = new NoteGroupCollection(PatternType,cur_key,suffix);
+                    NoteGroupCollection ngc = new(PatternType,cur_key,suffix);
                     ngc.Groups.AddRange(blocks.Select((x,idx) => new NoteGroup(ngc,idx,AddScaleFingering(x))));
                     // foreach(var ng in ngc.Groups) {
                     //     Debug.WriteLine($"{cur_key} {suffix} #{ng.Position}");
@@ -169,7 +169,7 @@ namespace Calcuchord {
         #region Helpers
 
         bool IsOrderedTuning() {
-            for(var i = 1; i < OpenNotes.Length; i++) {
+            for(int i = 1; i < OpenNotes.Length; i++) {
                 if(OpenNotes[i].NoteId < OpenNotes[i - 1].NoteId) {
                     return false;
                 }
@@ -179,11 +179,11 @@ namespace Calcuchord {
         }
 
         IEnumerable<PatternNote> AddScaleFingering(IEnumerable<InstrumentNote> notes) {
-            var min_fret = notes.Where(x => x.FretNum > 0).Min(x => x.FretNum);
-            var max_fret = notes.Where(x => x.FretNum > 0).Max(x => x.FretNum);
+            int min_fret = notes.Where(x => x.FretNum > 0).Min(x => x.FretNum);
+            int max_fret = notes.Where(x => x.FretNum > 0).Max(x => x.FretNum);
             var pnl = new List<PatternNote>();
-            foreach(var note in notes) {
-                var finger = 0;
+            foreach(InstrumentNote note in notes) {
+                int finger = 0;
                 if(note.FretNum >= min_fret) {
                     finger = Math.Min(val1: 4,(max_fret - note.FretNum) + 1);
                 }
@@ -196,8 +196,8 @@ namespace Calcuchord {
 
         IEnumerable<InstrumentNote> GenNotes(NoteType[] pattern) {
             var innl = new List<InstrumentNote>();
-            foreach(var open_note in OpenNotes) {
-                var cur_note = open_note; //.Clone();
+            foreach(InstrumentNote open_note in OpenNotes) {
+                InstrumentNote cur_note = open_note; //.Clone();
                 while(cur_note.FretNum <= FretCount) {
                     if(pattern.Contains(cur_note.Key)) {
                         innl.Add(cur_note);
@@ -211,10 +211,10 @@ namespace Calcuchord {
         }
 
         NoteType[] GenPattern(NoteType key,string suffix) {
-            var offsets = Patterns[PatternType][suffix];
+            int[] offsets = Patterns[PatternType][suffix];
             var ntl = new List<NoteType>();
-            var note_val = (int)key;
-            for(var i = 0; i < offsets.Length; i++) {
+            int note_val = (int)key;
+            for(int i = 0; i < offsets.Length; i++) {
                 note_val += offsets[i % offsets.Length];
                 if(note_val >= 12) {
                     note_val = note_val - 12;

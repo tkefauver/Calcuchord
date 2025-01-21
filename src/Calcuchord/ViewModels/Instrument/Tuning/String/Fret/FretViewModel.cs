@@ -52,7 +52,7 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public FretViewModel(StringRowViewModel parent, InstrumentNote fretNote) : base(parent) {
+        public FretViewModel(StringRowViewModel parent,InstrumentNote fretNote) : base(parent) {
             FretNote = fretNote;
         }
 
@@ -62,7 +62,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Protected Variables
+        #region Protected Methods
 
         #endregion
 

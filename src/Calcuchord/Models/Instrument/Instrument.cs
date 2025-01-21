@@ -42,7 +42,7 @@ namespace Calcuchord {
             Id = Guid.NewGuid().ToString();
         }
 
-        public Instrument(string name, InstrumentType it, int fretCount, int stringCount) : this() {
+        public Instrument(string name,InstrumentType it,int fretCount,int stringCount) : this() {
             Name = name;
             InstrumentType = it;
             FretCount = fretCount;
@@ -63,7 +63,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Protected Variables
+        #region Protected Methods
 
         #endregion
 

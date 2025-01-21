@@ -80,7 +80,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Protected Variables
+        #region Protected Methods
 
         #endregion
 

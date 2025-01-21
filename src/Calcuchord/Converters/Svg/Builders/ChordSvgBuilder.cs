@@ -21,39 +21,46 @@ namespace Calcuchord {
                 body.AppendChild(svg);
             }
 
-            ngl.ForEach(x => AddSvg(Build(x),x));
+            foreach(NoteGroup ng in ngl) {
+                AddSvg(Build(ng),ng);
+            }
 
             string result = doc.DocumentNode.OuterHtml;
-            MpFileIo.WriteTextToFile("/home/tkefauver/Desktop/chords.html",result);
+            string fp = "/home/tkefauver/Desktop/chords.html";
+            //string fp = "chords.html";
+            MpFileIo.WriteTextToFile(fp,result);
+
+            //Process.Start(fp);
+            //Process.Start(new ProcessStartInfo(fp.ToFileSystemUriFromPath()) { WorkingDirectory = "/home/tkefauver/Desktop" });
         }
 
         public override HtmlNode Build(NoteGroup ng) {
-            HtmlDocument doc = new();
+            HtmlNode svg = InitBuild();
 
-            string fg = "#000000"; //ColorPalette.Instance.P[PaletteColorType.Fg];
-            double fret_line_w = 0.25;
-            double fret_line_h = 0.25;
-            double nut_line_h = 1;
-            double str_line_w = 0.25;
-            double str_line_h = 0.25;
+            HtmlNode fret_grid_g = CurrentDoc.CreateElement("g");
+            svg.AppendChild(fret_grid_g);
 
-            double fret_w = 10;
-            double fret_h = 12;
+            HtmlNode bg_g = CurrentDoc.CreateElement("g");
+            svg.AppendChild(bg_g);
 
-            double dot_r = 4;
-            double dot_stroke_w = 1;
-            double bar_h = 9; // r*2 + stroke_w
-            double bar_offset_y = (fret_h - bar_h) / 2d;
+            if(ng.ToString() == "E minor #2") {
 
-            int visible_fret_count = 4;
-            double font_size = 4;
-            string font_family = "Verdana";
+            }
+
+            SvgFlags flags = DefaultSvgFlags; //Prefs.Instance.CurrentSvgFlags;
+
+            double lw = FretLineFixedAxisSize;
+            double fw = FretWidth;
+            double fh = FretHeight;
+            double nh = NutFixedAxisSize;
+
+            var notes = ng.Notes.ToList();
 
             int str_count = ng.Parent.Parent.Parent.StringCount;
             int min_fret = 0;
             int max_fret = 0;
             int min_vis_fret = 0;
-            if(ng.Notes.Where(x => x.FretNum >= 0) is { } real_frets &&
+            if(notes.Where(x => x.FretNum >= 0) is { } real_frets &&
                real_frets.Any()) {
                 min_fret = real_frets.Min(x => x.FretNum);
                 max_fret = real_frets.Max(x => x.FretNum);
@@ -63,114 +70,263 @@ namespace Calcuchord {
                 }
             }
 
-            bool show_header_labels = ng.Notes.Any(x => x.FretNum <= 0);
-            bool show_nut = max_fret - min_vis_fret <= visible_fret_count;
-            bool show_fret_marker = !show_nut;
-            double min_fret_x = show_fret_marker ? fret_w : 0;
-
-            double pad = 0;
-            int rows = visible_fret_count;
-            int cols = str_count;
-            if(show_header_labels) {
-                rows++;
-            }
-
-            if(show_fret_marker) {
-                cols++;
-            }
-
-            double tw = (fret_w * cols) + pad;
-            double th = (fret_h * rows) + pad;
-            double tox = 0;
-            double toy = 0;
-            HtmlNode svg = doc.CreateElement("svg");
-            svg.Attributes.Add("xmlns","http://www.w3.org/2000/svg");
-            svg.Attributes.Add("width",tw);
-            svg.Attributes.Add("height",th);
-
-            // bg
-            HtmlNode bg_g = doc.CreateElement("g");
-            bg_g.Attributes.Add("transform",$"translate({tox},{toy})");
-            svg.AppendChild(bg_g);
-
-
-            if(show_header_labels) {
-                double cur_x = min_fret_x;
-                double cur_y = fret_h; //-1;
-                for(int i = 0; i < str_count; i++) {
-                    if(ng.Notes.FirstOrDefault(x => x.StringNum == i) is { } str_fret &&
-                       str_fret.FretNum <= 0) {
-                        double text_x = cur_x - 2;
-                        double text_y = cur_y;
-                        string str_header_text = str_fret.FretNum < 0 ? "X" : "O";
-                        AddText(doc,bg_g,str_header_text,font_size + 2,font_family,fg,text_x,text_y);
+            int? min_barre_fret_num = null;
+            Dictionary<int,(int min_str,int max_str)> barred_fret_lookup = [];
+            if(notes.Where(x => x.FretNum > 0 && x.FingerNum > 0)
+                   .GroupBy(x => x.FingerNum)
+                   .Where(x => x.Count() > 1) is { } barre_groups &&
+               barre_groups.Any()) {
+                var barre_frets = barre_groups.SelectMany(x => x);
+                if(notes.All(x => x.FretNum != 0)) {
+                    // only show shadow when no open notes
+                    int min_barre_f_num = barre_frets.Min(x => x.FretNum);
+                    if(min_barre_f_num == min_vis_fret) {
+                        min_barre_fret_num = min_barre_f_num;
                     }
+                }
 
-                    cur_x += fret_w;
+                var barre_fret_nums = barre_frets.Select(x => x.FretNum).Distinct();
+                foreach(int barre_fret_num in barre_fret_nums) {
+                    int min_str = barre_frets.Where(x => x.FretNum == barre_fret_num).Min(x => x.StringNum);
+                    int max_str = barre_frets.Where(x => x.FretNum == barre_fret_num).Max(x => x.StringNum);
+                    barred_fret_lookup.Add(barre_fret_num,(min_str,max_str));
                 }
             }
 
-            if(show_fret_marker) {
-                double text_x = 0;
-                double text_y = (fret_h / 2d) - (font_size / 2d);
-                string marker_text = $"{min_vis_fret}fr";
-                AddText(doc,bg_g,marker_text,font_size,font_family,fg,text_x,text_y);
+            bool show_header_labels = notes.Any(x => x.FretNum <= 0);
+            bool show_nut = max_fret < VisibleFretCount;
+            bool show_fret_marker = !show_nut;
+            if(show_nut) {
+                min_fret = 0;
             }
 
-            double curx = min_fret_x;
-            double cury = show_header_labels ? fret_h : 0;
-            // +2 header, footer
-            for(int vis_fret_num = 0; vis_fret_num < visible_fret_count; vis_fret_num++) {
-                int fret_num = min_fret + vis_fret_num;
-                curx = min_fret_x;
-                for(int str_num = 0; str_num < str_count; str_num++) {
-                    AddRect(doc,bg_g,"transparent",fg,curx,cury,fret_w,fret_h,fret_line_w);
+            double min_fret_x = fw + 2; //show_fret_marker ? fw : 0;
 
-                    if(fret_num == 0 && show_nut) {
-                        AddRect(doc,bg_g,fg,"transparent",curx,cury,fret_w,nut_line_h,fret_line_w);
+            // +2 header, footer
+            int rows = VisibleFretCount + 2;
+
+            // +1 fret label
+            int cols = str_count + 1;
+
+            double tw = fw * cols;
+            double th = fh * rows;
+            // double tox = 0;
+            // double toy = 0;
+
+            double header_h = fh + 0.25;
+            double curx = min_fret_x;
+
+            double cury = header_h; //show_header_labels ? header_h : 0;
+            if(flags.HasFlag(SvgFlags.Frets)) {
+                double fs = BodyFontSize;
+                double offset_x = fs * 1.25d;
+                double offset_y = fs / 3d;
+                double marker_x = fw - offset_x;
+                double marker_y = cury + offset_y + (fh / 2d);
+
+                for(int i = 0; i < VisibleFretCount; i++) {
+                    // fret num label
+                    int fret_num = min_vis_fret + i;
+                    string label_text = fret_num.ToString();
+                    double cur_x = marker_x;
+                    if(label_text.Length > 1) {
+                        cur_x -= offset_x / 2d;
                     }
 
-                    if(fret_num > 0 &&
-                       ng.Notes.FirstOrDefault(x => x.StringNum == str_num && x.FretNum == fret_num) is { } fret_note) {
-                        double cur_r = dot_r;
-                        bool is_root = fret_note.IsRoot;
-                        // TODO add user thing
-                        bool is_user = false; //
-                        int finger_num = fret_note.FingerNum;
-                        string dot_bg = FingerBg[finger_num];
-                        string dot_fg = FingerFg[finger_num];
-                        var bar_notes = ng.Notes.Where(x => x.FretNum == fret_num && x.FingerNum == finger_num)
-                            .OrderBy(x => x.StringNum).ToList();
-                        if(bar_notes.Count > 1) {
-                            bool is_head = bar_notes.First() == fret_note;
-                            bool is_tail = bar_notes.Last() == fret_note;
+                    AddText(bg_g,label_text,fs,Fg,cur_x,marker_y);
+                    marker_y += fh;
+                }
+            } else if(show_fret_marker) {
+                double marker_x = 0;
+                double marker_y = cury + (fh / 2d) + (HeaderFontSize / 2d);
+                string marker_text = $"{min_vis_fret}fr";
+                // open label
+                AddText(bg_g,marker_text,HeaderFontSize,Fg,marker_x,marker_y);
+            }
 
-                            double bar_y = cury + bar_offset_y;
-                            AddRect(doc,bg_g,dot_bg,"transparent",curx,bar_y,fret_w,bar_h,sw: 0);
+            if(show_header_labels) {
+                double header_x = min_fret_x;
+                double header_y = fh; //-1;
+                for(int i = 0; i < str_count; i++) {
+                    if(notes.FirstOrDefault(x => x.StringNum == i) is { } str_fret &&
+                       str_fret.FretNum <= 0) {
+                        bool is_mute = str_fret.FretNum < 0;
+                        if(is_mute) {
+                            double mute_size = 3;
+                            double margin_y = 1;
+                            double x1 = header_x - (mute_size / 2d);
+                            double y1 = header_y - mute_size - margin_y;
+                            double x2 = header_x + (mute_size / 2d);
+                            double y2 = header_y - margin_y;
+                            // draw \
+                            AddLine(bg_g,Fg,x1,y1,x2,y2,lw * 2d);
+                            // draw /
+                            AddLine(bg_g,Fg,x2,y1,x1,y2,lw * 2d);
+                        } else {
+                            // open 'o'
+                            double open_r = 2;
+                            double x = header_x;
+                            double y = header_y - (fh / 4d);
+                            double width_mul =
+                                str_fret.IsRoot && flags.HasFlag(SvgFlags.Roots) ? 5 : 1;
+                            AddCircle(bg_g,Transparent,Fg,x,y,open_r,lw * width_mul);
+                        }
+                    }
+
+                    header_x += fw;
+                }
+            }
+
+            if(flags.HasFlag(SvgFlags.Tuning)) {
+                var open_notes = ng.Parent.Parent.OpenNotes;
+                double fs = BodyFontSize;
+                double offset_x = fs / 2;
+                double cur_x = min_fret_x - offset_x;
+                double cur_y = th - (fh / 2d);
+
+                for(int i = 0; i < str_count; i++) {
+                    string label_text = open_notes[i].FullName;
+                    AddText(bg_g,label_text,fs,Fg,cur_x,cur_y);
+                    cur_x += fw;
+                }
+            }
+
+            (int min_str,int max_str)? cur_bar_extent = null;
+            PatternNote last_barre_note = null;
+
+            for(int vis_fret_num = 0; vis_fret_num < VisibleFretCount; vis_fret_num++) {
+                int fret_num = min_vis_fret + vis_fret_num;
+                curx = min_fret_x;
+                for(int str_num = 0; str_num < str_count; str_num++) {
+                    double cx = curx;
+                    double cy = cury + (fh / 2d); //(fh + cury) - (fh / 2d);
+                    double bar_y = cy - (BarHeight / 2d);
+                    double dot_r = DotRadius;
+                    PatternNote fret_note = notes.Where(x => x.FretNum > 0)
+                        .FirstOrDefault(x => x.StringNum == str_num && x.FretNum == fret_num);
+                    string fret_bg = null;
+                    string fret_fg = null;
+
+                    PatternNote primary_note = fret_note ?? last_barre_note;
+                    if(primary_note != null) {
+                        fret_bg = flags.HasFlag(SvgFlags.Colors) ? FingerBg[primary_note.FingerNum] : Fg;
+                        fret_fg = flags.HasFlag(SvgFlags.Colors) ? FingerFg[primary_note.FingerNum] : Bg;
+                    }
+
+                    if(str_count == 1 || str_num < str_count - 1) {
+                        // fret/string cell
+                        AddRect(fret_grid_g,Transparent,Fg,curx,cury,fw,fh,lw);
+
+                        if(fret_num == 1 && show_nut) {
+                            // nut line
+                            AddRect(fret_grid_g,Fg,Transparent,curx,cury,fw,nh,lw);
+                        }
+                    }
+
+                    bool is_barred_fret = false;
+                    if(barred_fret_lookup.TryGetValue(fret_num,out (int min_str,int max_str) bar_extent) &&
+                       str_num >= bar_extent.min_str &&
+                       str_num < bar_extent.max_str) {
+                        if(fret_note != null) {
+                            last_barre_note = fret_note;
                         }
 
-                        double cx = curx + (fret_w / 2d);
-                        double cy = cury + (fret_h / 2d);
+                        cur_bar_extent = bar_extent;
+                        is_barred_fret = true;
+                    }
 
-                        if(is_root) {
-                            AddCircle(doc,bg_g,RootBg,cx,cy,dot_r);
-                            dot_r -= dot_stroke_w;
+                    if(!is_barred_fret &&
+                       min_barre_fret_num.HasValue && min_barre_fret_num.Value == fret_num) {
+                        if(str_num < str_count - 1) {
+                            // shadow rect
+                            AddRect(bg_g,BarShadow,Transparent,curx,bar_y,fw,BarHeight,sw: 0);
+                        }
+
+                        if(fret_note == null &&
+                           (str_num == 0 || str_num == str_count - 1)) {
+                            // shadow edge
+                            HtmlNode shadow_g = CurrentDoc.CreateElement("g");
+                            shadow_g.Attributes.Add("transform",$"translate({cx},{cy})");
+                            bg_g.AppendChild(shadow_g);
+                            HtmlNode shadow_path = CurrentDoc.CreateElement("path");
+                            shadow_path.Attributes.Add("fill",BarShadow);
+                            double angle = str_num == 0 ? -90 : 90;
+                            shadow_path.Attributes.Add("transform",$"rotate({angle})");
+                            double sh = BarHeight;
+                            double shh = BarHeight / 2d;
+                            shadow_path.Attributes.Add("d",$"M 0, 0 m -{shh}, 0 a {shh},{shh} 0 1,1 {sh},0");
+                            shadow_g.AppendChild(shadow_path);
+                        }
+                    }
+
+                    if(last_barre_note != null) {
+                        bool is_tail = cur_bar_extent.Value.max_str == str_num;
+                        if(is_tail) {
+                            last_barre_note = null;
+                            cur_bar_extent = null;
+                        } else {
+                            // bar rect
+                            AddRect(bg_g,fret_bg,Transparent,curx,bar_y,fw,BarHeight,sw: 0);
+                            last_barre_note = fret_note ?? last_barre_note;
+                        }
+                    }
+
+                    if(fret_note != null) {
+                        bool is_root = fret_note.IsRoot;
+                        // TODO add user thing
+                        bool is_user = true; //
+                        int finger_num = fret_note.FingerNum;
+                        string dot_fg = FingerFg[finger_num];
+
+                        if(is_root && flags.HasFlag(SvgFlags.Roots)) {
+                            // root outer circle
+                            AddCircle(bg_g,RootBg,Transparent,cx,cy,dot_r,sw: 0);
+                            dot_r -= DotStrokeWidth;
                         }
 
                         if(is_user) {
-                            AddCircle(doc,bg_g,UserBg,cx,cy,dot_r);
-                            dot_r -= dot_stroke_w;
+                            // user outer circle
+                            AddCircle(bg_g,UserBg,Transparent,cx,cy,dot_r,sw: 0);
+                            dot_r -= DotStrokeWidth;
                         }
 
-                        AddCircle(doc,bg_g,dot_bg,cx,cy,dot_r);
-                        AddText(doc,bg_g,finger_num.ToString(),font_size,font_family,dot_fg,cx - 1,cy + 1);
+                        // finger circle
+                        AddCircle(bg_g,fret_bg,Transparent,cx,cy,dot_r,sw: 0);
+
+                        // finger num text
+                        string dot_text = null;
+                        double tx = cx;
+                        double ty = cy;
+                        if(flags.HasFlag(SvgFlags.Fingers)) {
+                            dot_text = finger_num.ToString();
+                            tx -= 1;
+                            ty += 1.5;
+                        } else if(flags.HasFlag(SvgFlags.Notes)) {
+                            dot_text = fret_note.Name;
+                            tx -= 1.5;
+                            if(dot_text.Length == 2) {
+                                tx -= 1;
+                            }
+
+                            ty += 1;
+                        }
+
+                        if(dot_text != null) {
+                            AddText(bg_g,dot_text,BodyFontSize,fret_fg,tx,ty);
+                        }
+
                     }
 
-                    curx += fret_w;
+                    curx += fw;
                 }
 
-                cury += fret_h;
+                cury += fh;
             }
+
+            svg.Attributes.Add("width",tw);
+            svg.Attributes.Add("height",th);
+
+            //bg_g.Attributes.Add("transform",$"translate({tox},{toy})");
 
             return svg;
         }

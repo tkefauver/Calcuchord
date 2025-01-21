@@ -31,7 +31,7 @@ namespace Calcuchord {
         [IgnoreDataMember]
         static string PrefsFilePath {
             get {
-                var fp = "appstate.json";
+                string fp = "appstate.json";
                 if(_prefsFilePath == null) {
                     if(Application.Current is { } ac &&
                        ac.ApplicationLifetime is ISingleViewApplicationLifetime) {
@@ -75,7 +75,7 @@ namespace Calcuchord {
         public static void Init() {
             if(Application.Current != null &&
                Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime) {
-                var suspension = new AutoSuspendHelper(lifetime);
+                AutoSuspendHelper suspension = new(lifetime);
                 RxApp.SuspensionHost.CreateNewAppState = () => new Prefs();
                 RxApp.SuspensionHost.SetupDefaultSuspendResume(Driver);
                 suspension.OnFrameworkInitializationCompleted();
@@ -97,6 +97,9 @@ namespace Calcuchord {
         #region Properties
 
         #region Members
+
+        [DataMember]
+        public SvgFlags CurrentSvgFlags { get; set; } = SvgBuilderBase.DefaultSvgFlags;
 
         [DataMember]
         public bool IsThemeDark { get; set; }
@@ -171,7 +174,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Protected Variables
+        #region Protected Methods
 
         #endregion
 

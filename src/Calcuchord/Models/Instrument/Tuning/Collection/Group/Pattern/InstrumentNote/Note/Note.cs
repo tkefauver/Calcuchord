@@ -29,9 +29,9 @@ namespace Calcuchord {
             return (int)nt.Key + (nt.Register * MAX_NOTE_TYPE);
         }
 
-        static Note FromId(int id) {
-            var register = (int)Math.Floor(id / (double)MAX_NOTE_TYPE);
-            var nt = (NoteType)(id - (register * MAX_NOTE_TYPE));
+        static Note GetNote(int id) {
+            int register = (int)Math.Floor(id / (double)MAX_NOTE_TYPE);
+            NoteType nt = (NoteType)(id - (register * MAX_NOTE_TYPE));
             return new(nt,register);
         }
 
@@ -97,7 +97,7 @@ namespace Calcuchord {
 
         [IgnoreDataMember]
         public Note Next =>
-            FromId(NoteId + 1);
+            GetNote(NoteId + 1);
 
         #endregion
 
@@ -121,6 +121,10 @@ namespace Calcuchord {
 
         #region Public Methods
 
+        public Note Offset(int offset) {
+            return GetNote(Math.Max(val1: 0,NoteId + offset));
+        }
+
         public override string ToString() {
             return FullName;
         }
@@ -131,7 +135,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Protected Variables
+        #region Protected Methods
 
         #endregion
 

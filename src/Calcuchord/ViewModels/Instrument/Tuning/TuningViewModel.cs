@@ -112,7 +112,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Protected Variables
+        #region Protected Methods
 
         #endregion
 
@@ -185,7 +185,7 @@ namespace Calcuchord {
                             foreach((int f,int str_num) in pos.real_frets.WithIndex()) {
                                 ng.Notes.Add(
                                     new(
-                                        pos.fingers[str_num],f,str_num,tuning.OpenNotes[str_num].Key,
+                                        pos.fingers[str_num],f,str_num,tuning.OpenNotes[str_num].Offset(f).Key,
                                         tuning.OpenNotes[str_num].Register));
                             }
 

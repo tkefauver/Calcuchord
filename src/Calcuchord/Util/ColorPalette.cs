@@ -85,16 +85,16 @@ namespace Calcuchord {
                             ("#FFFFFF","#FFFFFF")
                         }, {
                             PaletteColorType.Finger1Bg,
-                            ("#BFFF00","#BFFF00")
+                            ("#77DD77","#77DD77")
                         }, {
                             PaletteColorType.Finger1Fg,
-                            ("#000000","#000000")
+                            ("#FFFFFF","#FFFFFF")
                         }, {
                             PaletteColorType.Finger2Bg,
                             ("#21CEE1","#21CEE1")
                         }, {
                             PaletteColorType.Finger2Fg,
-                            ("#000000","#000000")
+                            ("#FFFFFF","#FFFFFF")
                         }, {
                             PaletteColorType.Finger3Bg,
                             ("#A240E8","#A240E8")

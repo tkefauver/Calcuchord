@@ -89,7 +89,7 @@ namespace Calcuchord {
             Parent = parent;
 
             foreach(var col_kvp in Collections) {
-                foreach(var col in col_kvp.Value) {
+                foreach(NoteGroupCollection col in col_kvp.Value) {
                     col.SetParent(this);
                 }
             }
@@ -101,7 +101,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Protected Variables
+        #region Protected Methods
 
         #endregion
 

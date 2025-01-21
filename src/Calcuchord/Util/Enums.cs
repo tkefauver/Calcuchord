@@ -1,4 +1,18 @@
+using System;
+
 namespace Calcuchord {
+    [Flags]
+    public enum SvgFlags {
+        None = 0,
+        Fingers = 1,
+        Notes = 2,
+        Roots = 4,
+        Matches = 8,
+        Colors = 16,
+        Frets = 32,
+        Tuning = 64
+    }
+
     public enum NoteType {
         C,
         Db,

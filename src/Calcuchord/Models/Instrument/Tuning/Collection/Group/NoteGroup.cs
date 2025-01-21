@@ -35,6 +35,14 @@ namespace Calcuchord {
         public NoteType Key =>
             Parent.Key;
 
+        [IgnoreDataMember]
+        public string Name =>
+            $"{Key} {Suffix}";
+
+        [IgnoreDataMember]
+        public string FullName =>
+            $"{Name} #{Position + 1}";
+
         #endregion
 
         #endregion
@@ -60,18 +68,18 @@ namespace Calcuchord {
 
         public void SetParent(NoteGroupCollection parent) {
             Parent = parent;
-            foreach(var pn in Notes) {
+            foreach(PatternNote pn in Notes) {
                 pn.SetParent(this);
             }
         }
 
         public override string ToString() {
-            return $"{Key} {Suffix} #{Position}";
+            return FullName;
         }
 
         #endregion
 
-        #region Protected Variables
+        #region Protected Methods
 
         #endregion
 

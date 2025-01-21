@@ -33,7 +33,8 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public NoteGroupCollection() { }
+        public NoteGroupCollection() {
+        }
 
         public NoteGroupCollection(MusicPatternType pt,NoteType key,string suffix) {
             PatternType = pt;
@@ -47,14 +48,14 @@ namespace Calcuchord {
 
         public void SetParent(InstrumentTuning parent) {
             Parent = parent;
-            foreach(var g in Groups) {
+            foreach(NoteGroup g in Groups) {
                 g.SetParent(this);
             }
         }
 
         #endregion
 
-        #region Protected Variables
+        #region Protected Methods
 
         #endregion
 
