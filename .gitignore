@@ -456,3 +456,4 @@ $RECYCLE.BIN/
 artwork/
 *.keystore
 src/Calcuchord.Android/scripts/publish.sh
+src/Calcuchord.Android/scripts/publish2.sh
