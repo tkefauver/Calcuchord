@@ -1,8 +1,10 @@
+#nullable enable
 using System.Runtime.Serialization;
 
 namespace Calcuchord {
     [DataContract]
     public class InstrumentNote : Note {
+
         #region Private Variables
 
         #endregion
@@ -12,6 +14,10 @@ namespace Calcuchord {
         #endregion
 
         #region Statics
+
+        public static InstrumentNote Mute(int stringNum) {
+            return new(-1,stringNum,null);
+        }
 
         #endregion
 
@@ -46,10 +52,10 @@ namespace Calcuchord {
         public InstrumentNote() {
         }
 
-        public InstrumentNote(int fretNum,int stringNum,Note n) : this(fretNum,stringNum,n.Key,n.Register) {
+        public InstrumentNote(int fretNum,int stringNum,Note? n) : this(fretNum,stringNum,n?.Key,n?.Register) {
         }
 
-        public InstrumentNote(int fretNum,int stringNum,NoteType nt,int register) : base(nt,register) {
+        public InstrumentNote(int fretNum,int stringNum,NoteType? nt,int? register) : base(nt,register) {
             FretNum = fretNum;
             StringNum = stringNum;
         }
@@ -75,5 +81,6 @@ namespace Calcuchord {
         #region Private Methods
 
         #endregion
+
     }
 }

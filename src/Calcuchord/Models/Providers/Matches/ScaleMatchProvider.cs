@@ -30,7 +30,7 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public ScaleMatchProvider(InstrumentTuning tuning) : base(tuning) {
+        public ScaleMatchProvider(Tuning tuning) : base(tuning) {
         }
 
         #endregion

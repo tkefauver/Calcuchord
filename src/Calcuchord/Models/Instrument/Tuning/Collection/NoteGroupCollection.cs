@@ -25,7 +25,7 @@ namespace Calcuchord {
         #region Ignored
 
         [IgnoreDataMember]
-        public InstrumentTuning Parent { get; set; }
+        public Tuning Parent { get; set; }
 
         #endregion
 
@@ -46,7 +46,7 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public void SetParent(InstrumentTuning parent) {
+        public void SetParent(Tuning parent) {
             Parent = parent;
             foreach(NoteGroup g in Groups) {
                 g.SetParent(this);

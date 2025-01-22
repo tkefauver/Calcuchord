@@ -1,8 +1,11 @@
+using System.Collections.Generic;
 using System.Linq;
 using HtmlAgilityPack;
+using MonkeyPaste.Common;
 
 namespace Calcuchord {
     public abstract class SvgBuilderBase {
+
         #region Private Variables
 
         #endregion
@@ -30,7 +33,10 @@ namespace Calcuchord {
         #region Properties
 
         protected HtmlDocument CurrentDoc { get; private set; }
+        protected string DefaultFontFamily => "Verdana";
 
+
+        #region Colors
 
         protected string[] FingerFg { get; }
         protected string[] FingerBg { get; }
@@ -58,6 +64,10 @@ namespace Calcuchord {
 
         protected string Transparent => "transparent";
 
+        #endregion
+
+        #region Measurements
+
         protected double FretLineFixedAxisSize => 0.25;
         protected double NutFixedAxisSize => 1;
 
@@ -72,9 +82,10 @@ namespace Calcuchord {
 
         protected double BodyFontSize => 4;
         protected double HeaderFontSize => 6;
-        protected string DefaultFontFamily => "Verdana";
 
         protected int VisibleFretCount => 4;
+
+        #endregion
 
         #endregion
 
@@ -109,9 +120,45 @@ namespace Calcuchord {
 
         public abstract HtmlNode Build(NoteGroup ng);
 
+        public void Test(Tuning tuning,IEnumerable<NoteGroup> ngl) {
+            HtmlDocument doc = new();
+
+            HtmlNode body = doc.CreateElement("body");
+            doc.DocumentNode.AppendChild(body);
+
+            void AddSvg(HtmlNode svg,NoteGroup ng) {
+                HtmlNode title = doc.CreateElement("span");
+                title.InnerHtml = ng.ToString();
+
+                body.AppendChild(doc.CreateElement("br"));
+                body.AppendChild(title);
+                body.AppendChild(doc.CreateElement("br"));
+                body.AppendChild(svg);
+            }
+
+            foreach(NoteGroup ng in ngl) {
+                AddSvg(Build(ng),ng);
+            }
+
+            string result = doc.DocumentNode.OuterHtml;
+            string fn =
+                $"{tuning.ToString().Replace("|"," ")}_{GetType().Name.Replace("SvgBuilder",string.Empty).ToLower()}";
+            string fp = $"/home/tkefauver/Desktop/{fn}.html";
+            MpFileIo.WriteTextToFile(fp,result);
+        }
+
         #endregion
 
         #region Protected Methods
+
+        protected bool IsUserNote(InstrumentNote note) {
+            if(MainViewModel.Instance is not { } mvm ||
+               mvm.SelectedTuning is not { } stvm ||
+               stvm.SelectedFrets.All(x => x.StringNum != note.StringNum && x.FretNum != note.FretNum)) {
+                return false;
+            }
+            return true;
+        }
 
         protected HtmlNode InitBuild() {
             CurrentDoc = new();
@@ -128,7 +175,13 @@ namespace Calcuchord {
             double x,
             double y,
             bool isBold = false,
-            string classes = null) {
+            string classes = null,
+            bool shadow = false) {
+            if(shadow) {
+                string shadow_fill = fill == "#FFFFFF" ? "#000000" : "#FFFFFF";
+                double offset = 0.25; //fs / 16d;
+                AddText(cntr,text,fs,shadow_fill,x + offset,y + offset,isBold,classes);
+            }
             HtmlNode text_elm = CurrentDoc.CreateElement("text");
             text_elm.Attributes.Add("font-size",fs);
             text_elm.Attributes.Add("font-family",DefaultFontFamily);
@@ -144,6 +197,8 @@ namespace Calcuchord {
             text_elm.Attributes.Add("x",x);
             text_elm.Attributes.Add("y",y);
             text_elm.InnerHtml = text;
+
+
             cntr.AppendChild(text_elm);
         }
 
@@ -155,7 +210,13 @@ namespace Calcuchord {
             double y,
             double r,
             double sw,
-            string classes = null) {
+            string classes = null,
+            bool shadow = false) {
+            if(shadow) {
+                string shadow_fill = fill == Fg ? Bg : "#000000";
+                double offset = 0.25; //fs / 16d;
+                AddCircle(cntr,shadow_fill,stroke,x + offset,y + offset,r,sw,classes,false);
+            }
             HtmlNode circle = CurrentDoc.CreateElement("circle");
             circle.Attributes.Add("fill",fill);
             circle.Attributes.Add("stroke",stroke);
@@ -223,5 +284,6 @@ namespace Calcuchord {
         #region Private Methods
 
         #endregion
+
     }
 }

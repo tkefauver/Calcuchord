@@ -1,10 +1,15 @@
 namespace Calcuchord {
     public class FretViewModel : ViewModelBase<StringRowViewModel> {
+
         #region Private Variables
 
         #endregion
 
         #region Constants
+
+        public const int OPEN_FRET_NUM = 0;
+        public const int MUTE_FRET_NUM = -1;
+        public const int UNKNOWN_FRET_NUM = -2;
 
         #endregion
 
@@ -36,11 +41,49 @@ namespace Calcuchord {
 
         #region State
 
+        public bool IsInUnknownState { get; set; }
+        public bool IsInMuteState { get; set; }
+
+        public bool IsOpenFret =>
+            FretNum == 0;
+
+        public int WorkingFretNum {
+            get {
+                if(!IsOpenFret) {
+                    return FretNum;
+                }
+                if(IsInMuteState) {
+                    return MUTE_FRET_NUM;
+                }
+                if(IsInUnknownState) {
+                    return UNKNOWN_FRET_NUM;
+                }
+                return FretNum;
+            }
+        }
+
+        public bool IsDefaultState {
+            get {
+                if(IsOpenFret) {
+                    return WorkingFretNum == OPEN_FRET_NUM;
+                }
+                return true;
+            }
+        }
+
+        public bool IsSelected { get; set; }
+
         #endregion
 
         #region Model
 
-        public InstrumentNote FretNote { get; private set; }
+        public int FretNum =>
+            FretNote.FretNum;
+
+        public int StringNum =>
+            FretNote.StringNum;
+
+        public InstrumentNote FretNote { get; }
 
         #endregion
 
@@ -73,5 +116,6 @@ namespace Calcuchord {
         #region Commands
 
         #endregion
+
     }
 }

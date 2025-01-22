@@ -24,7 +24,7 @@ namespace Calcuchord {
             Tuning.Collections[PatternType];
 
         protected abstract MusicPatternType PatternType { get; }
-        protected InstrumentTuning Tuning { get; }
+        protected Tuning Tuning { get; }
 
         #endregion
 
@@ -34,7 +34,7 @@ namespace Calcuchord {
 
         #region Constructors
 
-        protected MatchProviderBase(InstrumentTuning tuning) {
+        protected MatchProviderBase(Tuning tuning) {
             Tuning = tuning;
         }
 

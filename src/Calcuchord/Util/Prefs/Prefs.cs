@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -121,6 +122,9 @@ namespace Calcuchord {
         #region Ignored
 
         [IgnoreDataMember]
+        bool IsSavingIgnored { get; set; }
+
+        [IgnoreDataMember]
         Dictionary<MusicPatternType,ObservableCollection<string>> _bookmarkLookup;
 
         [IgnoreDataMember]
@@ -156,7 +160,6 @@ namespace Calcuchord {
 
             Instance = this;
 
-
             PropertyChanged += PropertyChanged_OnPropertyChanged;
             Instruments.CollectionChanged += Coll_OnCollectionChanged;
             ChordBookmarkIds.CollectionChanged += Coll_OnCollectionChanged;
@@ -167,7 +170,19 @@ namespace Calcuchord {
 
         #region Public Methods
 
+        public void SyncAndSave() {
+            IsSavingIgnored = true;
+            Instruments.Clear();
+            IsSavingIgnored = false;
+            Instruments.AddRange(MainViewModel.Instance.Instruments.Select(x => x.Instrument));
+        }
+
         public void Save() {
+            if(IsSavingIgnored) {
+                Debug.WriteLine("Save ignored");
+                return;
+            }
+
             Driver?.SaveState(this);
             Debug.WriteLine($"{DateTime.Now} prefs saved");
         }

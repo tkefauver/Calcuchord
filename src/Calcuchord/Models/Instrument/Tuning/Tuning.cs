@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
+using MonkeyPaste.Common;
 
 namespace Calcuchord {
     [DataContract]
-    public class InstrumentTuning {
+    public class Tuning {
         #region Properties
 
         #region Members
@@ -45,6 +46,10 @@ namespace Calcuchord {
         #region Ignored
 
         [IgnoreDataMember]
+        public int FretCount =>
+            Parent.FretCount - CapoFretNum;
+
+        [IgnoreDataMember]
         Dictionary<MusicPatternType,ObservableCollection<NoteGroupCollection>> _collections;
 
         [IgnoreDataMember]
@@ -71,14 +76,16 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public InstrumentTuning() {
+        public Tuning() {
             Id = Guid.NewGuid().ToString();
         }
 
-        public InstrumentTuning(string name,bool isDefault,bool isReadOnly) {
+
+        public Tuning(string name,bool isDefault,bool isReadOnly,int capoNum = 0) {
             Name = name;
             IsDefault = isDefault;
             IsReadOnly = isReadOnly;
+            CapoFretNum = capoNum;
         }
 
         #endregion
@@ -93,6 +100,10 @@ namespace Calcuchord {
                     col.SetParent(this);
                 }
             }
+        }
+
+        public void ClearCollections() {
+            Collections.ForEach(x => x.Value.Clear());
         }
 
         public override string ToString() {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -13,6 +14,7 @@ using Newtonsoft.Json;
 
 namespace Calcuchord {
     public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
+
         #region Private Variables
 
         #endregion
@@ -36,6 +38,14 @@ namespace Calcuchord {
         #endregion
 
         #region View Models
+
+        public ObservableCollection<StringRowViewModel> StringRows { get; } = [];
+
+        public IEnumerable<FretViewModel> AllFrets =>
+            StringRows.SelectMany(x => x.Frets);
+
+        public IEnumerable<FretViewModel> SelectedFrets =>
+            AllFrets.Where(x => x.IsSelected);
 
         #endregion
 
@@ -68,7 +78,7 @@ namespace Calcuchord {
 
         #region Model
 
-        public InstrumentTuning Tuning { get; }
+        public Tuning Tuning { get; }
 
         #endregion
 
@@ -80,9 +90,12 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public TuningViewModel(InstrumentViewModel parent,InstrumentTuning tuning) : base(parent) {
+        public TuningViewModel(InstrumentViewModel parent,Tuning tuning) : base(parent) {
             PropertyChanged += InstrumentTuningViewModel_OnPropertyChanged;
             Tuning = tuning;
+            Tuning.SetParent(parent.Instrument);
+
+            Tuning.OpenNotes.ForEach(x => StringRows.Add(new(this,x)));
         }
 
         #endregion
@@ -102,12 +115,10 @@ namespace Calcuchord {
             }
 
             if(needs_save) {
-                Prefs.Instance.Save();
+                Prefs.Instance.SyncAndSave();
             }
 
             Parent.Instrument.RefreshModelTree();
-
-
         }
 
         #endregion
@@ -121,6 +132,10 @@ namespace Calcuchord {
         void InstrumentTuningViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
                 case nameof(IsSelected):
+                    if(IsSelected) {
+                        MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.SelectedTuning));
+                    }
+
                     break;
             }
         }
@@ -129,6 +144,7 @@ namespace Calcuchord {
         async Task CreateChordsAsync() {
             bool from_file = Tuning.IsDefault && (Tuning.Parent.InstrumentType == InstrumentType.Guitar ||
                                                   Tuning.Parent.InstrumentType == InstrumentType.Ukulele);
+            from_file = false;
             IEnumerable<NoteGroupCollection> chords = null;
             if(from_file) {
                 chords = GenFromFile(Tuning);
@@ -137,31 +153,15 @@ namespace Calcuchord {
             }
 
             Tuning.Chords.AddRange(chords);
-
-            Debug.WriteLine(
-                $"{chords.SelectMany(x => x.Groups).Count()} chords {(from_file ? " loaded from file" : " generated")} for {Tuning}");
-
-            NoteGroup test_c = Tuning.Chords.FirstOrDefault(x => x.Key == NoteType.C && x.Suffix.ToLower() == "major")
-                .Groups
-                .FirstOrDefault(x => x.Position == 0);
-
-            NoteGroup test_fmaj = Tuning.Chords
-                .FirstOrDefault(x => x.Key == NoteType.F && x.Suffix.ToLower() == "major")
-                .Groups
-                .FirstOrDefault(x => x.Position == 0);
-
-            NoteGroup test_emaj4 = Tuning.Chords
-                .FirstOrDefault(x => x.Key == NoteType.E && x.Suffix.ToLower() == "major")
-                .Groups
-                .FirstOrDefault(x => x.Position == 3);
             return;
 
-            async Task<IEnumerable<NoteGroupCollection>> GenFromPatternsAsync(InstrumentTuning tuning) {
-                await Task.Delay(1);
-                return [];
+            async Task<IEnumerable<NoteGroupCollection>> GenFromPatternsAsync(Tuning tuning) {
+                PatternGen pg = new(MusicPatternType.Chords,tuning);
+                var result = await pg.GenerateAsync();
+                return result;
             }
 
-            IEnumerable<NoteGroupCollection> GenFromFile(InstrumentTuning tuning) {
+            IEnumerable<NoteGroupCollection> GenFromFile(Tuning tuning) {
                 string json = MpAvFileIo.ReadTextFromResource(
                     $"avares://Calcuchord/Assets/Text/{tuning.Parent.InstrumentType.ToString().ToLower()}.json");
                 ChordsJsonRoot chordsJsonRoot = JsonConvert.DeserializeObject<ChordsJsonRoot>(json);
@@ -201,19 +201,17 @@ namespace Calcuchord {
         }
 
         async Task CreateScalesAsync() {
-            await Task.Delay(1);
             PatternGen pg = new(MusicPatternType.Scales,Tuning);
-            var scales = pg.Generate();
+            var scales = await pg.GenerateAsync();
             Tuning.Scales.AddRange(scales);
             Debug.WriteLine(
                 $"{scales.SelectMany(x => x.Groups).Count()} scales generated for {Tuning}");
 
             pg = new(MusicPatternType.Modes,Tuning);
-            var modes = pg.Generate();
+            var modes = await pg.GenerateAsync();
             Tuning.Modes.AddRange(modes);
             Debug.WriteLine(
                 $"{modes.SelectMany(x => x.Groups).Count()} modes generated for {Tuning}");
-
         }
 
         #endregion
@@ -221,5 +219,6 @@ namespace Calcuchord {
         #region Commands
 
         #endregion
+
     }
 }

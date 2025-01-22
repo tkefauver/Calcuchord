@@ -20,13 +20,16 @@ namespace Calcuchord {
         public InstrumentType InstrumentType { get; set; }
 
         [DataMember]
+        public double? NeckLengthInInches { get; set; }
+
+        [DataMember]
         public int FretCount { get; set; }
 
         [DataMember]
         public int StringCount { get; set; }
 
         [DataMember]
-        public ObservableCollection<InstrumentTuning> Tunings { get; set; } = [];
+        public ObservableCollection<Tuning> Tunings { get; set; } = [];
 
         #endregion
 
@@ -42,11 +45,13 @@ namespace Calcuchord {
             Id = Guid.NewGuid().ToString();
         }
 
-        public Instrument(string name,InstrumentType it,int fretCount,int stringCount) : this() {
+        public Instrument(string name,InstrumentType it,int fretCount,int stringCount,
+            double? neckLengthInInches = null) : this() {
             Name = name;
             InstrumentType = it;
             FretCount = fretCount;
             StringCount = stringCount;
+            NeckLengthInInches = neckLengthInInches;
         }
 
         #endregion

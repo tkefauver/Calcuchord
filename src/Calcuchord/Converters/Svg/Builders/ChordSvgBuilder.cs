@@ -1,38 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using HtmlAgilityPack;
-using MonkeyPaste.Common;
 
 namespace Calcuchord {
     public class ChordSvgBuilder : SvgBuilderBase {
-        public void Test(IEnumerable<NoteGroup> ngl) {
-            HtmlDocument doc = new();
 
-            HtmlNode body = doc.CreateElement("body");
-            doc.DocumentNode.AppendChild(body);
-
-            void AddSvg(HtmlNode svg,NoteGroup ng) {
-                HtmlNode title = doc.CreateElement("span");
-                title.InnerHtml = ng.ToString();
-
-                body.AppendChild(doc.CreateElement("br"));
-                body.AppendChild(title);
-                body.AppendChild(doc.CreateElement("br"));
-                body.AppendChild(svg);
-            }
-
-            foreach(NoteGroup ng in ngl) {
-                AddSvg(Build(ng),ng);
-            }
-
-            string result = doc.DocumentNode.OuterHtml;
-            string fp = "/home/tkefauver/Desktop/chords.html";
-            //string fp = "chords.html";
-            MpFileIo.WriteTextToFile(fp,result);
-
-            //Process.Start(fp);
-            //Process.Start(new ProcessStartInfo(fp.ToFileSystemUriFromPath()) { WorkingDirectory = "/home/tkefauver/Desktop" });
-        }
 
         public override HtmlNode Build(NoteGroup ng) {
             HtmlNode svg = InitBuild();
@@ -43,8 +15,7 @@ namespace Calcuchord {
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
             svg.AppendChild(bg_g);
 
-            if(ng.ToString() == "E minor #2") {
-
+            if(ng.ToString() == "G Major chord #5") {
             }
 
             SvgFlags flags = DefaultSvgFlags; //Prefs.Instance.CurrentSvgFlags;
@@ -60,6 +31,7 @@ namespace Calcuchord {
             int min_fret = 0;
             int max_fret = 0;
             int min_vis_fret = 0;
+            // get min/max visual frets
             if(notes.Where(x => x.FretNum >= 0) is { } real_frets &&
                real_frets.Any()) {
                 min_fret = real_frets.Min(x => x.FretNum);
@@ -70,7 +42,8 @@ namespace Calcuchord {
                 }
             }
 
-            int? min_barre_fret_num = null;
+            // find barres
+            int? shadow_barre_fret_num = null;
             Dictionary<int,(int min_str,int max_str)> barred_fret_lookup = [];
             if(notes.Where(x => x.FretNum > 0 && x.FingerNum > 0)
                    .GroupBy(x => x.FingerNum)
@@ -79,9 +52,13 @@ namespace Calcuchord {
                 var barre_frets = barre_groups.SelectMany(x => x);
                 if(notes.All(x => x.FretNum != 0)) {
                     // only show shadow when no open notes
-                    int min_barre_f_num = barre_frets.Min(x => x.FretNum);
-                    if(min_barre_f_num == min_vis_fret) {
-                        min_barre_fret_num = min_barre_f_num;
+                    // and min barre fret doesn't have other fingers
+                    int min_barre_fret_num = barre_frets.Min(x => x.FretNum);
+                    if(min_barre_fret_num == min_vis_fret &&
+                       notes
+                           .Where(x => x.FingerNum > 0 && x.FretNum == min_barre_fret_num)
+                           .Select(x => x.FingerNum).Distinct().Count() == 1) {
+                        shadow_barre_fret_num = min_barre_fret_num;
                     }
                 }
 
@@ -98,6 +75,7 @@ namespace Calcuchord {
             bool show_fret_marker = !show_nut;
             if(show_nut) {
                 min_fret = 0;
+                min_vis_fret = 1;
             }
 
             double min_fret_x = fw + 2; //show_fret_marker ? fw : 0;
@@ -236,10 +214,10 @@ namespace Calcuchord {
                     }
 
                     if(!is_barred_fret &&
-                       min_barre_fret_num.HasValue && min_barre_fret_num.Value == fret_num) {
+                       shadow_barre_fret_num.HasValue && shadow_barre_fret_num.Value == fret_num) {
                         if(str_num < str_count - 1) {
                             // shadow rect
-                            AddRect(bg_g,BarShadow,Transparent,curx,bar_y,fw,BarHeight,sw: 0);
+                            AddRect(bg_g,BarShadow,Transparent,curx,bar_y,fw,BarHeight,0);
                         }
 
                         if(fret_note == null &&
@@ -266,32 +244,32 @@ namespace Calcuchord {
                             cur_bar_extent = null;
                         } else {
                             // bar rect
-                            AddRect(bg_g,fret_bg,Transparent,curx,bar_y,fw,BarHeight,sw: 0);
+                            AddRect(bg_g,fret_bg,Transparent,curx,bar_y,fw,BarHeight,0);
                             last_barre_note = fret_note ?? last_barre_note;
                         }
                     }
 
                     if(fret_note != null) {
                         bool is_root = fret_note.IsRoot;
-                        // TODO add user thing
-                        bool is_user = true; //
+                        bool is_user = IsUserNote(fret_note);
                         int finger_num = fret_note.FingerNum;
                         string dot_fg = FingerFg[finger_num];
 
                         if(is_root && flags.HasFlag(SvgFlags.Roots)) {
                             // root outer circle
-                            AddCircle(bg_g,RootBg,Transparent,cx,cy,dot_r,sw: 0);
+                            AddCircle(bg_g,RootBg,Transparent,cx,cy,dot_r,0);
                             dot_r -= DotStrokeWidth;
                         }
 
                         if(is_user) {
                             // user outer circle
-                            AddCircle(bg_g,UserBg,Transparent,cx,cy,dot_r,sw: 0);
+                            AddCircle(bg_g,UserBg,Transparent,cx,cy,dot_r,0,shadow: !is_root && !is_barred_fret);
                             dot_r -= DotStrokeWidth;
                         }
 
                         // finger circle
-                        AddCircle(bg_g,fret_bg,Transparent,cx,cy,dot_r,sw: 0);
+                        AddCircle(
+                            bg_g,fret_bg,Transparent,cx,cy,dot_r,0,shadow: !is_root && !is_user && !is_barred_fret);
 
                         // finger num text
                         string dot_text = null;
@@ -312,9 +290,8 @@ namespace Calcuchord {
                         }
 
                         if(dot_text != null) {
-                            AddText(bg_g,dot_text,BodyFontSize,fret_fg,tx,ty);
+                            AddText(bg_g,dot_text,BodyFontSize,fret_fg,tx,ty,shadow: true);
                         }
-
                     }
 
                     curx += fw;

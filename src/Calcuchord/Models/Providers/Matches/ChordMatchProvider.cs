@@ -30,7 +30,7 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public ChordMatchProvider(InstrumentTuning tuning) : base(tuning) {
+        public ChordMatchProvider(Tuning tuning) : base(tuning) {
         }
 
         #endregion
