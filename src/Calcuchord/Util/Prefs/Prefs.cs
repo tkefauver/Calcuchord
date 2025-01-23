@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.ReactiveUI;
 using MonkeyPaste.Common;
@@ -16,6 +17,7 @@ using ReactiveUI;
 namespace Calcuchord {
     [DataContract]
     public class Prefs : ViewModelBase {
+
         #region Private Variables
 
         #endregion
@@ -83,8 +85,12 @@ namespace Calcuchord {
             }
 
             // Load the saved view model state.
-            _ = RxApp.SuspensionHost.GetAppState<Prefs>();
-            RxApp.SuspensionHost.CreateNewAppState.Invoke();
+            if(Design.IsDesignMode) {
+                _ = new Prefs();
+            } else {
+                _ = RxApp.SuspensionHost.GetAppState<Prefs>();
+                RxApp.SuspensionHost.CreateNewAppState.Invoke();
+            }
         }
 
         public static Prefs Instance { get; private set; }
@@ -116,6 +122,9 @@ namespace Calcuchord {
 
         [DataMember]
         public ObservableCollection<Instrument> Instruments { get; set; } = [];
+
+        [DataMember]
+        public ObservableCollection<OptionViewModel> Options { get; set; } = [];
 
         #endregion
 
@@ -208,5 +217,6 @@ namespace Calcuchord {
         #region Commands
 
         #endregion
+
     }
 }

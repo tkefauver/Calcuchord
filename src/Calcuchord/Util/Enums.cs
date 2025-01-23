@@ -41,9 +41,47 @@ namespace Calcuchord {
         Modes
     }
 
+    public enum DisplayModeType {
+        Search,
+        Bookmarks,
+        Index
+    }
+
+    public enum OptionType {
+        Pattern,
+        DisplayMode,
+        Key,
+        Svg,
+        ChordSuffix,
+        ScaleSuffix,
+        ModeSuffix
+    }
+
     // _ = '/'
     // Num = ''
     // sharp = 'sharp'
+    public enum ScaleSuffixType {
+        Major,
+        NaturalMinor,
+        HarmonicMinor,
+        MelodicMinor,
+        MinorPentatonic,
+        Pentatonic,
+        Blues
+    }
+
+    public enum ModeSuffixType {
+        Dorian,
+        Phrygian,
+        Lydian,
+        Mixolydian,
+        Locrian,
+        AhavaRaba,
+        // missing:
+        // Ionian,
+        // Aeolian
+    }
+
     public enum ChordSuffixType {
         major,
         minor,

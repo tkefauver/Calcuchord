@@ -20,9 +20,10 @@ namespace Calcuchord {
 
             SvgFlags flags = DefaultSvgFlags; //Prefs.Instance.CurrentSvgFlags;
 
+            int vfc = 4;
             double lw = FretLineFixedAxisSize;
-            double fw = FretWidth;
-            double fh = FretHeight;
+            double fw = FretLength;
+            double fh = StringFixedAxisLength;
             double nh = NutFixedAxisSize;
 
             var notes = ng.Notes.ToList();
@@ -71,7 +72,7 @@ namespace Calcuchord {
             }
 
             bool show_header_labels = notes.Any(x => x.FretNum <= 0);
-            bool show_nut = max_fret < VisibleFretCount;
+            bool show_nut = max_fret < vfc;
             bool show_fret_marker = !show_nut;
             if(show_nut) {
                 min_fret = 0;
@@ -81,7 +82,7 @@ namespace Calcuchord {
             double min_fret_x = fw + 2; //show_fret_marker ? fw : 0;
 
             // +2 header, footer
-            int rows = VisibleFretCount + 2;
+            int rows = vfc + 2;
 
             // +1 fret label
             int cols = str_count + 1;
@@ -102,7 +103,7 @@ namespace Calcuchord {
                 double marker_x = fw - offset_x;
                 double marker_y = cury + offset_y + (fh / 2d);
 
-                for(int i = 0; i < VisibleFretCount; i++) {
+                for(int i = 0; i < vfc; i++) {
                     // fret num label
                     int fret_num = min_vis_fret + i;
                     string label_text = fret_num.ToString();
@@ -172,7 +173,7 @@ namespace Calcuchord {
             (int min_str,int max_str)? cur_bar_extent = null;
             PatternNote last_barre_note = null;
 
-            for(int vis_fret_num = 0; vis_fret_num < VisibleFretCount; vis_fret_num++) {
+            for(int vis_fret_num = 0; vis_fret_num < vfc; vis_fret_num++) {
                 int fret_num = min_vis_fret + vis_fret_num;
                 curx = min_fret_x;
                 for(int str_num = 0; str_num < str_count; str_num++) {

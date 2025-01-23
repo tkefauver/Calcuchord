@@ -1,0 +1,25 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+        xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+        xmlns:local="clr-namespace:Calcuchord"
+        xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+    <Styles.Resources>
+        <FontFamily x:Key="NunitoFont">avares://Calcuchord/Assets/Fonts#Nunito</FontFamily>
+
+        <FontFamily x:Key="GaramondFont">avares://Calcuchord/Assets/Fonts#EB Garamond Regular</FontFamily>
+    </Styles.Resources>
+
+
+    <Style Selector=":is(TextBlock)">
+        <Setter Property="FontFamily"
+                Value="{StaticResource GaramondFont}" />
+    </Style>
+
+</Styles>

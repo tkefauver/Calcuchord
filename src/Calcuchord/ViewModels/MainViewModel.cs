@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using Cairo;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
@@ -34,20 +37,63 @@ namespace Calcuchord {
 
         #region View Models
 
+        #region Instrument
+
         public ObservableCollection<InstrumentViewModel> Instruments { get; } = [];
 
         public InstrumentViewModel SelectedInstrument {
-            get => Instruments.OrderByDescending(x => x.SelectedTuning.Tuning.LastSelectedDt).FirstOrDefault();
+            get => Instruments.FirstOrDefault(x => x.IsSelected);
             set {
-                Instruments.ForEach(x => x.IsSelected = value == x);
+                Instruments.ForEach(x => x.IsSelected = x == value);
                 OnPropertyChanged(nameof(SelectedInstrument));
+                OnPropertyChanged(nameof(SelectedTuning));
             }
         }
 
         TuningViewModel LastSelectedTuning { get; set; }
 
         public TuningViewModel SelectedTuning =>
-            SelectedInstrument.SelectedTuning;
+            SelectedInstrument == null ? null : SelectedInstrument.SelectedTuning;
+
+        #endregion
+
+        #region Options
+
+        public IEnumerable<OptionViewModel> PatternOptions =>
+            OptionLookup[OptionType.Pattern];
+
+        OptionViewModel SelectedPatternOption =>
+            PatternOptions.FirstOrDefault(x => x.IsChecked);
+
+        public IEnumerable<OptionViewModel> DisplayModeOptions =>
+            OptionLookup[OptionType.DisplayMode];
+
+        public IEnumerable<OptionViewModel> KeyOptions =>
+            OptionLookup[OptionType.Key];
+
+        public IEnumerable<OptionViewModel> SvgOptions =>
+            OptionLookup[OptionType.Svg];
+
+        IEnumerable<OptionViewModel> ChordSuffixOptions =>
+            OptionLookup[OptionType.ChordSuffix];
+
+        IEnumerable<OptionViewModel> ScaleSuffixOptions =>
+            OptionLookup[OptionType.ScaleSuffix];
+
+        IEnumerable<OptionViewModel> ModeSuffixOptions =>
+            OptionLookup[OptionType.ModeSuffix];
+
+        public IEnumerable<OptionViewModel> SuffixOptions =>
+            SelectedPatternType switch {
+                MusicPatternType.Chords => ChordSuffixOptions,
+                MusicPatternType.Scales => ScaleSuffixOptions,
+                MusicPatternType.Modes => ModeSuffixOptions,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+        Dictionary<OptionType,IEnumerable<OptionViewModel>> OptionLookup { get; set; }
+
+        #endregion
 
         #endregion
 
@@ -60,6 +106,9 @@ namespace Calcuchord {
         #endregion
 
         #region State
+
+        public MusicPatternType SelectedPatternType =>
+            SelectedPatternOption.OptionValue.ToEnum<MusicPatternType>();
 
         #endregion
 
@@ -86,23 +135,33 @@ namespace Calcuchord {
 
             instl.ForEach(x => Instruments.Add(new(this,x)));
 
-            if(Instruments.FirstOrDefault(x => x.Instrument.InstrumentType == InstrumentType.Guitar) is { } guitar_vm) {
-                // if(guitar_vm.Tunings.FirstOrDefault(x => x.Tuning.Name == "Open D") is not { } open_d) {
-                //     guitar_vm.AddTuningCommand.Execute(
-                //         new object[] {
-                //             new[] { "D3","A3","D3","F#3","A3","D4" }.Select(x => Note.Parse(x)),
-                //             0,
-                //             "Open D"
-                //         });
-                // } else 
-                if(guitar_vm.Tunings.FirstOrDefault(x => x.Tuning.Name == "Standard") is { } std) {
+            // if(Instruments
+            //        .FirstOrDefault(x => x.Instrument.InstrumentType == InstrumentType.Guitar) is { } guitar_vm) {
+            //     if(guitar_vm.Tunings.FirstOrDefault(x => x.Tuning.Name == "Open D") is not { } open_d) {
+            //         guitar_vm.AddTuningCommand.Execute(
+            //             new object[] {
+            //                 new[] { "D3","A3","D3","F#3","A3","D4" }.Select(x => Note.Parse(x)),
+            //                 0,
+            //                 "Open D"
+            //             });
+            //     } else 
+            //     if(guitar_vm.Tunings.FirstOrDefault(x => x.Tuning.Name == "Standard") is { } std) {
+            //         std.IsSelected = false;
+            //         std.IsSelected = true;
+            //     }
+            // }
+
+            if(Instruments
+                   .FirstOrDefault(x => x.Instrument.InstrumentType == InstrumentType.Ukulele) is { } ukulele_vm) {
+                SelectedInstrument = ukulele_vm;
+                if(ukulele_vm.Tunings.FirstOrDefault(x => x.Tuning.Name == "Standard") is { } std) {
                     std.IsSelected = false;
                     std.IsSelected = true;
                 }
-                //open_d.Tuning.ClearCollections();
             }
 
             //InitInstrumentAsync().FireAndForgetSafeAsync();
+            InitOptions();
         }
 
         #endregion
@@ -129,6 +188,45 @@ namespace Calcuchord {
             }
         }
 
+        #region Options
+
+        void InitOptions() {
+            /*
+             public ObservableCollection<OptionViewModel<MusicPatternType>> PatternOptions { get; } = [];
+               public ObservableCollection<OptionViewModel<DisplayModeType>> DisplayModeOptions { get; } = [];
+               public ObservableCollection<OptionViewModel<string>> SuffixOptions { get; } = [];
+               public ObservableCollection<OptionViewModel<NoteType>> KeyOptions { get; } = [];
+               public ObservableCollection<OptionViewModel<SvgFlags>> SvgOptions { get; } = [];
+             */
+            var all_opts = Prefs.Instance.Options;
+            if(!all_opts.Any()) {
+                Dictionary<OptionType,Type> opt_lookup = new() {
+                    { OptionType.Pattern,typeof(PatternType) },
+                    { OptionType.DisplayMode,typeof(DisplayModeType) },
+                    { OptionType.ChordSuffix,typeof(ChordSuffixType) },
+                    { OptionType.ScaleSuffix,typeof(ScaleSuffixType) },
+                    { OptionType.ModeSuffix,typeof(ModeSuffixType) },
+                    { OptionType.Key,typeof(NoteType) },
+                    { OptionType.Svg,typeof(SvgFlags) }
+                };
+                all_opts.AddRange(
+                    opt_lookup.SelectMany(
+                        x =>
+                            Enum.GetNames(x.Value).Select(
+                                (y,idx) => new OptionViewModel {
+                                    IsChecked = idx == 0,
+                                    OptionType = x.Key,
+                                    OptionValue = y,
+                                    Label = y
+                                })));
+            }
+            OptionLookup = all_opts.GroupBy(x => x.OptionType).ToDictionary(x => x.Key,x => x.Select(y => y));
+        }
+
+        #endregion
+
+        #region Instruments
+
         async Task InitInstrumentAsync() {
             if(!SelectedTuning.IsLoaded) {
                 await SelectedTuning.InitCollectionsAsync();
@@ -137,7 +235,12 @@ namespace Calcuchord {
             OnPropertyChanged(nameof(SelectedInstrument));
             OnPropertyChanged(nameof(SelectedTuning));
 
-            new ChordSvgBuilder().Test(SelectedTuning.Tuning,SelectedTuning.Tuning.Chords.SelectMany(x => x.Groups));
+            if(false) {
+                new ChordSvgBuilder().Test(
+                    SelectedTuning.Tuning,SelectedTuning.Tuning.Chords.SelectMany(x => x.Groups));
+                new ScaleSvgBuilder().Test(
+                    SelectedTuning.Tuning,SelectedTuning.Tuning.Scales.SelectMany(x => x.Groups));
+            }
         }
 
         IEnumerable<Instrument> CreateDefaultInstruments() {
@@ -166,6 +269,11 @@ namespace Calcuchord {
                     kvp.Value.Item1.Length,
                     kvp.Value.Item3);
                 inst.Tunings.Add(tuning);
+                if(kvp.Key == InstrumentType.Guitar) {
+                    // select guitar by default
+                    inst.IsSelected = true;
+                    tuning.IsSelected = true;
+                }
                 instl.Add(inst);
             }
 
@@ -174,9 +282,20 @@ namespace Calcuchord {
 
         #endregion
 
+        #endregion
+
         #region Commands
+
+        public ICommand SelectDisplayModeCommand => new MpCommand<object>(
+            args => {
+            });
+
+        public ICommand SelectOptionCommand => new MpCommand<object>(
+            args => {
+            });
 
         #endregion
 
     }
+
 }

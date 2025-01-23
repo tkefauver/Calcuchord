@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -63,13 +62,9 @@ namespace Calcuchord {
             Tuning.Chords.Any() && Tuning.Scales.Any();
 
         public bool IsSelected {
-            get => Parent.SelectedTuning == this;
+            get => Tuning.IsSelected;
             set {
-                if(value) {
-                    Tuning.LastSelectedDt = DateTime.Now;
-                    HasModelChanged = true;
-                }
-
+                Tuning.IsSelected = value;
                 OnPropertyChanged(nameof(IsSelected));
             }
         }

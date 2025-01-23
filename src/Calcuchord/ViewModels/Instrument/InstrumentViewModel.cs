@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
@@ -36,7 +37,7 @@ namespace Calcuchord {
         public ObservableCollection<TuningViewModel> Tunings { get; } = [];
 
         public TuningViewModel SelectedTuning {
-            get => Tunings.OrderByDescending(x => x.Tuning.LastSelectedDt).FirstOrDefault();
+            get => Tunings.FirstOrDefault(x => x.IsSelected);
             set {
                 Tunings.ForEach(x => x.IsSelected = value == x);
                 OnPropertyChanged(nameof(SelectedTuning));
@@ -55,7 +56,13 @@ namespace Calcuchord {
 
         #region State
 
-        public bool IsSelected { get; set; }
+        public bool IsSelected {
+            get => Instrument.IsSelected;
+            set {
+                Instrument.IsSelected = value;
+                OnPropertyChanged(nameof(IsSelected));
+            }
+        }
 
         #endregion
 
@@ -74,6 +81,7 @@ namespace Calcuchord {
         #region Constructors
 
         public InstrumentViewModel(MainViewModel parent,Instrument it) : base(parent) {
+            PropertyChanged += InstrumentViewModel_OnPropertyChanged;
             Instrument = it;
             Tunings.AddRange(Instrument.Tunings.Select(x => new TuningViewModel(this,x)));
             Instrument.RefreshModelTree();
@@ -91,6 +99,16 @@ namespace Calcuchord {
         #endregion
 
         #region Private Methods
+
+        void InstrumentViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
+            switch(e.PropertyName) {
+                case nameof(SelectedTuning):
+                    if(IsSelected) {
+                        Parent.OnPropertyChanged(nameof(SelectedTuning));
+                    }
+                    break;
+            }
+        }
 
         void TuningsOnCollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
         }

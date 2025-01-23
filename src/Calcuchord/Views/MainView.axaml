@@ -2,15 +2,88 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Calcuchord.MainView"
-             x:DataType="local:MainViewModel">
+             xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:MainViewModel"
+             x:Class="Calcuchord.MainView">
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <local:MainViewModel />
     </Design.DataContext>
 
-    <TextBlock x:Name="YoBlock" Text="yo" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    <dialogHostAvalonia:DialogHost Identifier="MainDialogHost">
+        <controls:SnackbarHost HostName="Root">
+            <controls:NavigationDrawer x:Name="LeftDrawer"
+                                       Classes="permanent"
+                                       LeftDrawerOpened="{Binding ElementName=NavDrawerSwitch, Path=IsChecked, Mode=TwoWay}">
+                <controls:NavigationDrawer.LeftDrawerContent>
+                    <local:LeftDrawerView />
+                </controls:NavigationDrawer.LeftDrawerContent>
+                <controls:NavigationDrawer.RightDrawerContent>
+                    <local:RightDrawerView />
+                </controls:NavigationDrawer.RightDrawerContent>
+                <DockPanel LastChildFill="true">
+                    <controls:ColorZone Name="PART_AppBarContainer"
+                                        VerticalAlignment="Top"
+                                        HorizontalAlignment="Stretch"
+                                        DockPanel.Dock="Top"
+                                        Height="56"
+                                        Mode="PrimaryMid"
+                                        ZIndex="1">
+                        <Grid Margin="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="32" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="32" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ToggleButton Name="NavDrawerSwitch"
+                                          Theme="{StaticResource MaterialFlatButton}"
+                                          Width="32"
+                                          Height="32"
+                                          Padding="4">
+                                <avalonia:MaterialIcon Kind="Menu"
+                                                       Width="24"
+                                                       Height="24" />
+                            </ToggleButton>
+                            <TextBlock Grid.Column="2"
+                                       Classes="Headline6"
+                                       Text="Calcuchord"
+                                       VerticalAlignment="Center" />
+
+                        </Grid>
+                    </controls:ColorZone>
+                    <ScrollViewer Name="mainScroller"
+                                  DockPanel.Dock="Top"
+                                  HorizontalContentAlignment="Stretch"
+                                  HorizontalAlignment="Stretch"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <Border HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                            <Carousel Name="PageCarousel"
+                                      HorizontalAlignment="Stretch">
+                                <Carousel.Styles>
+                                    <Style Selector="Carousel#PageCarousel:not(.no-transitions)">
+                                        <Setter Property="PageTransition">
+                                            <PageSlide Duration="0.25"
+                                                       SlideOutEasing="CircularEaseOut"
+                                                       SlideInEasing="CircularEaseOut" />
+                                        </Setter>
+                                    </Style>
+                                </Carousel.Styles>
+                            </Carousel>
+                        </Border>
+                    </ScrollViewer>
+                </DockPanel>
+            </controls:NavigationDrawer>
+        </controls:SnackbarHost>
+    </dialogHostAvalonia:DialogHost>
 </UserControl>

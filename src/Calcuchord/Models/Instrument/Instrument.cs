@@ -6,6 +6,7 @@ using MonkeyPaste.Common;
 namespace Calcuchord {
     [DataContract]
     public class Instrument {
+
         #region Properties
 
         #region Members
@@ -15,6 +16,9 @@ namespace Calcuchord {
 
         [DataMember]
         public string Name { get; set; }
+
+        [DataMember]
+        public bool IsSelected { get; set; }
 
         [DataMember]
         public InstrumentType InstrumentType { get; set; }
@@ -75,5 +79,6 @@ namespace Calcuchord {
         #region Private Methods
 
         #endregion
+
     }
 }

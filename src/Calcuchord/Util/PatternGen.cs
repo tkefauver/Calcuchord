@@ -35,6 +35,45 @@ namespace Calcuchord {
 
         #region Properties
 
+        Dictionary<ChordSuffixType,int[]> Chords { get; } = new() {
+            { ChordSuffixType.Num5,[0,7] },
+            { ChordSuffixType.major,[0,4,3] },
+            { ChordSuffixType.minor,[0,3,4] },
+            { ChordSuffixType.dim,[0,3,3] },
+            { ChordSuffixType.aug,[0,4,4] },
+            { ChordSuffixType.sus2,[0,2,5] },
+            { ChordSuffixType.sus4,[0,5,2] },
+            { ChordSuffixType.maj7,[0,4,3,4] },
+            { ChordSuffixType.m7,[0,3,4,3] },
+            { ChordSuffixType.Num7,[0,4,3,3] },
+            { ChordSuffixType.m7b5,[0,3,3,4] },
+            { ChordSuffixType.dim7,[0,3,3,3] },
+            { ChordSuffixType.Num9,[0,4,3,3,4] },
+            { ChordSuffixType.maj9,[0,4,3,4,3] },
+            { ChordSuffixType.m9,[0,3,4,3,4] },
+            { ChordSuffixType.Num11,[0,4,3,3,4,3] },
+            { ChordSuffixType.maj11,[0,4,3,4,3,3] },
+            { ChordSuffixType.m11,[0,3,4,3,4,3] }
+        };
+        Dictionary<ScaleSuffixType,int[]> Scales { get; } = new() {
+            { ScaleSuffixType.Major,[0,2,2,1,2,2,2,1] },
+            { ScaleSuffixType.NaturalMinor,[0,2,1,2,2,1,2,2] },
+            { ScaleSuffixType.HarmonicMinor,[0,2,1,2,2,1,3,1] },
+            { ScaleSuffixType.MelodicMinor,[0,2,1,2,2,2,2,2] },
+            { ScaleSuffixType.MinorPentatonic,[0,3,2,2,3,2] },
+            { ScaleSuffixType.Pentatonic,[0,2,2,3,2,3] },
+            { ScaleSuffixType.Blues,[0,3,2,1,1,3] }
+        };
+        
+        Dictionary<ModeSuffixType,int[]> Modes { get; } = new() {
+            { ModeSuffixType.Dorian,[0,2,1,2,2,2,1,2] },
+            { ModeSuffixType.Phrygian,[0,1,2,2,2,1,2,2] },
+            { ModeSuffixType.Lydian,[0,2,2,2,1,2,2,1] },
+            { ModeSuffixType.Mixolydian,[0,2,2,1,2,2,1,2] },
+            { ModeSuffixType.Locrian,[0,1,2,2,1,2,2,2] },
+            { ModeSuffixType.AhavaRaba,[0,1,3,1,2,1,2,2] }
+        };
+
         Dictionary<MusicPatternType,Dictionary<string,int[]>> _patterns;
 
         Dictionary<MusicPatternType,Dictionary<string,int[]>> PatternsLookup {
@@ -43,48 +82,16 @@ namespace Calcuchord {
                     _patterns = new() {
                         {
                             MusicPatternType.Chords,
-                            new() {
-                                { "5 chord",[0,7] },
-                                { "Major chord",[0,4,3] },
-                                { "Minor chord",[0,3,4] },
-                                { "Diminished chord",[0,3,3] },
-                                { "Augmented chord",[0,4,4] },
-                                { "Sus2 chord",[0,2,5] },
-                                { "Sus4 chord",[0,5,2] },
-                                { "Maj7 chord",[0,4,3,4] },
-                                { "min7 chord",[0,3,4,3] },
-                                { "7 chord",[0,4,3,3] },
-                                { "min7b5 chord",[0,3,3,4] },
-                                { "dim7 chord",[0,3,3,3] },
-                                { "9 chord",[0,4,3,3,4] },
-                                { "Maj9 chord",[0,4,3,4,3] },
-                                { "m9 chord",[0,3,4,3,4] },
-                                { "11 chord",[0,4,3,3,4,3] },
-                                { "Maj11 chord",[0,4,3,4,3,3] },
-                                { "min11 chord",[0,3,4,3,4,3] }
-                            }
-                        }, {
+                            Chords.ToDictionary(x=>x.Key.ToString(),x=>x.Value)
+                        }, 
+                        {
                             MusicPatternType.Scales,
-                            new() {
-                                { "Major",[0,2,2,1,2,2,2,1] },
-                                { "Natural minor",[0,2,1,2,2,1,2,2] },
-                                { "Harmonic minor",[0,2,1,2,2,1,3,1] },
-                                { "Melodic minor",[0,2,1,2,2,2,2,2] },
-                                { "Minor pentatonic",[0,3,2,2,3,2] },
-                                { "Pentatonic",[0,2,2,3,2,3] },
-                                { "Blues",[0,3,2,1,1,3] }
-                            }
-                        }, {
+                            Scales.ToDictionary(x=>x.Key.ToString(),x=>x.Value)
+                        }, 
+                        {
                             MusicPatternType.Modes,
-                            new() {
-                                { "Dorian mode",[0,2,1,2,2,2,1,2] },
-                                { "Phrygian mode",[0,1,2,2,2,1,2,2] },
-                                { "Lydian mode",[0,2,2,2,1,2,2,1] },
-                                { "Mixolydian mode",[0,2,2,1,2,2,1,2] },
-                                { "Locrian mode",[0,1,2,2,1,2,2,2] },
-                                { "Ahava raba mode",[0,1,3,1,2,1,2,2] }
-                            }
-                        }
+                            Modes.ToDictionary(x=>x.Key.ToString(),x=>x.Value)
+                        }, 
                     };
                 }
 
@@ -115,7 +122,6 @@ namespace Calcuchord {
         #region Events
 
         #endregion
-
 
         #region Constructors
 
@@ -182,19 +188,6 @@ namespace Calcuchord {
                         .GroupBy(x => Math.Floor((x.FretNum + 0) / (double)PatternFretSpan));
                     NoteGroupCollection ngc = new(PatternType,cur_key,suffix);
                     ngc.Groups.AddRange(blocks.Select((x,idx) => new NoteGroup(ngc,idx,AddScaleFingering(x))));
-                    // foreach(var ng in ngc.Groups) {
-                    //     Debug.WriteLine($"{cur_key} {suffix} #{ng.Position}");
-                    //     foreach(var (str_ng,idx) in ng.Notes.GroupBy(x => x.StringNum).WithIndex()) {
-                    //         var sb = new StringBuilder();
-                    //         sb.Append($"{idx}: ");
-                    //         foreach(var pn in str_ng) {
-                    //             sb.Append($"{pn.FretNum} ");
-                    //         }
-                    //
-                    //         Debug.WriteLine(sb.ToString());
-                    //     }
-                    // }
-
                     ngcl.Add(ngc);
                 }
             }
@@ -416,7 +409,7 @@ namespace Calcuchord {
             foreach(InstrumentNote note in notes) {
                 int finger = 0;
                 if(note.FretNum >= min_fret) {
-                    finger = Math.Min(4,(max_fret - note.FretNum) + 1);
+                    finger = Math.Min(4,(note.FretNum - min_fret) + 1);
                 }
 
                 pnl.Add(new(finger,note));

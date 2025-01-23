@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia"
+             x:Class="Calcuchord.LeftDrawerView">
+    <ScrollViewer>
+        <StackPanel>
+            <controls:ColorZone Mode="Accent"
+                                Height="180">
+                <StackPanel>
+                    <Image Width="96"
+                           Height="120"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Source="avares://Calcuchord/Assets/Images/logo.png" />
+                    <TextBlock Classes="Headline6"
+                               Text="Calcuchord"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Classes="Subtitle1"
+                               HorizontalAlignment="Center">
+                        <TextBlock.Inlines>
+                            <Run Text="Reverse search for " />
+                            <Run FontStyle="Italic"
+                                 Text="musicians" />
+                        </TextBlock.Inlines>
+                    </TextBlock>
+                </StackPanel>
+            </controls:ColorZone>
+            <ListBox Classes="NoScroll"
+                     Name="DrawerList">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Height"
+                                Value="48" />
+                        <Setter Property="Padding"
+                                Value="16,0" />
+                        <Setter Property="VerticalContentAlignment"
+                                Value="Center" />
+                    </Style>
+                </ListBox.Styles>
+                <ListBoxItem>Home</ListBoxItem>
+                <ListBoxItem>Buttons</ListBoxItem>
+                <ListBoxItem>Card</ListBoxItem>
+                <ListBoxItem>ColorZones</ListBoxItem>
+                <ListBoxItem>Colors</ListBoxItem>
+                <ListBoxItem>ComboBoxes</ListBoxItem>
+                <ListBoxItem>Date/Time pickers</ListBoxItem>
+                <ListBoxItem>Dialogs</ListBoxItem>
+                <ListBoxItem>Expanders</ListBoxItem>
+                <ListBoxItem>Fields</ListBoxItem>
+                <ListBoxItem>Lists</ListBoxItem>
+                <ListBoxItem>Material Icons</ListBoxItem>
+                <ListBoxItem>Progress indicators</ListBoxItem>
+                <ListBoxItem>ScrollViewer</ListBoxItem>
+                <!-- <ListBoxItem>Shadows</ListBoxItem> -->
+                <ListBoxItem>SideSheet</ListBoxItem>
+                <ListBoxItem>Sliders</ListBoxItem>
+                <ListBoxItem>Snackbar</ListBoxItem>
+                <ListBoxItem>TabControls</ListBoxItem>
+                <ListBoxItem>Toggles</ListBoxItem>
+                <ListBoxItem>TreeViews</ListBoxItem>
+                <ListBoxItem>Typography</ListBoxItem>
+            </ListBox>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

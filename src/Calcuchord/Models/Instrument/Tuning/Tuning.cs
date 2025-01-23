@@ -7,6 +7,7 @@ using MonkeyPaste.Common;
 namespace Calcuchord {
     [DataContract]
     public class Tuning {
+
         #region Properties
 
         #region Members
@@ -21,7 +22,7 @@ namespace Calcuchord {
         public int CapoFretNum { get; set; }
 
         [DataMember]
-        public DateTime LastSelectedDt { get; set; } = DateTime.MinValue;
+        public bool IsSelected { get; set; }
 
         [DataMember]
         public bool IsReadOnly { get; set; }
@@ -119,5 +120,6 @@ namespace Calcuchord {
         #region Private Methods
 
         #endregion
+
     }
 }

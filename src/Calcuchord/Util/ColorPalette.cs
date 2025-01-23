@@ -20,10 +20,13 @@ namespace Calcuchord {
         Finger3Fg,
         Finger3Bg,
         Finger4Fg,
-        Finger4Bg
+        Finger4Bg,
+        NutBg,
+        NutFg
     }
 
     public class ColorPalette : ViewModelBase {
+
         #region Statics
 
         static ColorPalette _instance;
@@ -107,6 +110,12 @@ namespace Calcuchord {
                         }, {
                             PaletteColorType.Finger4Fg,
                             ("#FFFFFF","#FFFFFF")
+                        }, {
+                            PaletteColorType.NutBg,
+                            ("#FAEBD7","#FAEBD7")
+                        }, {
+                            PaletteColorType.NutFg,
+                            ("#000000","#000000")
                         }
                     };
 
@@ -140,5 +149,6 @@ namespace Calcuchord {
         }
 
         #endregion
+
     }
 }

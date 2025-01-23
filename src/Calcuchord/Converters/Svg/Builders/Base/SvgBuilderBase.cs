@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using Avalonia.Controls;
 using HtmlAgilityPack;
 using MonkeyPaste.Common;
+using Process = System.Diagnostics.Process;
 
 namespace Calcuchord {
     public abstract class SvgBuilderBase {
@@ -17,7 +20,8 @@ namespace Calcuchord {
         #region Statics
 
         public static SvgFlags DefaultSvgFlags =>
-            SvgFlags.Fingers |
+            //SvgFlags.Fingers |
+            SvgFlags.Notes |
             SvgFlags.Colors |
             SvgFlags.Tuning |
             SvgFlags.Roots |
@@ -34,6 +38,8 @@ namespace Calcuchord {
 
         protected HtmlDocument CurrentDoc { get; private set; }
         protected string DefaultFontFamily => "Verdana";
+
+        bool IsShadowsEnabled => false;
 
 
         #region Colors
@@ -71,8 +77,8 @@ namespace Calcuchord {
         protected double FretLineFixedAxisSize => 0.25;
         protected double NutFixedAxisSize => 1;
 
-        protected double FretWidth => 10;
-        protected double FretHeight => 12;
+        protected double FretLength => 10;
+        protected double StringFixedAxisLength => 12;
 
         protected double DotRadius => 4;
         protected double DotStrokeWidth => 0.775;
@@ -82,8 +88,6 @@ namespace Calcuchord {
 
         protected double BodyFontSize => 4;
         protected double HeaderFontSize => 6;
-
-        protected int VisibleFretCount => 4;
 
         #endregion
 
@@ -97,7 +101,7 @@ namespace Calcuchord {
 
         protected SvgBuilderBase() {
             PaletteColorType[] fbg = [
-                PaletteColorType.Bg,
+                PaletteColorType.NutBg,
                 PaletteColorType.Finger1Bg,
                 PaletteColorType.Finger2Bg,
                 PaletteColorType.Finger3Bg,
@@ -105,7 +109,7 @@ namespace Calcuchord {
             ];
             FingerBg = fbg.Select(x => ColorPalette.Instance.P[x]).ToArray();
             PaletteColorType[] ffg = [
-                PaletteColorType.Fg,
+                PaletteColorType.NutFg,
                 PaletteColorType.Finger1Fg,
                 PaletteColorType.Finger2Fg,
                 PaletteColorType.Finger3Fg,
@@ -121,10 +125,14 @@ namespace Calcuchord {
         public abstract HtmlNode Build(NoteGroup ng);
 
         public void Test(Tuning tuning,IEnumerable<NoteGroup> ngl) {
+            if(Design.IsDesignMode) {
+                return;
+            }
             HtmlDocument doc = new();
 
             HtmlNode body = doc.CreateElement("body");
             doc.DocumentNode.AppendChild(body);
+            body.Attributes.Add("style","zoom=\"400%\"");
 
             void AddSvg(HtmlNode svg,NoteGroup ng) {
                 HtmlNode title = doc.CreateElement("span");
@@ -142,9 +150,17 @@ namespace Calcuchord {
 
             string result = doc.DocumentNode.OuterHtml;
             string fn =
-                $"{tuning.ToString().Replace("|"," ")}_{GetType().Name.Replace("SvgBuilder",string.Empty).ToLower()}";
-            string fp = $"/home/tkefauver/Desktop/{fn}.html";
+                $"{tuning.ToString().Replace("|","-").Replace(" ","-")}_{GetType().Name.Replace("SvgBuilder",string.Empty).ToLower()}.html";
+            string fp = $"/home/tkefauver/Desktop/{fn}";
             MpFileIo.WriteTextToFile(fp,result);
+
+            Process.Start(
+                new ProcessStartInfo {
+                    UseShellExecute = true,
+                    //WorkingDirectory = Path.GetDirectoryName(fp),
+                    FileName = "xdg-open",
+                    Arguments = fp
+                });
         }
 
         #endregion
@@ -167,6 +183,24 @@ namespace Calcuchord {
             return svg;
         }
 
+
+        protected void AddCenteredText(
+            HtmlNode cntr,
+            string text,
+            double fs,
+            string fill,
+            double x,
+            double y,
+            double w,
+            double h,
+            bool isBold = false,
+            string classes = null,
+            bool shadow = false) {
+            double tx = (x + (w / 2d)) - ((fs * text.Length) / (text.Length + 2));
+            double ty = y + (h / 2d) + (fs / 3d);
+            AddText(cntr,text,fs,fill,tx,ty,isBold,classes,shadow);
+        }
+
         protected void AddText(
             HtmlNode cntr,
             string text,
@@ -177,7 +211,7 @@ namespace Calcuchord {
             bool isBold = false,
             string classes = null,
             bool shadow = false) {
-            if(shadow) {
+            if(shadow && IsShadowsEnabled) {
                 string shadow_fill = fill == "#FFFFFF" ? "#000000" : "#FFFFFF";
                 double offset = 0.25; //fs / 16d;
                 AddText(cntr,text,fs,shadow_fill,x + offset,y + offset,isBold,classes);
@@ -212,10 +246,10 @@ namespace Calcuchord {
             double sw,
             string classes = null,
             bool shadow = false) {
-            if(shadow) {
+            if(shadow && IsShadowsEnabled) {
                 string shadow_fill = fill == Fg ? Bg : "#000000";
                 double offset = 0.25; //fs / 16d;
-                AddCircle(cntr,shadow_fill,stroke,x + offset,y + offset,r,sw,classes,false);
+                AddCircle(cntr,shadow_fill,stroke,x + offset,y + offset,r,sw,classes);
             }
             HtmlNode circle = CurrentDoc.CreateElement("circle");
             circle.Attributes.Add("fill",fill);

@@ -22,6 +22,7 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm"/>
+        <PackageReference Include="DialogHost.Avalonia"/>
         <PackageReference Include="fody">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
@@ -38,5 +39,18 @@
     <ItemGroup>
         <Folder Include="AttachedProperties\"/>
         <Folder Include="Models\Providers\Patterns\"/>
+        <Folder Include="Views\Instrument\"/>
+        <Folder Include="Views\Matches\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Views\Drawers\Left\LeftDrawerView.axaml.cs">
+            <DependentUpon>LeftDrawerView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Drawers\Right\RightDrawerView.axaml.cs">
+            <DependentUpon>LeftDrawerView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 </Project>
