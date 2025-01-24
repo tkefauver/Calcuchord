@@ -68,6 +68,9 @@ namespace Calcuchord {
         public IEnumerable<OptionViewModel> DisplayModeOptions =>
             OptionLookup[OptionType.DisplayMode];
 
+        OptionViewModel SelectedDisplayModeOption =>
+            DisplayModeOptions.FirstOrDefault(x => x.IsChecked);
+
         public IEnumerable<OptionViewModel> KeyOptions =>
             OptionLookup[OptionType.Key];
 
@@ -107,8 +110,31 @@ namespace Calcuchord {
 
         #region State
 
+        public int SelectedInstrumentIndex {
+            get => Instruments.IndexOf(SelectedInstrument);
+            set {
+                if(value >= 0 && value < Instruments.Count) {
+                    SelectedInstrument = Instruments[value];
+                    OnPropertyChanged(nameof(SelectedInstrument));
+                }
+            }
+        }
+
+
         public MusicPatternType SelectedPatternType =>
             SelectedPatternOption.OptionValue.ToEnum<MusicPatternType>();
+
+        public DisplayModeType SelectedDisplayMode =>
+            SelectedDisplayModeOption.OptionValue.ToEnum<DisplayModeType>();
+
+        public InstrumentType SelectedInstrumentType =>
+            SelectedInstrument.Instrument.InstrumentType;
+
+        public bool IsPianoSelected =>
+            SelectedInstrumentType == InstrumentType.Piano;
+
+        public bool IsInstrumentVisible =>
+            SelectedDisplayMode == DisplayModeType.Search;
 
         #endregion
 
@@ -151,14 +177,22 @@ namespace Calcuchord {
             //     }
             // }
 
-            if(Instruments
-                   .FirstOrDefault(x => x.Instrument.InstrumentType == InstrumentType.Ukulele) is { } ukulele_vm) {
-                SelectedInstrument = ukulele_vm;
-                if(ukulele_vm.Tunings.FirstOrDefault(x => x.Tuning.Name == "Standard") is { } std) {
-                    std.IsSelected = false;
-                    std.IsSelected = true;
-                }
-            }
+            // if(Instruments
+            //        .FirstOrDefault(x => x.Instrument.InstrumentType == InstrumentType.Ukulele) is { } ukulele_vm) {
+            //     SelectedInstrument = ukulele_vm;
+            //     if(ukulele_vm.Tunings.FirstOrDefault(x => x.Tuning.Name == "Standard") is { } std) {
+            //         std.IsSelected = false;
+            //         std.IsSelected = true;
+            //     }
+            // }
+            // if(Instruments
+            //        .FirstOrDefault(x => x.Instrument.InstrumentType == InstrumentType.Piano) is { } piano_vm) {
+            //     SelectedInstrument = piano_vm;
+            //     if(piano_vm.Tunings.FirstOrDefault(x => x.Tuning.Name == "Standard") is { } std) {
+            //         std.IsSelected = false;
+            //         std.IsSelected = true;
+            //     }
+            // }
 
             //InitInstrumentAsync().FireAndForgetSafeAsync();
             InitOptions();
@@ -184,6 +218,9 @@ namespace Calcuchord {
                     }
                     LastSelectedTuning = SelectedTuning;
                     InitInstrumentAsync().FireAndForgetSafeAsync();
+                    break;
+                case nameof(SelectedInstrumentIndex):
+                    OnPropertyChanged(nameof(SelectedInstrument));
                     break;
             }
         }
@@ -234,11 +271,12 @@ namespace Calcuchord {
 
             OnPropertyChanged(nameof(SelectedInstrument));
             OnPropertyChanged(nameof(SelectedTuning));
+            OnPropertyChanged(nameof(IsPianoSelected));
 
             if(false) {
-                new ChordSvgBuilder().Test(
+                new PianoSvgBuilder().Test(
                     SelectedTuning.Tuning,SelectedTuning.Tuning.Chords.SelectMany(x => x.Groups));
-                new ScaleSvgBuilder().Test(
+                new PianoSvgBuilder().Test(
                     SelectedTuning.Tuning,SelectedTuning.Tuning.Scales.SelectMany(x => x.Groups));
             }
         }
@@ -263,7 +301,7 @@ namespace Calcuchord {
                                 idx,
                                 Note.Parse(x))));
                 Instrument inst = new(
-                    kvp.ToString(),
+                    kvp.Key.ToString(),
                     kvp.Key,
                     kvp.Value.Item2,
                     kvp.Value.Item1.Length,
@@ -296,6 +334,33 @@ namespace Calcuchord {
 
         #endregion
 
+    }
+
+    public class DesignMainViewModel : MainViewModel {
+    }
+
+    public class DesignFretboardTuningViewModel : TuningViewModel {
+        public DesignFretboardTuningViewModel() {
+            Instrument inst = new() {
+                InstrumentType = InstrumentType.Guitar,
+                FretCount = 23,
+                StringCount = 6
+            };
+
+            Tuning tuning = new() {
+                Name = "Standard",
+                IsSelected = true
+            };
+            tuning.SetParent(inst);
+            tuning.OpenNotes.AddRange(
+                new[] { "E2","A2","D3","G3","B3","E4" }.Select(
+                    (x,idx) => new InstrumentNote(0,idx,Note.Parse(x))));
+
+            DesignMainViewModel mvm = new();
+            InstrumentViewModel instvm = new(mvm,inst);
+            Parent = instvm;
+            Init(tuning);
+        }
     }
 
 }

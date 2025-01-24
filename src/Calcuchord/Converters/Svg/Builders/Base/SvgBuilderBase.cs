@@ -50,16 +50,16 @@ namespace Calcuchord {
         protected string BarShadow =>
             "#00000050";
 
-        protected string RootBg =>
+        protected virtual string RootBg =>
             ColorPalette.Instance.P[PaletteColorType.RootFretBg];
 
-        protected string RootFg =>
+        protected virtual string RootFg =>
             ColorPalette.Instance.P[PaletteColorType.RootFretFg];
 
-        protected string UserBg =>
+        protected virtual string UserBg =>
             ColorPalette.Instance.P[PaletteColorType.UserFretBg];
 
-        protected string UserFg =>
+        protected virtual string UserFg =>
             ColorPalette.Instance.P[PaletteColorType.UserFretFg];
 
         protected string Fg =>
@@ -150,7 +150,7 @@ namespace Calcuchord {
 
             string result = doc.DocumentNode.OuterHtml;
             string fn =
-                $"{tuning.ToString().Replace("|","-").Replace(" ","-")}_{GetType().Name.Replace("SvgBuilder",string.Empty).ToLower()}.html";
+                $"{tuning.ToString().Replace("|","-").Replace(" ","-")}_{GetType().Name.Replace("SvgBuilder",string.Empty).ToLower()}_{ngl.FirstOrDefault().Parent.PatternType}.html";
             string fp = $"/home/tkefauver/Desktop/{fn}";
             MpFileIo.WriteTextToFile(fp,result);
 
@@ -168,7 +168,8 @@ namespace Calcuchord {
         #region Protected Methods
 
         protected bool IsUserNote(InstrumentNote note) {
-            if(MainViewModel.Instance is not { } mvm ||
+            if(note is null ||
+               MainViewModel.Instance is not { } mvm ||
                mvm.SelectedTuning is not { } stvm ||
                stvm.SelectedFrets.All(x => x.StringNum != note.StringNum && x.FretNum != note.FretNum)) {
                 return false;

@@ -5,6 +5,19 @@ using HtmlAgilityPack;
 
 namespace Calcuchord {
     public static class Extensions {
+        public static bool IsFlagEnabled(this InstrumentType it,SvgFlags flag) {
+            if(it != InstrumentType.Piano) {
+                return true;
+            }
+            if(flag == SvgFlags.Colors ||
+               flag == SvgFlags.Fingers ||
+               flag == SvgFlags.Frets ||
+               flag == SvgFlags.Tuning) {
+                return false;
+            }
+            return true;
+        }
+
         public static double CentimetersToInches(this double cms) {
             return cms / 2.54d;
         }

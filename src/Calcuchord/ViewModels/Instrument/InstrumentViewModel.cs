@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
+using Avalonia.Controls;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
@@ -48,9 +49,20 @@ namespace Calcuchord {
 
         #region Appearance
 
+        public string Icon =>
+            InstrumentType == InstrumentType.Guitar ? "GuitarElectric" :
+            InstrumentType == InstrumentType.Ukulele ? "GuitarAcoustic" :
+            InstrumentType == InstrumentType.Piano ? "Piano" :
+            "Music";
+
+        public string Name =>
+            Instrument.Name;
+
         #endregion
 
         #region Layout
+
+        public ColumnDefinitions ColumnDefinitions { get; private set; }
 
         #endregion
 
@@ -64,11 +76,24 @@ namespace Calcuchord {
             }
         }
 
+        public bool IsKeyboard =>
+            InstrumentType == InstrumentType.Piano;
+
         #endregion
 
         #region Model
 
-        public Instrument Instrument { get; }
+        public int StringCount =>
+            Instrument.StringCount;
+
+        public int LogicalStringCount =>
+            IsKeyboard ? StringCount : StringCount + 1;
+
+
+        public InstrumentType InstrumentType =>
+            Instrument.InstrumentType;
+
+        public Instrument Instrument { get; set; }
 
         #endregion
 
@@ -80,12 +105,13 @@ namespace Calcuchord {
 
         #region Constructors
 
+        public InstrumentViewModel() {
+            PropertyChanged += InstrumentViewModel_OnPropertyChanged;
+        }
+
         public InstrumentViewModel(MainViewModel parent,Instrument it) : base(parent) {
             PropertyChanged += InstrumentViewModel_OnPropertyChanged;
-            Instrument = it;
-            Tunings.AddRange(Instrument.Tunings.Select(x => new TuningViewModel(this,x)));
-            Instrument.RefreshModelTree();
-            Tunings.CollectionChanged += TuningsOnCollectionChanged;
+            Init(it);
         }
 
         #endregion
@@ -95,6 +121,13 @@ namespace Calcuchord {
         #endregion
 
         #region Protected Methods
+
+        public void Init(Instrument it) {
+            Instrument = it;
+            Tunings.AddRange(Instrument.Tunings.Select(x => new TuningViewModel(this,x)));
+            Instrument.RefreshModelTree();
+            Tunings.CollectionChanged += TuningsOnCollectionChanged;
+        }
 
         #endregion
 

@@ -7,6 +7,7 @@ using MonkeyPaste.Common;
 namespace Calcuchord {
     [DataContract]
     public class NoteGroup {
+
         #region Properties
 
         #region Members
@@ -25,8 +26,12 @@ namespace Calcuchord {
         #region Ignored
 
         [IgnoreDataMember]
-        public string Suffix =>
-            Parent.Suffix;
+        public string SuffixKey =>
+            Parent.SuffixKey;
+
+        [IgnoreDataMember]
+        public string SuffixDisplayValue =>
+            Parent.SuffixDisplayValue;
 
         [IgnoreDataMember]
         public NoteGroupCollection Parent { get; private set; }
@@ -37,7 +42,7 @@ namespace Calcuchord {
 
         [IgnoreDataMember]
         public string Name =>
-            $"{Key} {Suffix}";
+            $"{Key} {SuffixDisplayValue}";
 
         [IgnoreDataMember]
         public string FullName =>
@@ -86,5 +91,6 @@ namespace Calcuchord {
         #region Private Methods
 
         #endregion
+
     }
 }

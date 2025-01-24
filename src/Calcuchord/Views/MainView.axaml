@@ -3,8 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignWidth="800"
-             d:DesignHeight="450"
+             d:DesignWidth="360"
+             d:DesignHeight="720"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
@@ -13,8 +13,6 @@
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.MainView">
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <local:MainViewModel />
     </Design.DataContext>
 
@@ -22,7 +20,8 @@
         <controls:SnackbarHost HostName="Root">
             <controls:NavigationDrawer x:Name="LeftDrawer"
                                        Classes="permanent"
-                                       LeftDrawerOpened="{Binding ElementName=NavDrawerSwitch, Path=IsChecked, Mode=TwoWay}">
+                                       LeftDrawerOpened="{Binding ElementName=NavDrawerSwitch, Path=IsChecked, Mode=TwoWay}"
+                                       RightDrawerOpened="{Binding ElementName=OptionDrawerSwitch, Path=IsChecked, Mode=TwoWay}">
                 <controls:NavigationDrawer.LeftDrawerContent>
                     <local:LeftDrawerView />
                 </controls:NavigationDrawer.LeftDrawerContent>
@@ -30,6 +29,7 @@
                     <local:RightDrawerView />
                 </controls:NavigationDrawer.RightDrawerContent>
                 <DockPanel LastChildFill="true">
+                    <!-- HEADER MENU -->
                     <controls:ColorZone Name="PART_AppBarContainer"
                                         VerticalAlignment="Top"
                                         HorizontalAlignment="Stretch"
@@ -37,51 +37,37 @@
                                         Height="56"
                                         Mode="PrimaryMid"
                                         ZIndex="1">
-                        <Grid Margin="16">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="24" />
-                                <ColumnDefinition Width="32" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="32" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <ToggleButton Name="NavDrawerSwitch"
-                                          Theme="{StaticResource MaterialFlatButton}"
-                                          Width="32"
-                                          Height="32"
-                                          Padding="4">
-                                <avalonia:MaterialIcon Kind="Menu"
-                                                       Width="24"
-                                                       Height="24" />
-                            </ToggleButton>
-                            <TextBlock Grid.Column="2"
-                                       Classes="Headline6"
-                                       Text="Calcuchord"
-                                       VerticalAlignment="Center" />
+                        <DockPanel Margin="16">
 
-                        </Grid>
+                            <ToggleButton x:Name="NavDrawerSwitch"
+                                          DockPanel.Dock="Left"
+                                          Classes="float">
+                                <avalonia:MaterialIcon Kind="Menu" />
+                            </ToggleButton>
+
+                            <ToggleButton x:Name="OptionDrawerSwitch"
+                                          DockPanel.Dock="Right"
+                                          Classes="float">
+                                <avalonia:MaterialIcon Kind="DotsVertical" />
+                            </ToggleButton>
+
+                            <TextBlock Classes="Headline6"
+                                       Text="Calcuchord"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
                     </controls:ColorZone>
-                    <ScrollViewer Name="mainScroller"
-                                  DockPanel.Dock="Top"
-                                  HorizontalContentAlignment="Stretch"
-                                  HorizontalAlignment="Stretch"
-                                  HorizontalScrollBarVisibility="Disabled">
-                        <Border HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch">
-                            <Carousel Name="PageCarousel"
-                                      HorizontalAlignment="Stretch">
-                                <Carousel.Styles>
-                                    <Style Selector="Carousel#PageCarousel:not(.no-transitions)">
-                                        <Setter Property="PageTransition">
-                                            <PageSlide Duration="0.25"
-                                                       SlideOutEasing="CircularEaseOut"
-                                                       SlideInEasing="CircularEaseOut" />
-                                        </Setter>
-                                    </Style>
-                                </Carousel.Styles>
-                            </Carousel>
-                        </Border>
-                    </ScrollViewer>
+                    <Grid x:Name="MainContainerGrid"
+                          RowDefinitions="Auto,*">
+                        <Image Grid.RowSpan="2"
+                               Source="/Assets/Images/parchment.jpg"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               Opacity="0.5"
+                               Stretch="None" />
+                        <local:InstrumentView DataContext="{Binding SelectedInstrument}"
+                                              IsVisible="{Binding IsInstrumentVisible, Source={x:Static local:MainViewModel.Instance}}" />
+                    </Grid>
                 </DockPanel>
             </controls:NavigationDrawer>
         </controls:SnackbarHost>

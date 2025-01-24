@@ -3,12 +3,20 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignWidth="800"
-             d:DesignHeight="450"
+             d:DesignWidth="360"
+             d:DesignHeight="240"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia"
-             x:Class="Calcuchord.RightDrawerView">
+             x:DataType="local:InstrumentViewModel"
+             x:Class="Calcuchord.InstrumentView">
+    <Grid DataContext="{Binding SelectedTuning}">
+        <local:KeyboardView
+            IsVisible="{Binding IsPianoSelected, Source={x:Static local:MainViewModel.Instance}, FallbackValue=False, TargetNullValue=False}" />
+        <local:FretboardView
+            IsVisible="{Binding !IsPianoSelected, Source={x:Static local:MainViewModel.Instance}, FallbackValue=True, TargetNullValue=True}" />
+    </Grid>
+
 </UserControl>

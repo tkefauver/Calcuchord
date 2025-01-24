@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="360"
+             d:DesignHeight="240"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:TuningViewModel"
+             x:Class="Calcuchord.FretboardView">
+    <Design.DataContext>
+        <local:DesignFretboardTuningViewModel />
+    </Design.DataContext>
+    <Grid RowDefinitions="Auto,*">
+        <ToggleButton Classes="float"
+                      Margin="5"
+                      HorizontalAlignment="Left"
+                      IsChecked="{Binding IsStringsDescending,Mode=TwoWay}">
+            <avalonia:MaterialIcon Kind="{Binding StringSortIcon}" />
+        </ToggleButton>
+        <ScrollViewer x:Name="FretboardScrollViewer"
+                      Grid.Row="1"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Hidden">
+            <Viewbox>
+                <Grid x:Name="FretboardContainerGrid">
+                    <Image x:Name="FretboardBgImage"
+                           Source="/Assets/Images/rosewood.jpg"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top"
+                           Stretch="UniformToFill">
+                        <Image.RenderTransform>
+                            <TranslateTransform />
+                        </Image.RenderTransform>
+                    </Image>
+
+                    <ItemsControl x:Name="StringsItemsControl"
+                                  ItemsSource="{Binding SortedStringRows}"
+                                  Margin="0,0,0,10">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="local:StringRowViewModel">
+                                <ItemsControl x:Name="FretsItemsControl"
+                                              ItemsSource="{Binding Frets}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="local:FretViewModel">
+                                            <local:FretView />
+
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </Grid>
+            </Viewbox>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

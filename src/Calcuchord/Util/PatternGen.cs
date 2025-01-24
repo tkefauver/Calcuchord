@@ -55,6 +55,7 @@ namespace Calcuchord {
             { ChordSuffixType.maj11,[0,4,3,4,3,3] },
             { ChordSuffixType.m11,[0,3,4,3,4,3] }
         };
+
         Dictionary<ScaleSuffixType,int[]> Scales { get; } = new() {
             { ScaleSuffixType.Major,[0,2,2,1,2,2,2,1] },
             { ScaleSuffixType.NaturalMinor,[0,2,1,2,2,1,2,2] },
@@ -64,7 +65,7 @@ namespace Calcuchord {
             { ScaleSuffixType.Pentatonic,[0,2,2,3,2,3] },
             { ScaleSuffixType.Blues,[0,3,2,1,1,3] }
         };
-        
+
         Dictionary<ModeSuffixType,int[]> Modes { get; } = new() {
             { ModeSuffixType.Dorian,[0,2,1,2,2,2,1,2] },
             { ModeSuffixType.Phrygian,[0,1,2,2,2,1,2,2] },
@@ -82,16 +83,14 @@ namespace Calcuchord {
                     _patterns = new() {
                         {
                             MusicPatternType.Chords,
-                            Chords.ToDictionary(x=>x.Key.ToString(),x=>x.Value)
-                        }, 
-                        {
+                            Chords.ToDictionary(x => x.Key.ToString(),x => x.Value)
+                        }, {
                             MusicPatternType.Scales,
-                            Scales.ToDictionary(x=>x.Key.ToString(),x=>x.Value)
-                        }, 
-                        {
+                            Scales.ToDictionary(x => x.Key.ToString(),x => x.Value)
+                        }, {
                             MusicPatternType.Modes,
-                            Modes.ToDictionary(x=>x.Key.ToString(),x=>x.Value)
-                        }, 
+                            Modes.ToDictionary(x => x.Key.ToString(),x => x.Value)
+                        }
                     };
                 }
 
@@ -158,7 +157,25 @@ namespace Calcuchord {
 
         async Task<IEnumerable<NoteGroupCollection>> GenKeyboardPatternAsync() {
             await Task.Delay(1);
-            return null;
+            var patterns = PatternsLookup[PatternType];
+            var ngcl = new List<NoteGroupCollection>();
+            foreach(string suffix in patterns.Select(x => x.Key)) {
+                for(int cur_key_val = 0; cur_key_val < 12; cur_key_val++) {
+                    NoteType cur_key = (NoteType)cur_key_val;
+                    var pattern = GenPattern(cur_key,suffix);
+                    var all_pattern_inst_notes = GenNotes(pattern);
+                    // only return use 1 set of pattern for chords or 1 set + next root for scales/modes
+                    int result_len = PatternType == MusicPatternType.Chords ? pattern.Length : pattern.Length + 1;
+                    NoteGroupCollection ngc = new(PatternType,cur_key,suffix);
+                    var pattern_notes =
+                        all_pattern_inst_notes
+                            .Take(result_len)
+                            .Select(x => new PatternNote(0,x));
+                    ngc.Groups.Add(new(ngc,0,pattern_notes));
+                    ngcl.Add(ngc);
+                }
+            }
+            return ngcl;
         }
 
         #endregion
@@ -170,14 +187,14 @@ namespace Calcuchord {
                 return await GetFretboardChordsAsync();
             }
 
-            return await GetFretboardScalesAsync(PatternType == MusicPatternType.Modes);
+            return await GetFretboardScalesAsync();
         }
 
         #region Scales/Modes
 
-        async Task<IEnumerable<NoteGroupCollection>> GetFretboardScalesAsync(bool isMode) {
+        async Task<IEnumerable<NoteGroupCollection>> GetFretboardScalesAsync() {
             await Task.Delay(1);
-            var patterns = PatternsLookup[isMode ? MusicPatternType.Modes : MusicPatternType.Scales];
+            var patterns = PatternsLookup[PatternType];
             var ngcl = new List<NoteGroupCollection>();
             foreach(string suffix in patterns.Select(x => x.Key)) {
                 for(int cur_key_val = 0; cur_key_val < 12; cur_key_val++) {
@@ -191,8 +208,6 @@ namespace Calcuchord {
                     ngcl.Add(ngc);
                 }
             }
-
-
             return ngcl;
         }
 

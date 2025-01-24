@@ -48,32 +48,20 @@ namespace Calcuchord {
             }
 
             return null;
-
         }
 
-        static Dictionary<string,string> ChordSuffixTranslations { get; } = new() {
+        static Dictionary<string,string> SuffixTranslations { get; } = new() {
             { "_","/" },
             { "Num",string.Empty },
             { "sharp","#" }
         };
 
-        public static string ToDisplayValue(this ChordSuffixType cst) {
-            string dv = cst.ToString();
-            foreach(var cst_kvp in ChordSuffixTranslations) {
+        public static string ToDisplayValue(this MusicPatternType mpt,string suffixKey) {
+            string dv = suffixKey;
+            foreach(var cst_kvp in SuffixTranslations) {
                 dv = dv.Replace(cst_kvp.Key,cst_kvp.Value);
             }
-
-            return dv;
-        }
-
-        public static string ToChordEnumName(this string chord_suffix_disp_str) {
-            string en = chord_suffix_disp_str;
-
-            foreach(var cst_kvp in ChordSuffixTranslations) {
-                en = en.Replace(cst_kvp.Value,cst_kvp.Key);
-            }
-
-            return en;
+            return dv.ToProperCase();
         }
     }
 }

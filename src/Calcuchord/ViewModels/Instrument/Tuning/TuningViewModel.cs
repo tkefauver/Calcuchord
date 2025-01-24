@@ -38,6 +38,10 @@ namespace Calcuchord {
 
         #region View Models
 
+        public IEnumerable<StringRowViewModel> SortedStringRows =>
+            StringRows.OrderBy(
+                x => x.StringNum < 0 ? -1 : IsStringsDescending ? StringCount - x.StringNum : x.StringNum);
+
         public ObservableCollection<StringRowViewModel> StringRows { get; } = [];
 
         public IEnumerable<FretViewModel> AllFrets =>
@@ -50,6 +54,9 @@ namespace Calcuchord {
 
         #region Appearance
 
+        public string StringSortIcon =>
+            IsStringsDescending ? "SortDescending" : "SortAscending";
+
         #endregion
 
         #region Layout
@@ -57,6 +64,14 @@ namespace Calcuchord {
         #endregion
 
         #region State
+
+        public bool IsStringsDescending {
+            get => Prefs.Instance.IsStringsDescending;
+            set {
+                Prefs.Instance.IsStringsDescending = value;
+                OnPropertyChanged(nameof(IsStringsDescending));
+            }
+        }
 
         public bool IsLoaded =>
             Tuning.Chords.Any() && Tuning.Scales.Any();
@@ -73,7 +88,17 @@ namespace Calcuchord {
 
         #region Model
 
-        public Tuning Tuning { get; }
+        public int FretCount =>
+            Tuning.FretCount;
+
+        int StringCount =>
+            Parent.StringCount;
+
+        // +2 for label and nut
+        public int LogicalFretCount =>
+            FretCount + (Parent.IsKeyboard ? 0 : 2);
+
+        public Tuning Tuning { get; set; }
 
         #endregion
 
@@ -85,12 +110,12 @@ namespace Calcuchord {
 
         #region Constructors
 
+        public TuningViewModel() {
+        }
+
         public TuningViewModel(InstrumentViewModel parent,Tuning tuning) : base(parent) {
             PropertyChanged += InstrumentTuningViewModel_OnPropertyChanged;
-            Tuning = tuning;
-            Tuning.SetParent(parent.Instrument);
-
-            Tuning.OpenNotes.ForEach(x => StringRows.Add(new(this,x)));
+            Init(tuning);
         }
 
         #endregion
@@ -120,6 +145,18 @@ namespace Calcuchord {
 
         #region Protected Methods
 
+        public void Init(Tuning tuning) {
+            Tuning = tuning;
+            Tuning.SetParent(Parent.Instrument);
+
+
+            Tuning.OpenNotes.OrderBy(x => x.StringNum).ForEach(x => StringRows.Add(new(this,x)));
+            if(!Parent.IsKeyboard) {
+                StringRows.Insert(0,new(this,null));
+            }
+            OnPropertyChanged(nameof(IsStringsDescending));
+        }
+
         #endregion
 
         #region Private Methods
@@ -130,6 +167,13 @@ namespace Calcuchord {
                     if(IsSelected) {
                         MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.SelectedTuning));
                     }
+
+                    break;
+                case nameof(IsStringsDescending):
+                    OnPropertyChanged(nameof(SortedStringRows));
+                    OnPropertyChanged(nameof(StringSortIcon));
+                    AllFrets.ForEach(x => x.OnPropertyChanged(nameof(x.IsTopDotFret)));
+                    AllFrets.ForEach(x => x.OnPropertyChanged(nameof(x.IsBottomDotFret)));
 
                     break;
             }

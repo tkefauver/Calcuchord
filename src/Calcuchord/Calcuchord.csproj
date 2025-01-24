@@ -39,7 +39,6 @@
     <ItemGroup>
         <Folder Include="AttachedProperties\"/>
         <Folder Include="Models\Providers\Patterns\"/>
-        <Folder Include="Views\Instrument\"/>
         <Folder Include="Views\Matches\"/>
     </ItemGroup>
 

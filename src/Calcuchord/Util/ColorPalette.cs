@@ -22,7 +22,12 @@ namespace Calcuchord {
         Finger4Fg,
         Finger4Bg,
         NutBg,
-        NutFg
+        NutFg,
+        PianoWhiteKeyBg,
+        PianoWhiteKeyFg,
+        PianoBlackKeyBg,
+        PianoBlackKeyFg,
+        PianoMatch
     }
 
     public class ColorPalette : ViewModelBase {
@@ -76,7 +81,8 @@ namespace Calcuchord {
                             ("#000000","#FFFFFF")
                         }, {
                             PaletteColorType.UserFretBg,
-                            ("#EC3E7B","#EC3E7B")
+                            //("#EC3E7B","#EC3E7B")
+                            ("#DC143C","#DC143C")
                         }, {
                             PaletteColorType.UserFretFg,
                             ("#FFFFFF","#FFFFFF")
@@ -116,6 +122,18 @@ namespace Calcuchord {
                         }, {
                             PaletteColorType.NutFg,
                             ("#000000","#000000")
+                        }, {
+                            PaletteColorType.PianoWhiteKeyBg,
+                            ("#FFFFFF","#000000")
+                        }, {
+                            PaletteColorType.PianoWhiteKeyFg,
+                            ("#000000","#FFFFFF")
+                        }, {
+                            PaletteColorType.PianoBlackKeyBg,
+                            ("#000000","#FFFFFF")
+                        }, {
+                            PaletteColorType.PianoBlackKeyFg,
+                            ("#FFFFFF","#000000")
                         }
                     };
 

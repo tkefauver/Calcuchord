@@ -73,13 +73,16 @@ namespace Calcuchord {
             DefaultFret.IsDefaultState;
 
         public int StringNum =>
-            OpenNote.StringNum;
+            OpenNote == null ? -1 : OpenNote.StringNum;
+
+        public int FretCount =>
+            Parent.Tuning.FretCount;
 
         #endregion
 
         #region Model
 
-        public InstrumentNote OpenNote { get; }
+        public InstrumentNote OpenNote { get; set; }
 
         #endregion
 
@@ -91,10 +94,11 @@ namespace Calcuchord {
 
         #region Constructors
 
+        public StringRowViewModel() {
+        }
+
         public StringRowViewModel(TuningViewModel parent,InstrumentNote openNote) : base(parent) {
-            OpenNote = openNote;
-            Enumerable.Range(0,Parent.Tuning.FretCount)
-                .ForEach(x => Frets.Add(new(this,new(x,StringNum,OpenNote.Offset(x)))));
+            Init(openNote);
         }
 
         #endregion
@@ -104,6 +108,18 @@ namespace Calcuchord {
         #endregion
 
         #region Protected Methods
+
+        public void Init(InstrumentNote openNote) {
+            OpenNote = openNote;
+
+            int min_fret_num = Parent.Parent.IsKeyboard ? 0 : -1;
+            Enumerable.Range(min_fret_num,Parent.LogicalFretCount)
+                .ForEach(
+                    x => Frets.Add(
+                        new(
+                            this,
+                            new(x,StringNum,OpenNote == null ? null : OpenNote.Offset(x)))));
+        }
 
         #endregion
 

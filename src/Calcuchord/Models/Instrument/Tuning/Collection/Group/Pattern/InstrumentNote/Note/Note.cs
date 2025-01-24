@@ -62,6 +62,14 @@ namespace Calcuchord {
         #region Ignored
 
         [IgnoreDataMember]
+        public bool IsAltered =>
+            Key == NoteType.Db ||
+            Key == NoteType.Eb ||
+            Key == NoteType.Gb ||
+            Key == NoteType.Ab ||
+            Key == NoteType.Bb;
+
+        [IgnoreDataMember]
         public virtual string Name =>
             Key.ToDisplayValue();
 

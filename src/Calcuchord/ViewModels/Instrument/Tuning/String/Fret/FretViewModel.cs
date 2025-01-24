@@ -33,6 +33,31 @@ namespace Calcuchord {
 
         #region Appearance
 
+        public string FretLabel {
+            get {
+                if(IsFretNumLabel) {
+                    return FretNum.ToString();
+                }
+                if(IsStringKeyLabel) {
+                    if(Parent.OpenNote == null) {
+                        return string.Empty;
+                    }
+                    return Parent.OpenNote.FullName;
+                }
+                return FretNote.Name;
+            }
+        }
+
+
+        public double StringHeight {
+            get {
+                if(!IsRealFret) {
+                    return 0;
+                }
+                return (Parent.Parent.Parent.StringCount - StringNum) + 1;
+            }
+        }
+
         #endregion
 
         #region Layout
@@ -41,15 +66,92 @@ namespace Calcuchord {
 
         #region State
 
+        public bool IsEnabled =>
+            StringNum >= 0 && FretNum >= 0;
+
+        public bool IsSolid =>
+            //Parent.Parent.Parent.InstrumentType == InstrumentType.Guitar &&
+            StringNum >= 4;
+
+        public bool IsRealFret =>
+            IsEnabled && FretNum >= 0;
+
+        public bool IsTopDotFret {
+            get {
+                bool desc = Parent.Parent.IsStringsDescending;
+                double a = desc ? 3 : 2;
+                double b = desc ? 2 : 1;
+                double c = desc ? 4 : 3;
+
+                if(StringNum == a &&
+                   (FretNum == 3 ||
+                    FretNum == 5 ||
+                    FretNum == 7 ||
+                    FretNum == 9 ||
+                    FretNum == 15 ||
+                    FretNum == 17 ||
+                    FretNum == 19 ||
+                    FretNum == 21)) {
+                    return true;
+                }
+                if((StringNum == b || StringNum == c) && FretNum == 12) {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public bool IsBottomDotFret {
+            get {
+                bool desc = Parent.Parent.IsStringsDescending;
+                double a = desc ? 2 : 3;
+                double b = desc ? 1 : 2;
+                double c = desc ? 3 : 4;
+                if(StringNum == a &&
+                   (FretNum == 3 ||
+                    FretNum == 5 ||
+                    FretNum == 7 ||
+                    FretNum == 9 ||
+                    FretNum == 15 ||
+                    FretNum == 17 ||
+                    FretNum == 19 ||
+                    FretNum == 21)) {
+                    return true;
+                }
+                if((StringNum == b || StringNum == c) && FretNum == 12) {
+                    return true;
+                }
+                return false;
+            }
+        }
+
         public bool IsInUnknownState { get; set; }
         public bool IsInMuteState { get; set; }
 
-        public bool IsOpenFret =>
-            FretNum == 0;
+        public bool IsNutFret =>
+            IsEnabled && FretNum == 0;
+
+        public bool IsFretNumLabel =>
+            Parent.StringNum == -1;
+
+        public bool IsVisible {
+            get {
+                if(IsFretNumLabel) {
+                    return FretNum >= 1;
+                }
+                if(IsStringKeyLabel) {
+                    return Parent.StringNum >= 0;
+                }
+                return true;
+            }
+        }
+
+        public bool IsStringKeyLabel =>
+            FretNum == -1;
 
         public int WorkingFretNum {
             get {
-                if(!IsOpenFret) {
+                if(!IsNutFret) {
                     return FretNum;
                 }
                 if(IsInMuteState) {
@@ -64,7 +166,7 @@ namespace Calcuchord {
 
         public bool IsDefaultState {
             get {
-                if(IsOpenFret) {
+                if(IsNutFret) {
                     return WorkingFretNum == OPEN_FRET_NUM;
                 }
                 return true;
@@ -83,7 +185,7 @@ namespace Calcuchord {
         public int StringNum =>
             FretNote.StringNum;
 
-        public InstrumentNote FretNote { get; }
+        public InstrumentNote FretNote { get; set; }
 
         #endregion
 
@@ -95,8 +197,11 @@ namespace Calcuchord {
 
         #region Constructors
 
+        public FretViewModel() {
+        }
+
         public FretViewModel(StringRowViewModel parent,InstrumentNote fretNote) : base(parent) {
-            FretNote = fretNote;
+            Init(fretNote);
         }
 
         #endregion
@@ -106,6 +211,12 @@ namespace Calcuchord {
         #endregion
 
         #region Protected Methods
+
+        public void Init(InstrumentNote fretNote) {
+            FretNote = fretNote;
+
+            OnPropertyChanged(nameof(FretNum));
+        }
 
         #endregion
 

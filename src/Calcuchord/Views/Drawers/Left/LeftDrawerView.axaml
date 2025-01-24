@@ -3,16 +3,20 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignWidth="800"
-             d:DesignHeight="450"
+             d:DesignWidth="340"
+             d:DesignHeight="720"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:MainViewModel"
              x:Class="Calcuchord.LeftDrawerView">
+    <Design.DataContext>
+        <local:MainViewModel />
+    </Design.DataContext>
     <ScrollViewer>
-        <StackPanel>
+        <Grid RowDefinitions="Auto,*,Auto,Auto">
             <controls:ColorZone Mode="Accent"
                                 Height="180">
                 <StackPanel>
@@ -34,8 +38,11 @@
                     </TextBlock>
                 </StackPanel>
             </controls:ColorZone>
-            <ListBox Classes="NoScroll"
-                     Name="DrawerList">
+            <ListBox x:Name="InstrumentsList"
+                     Grid.Row="1"
+                     Classes="NoScroll"
+                     SelectedIndex="{Binding SelectedInstrumentIndex, Mode=TwoWay}"
+                     ItemsSource="{Binding Instruments}">
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem">
                         <Setter Property="Height"
@@ -44,31 +51,55 @@
                                 Value="16,0" />
                         <Setter Property="VerticalContentAlignment"
                                 Value="Center" />
+                        <Setter Property="HorizontalContentAlignment"
+                                Value="Left" />
                     </Style>
                 </ListBox.Styles>
-                <ListBoxItem>Home</ListBoxItem>
-                <ListBoxItem>Buttons</ListBoxItem>
-                <ListBoxItem>Card</ListBoxItem>
-                <ListBoxItem>ColorZones</ListBoxItem>
-                <ListBoxItem>Colors</ListBoxItem>
-                <ListBoxItem>ComboBoxes</ListBoxItem>
-                <ListBoxItem>Date/Time pickers</ListBoxItem>
-                <ListBoxItem>Dialogs</ListBoxItem>
-                <ListBoxItem>Expanders</ListBoxItem>
-                <ListBoxItem>Fields</ListBoxItem>
-                <ListBoxItem>Lists</ListBoxItem>
-                <ListBoxItem>Material Icons</ListBoxItem>
-                <ListBoxItem>Progress indicators</ListBoxItem>
-                <ListBoxItem>ScrollViewer</ListBoxItem>
-                <!-- <ListBoxItem>Shadows</ListBoxItem> -->
-                <ListBoxItem>SideSheet</ListBoxItem>
-                <ListBoxItem>Sliders</ListBoxItem>
-                <ListBoxItem>Snackbar</ListBoxItem>
-                <ListBoxItem>TabControls</ListBoxItem>
-                <ListBoxItem>Toggles</ListBoxItem>
-                <ListBoxItem>TreeViews</ListBoxItem>
-                <ListBoxItem>Typography</ListBoxItem>
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="local:InstrumentViewModel">
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="10">
+                            <avalonia:MaterialIcon Kind="{Binding Icon}" />
+                            <TextBlock Classes="Headline6"
+                                       Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
-        </StackPanel>
+            <controls:FloatingButton Grid.Row="2"
+                                     Margin="5"
+                                     IsExtended="True"
+                                     HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal"
+                            Height="24">
+                    <Viewbox Stretch="Fill"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch">
+                        <avalonia:MaterialIcon Kind="Plus"
+                                               Width="24"
+                                               Height="24" />
+                    </Viewbox>
+                    <TextBlock Margin="8,0"
+                               Text="Add "
+                               Classes="Subtitle2"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </controls:FloatingButton>
+            <controls:ColorZone Grid.Row="3"
+                                Mode="Inverted"
+                                VerticalContentAlignment="Center"
+                                HorizontalContentAlignment="Left"
+                                Padding="10">
+
+                <Button Classes="float">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="5">
+                        <avalonia:MaterialIcon Kind="About" />
+                        <TextBlock Text="About" />
+
+                    </StackPanel>
+                </Button>
+            </controls:ColorZone>
+        </Grid>
     </ScrollViewer>
 </UserControl>

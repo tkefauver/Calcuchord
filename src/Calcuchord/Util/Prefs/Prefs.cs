@@ -106,6 +106,9 @@ namespace Calcuchord {
         #region Members
 
         [DataMember]
+        public bool IsStringsDescending { get; set; }
+
+        [DataMember]
         public SvgFlags CurrentSvgFlags { get; set; } = SvgBuilderBase.DefaultSvgFlags;
 
         [DataMember]

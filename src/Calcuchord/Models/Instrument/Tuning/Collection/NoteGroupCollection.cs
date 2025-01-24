@@ -4,12 +4,13 @@ using System.Runtime.Serialization;
 namespace Calcuchord {
     [DataContract]
     public class NoteGroupCollection {
+
         #region Properties
 
         #region Members
 
         [DataMember]
-        public string Suffix { get; set; }
+        public string SuffixKey { get; set; }
 
         [DataMember]
         public NoteType Key { get; set; }
@@ -25,6 +26,10 @@ namespace Calcuchord {
         #region Ignored
 
         [IgnoreDataMember]
+        public string SuffixDisplayValue =>
+            PatternType.ToDisplayValue(SuffixKey);
+
+        [IgnoreDataMember]
         public Tuning Parent { get; set; }
 
         #endregion
@@ -36,10 +41,10 @@ namespace Calcuchord {
         public NoteGroupCollection() {
         }
 
-        public NoteGroupCollection(MusicPatternType pt,NoteType key,string suffix) {
+        public NoteGroupCollection(MusicPatternType pt,NoteType key,string suffixKey) {
             PatternType = pt;
             Key = key;
-            Suffix = suffix;
+            SuffixKey = suffixKey;
         }
 
         #endregion
@@ -62,5 +67,6 @@ namespace Calcuchord {
         #region Private Methods
 
         #endregion
+
     }
 }

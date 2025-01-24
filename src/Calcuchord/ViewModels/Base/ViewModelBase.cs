@@ -10,7 +10,7 @@ namespace Calcuchord {
         }
 
         void OnPropertyChanged_internal(object sender,PropertyChangedEventArgs e) {
-            OnPropertyChanged(e.PropertyName,from_internal: true);
+            OnPropertyChanged(e.PropertyName,true);
         }
 
         public virtual void OnPropertyChanged(string propertyName,bool from_internal = false) {
@@ -29,6 +29,9 @@ namespace Calcuchord {
 
     public abstract class ViewModelBase<T> : ViewModelBase where T : ViewModelBase {
         public T Parent { get; set; }
+
+        public ViewModelBase() {
+        }
 
         public ViewModelBase(T parent) {
             Parent = parent;
