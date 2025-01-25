@@ -5,13 +5,11 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.ReactiveUI;
-using MonkeyPaste.Common;
 using ReactiveUI;
 
 namespace Calcuchord {
@@ -19,6 +17,9 @@ namespace Calcuchord {
     public class Prefs : ViewModelBase {
 
         #region Private Variables
+
+        [IgnoreDataMember]
+        bool _isSavingIgnored;
 
         #endregion
 
@@ -46,17 +47,6 @@ namespace Calcuchord {
                     _prefsFilePath = fp;
                 }
 
-                try {
-                    if(!File.Exists(_prefsFilePath)) {
-                        using(File.Create(_prefsFilePath)) {
-                            ;
-                        }
-                    }
-                }
-                catch(Exception ex) {
-                    ex.Dump();
-                }
-
                 return _prefsFilePath;
             }
         }
@@ -76,9 +66,12 @@ namespace Calcuchord {
         }
 
         public static void Init() {
+            //File.Delete(PrefsFilePath);
+            bool is_initial_startup = !File.Exists(PrefsFilePath);
+
             if(Application.Current != null &&
                Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime) {
-                AutoSuspendHelper suspension = new(lifetime);
+                AutoSuspendHelper suspension = new AutoSuspendHelper(lifetime);
                 RxApp.SuspensionHost.CreateNewAppState = () => new Prefs();
                 RxApp.SuspensionHost.SetupDefaultSuspendResume(Driver);
                 suspension.OnFrameworkInitializationCompleted();
@@ -89,7 +82,11 @@ namespace Calcuchord {
                 _ = new Prefs();
             } else {
                 _ = RxApp.SuspensionHost.GetAppState<Prefs>();
-                RxApp.SuspensionHost.CreateNewAppState.Invoke();
+                if(is_initial_startup) {
+                    //RxApp.SuspensionHost.CreateNewAppState.Invoke();
+                    _ = new Prefs();
+                }
+                //
             }
         }
 
@@ -104,6 +101,19 @@ namespace Calcuchord {
         #region Properties
 
         #region Members
+
+        [DataMember]
+        string _selectedTuningId;
+
+        public string SelectedTuningId {
+            get => _selectedTuningId;
+            set {
+                if(SelectedTuningId != value) {
+                    _selectedTuningId = value;
+                    OnPropertyChanged(nameof(SelectedTuningId));
+                }
+            }
+        }
 
         [DataMember]
         public bool IsStringsDescending { get; set; }
@@ -132,9 +142,6 @@ namespace Calcuchord {
         #endregion
 
         #region Ignored
-
-        [IgnoreDataMember]
-        bool IsSavingIgnored { get; set; }
 
         [IgnoreDataMember]
         Dictionary<MusicPatternType,ObservableCollection<string>> _bookmarkLookup;
@@ -173,30 +180,35 @@ namespace Calcuchord {
             Instance = this;
 
             PropertyChanged += PropertyChanged_OnPropertyChanged;
-            Instruments.CollectionChanged += Coll_OnCollectionChanged;
-            ChordBookmarkIds.CollectionChanged += Coll_OnCollectionChanged;
-            ScaleBookmarkIds.CollectionChanged += Coll_OnCollectionChanged;
+            // Instruments.CollectionChanged += Coll_OnCollectionChanged;
+            // ChordBookmarkIds.CollectionChanged += Coll_OnCollectionChanged;
+            // ScaleBookmarkIds.CollectionChanged += Coll_OnCollectionChanged;
         }
 
         #endregion
 
         #region Public Methods
 
-        public void SyncAndSave() {
-            IsSavingIgnored = true;
-            Instruments.Clear();
-            IsSavingIgnored = false;
-            Instruments.AddRange(MainViewModel.Instance.Instruments.Select(x => x.Instrument));
-        }
-
         public void Save() {
-            if(IsSavingIgnored) {
+            if(_isSavingIgnored) {
                 Debug.WriteLine("Save ignored");
                 return;
             }
 
+            if(Driver == null) {
+            }
+
             Driver?.SaveState(this);
-            Debug.WriteLine($"{DateTime.Now} prefs saved");
+            Debug.WriteLine("");
+            Debug.WriteLine($"{DateTime.Now} prefs saved. SelectedTuningId: {SelectedTuningId}");
+            foreach(Instrument inst in Instruments) {
+                foreach(Tuning tuning in inst.Tunings) {
+                    Debug.WriteLine(
+                        $"{inst} Chords: {tuning.Chords.Count} Scales: {tuning.Scales.Count} Modes: {tuning.Modes.Count}");
+                }
+            }
+
+            Debug.WriteLine("");
         }
 
         #endregion

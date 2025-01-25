@@ -68,6 +68,9 @@ namespace Calcuchord {
 
         #region State
 
+        bool IsKeyboard =>
+            Parent.Parent.IsKeyboard;
+
         public bool IsDefaultSelection =>
             SelectedFrets.All(x => x == DefaultFret) &&
             DefaultFret.IsDefaultState;
@@ -113,17 +116,22 @@ namespace Calcuchord {
             OpenNote = openNote;
 
             int min_fret_num = Parent.Parent.IsKeyboard ? 0 : -1;
-            Enumerable.Range(min_fret_num,Parent.LogicalFretCount)
-                .ForEach(
-                    x => Frets.Add(
-                        new(
-                            this,
-                            new(x,StringNum,OpenNote == null ? null : OpenNote.Offset(x)))));
+            Frets.AddRange(
+                Enumerable.Range(min_fret_num,Parent.LogicalFretCount)
+                    .Select(x => CreateFretViewModel(x)));
         }
 
         #endregion
 
         #region Private Methods
+
+        FretViewModel CreateFretViewModel(int fretNum) {
+            InstrumentNote inn = new(fretNum,StringNum,OpenNote == null ? null : OpenNote.Offset(fretNum));
+            if(IsKeyboard) {
+                return new KeyViewModel(this,inn);
+            }
+            return new(this,inn);
+        }
 
         #endregion
 

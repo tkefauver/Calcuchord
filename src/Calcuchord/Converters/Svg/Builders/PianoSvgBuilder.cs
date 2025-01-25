@@ -31,9 +31,9 @@ namespace Calcuchord {
             double lw = FretLineFixedAxisSize * 2;
             double bw = lw * 1;
             double wkw = StringFixedAxisLength;
-            double bkw = wkw * 0.5;
-            double wkh = wkw * 5.700677201;
-            double bkh = wkh * 0.633563;
+            double bkw = wkw * KeyViewModel.WHITE_TO_BLACK_WIDTH_RATIO;
+            double wkh = wkw * KeyViewModel.WHITE_WIDTH_TO_HEIGHT_RATIO;
+            double bkh = wkh * KeyViewModel.WHITE_TO_BLACK_HEIGHT_RATIO;
 
             string bkf = Fg;
             string wkf = Bg;

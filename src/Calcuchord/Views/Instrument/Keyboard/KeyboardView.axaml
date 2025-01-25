@@ -10,5 +10,54 @@
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:TuningViewModel"
              x:Class="Calcuchord.KeyboardView">
+    <UserControl.Styles>
+        <Style Selector="local|KeyView">
+            <Setter Property="ZIndex"
+                    Value="0" />
+            <Setter Property="BorderThickness"
+                    Value="2" />
+            <Setter Property="Width"
+                    Value="40" />
+            <Setter Property="Height"
+                    Value="228" />
+            <Setter Property="Background"
+                    Value="{DynamicResource PianoWhiteKeyBg}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource PianoWhiteKeyFg}" />
+        </Style>
+        <Style Selector="local|KeyView.black">
+            <Setter Property="ZIndex"
+                    Value="1" />
+            <Setter Property="Width"
+                    Value="20" />
+            <Setter Property="Height"
+                    Value="144.4" />
+            <Setter Property="Background"
+                    Value="{DynamicResource PianoBlackKeyBg}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource PianoBlackKeyFg}" />
+        </Style>
+
+    </UserControl.Styles>
+    <Viewbox Margin="10">
+        <ItemsControl x:Name="KeyboardItemsControl"
+                      Width="{x:Static local:KeyViewModel.KeyboardWidth}"
+                      Height="{x:Static local:KeyViewModel.KeyboardHeight}"
+                      ItemsSource="{Binding AllFrets}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas Classes="keyboard" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="local:KeyViewModel">
+                    <local:KeyView Classes.black="{Binding IsAltered}" />
+
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Viewbox>
+
 </UserControl>

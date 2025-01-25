@@ -79,11 +79,22 @@ namespace Calcuchord {
         public bool IsTopDotFret {
             get {
                 bool desc = Parent.Parent.IsStringsDescending;
-                double a = desc ? 3 : 2;
-                double b = desc ? 2 : 1;
-                double c = desc ? 4 : 3;
+                double single_top_str_num = 0,dbl_top_str_num1 = 0,dbl_top_str_num2 = 0;
 
-                if(StringNum == a &&
+                switch(Parent.Parent.Parent.StringCount) {
+                    case 6:
+                        single_top_str_num = desc ? 3 : 2;
+                        dbl_top_str_num1 = desc ? 2 : 1;
+                        dbl_top_str_num2 = desc ? 4 : 3;
+                        break;
+                    case 4:
+                        single_top_str_num = desc ? 2 : 1;
+                        dbl_top_str_num1 = desc ? 3 : 0;
+                        dbl_top_str_num2 = desc ? 1 : 2;
+                        break;
+                }
+
+                if(StringNum == single_top_str_num &&
                    (FretNum == 3 ||
                     FretNum == 5 ||
                     FretNum == 7 ||
@@ -94,7 +105,7 @@ namespace Calcuchord {
                     FretNum == 21)) {
                     return true;
                 }
-                if((StringNum == b || StringNum == c) && FretNum == 12) {
+                if((StringNum == dbl_top_str_num1 || StringNum == dbl_top_str_num2) && FretNum == 12) {
                     return true;
                 }
                 return false;
@@ -104,10 +115,21 @@ namespace Calcuchord {
         public bool IsBottomDotFret {
             get {
                 bool desc = Parent.Parent.IsStringsDescending;
-                double a = desc ? 2 : 3;
-                double b = desc ? 1 : 2;
-                double c = desc ? 3 : 4;
-                if(StringNum == a &&
+                double single_bottom_str_num = 0,dbl_bottom_str_num1 = 0,dbl_bottom_str_num2 = 0;
+                switch(Parent.Parent.Parent.StringCount) {
+                    case 6:
+                        single_bottom_str_num = desc ? 2 : 3;
+                        dbl_bottom_str_num1 = desc ? 1 : 2;
+                        dbl_bottom_str_num2 = desc ? 3 : 4;
+                        break;
+                    case 4:
+                        single_bottom_str_num = desc ? 1 : 2;
+                        dbl_bottom_str_num1 = desc ? 2 : 1;
+                        dbl_bottom_str_num2 = desc ? 0 : 3;
+                        break;
+                }
+
+                if(StringNum == single_bottom_str_num &&
                    (FretNum == 3 ||
                     FretNum == 5 ||
                     FretNum == 7 ||
@@ -118,7 +140,7 @@ namespace Calcuchord {
                     FretNum == 21)) {
                     return true;
                 }
-                if((StringNum == b || StringNum == c) && FretNum == 12) {
+                if((StringNum == dbl_bottom_str_num1 || StringNum == dbl_bottom_str_num2) && FretNum == 12) {
                     return true;
                 }
                 return false;
@@ -179,6 +201,9 @@ namespace Calcuchord {
 
         #region Model
 
+        public bool IsAltered =>
+            FretNote.IsAltered;
+
         public int FretNum =>
             FretNote.FretNum;
 
@@ -229,4 +254,5 @@ namespace Calcuchord {
         #endregion
 
     }
+
 }

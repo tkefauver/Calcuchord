@@ -2,6 +2,7 @@
 
 namespace Calcuchord {
     public abstract class ViewModelBase : INotifyPropertyChanged {
+        public bool IsBusy { get; set; }
         public bool HasModelChanged { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
 

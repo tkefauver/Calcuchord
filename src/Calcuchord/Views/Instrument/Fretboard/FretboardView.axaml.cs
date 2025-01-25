@@ -13,6 +13,7 @@ using PropertyChanged;
 namespace Calcuchord {
     [DoNotNotify]
     public partial class FretboardView : UserControl {
+
         public FretboardView() {
             InitializeComponent();
 
@@ -41,6 +42,7 @@ namespace Calcuchord {
             if(DataContext is not TuningViewModel tvm) {
                 return;
             }
+
             ItemsControl cntr = StringsItemsControl;
 
             double min_width = tvm.FretCount * (1600 / 23d);
@@ -64,6 +66,7 @@ namespace Calcuchord {
                 fret_widths[i - 1] = l - ll;
                 ll = l;
             }
+
             double nut_width = fret_widths.Min();
             double label_width = fret_widths.Max() * 0.25;
             double str_h = th / tvm.Parent.LogicalStringCount;
@@ -73,6 +76,7 @@ namespace Calcuchord {
                     if(x.GetVisualAncestor<ContentPresenter>() is not { } cp) {
                         return;
                     }
+
                     int fn = x.BindingContext.FretNum;
                     cp.Width = fn < 0 ? label_width :
                         fn == 0 ? nut_width :

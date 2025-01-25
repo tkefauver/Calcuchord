@@ -15,61 +15,78 @@
     <Design.DataContext>
         <local:MainViewModel />
     </Design.DataContext>
+    <Grid x:Name="MainOuterContainer">
+        <dialogHostAvalonia:DialogHost Identifier="MainDialogHost">
+            <controls:SnackbarHost HostName="Root">
+                <controls:NavigationDrawer x:Name="LeftDrawer"
+                                           Classes="permanent"
+                                           LeftDrawerOpened="{Binding ElementName=NavDrawerSwitch, Path=IsChecked, Mode=TwoWay}"
+                                           RightDrawerOpened="{Binding ElementName=OptionDrawerSwitch, Path=IsChecked, Mode=TwoWay}">
+                    <controls:NavigationDrawer.LeftDrawerContent>
+                        <local:LeftDrawerView />
+                    </controls:NavigationDrawer.LeftDrawerContent>
+                    <controls:NavigationDrawer.RightDrawerContent>
+                        <local:RightDrawerView />
+                    </controls:NavigationDrawer.RightDrawerContent>
+                    <DockPanel LastChildFill="true">
+                        <!-- HEADER MENU -->
+                        <controls:ColorZone Name="PART_AppBarContainer"
+                                            VerticalAlignment="Top"
+                                            HorizontalAlignment="Stretch"
+                                            DockPanel.Dock="Top"
+                                            Height="56"
+                                            Mode="PrimaryMid"
+                                            ZIndex="1">
+                            <DockPanel Margin="16">
+                                <ToggleButton x:Name="NavDrawerSwitch"
+                                              DockPanel.Dock="Left"
+                                              Classes="float">
+                                    <avalonia:MaterialIcon Kind="Menu" />
+                                </ToggleButton>
 
-    <dialogHostAvalonia:DialogHost Identifier="MainDialogHost">
-        <controls:SnackbarHost HostName="Root">
-            <controls:NavigationDrawer x:Name="LeftDrawer"
-                                       Classes="permanent"
-                                       LeftDrawerOpened="{Binding ElementName=NavDrawerSwitch, Path=IsChecked, Mode=TwoWay}"
-                                       RightDrawerOpened="{Binding ElementName=OptionDrawerSwitch, Path=IsChecked, Mode=TwoWay}">
-                <controls:NavigationDrawer.LeftDrawerContent>
-                    <local:LeftDrawerView />
-                </controls:NavigationDrawer.LeftDrawerContent>
-                <controls:NavigationDrawer.RightDrawerContent>
-                    <local:RightDrawerView />
-                </controls:NavigationDrawer.RightDrawerContent>
-                <DockPanel LastChildFill="true">
-                    <!-- HEADER MENU -->
-                    <controls:ColorZone Name="PART_AppBarContainer"
-                                        VerticalAlignment="Top"
-                                        HorizontalAlignment="Stretch"
-                                        DockPanel.Dock="Top"
-                                        Height="56"
-                                        Mode="PrimaryMid"
-                                        ZIndex="1">
-                        <DockPanel Margin="16">
+                                <ToggleButton x:Name="OptionDrawerSwitch"
+                                              DockPanel.Dock="Right"
+                                              Classes="float">
+                                    <avalonia:MaterialIcon Kind="DotsVertical" />
+                                </ToggleButton>
 
-                            <ToggleButton x:Name="NavDrawerSwitch"
-                                          DockPanel.Dock="Left"
-                                          Classes="float">
-                                <avalonia:MaterialIcon Kind="Menu" />
-                            </ToggleButton>
+                                <TextBlock Classes="Headline6"
+                                           Text="Calcuchord"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </DockPanel>
+                        </controls:ColorZone>
+                        <Grid x:Name="MainContainerGrid"
+                              RowDefinitions="Auto,*">
+                            <Image Grid.RowSpan="2"
+                                   Source="/Assets/Images/parchment.jpg"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   Opacity="0.5"
+                                   Stretch="None" />
+                            <local:InstrumentView Grid.Row="0"
+                                                  DataContext="{Binding SelectedInstrument}" />
+                        </Grid>
+                    </DockPanel>
+                </controls:NavigationDrawer>
+            </controls:SnackbarHost>
+        </dialogHostAvalonia:DialogHost>
+        <Border x:Name="MainContainerBusyOverlay"
+                IsHitTestVisible="False"
+                IsVisible="{Binding IsBusy}">
+            <Border.Background>
+                <SolidColorBrush Color="Black"
+                                 Opacity="0.5" />
+            </Border.Background>
+            <controls:Card CornerRadius="24"
+                           Padding="4"
+                           Margin="4"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center">
+                <ProgressBar Classes="circular"
+                             IsIndeterminate="True" />
+            </controls:Card>
+        </Border>
 
-                            <ToggleButton x:Name="OptionDrawerSwitch"
-                                          DockPanel.Dock="Right"
-                                          Classes="float">
-                                <avalonia:MaterialIcon Kind="DotsVertical" />
-                            </ToggleButton>
-
-                            <TextBlock Classes="Headline6"
-                                       Text="Calcuchord"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-                    </controls:ColorZone>
-                    <Grid x:Name="MainContainerGrid"
-                          RowDefinitions="Auto,*">
-                        <Image Grid.RowSpan="2"
-                               Source="/Assets/Images/parchment.jpg"
-                               HorizontalAlignment="Stretch"
-                               VerticalAlignment="Stretch"
-                               Opacity="0.5"
-                               Stretch="None" />
-                        <local:InstrumentView DataContext="{Binding SelectedInstrument}"
-                                              IsVisible="{Binding IsInstrumentVisible, Source={x:Static local:MainViewModel.Instance}}" />
-                    </Grid>
-                </DockPanel>
-            </controls:NavigationDrawer>
-        </controls:SnackbarHost>
-    </dialogHostAvalonia:DialogHost>
+    </Grid>
 </UserControl>

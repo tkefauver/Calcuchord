@@ -38,6 +38,16 @@
                     </TextBlock>
                 </StackPanel>
             </controls:ColorZone>
+            <ToggleButton x:Name="ThemeToggleButton"
+                          Margin="3"
+                          Classes="float"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Top"
+                          IsChecked="{Binding IsDark, Source={x:Static local:ColorPalette.Instance}, Mode=OneWay}"
+                          Command="{Binding ToggleThemeCommand, Source={x:Static local:ColorPalette.Instance}}">
+                <avalonia:MaterialIcon
+                    Kind="{Binding ThemeIcon, Source={x:Static local:ColorPalette.Instance}, Mode=OneWay}" />
+            </ToggleButton>
             <ListBox x:Name="InstrumentsList"
                      Grid.Row="1"
                      Classes="NoScroll"
@@ -86,6 +96,7 @@
                 </StackPanel>
             </controls:FloatingButton>
             <controls:ColorZone Grid.Row="3"
+                                IsVisible="False"
                                 Mode="Inverted"
                                 VerticalContentAlignment="Center"
                                 HorizontalContentAlignment="Left"
@@ -95,7 +106,8 @@
                     <StackPanel Orientation="Horizontal"
                                 Spacing="5">
                         <avalonia:MaterialIcon Kind="About" />
-                        <TextBlock Text="About" />
+                        <TextBlock Foreground="{DynamicResource Fg}"
+                                   Text="About" />
 
                     </StackPanel>
                 </Button>

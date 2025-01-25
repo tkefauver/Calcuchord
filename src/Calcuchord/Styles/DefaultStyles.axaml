@@ -16,6 +16,15 @@
         <FontFamily x:Key="GaramondFont">avares://Calcuchord/Assets/Fonts#EB Garamond Regular</FontFamily>
     </Styles.Resources>
 
+    <Style Selector=":is(Button)">
+        <Setter Property="Cursor"
+                Value="Hand" />
+    </Style>
+    <Style Selector=":is(ListBoxItem)">
+        <Setter Property="Cursor"
+                Value="Hand" />
+    </Style>
+
 
     <Style Selector=":is(TextBlock)">
         <Setter Property="FontFamily"

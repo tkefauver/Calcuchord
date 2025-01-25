@@ -1,8 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Media;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
+using MonkeyPaste.Common;
+using MonkeyPaste.Common.Avalonia;
 
 namespace Calcuchord {
     public enum PaletteColorType {
@@ -133,7 +138,7 @@ namespace Calcuchord {
                             ("#000000","#FFFFFF")
                         }, {
                             PaletteColorType.PianoBlackKeyFg,
-                            ("#FFFFFF","#000000")
+                            ("#000000","#FFFFFF")
                         }
                     };
 
@@ -150,6 +155,9 @@ namespace Calcuchord {
 
         public string Transparent { get; set; } = "#00000000";
 
+        public string ThemeIcon =>
+            IsDark ? "Lightbulb" : "LightbulbOutline";
+
         #endregion
 
         #region Public Methods
@@ -164,9 +172,36 @@ namespace Calcuchord {
             _fullPalette = null;
             _ = P;
             OnPropertyChanged(nameof(P));
+            InitResoures();
         }
 
         #endregion
+
+        #region Private Methods
+
+        void InitResoures() {
+            if(Application.Current is not { } ac) {
+            }
+
+            IResourceDictionary res = Application.Current.Resources;
+            foreach(var kvp in P) {
+                string brush_name = kvp.Key.ToString(); // + "Brush";
+                IBrush brush = kvp.Value.ToAvBrush();
+                if(res.ContainsKey(brush_name)) {
+                    res[brush_name] = brush;
+                } else {
+                    res.Add(brush_name,brush);
+                }
+            }
+        }
+
+        #endregion
+
+        public ICommand ToggleThemeCommand => new MpCommand(
+            () => {
+                SetTheme(!IsDark);
+                OnPropertyChanged(nameof(ThemeIcon));
+            });
 
     }
 }

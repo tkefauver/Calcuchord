@@ -35,7 +35,7 @@ namespace Calcuchord {
 
         #region Properties
 
-        Dictionary<ChordSuffixType,int[]> Chords { get; } = new() {
+        Dictionary<ChordSuffixType,int[]> Chords { get; } = new Dictionary<ChordSuffixType,int[]> {
             { ChordSuffixType.Num5,[0,7] },
             { ChordSuffixType.major,[0,4,3] },
             { ChordSuffixType.minor,[0,3,4] },
@@ -56,7 +56,7 @@ namespace Calcuchord {
             { ChordSuffixType.m11,[0,3,4,3,4,3] }
         };
 
-        Dictionary<ScaleSuffixType,int[]> Scales { get; } = new() {
+        Dictionary<ScaleSuffixType,int[]> Scales { get; } = new Dictionary<ScaleSuffixType,int[]> {
             { ScaleSuffixType.Major,[0,2,2,1,2,2,2,1] },
             { ScaleSuffixType.NaturalMinor,[0,2,1,2,2,1,2,2] },
             { ScaleSuffixType.HarmonicMinor,[0,2,1,2,2,1,3,1] },
@@ -66,7 +66,7 @@ namespace Calcuchord {
             { ScaleSuffixType.Blues,[0,3,2,1,1,3] }
         };
 
-        Dictionary<ModeSuffixType,int[]> Modes { get; } = new() {
+        Dictionary<ModeSuffixType,int[]> Modes { get; } = new Dictionary<ModeSuffixType,int[]> {
             { ModeSuffixType.Dorian,[0,2,1,2,2,2,1,2] },
             { ModeSuffixType.Phrygian,[0,1,2,2,2,1,2,2] },
             { ModeSuffixType.Lydian,[0,2,2,2,1,2,2,1] },
@@ -141,6 +141,7 @@ namespace Calcuchord {
             } else {
                 result = await GenFretboardPatternAsync();
             }
+
             result.ForEach(x => x.SetParent(Tuning));
             return result;
         }
@@ -166,7 +167,7 @@ namespace Calcuchord {
                     var all_pattern_inst_notes = GenNotes(pattern);
                     // only return use 1 set of pattern for chords or 1 set + next root for scales/modes
                     int result_len = PatternType == MusicPatternType.Chords ? pattern.Length : pattern.Length + 1;
-                    NoteGroupCollection ngc = new(PatternType,cur_key,suffix);
+                    NoteGroupCollection ngc = new NoteGroupCollection(PatternType,cur_key,suffix);
                     var pattern_notes =
                         all_pattern_inst_notes
                             .Take(result_len)
@@ -175,6 +176,7 @@ namespace Calcuchord {
                     ngcl.Add(ngc);
                 }
             }
+
             return ngcl;
         }
 
@@ -203,11 +205,14 @@ namespace Calcuchord {
                     var pattern_inst_notes = GenNotes(pattern);
                     var blocks = pattern_inst_notes
                         .GroupBy(x => Math.Floor((x.FretNum + 0) / (double)PatternFretSpan));
-                    NoteGroupCollection ngc = new(PatternType,cur_key,suffix);
-                    ngc.Groups.AddRange(blocks.Select((x,idx) => new NoteGroup(ngc,idx,AddScaleFingering(x))));
+                    NoteGroupCollection ngc = new NoteGroupCollection(PatternType,cur_key,suffix);
+                    ngc.Groups.AddRange(
+                        blocks.Select(
+                            (x,idx) => new NoteGroup(ngc,idx,AddScaleFingering(x)) { Id = Guid.NewGuid().ToString() }));
                     ngcl.Add(ngc);
                 }
             }
+
             return ngcl;
         }
 
@@ -246,6 +251,7 @@ namespace Calcuchord {
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -288,7 +294,8 @@ namespace Calcuchord {
                         bool can_bar = do_bar &&
                                        !notes
                                            .Any(
-                                               x => x.FretNum >= 0 && x.FretNum < cur_fret_num &&
+                                               x => x.FretNum >= 0 &&
+                                                    x.FretNum < cur_fret_num &&
                                                     x.StringNum >= min_fret_str &&
                                                     x.StringNum <= max_fret_str);
                         foreach(InstrumentNote cur_fret_note in cur_fret_notes) {
@@ -296,6 +303,7 @@ namespace Calcuchord {
                                 // reject
                                 return null;
                             }
+
                             pnl.Add(new(cur_finger,cur_fret_note));
                             if(!can_bar) {
                                 cur_finger++;
@@ -303,11 +311,13 @@ namespace Calcuchord {
                             }
                         }
                     }
+
                     if(incr_finger) {
                         cur_finger++;
                     }
                 }
             }
+
             // add opens
             notes.Where(x => x.FretNum == 0).ForEach(x => pnl.Add(new(0,x)));
             // add mutes
@@ -340,6 +350,7 @@ namespace Calcuchord {
                         if(min_fret_num > 0) {
                             max_fret_num--;
                         }
+
                         var block_notes = pattern_inst_notes.Where(
                             x => x.FretNum >= min_fret_num && x.FretNum <= max_fret_num);
                         var combos = block_notes.Combinations().Where(x => x.Length >= pattern.Length);
@@ -347,18 +358,24 @@ namespace Calcuchord {
                             if(!IsValidCombo(combo,pattern,valid_patterns)) {
                                 continue;
                             }
+
                             valid_patterns.Add(combo);
                         }
                     }
-                    NoteGroupCollection ngc = new(PatternType,cur_key,suffix);
+
+                    NoteGroupCollection ngc = new NoteGroupCollection(PatternType,cur_key,suffix);
                     foreach((var vp,int idx) in valid_patterns.OrderBy(x => x.Min(y => y.FretNum))
                                 .ThenBy(x => x.Min(y => y.StringNum)).WithIndex()) {
                         if(AddChordFingerings(vp) is not { } fingerings) {
                             continue;
                         }
-                        ngc.Groups.Add(new(ngc,idx,fingerings.OrderBy(x => x.StringNum).ThenBy(x => x.FretNum)));
+
+                        ngc.Groups.Add(
+                            new(ngc,idx,fingerings.OrderBy(x => x.StringNum).ThenBy(x => x.FretNum))
+                                { Id = Guid.NewGuid().ToString() });
                         cur_chord_count++;
                     }
+
                     ngcl.Add(ngc);
                     UpdateProgress(++cur_progress,$"{cur_chord_count} chords found...{sw.ElapsedMilliseconds}ms");
                 }

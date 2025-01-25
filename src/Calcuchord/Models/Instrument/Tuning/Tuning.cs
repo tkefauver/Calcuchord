@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
@@ -13,6 +12,7 @@ namespace Calcuchord {
         #region Members
 
         [DataMember]
+
         public string Id { get; set; }
 
         [DataMember]
@@ -20,9 +20,6 @@ namespace Calcuchord {
 
         [DataMember]
         public int CapoFretNum { get; set; }
-
-        [DataMember]
-        public bool IsSelected { get; set; }
 
         [DataMember]
         public bool IsReadOnly { get; set; }
@@ -78,11 +75,10 @@ namespace Calcuchord {
         #region Constructors
 
         public Tuning() {
-            Id = Guid.NewGuid().ToString();
         }
 
 
-        public Tuning(string name,bool isDefault,bool isReadOnly,int capoNum = 0) {
+        public Tuning(string name,bool isDefault,bool isReadOnly,int capoNum = 0) : this() {
             Name = name;
             IsDefault = isDefault;
             IsReadOnly = isReadOnly;

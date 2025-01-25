@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using Calcuchord.JsonChords;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
@@ -76,17 +78,17 @@ namespace Calcuchord {
         public bool IsLoaded =>
             Tuning.Chords.Any() && Tuning.Scales.Any();
 
-        public bool IsSelected {
-            get => Tuning.IsSelected;
-            set {
-                Tuning.IsSelected = value;
-                OnPropertyChanged(nameof(IsSelected));
-            }
-        }
+        public bool IsSelected { get; set; }
 
         #endregion
 
         #region Model
+
+        public string Id =>
+            Tuning.Id;
+
+        public bool IsDefault =>
+            Tuning.IsDefault;
 
         public int FretCount =>
             Tuning.FretCount;
@@ -110,52 +112,53 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public TuningViewModel() {
-        }
-
-        public TuningViewModel(InstrumentViewModel parent,Tuning tuning) : base(parent) {
+        public TuningViewModel(InstrumentViewModel parent) : base(parent) {
             PropertyChanged += InstrumentTuningViewModel_OnPropertyChanged;
-            Init(tuning);
         }
 
         #endregion
 
         #region Public Methods
 
-        public async Task InitCollectionsAsync() {
-            bool needs_save = false;
-            if(!Tuning.Chords.Any()) {
-                await CreateChordsAsync();
-                needs_save = true;
-            }
-
-            if(!Tuning.Scales.Any()) {
-                await CreateScalesAsync();
-                needs_save = true;
-            }
-
-            if(needs_save) {
-                Prefs.Instance.SyncAndSave();
-            }
-
-            Parent.Instrument.RefreshModelTree();
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        public void Init(Tuning tuning) {
+        public async Task InitAsync(Tuning tuning) {
+            IsBusy = true;
             Tuning = tuning;
             Tuning.SetParent(Parent.Instrument);
-
 
             Tuning.OpenNotes.OrderBy(x => x.StringNum).ForEach(x => StringRows.Add(new(this,x)));
             if(!Parent.IsKeyboard) {
                 StringRows.Insert(0,new(this,null));
             }
+
             OnPropertyChanged(nameof(IsStringsDescending));
+
+            if(!Tuning.Chords.Any()) {
+                await CreateChordsAsync();
+                if(Prefs.Instance.Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Id == Id) is
+                   { } tuning_model) {
+                    tuning_model.Chords = Tuning.Chords;
+                }
+                // error
+            }
+
+            if(!Tuning.Scales.Any() || !Tuning.Modes.Any()) {
+                await CreateScalesAndModesAsync();
+
+                if(Prefs.Instance.Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Id == Id) is
+                   { } tuning_model) {
+                    tuning_model.Scales = Tuning.Scales;
+                    tuning_model.Modes = Tuning.Modes;
+                }
+                // error
+            }
+
+            Parent.Instrument.RefreshModelTree();
+            IsBusy = false;
         }
+
+        #endregion
+
+        #region Protected Methods
 
         #endregion
 
@@ -165,15 +168,38 @@ namespace Calcuchord {
             switch(e.PropertyName) {
                 case nameof(IsSelected):
                     if(IsSelected) {
+                        Prefs.Instance.SelectedTuningId = Id;
                         MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.SelectedTuning));
+                        // if(Parent.IsKeyboard &&
+                        //    AllFrets.OfType<KeyViewModel>() is { } kvml) {
+                        //     kvml.ForEach(x => x.OnPropertyChanged(nameof(x.KeyX)));
+                        //     kvml.ForEach(x => x.OnPropertyChanged(nameof(x.KeyWidth)));
+                        //     kvml.ForEach(x => x.OnPropertyChanged(nameof(x.KeyHeight)));
+                        //     Debug.WriteLine(string.Join(",",kvml.Select(x => x.KeyX)));
+                        // }
                     }
 
                     break;
                 case nameof(IsStringsDescending):
+                    if(IsSelected &&
+                       !Parent.IsKeyboard &&
+                       InstrumentView.Instance is { } iv &&
+                       iv.InstrumentContentControl is { } icc) {
+                        Dispatcher.UIThread.Post(
+                            async () => {
+                                MainViewModel.Instance.IsBusy = true;
+                                icc.Content = null;
+                                await Task.Delay(500);
+                                icc.Content = this;
+                                MainViewModel.Instance.IsBusy = false;
+                            });
+                    }
+
                     OnPropertyChanged(nameof(SortedStringRows));
                     OnPropertyChanged(nameof(StringSortIcon));
                     AllFrets.ForEach(x => x.OnPropertyChanged(nameof(x.IsTopDotFret)));
                     AllFrets.ForEach(x => x.OnPropertyChanged(nameof(x.IsBottomDotFret)));
+
 
                     break;
             }
@@ -181,9 +207,10 @@ namespace Calcuchord {
 
 
         async Task CreateChordsAsync() {
-            bool from_file = Tuning.IsDefault && (Tuning.Parent.InstrumentType == InstrumentType.Guitar ||
-                                                  Tuning.Parent.InstrumentType == InstrumentType.Ukulele);
-            from_file = false;
+            bool from_file = Tuning.IsDefault &&
+                             (Tuning.Parent.InstrumentType == InstrumentType.Guitar ||
+                              Tuning.Parent.InstrumentType == InstrumentType.Ukulele);
+            //from_file = false;
             IEnumerable<NoteGroupCollection> chords = null;
             if(from_file) {
                 chords = GenFromFile(Tuning);
@@ -195,7 +222,7 @@ namespace Calcuchord {
             return;
 
             async Task<IEnumerable<NoteGroupCollection>> GenFromPatternsAsync(Tuning tuning) {
-                PatternGen pg = new(MusicPatternType.Chords,tuning);
+                PatternGen pg = new PatternGen(MusicPatternType.Chords,tuning);
                 var result = await pg.GenerateAsync();
                 return result;
             }
@@ -218,9 +245,11 @@ namespace Calcuchord {
 
                     foreach(Key chord_group in keys_obj) {
                         string cur_suffix = chord_group.suffix;
-                        NoteGroupCollection ngc = new(MusicPatternType.Chords,cur_key,chord_group.suffix);
+                        NoteGroupCollection ngc = new NoteGroupCollection(
+                            MusicPatternType.Chords,cur_key,chord_group.suffix);
                         foreach((Position pos,int pos_num) in chord_group.positions.WithIndex()) {
-                            NoteGroup ng = new(ngc,pos_num);
+                            NoteGroup ng = new NoteGroup(ngc,pos_num);
+                            ng.Id = Guid.NewGuid().ToString();
                             foreach((int f,int str_num) in pos.real_frets.WithIndex()) {
                                 ng.Notes.Add(
                                     new(
@@ -239,8 +268,8 @@ namespace Calcuchord {
             }
         }
 
-        async Task CreateScalesAsync() {
-            PatternGen pg = new(MusicPatternType.Scales,Tuning);
+        async Task CreateScalesAndModesAsync() {
+            PatternGen pg = new PatternGen(MusicPatternType.Scales,Tuning);
             var scales = await pg.GenerateAsync();
             Tuning.Scales.AddRange(scales);
             Debug.WriteLine(

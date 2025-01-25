@@ -12,11 +12,23 @@
              xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:InstrumentViewModel"
              x:Class="Calcuchord.InstrumentView">
-    <Grid DataContext="{Binding SelectedTuning}">
-        <local:KeyboardView
-            IsVisible="{Binding IsPianoSelected, Source={x:Static local:MainViewModel.Instance}, FallbackValue=False, TargetNullValue=False}" />
-        <local:FretboardView
-            IsVisible="{Binding !IsPianoSelected, Source={x:Static local:MainViewModel.Instance}, FallbackValue=True, TargetNullValue=True}" />
-    </Grid>
-
+    <TransitioningContentControl x:Name="InstrumentContentControl"
+                                 Content="{Binding SelectedTuning}">
+        <TransitioningContentControl.PageTransition>
+            <CrossFade Duration="0:0:1.0" />
+        </TransitioningContentControl.PageTransition>
+        <TransitioningContentControl.DataTemplates>
+            <local:InstrumentTuningTemplateSelector>
+                <DataTemplate x:Key="KeyboardViewTemplate">
+                    <local:KeyboardView />
+                </DataTemplate>
+                <DataTemplate x:Key="FretboardViewTemplate">
+                    <local:FretboardView />
+                </DataTemplate>
+                <DataTemplate x:Key="EmptyTemplate">
+                    <Border />
+                </DataTemplate>
+            </local:InstrumentTuningTemplateSelector>
+        </TransitioningContentControl.DataTemplates>
+    </TransitioningContentControl>
 </UserControl>

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using MonkeyPaste.Common;
@@ -12,13 +11,7 @@ namespace Calcuchord {
         #region Members
 
         [DataMember]
-        public string Id { get; set; }
-
-        [DataMember]
         public string Name { get; set; }
-
-        [DataMember]
-        public bool IsSelected { get; set; }
 
         [DataMember]
         public InstrumentType InstrumentType { get; set; }
@@ -46,7 +39,6 @@ namespace Calcuchord {
         #region Constructors
 
         public Instrument() {
-            Id = Guid.NewGuid().ToString();
         }
 
         public Instrument(string name,InstrumentType it,int fretCount,int stringCount,

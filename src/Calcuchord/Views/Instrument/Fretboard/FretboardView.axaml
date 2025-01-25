@@ -12,35 +12,33 @@
              xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:TuningViewModel"
              x:Class="Calcuchord.FretboardView">
-    <Design.DataContext>
-        <local:DesignFretboardTuningViewModel />
-    </Design.DataContext>
-    <Grid RowDefinitions="Auto,*">
-        <ToggleButton Classes="float"
-                      Margin="5"
-                      HorizontalAlignment="Left"
-                      IsChecked="{Binding IsStringsDescending,Mode=TwoWay}">
-            <avalonia:MaterialIcon Kind="{Binding StringSortIcon}" />
-        </ToggleButton>
+    <UserControl.Styles>
+        <Style Selector="Image#FretboardBgImage">
+            <Setter Property="Source"
+                    Value="/Assets/Images/rosewood.jpg" />
+        </Style>
+        <Style Selector="Image#FretboardBgImage.dark">
+            <Setter Property="Source"
+                    Value="/Assets/Images/ebony.jpg" />
+        </Style>
+
+    </UserControl.Styles>
+    <Grid>
         <ScrollViewer x:Name="FretboardScrollViewer"
-                      Grid.Row="1"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Hidden">
             <Viewbox>
                 <Grid x:Name="FretboardContainerGrid">
                     <Image x:Name="FretboardBgImage"
-                           Source="/Assets/Images/rosewood.jpg"
+                           Classes.dark="{Binding IsDark, Source={x:Static local:ColorPalette.Instance}}"
                            HorizontalAlignment="Left"
                            VerticalAlignment="Top"
-                           Stretch="UniformToFill">
-                        <Image.RenderTransform>
-                            <TranslateTransform />
-                        </Image.RenderTransform>
-                    </Image>
+                           Stretch="UniformToFill" />
 
                     <ItemsControl x:Name="StringsItemsControl"
+                                  Effect="drop-shadow(3 5 7 black)"
                                   ItemsSource="{Binding SortedStringRows}"
-                                  Margin="0,0,0,10">
+                                  Margin="0,0,0,20">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Vertical" />
@@ -69,5 +67,13 @@
                 </Grid>
             </Viewbox>
         </ScrollViewer>
+
+        <ToggleButton Classes="float"
+                      Margin="5,0,0,0"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Top"
+                      IsChecked="{Binding IsStringsDescending,Mode=TwoWay}">
+            <avalonia:MaterialIcon Kind="{Binding StringSortIcon}" />
+        </ToggleButton>
     </Grid>
 </UserControl>

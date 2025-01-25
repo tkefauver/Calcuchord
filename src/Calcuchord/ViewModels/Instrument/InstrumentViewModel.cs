@@ -1,11 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
-using Avalonia.Controls;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
@@ -37,6 +38,9 @@ namespace Calcuchord {
 
         public ObservableCollection<TuningViewModel> Tunings { get; } = [];
 
+        public TuningViewModel DefaultTuning =>
+            Tunings.FirstOrDefault(x => x.IsDefault) ?? Tunings.FirstOrDefault();
+
         public TuningViewModel SelectedTuning {
             get => Tunings.FirstOrDefault(x => x.IsSelected);
             set {
@@ -62,19 +66,11 @@ namespace Calcuchord {
 
         #region Layout
 
-        public ColumnDefinitions ColumnDefinitions { get; private set; }
-
         #endregion
 
         #region State
 
-        public bool IsSelected {
-            get => Instrument.IsSelected;
-            set {
-                Instrument.IsSelected = value;
-                OnPropertyChanged(nameof(IsSelected));
-            }
-        }
+        public bool IsSelected { get; set; }
 
         public bool IsKeyboard =>
             InstrumentType == InstrumentType.Piano;
@@ -105,29 +101,26 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public InstrumentViewModel() {
+        public InstrumentViewModel(MainViewModel parent) : base(parent) {
             PropertyChanged += InstrumentViewModel_OnPropertyChanged;
-        }
-
-        public InstrumentViewModel(MainViewModel parent,Instrument it) : base(parent) {
-            PropertyChanged += InstrumentViewModel_OnPropertyChanged;
-            Init(it);
+            Tunings.CollectionChanged += TuningsOnCollectionChanged;
         }
 
         #endregion
 
         #region Public Methods
 
+        public async Task InitAsync(Instrument instrument) {
+            IsBusy = true;
+            Instrument = instrument;
+            Tunings.AddRange(await Task.WhenAll(Instrument.Tunings.Select(x => CreateTuningViewModelAsync(x))));
+            Instrument.RefreshModelTree();
+            IsBusy = false;
+        }
+
         #endregion
 
         #region Protected Methods
-
-        public void Init(Instrument it) {
-            Instrument = it;
-            Tunings.AddRange(Instrument.Tunings.Select(x => new TuningViewModel(this,x)));
-            Instrument.RefreshModelTree();
-            Tunings.CollectionChanged += TuningsOnCollectionChanged;
-        }
 
         #endregion
 
@@ -135,15 +128,35 @@ namespace Calcuchord {
 
         void InstrumentViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
+                case nameof(IsSelected):
+
+                    if(IsSelected) {
+                        if(SelectedTuning == null) {
+                            SelectedTuning = DefaultTuning;
+                        }
+
+                        Prefs.Instance.SelectedTuningId = SelectedTuning.Id;
+                    } else {
+                        Tunings.ForEach(x => x.IsSelected = false);
+                    }
+
+                    break;
                 case nameof(SelectedTuning):
                     if(IsSelected) {
                         Parent.OnPropertyChanged(nameof(SelectedTuning));
                     }
+
                     break;
             }
         }
 
         void TuningsOnCollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
+        }
+
+        async Task<TuningViewModel> CreateTuningViewModelAsync(Tuning tuning) {
+            TuningViewModel tvm = new TuningViewModel(this);
+            await tvm.InitAsync(tuning);
+            return tvm;
         }
 
         string GetDefaultTuningName() {
@@ -173,12 +186,12 @@ namespace Calcuchord {
                     return;
                 }
 
-                Prefs.Instance.SyncAndSave();
+                Prefs.Instance.Save();
                 Debug.WriteLine($"'{tuning_vm_to_remove.Tuning.Name}' removed from {Instrument.Name}");
             });
 
-        public ICommand AddTuningCommand => new MpCommand<object>(
-            args => {
+        public ICommand AddTuningCommand => new MpAsyncCommand<object>(
+            async args => {
                 if(args is not object[] arg_parts ||
                    arg_parts.Length < 2 ||
                    arg_parts[0] is not IEnumerable<Note> notes ||
@@ -193,13 +206,16 @@ namespace Calcuchord {
 
                 var actual_open_notes =
                     notes.Select((x,idx) => new InstrumentNote(0,idx,x.Offset(capo_fret_num)));
-                Tuning new_tuning = new(tuning_name,!Tunings.Any(),false,capo_fret_num);
+                Tuning new_tuning = new Tuning(tuning_name,!Tunings.Any(),false,capo_fret_num);
+                new_tuning.Id = Guid.NewGuid().ToString();
                 new_tuning.OpenNotes.AddRange(actual_open_notes);
                 Instrument.Tunings.Add(new_tuning);
-                Tunings.Add(new(this,new_tuning));
+
+                TuningViewModel tvm = await CreateTuningViewModelAsync(new_tuning);
+                Tunings.Add(tvm);
 
                 Tunings.Last().IsSelected = true;
-                Prefs.Instance.SyncAndSave();
+                Prefs.Instance.Save();
             });
 
         #endregion

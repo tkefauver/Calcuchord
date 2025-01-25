@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
@@ -55,7 +54,6 @@ namespace Calcuchord {
         #region Constructors
 
         public NoteGroup() {
-            Id = Guid.NewGuid().ToString();
         }
 
         public NoteGroup(NoteGroupCollection ngc,int position) : this(ngc,position,[]) {
