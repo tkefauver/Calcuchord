@@ -22,7 +22,7 @@ namespace Calcuchord {
 
         public override void OnFrameworkInitializationCompleted() {
             Prefs.Init();
-            ColorPalette.Instance.Init();
+            ThemeViewModel.Instance.Init();
 
             if(ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
                 desktop.MainWindow = new MainWindow {

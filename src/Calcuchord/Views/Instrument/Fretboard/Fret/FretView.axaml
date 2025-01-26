@@ -9,10 +9,11 @@
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
-             xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia"
-             x:DataType="local:FretViewModel"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:NoteViewModel"
              x:Class="Calcuchord.FretView">
     <UserControl.Styles>
+        <!-- FRET DOTS -->
         <Style Selector="Ellipse.dot">
             <Setter Property="ClipToBounds"
                     Value="True" />
@@ -31,6 +32,8 @@
             </Setter>
         </Style>
 
+        <!-- STRING CHUNK (WOUND) -->
+
         <Style Selector="Border#StringChunkBorder">
             <Setter Property="Background">
                 <Setter.Value>
@@ -40,6 +43,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- STRING CHUNK (SOLID) -->
         <Style Selector="Border#StringChunkBorder.solid">
             <Setter Property="Background">
                 <Setter.Value>
@@ -59,25 +64,30 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <!-- STRING CHUNK (UNKNOWN) -->
+        <Style Selector="Border#StringChunkBorder.unknown">
+            <Setter Property="Background"
+                    Value="{StaticResource UnknownBrush}" />
+        </Style>
 
 
     </UserControl.Styles>
     <Grid>
         <!-- FRET NUM LABEL -->
-        <TextBlock Text="{Binding FretLabel}"
+        <TextBlock Text="{Binding MarkerLabel}"
                    Classes="Subtitle2"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Bottom">
             <TextBlock.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="IsVisible" />
-                    <Binding Path="IsFretNumLabel" />
+                    <Binding Path="IsNoteNumLabel" />
                 </MultiBinding>
             </TextBlock.IsVisible>
         </TextBlock>
 
         <!-- STRING NAME LABEL -->
-        <TextBlock Text="{Binding FretLabel}"
+        <TextBlock Text="{Binding MarkerLabel}"
                    Classes="Subtitle2"
                    Margin="0,0,5,0"
                    HorizontalAlignment="Right"
@@ -85,7 +95,7 @@
             <TextBlock.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="IsVisible" />
-                    <Binding Path="IsStringKeyLabel" />
+                    <Binding Path="IsRowKeyLabel" />
                 </MultiBinding>
             </TextBlock.IsVisible>
         </TextBlock>
@@ -109,8 +119,8 @@
             </Ellipse.RenderTransform>
         </Ellipse>
 
-        <!-- FRET BARS -->
-        <Border IsVisible="{Binding IsRealFret}"
+        <!-- FRET BAR (LEFT) -->
+        <Border IsVisible="{Binding IsRealNote}"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Stretch"
                 Width="1.5">
@@ -131,7 +141,9 @@
             </Border.Background>
         </Border>
 
-        <Border IsVisible="{Binding IsRealFret}"
+        <!-- FRET BAR (RIGHT) -->
+
+        <Border IsVisible="{Binding IsRealNote}"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Stretch"
                 Width="1.5">
@@ -153,6 +165,7 @@
         </Border>
 
         <!-- NUT -->
+
         <Border IsVisible="{Binding IsNutFret}"
                 Background="AntiqueWhite"
                 HorizontalAlignment="Stretch"
@@ -161,12 +174,36 @@
         <!-- STRING CHUNK -->
 
         <Border x:Name="StringChunkBorder"
-                Classes.solid="{Binding IsSolid}"
-                IsVisible="{Binding IsRealFret}"
+                Classes.solid="{Binding IsRowSolid}"
+                Classes.unknown="{Binding IsRowUnknown}"
+                IsVisible="{Binding IsRealNote}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
                 Effect="drop-shadow(1 1 2 black)"
-                Height="{Binding StringHeight}" />
+                Height="{local:MathBinding a={Binding RowCount}, b={Binding RowNum}, exp=a-b}" />
+
+
+        <!-- MUTE OVERLAY -->
+        <Border x:Name="MuteOverlay"
+                Classes="fade">
+            <Border.Background>
+                <SolidColorBrush Color="DimGray"
+                                 Opacity="0.75" />
+            </Border.Background>
+        </Border>
+        <!-- FRET MARKER -->
+        <Border x:Name="FretMarker"
+                Classes="note-marker"
+                Classes.desired-root="{Binding IsDesiredRoot}"
+                Width="{Binding $self.Bounds.Height}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Stretch"
+                Margin="1.5"
+                CornerRadius="15">
+            <TextBlock HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Text="{Binding MarkerLabel}" />
+        </Border>
 
 
     </Grid>

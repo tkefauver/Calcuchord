@@ -79,6 +79,15 @@ namespace Calcuchord {
 
         #region Model
 
+        #region Validation
+
+        public int MinStringCount => 3;
+        public int MaxStringCount => 7;
+        public int MinFretCount => 5;
+        public int MaxFretCount => 24;
+
+        #endregion
+
         public int StringCount =>
             Instrument.StringCount;
 

@@ -150,7 +150,8 @@ namespace Calcuchord {
         public Dictionary<MusicPatternType,ObservableCollection<string>> BookmarkLookup {
             get {
                 if(_bookmarkLookup == null) {
-                    _bookmarkLookup = new() {
+                    _bookmarkLookup = new()
+                    {
                         { MusicPatternType.Chords,ChordBookmarkIds },
                         { MusicPatternType.Scales,ScaleBookmarkIds }
                         //{ MusicPatternType.Modes,ModeBookmarkIds }

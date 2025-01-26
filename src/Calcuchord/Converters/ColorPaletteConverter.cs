@@ -6,14 +6,15 @@ using MonkeyPaste.Common.Avalonia;
 
 namespace Calcuchord {
     public class ColorPaletteConverter : IValueConverter {
-        public static readonly ColorPaletteConverter Instance = new();
+        public static readonly ColorPaletteConverter Instance = new ColorPaletteConverter();
 
         public object Convert(object value,Type targetType,object parameter,CultureInfo culture) {
             if(parameter is not string paramStr ||
                !paramStr.TryToEnum(out PaletteColorType pct) ||
-               !ColorPalette.Instance.P.TryGetValue(pct,out string hex)) {
+               !ThemeViewModel.Instance.P.TryGetValue(pct,out string hex)) {
                 return null;
             }
+
             return hex.ToAvBrush();
         }
 
@@ -21,4 +22,5 @@ namespace Calcuchord {
             return null;
         }
     }
+
 }

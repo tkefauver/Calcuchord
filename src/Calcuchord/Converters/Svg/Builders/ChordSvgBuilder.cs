@@ -58,15 +58,16 @@ namespace Calcuchord {
                     if(min_barre_fret_num == min_vis_fret &&
                        notes
                            .Where(x => x.FingerNum > 0 && x.FretNum == min_barre_fret_num)
-                           .Select(x => x.FingerNum).Distinct().Count() == 1) {
+                           .Select(x => x.FingerNum).Distinct().Count() ==
+                       1) {
                         shadow_barre_fret_num = min_barre_fret_num;
                     }
                 }
 
                 var barre_fret_nums = barre_frets.Select(x => x.FretNum).Distinct();
                 foreach(int barre_fret_num in barre_fret_nums) {
-                    int min_str = barre_frets.Where(x => x.FretNum == barre_fret_num).Min(x => x.StringNum);
-                    int max_str = barre_frets.Where(x => x.FretNum == barre_fret_num).Max(x => x.StringNum);
+                    int min_str = barre_frets.Where(x => x.FretNum == barre_fret_num).Min(x => x.RowNum);
+                    int max_str = barre_frets.Where(x => x.FretNum == barre_fret_num).Max(x => x.RowNum);
                     barred_fret_lookup.Add(barre_fret_num,(min_str,max_str));
                 }
             }
@@ -127,7 +128,7 @@ namespace Calcuchord {
                 double header_x = min_fret_x;
                 double header_y = fh; //-1;
                 for(int i = 0; i < str_count; i++) {
-                    if(notes.FirstOrDefault(x => x.StringNum == i) is { } str_fret &&
+                    if(notes.FirstOrDefault(x => x.RowNum == i) is { } str_fret &&
                        str_fret.FretNum <= 0) {
                         bool is_mute = str_fret.FretNum < 0;
                         if(is_mute) {
@@ -182,7 +183,7 @@ namespace Calcuchord {
                     double bar_y = cy - (BarHeight / 2d);
                     double dot_r = DotRadius;
                     PatternNote fret_note = notes.Where(x => x.FretNum > 0)
-                        .FirstOrDefault(x => x.StringNum == str_num && x.FretNum == fret_num);
+                        .FirstOrDefault(x => x.RowNum == str_num && x.FretNum == fret_num);
                     string fret_bg = null;
                     string fret_fg = null;
 
@@ -215,7 +216,8 @@ namespace Calcuchord {
                     }
 
                     if(!is_barred_fret &&
-                       shadow_barre_fret_num.HasValue && shadow_barre_fret_num.Value == fret_num) {
+                       shadow_barre_fret_num.HasValue &&
+                       shadow_barre_fret_num.Value == fret_num) {
                         if(str_num < str_count - 1) {
                             // shadow rect
                             AddRect(bg_g,BarShadow,Transparent,curx,bar_y,fw,BarHeight,0);

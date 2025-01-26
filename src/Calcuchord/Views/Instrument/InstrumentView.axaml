@@ -9,9 +9,79 @@
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
-             xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:InstrumentViewModel"
              x:Class="Calcuchord.InstrumentView">
+    <UserControl.Styles>
+
+        <!-- NOTE BUTTON -->
+
+        <Style Selector=":is(UserControl).note-btn"
+               x:DataType="local:NoteViewModel">
+            <Setter Property="common:MpAvIsHoveringExtension.IsEnabled"
+                    Value="{Binding IsEnabled}" />
+            <Setter Property="common:MpAvIsHoveringExtension.IsHovering"
+                    Value="{Binding IsHovering, Mode=TwoWay}" />
+            <Setter Property="Cursor"
+                    Value="Hand" />
+            <Setter Property="ToolTip.ShowDelay"
+                    Value="3000" />
+            <Setter Property="ToolTip.Tip">
+                <Setter.Value>
+                    <Template>
+                        <controls:ColorZone>
+                            <TextBlock Text="{Binding MarkerDetail}" />
+                        </controls:ColorZone>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- NOTE MARKER -->
+
+        <Style Selector="Border.note-marker">
+            <Setter Property="IsVisible"
+                    Value="False" />
+            <Setter Property="Background"
+                    Value="{DynamicResource UserFretBg}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource UserFretFg}" />
+            <Setter Property="BorderThickness"
+                    Value="1.5" />
+        </Style>
+        <Style Selector="Border.note-marker.desired-root">
+            <Setter Property="Background"
+                    Value="{DynamicResource RootFretBg}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource RootFretFg}" />
+        </Style>
+        <Style Selector="Border.note-marker TextBlock">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource UserFretFg}" />
+        </Style>
+
+        <Style Selector="Border.note-marker.desired-root TextBlock">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource RootFretFg}" />
+        </Style>
+        <Style Selector=":is(UserControl).note-btn.unknown.nut Border.note-marker">
+            <Setter Property="Background"
+                    Value="Black" />
+        </Style>
+        <Style Selector=":is(UserControl).note-btn.unknown.nut Border.note-marker TextBlock">
+            <Setter Property="Foreground"
+                    Value="White" />
+        </Style>
+        <Style
+            Selector=":is(UserControl).note-btn.hover Border.note-marker, :is(UserControl).note-btn.selected Border.note-marker">
+            <Setter Property="IsVisible"
+                    Value="True" />
+        </Style>
+        <Style Selector=":is(UserControl).note-btn.hover Border.note-marker">
+            <Setter Property="Opacity"
+                    Value="0.75" />
+        </Style>
+    </UserControl.Styles>
     <TransitioningContentControl x:Name="InstrumentContentControl"
                                  Content="{Binding SelectedTuning}">
         <TransitioningContentControl.PageTransition>

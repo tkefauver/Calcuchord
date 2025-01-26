@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
@@ -12,6 +13,7 @@ using MonkeyPaste.Common.Avalonia;
 namespace Calcuchord {
     public enum PaletteColorType {
         None = 0,
+        HttTransparent,
         Bg,
         Fg,
         RootFretBg,
@@ -35,16 +37,30 @@ namespace Calcuchord {
         PianoMatch
     }
 
-    public class ColorPalette : ViewModelBase {
+    public class ThemeViewModel : ViewModelBase {
 
         #region Statics
 
-        static ColorPalette _instance;
-        public static ColorPalette Instance => _instance ??= new();
+        static ThemeViewModel _instance;
+        public static ThemeViewModel Instance => _instance ??= new();
 
         #endregion
 
         #region Properties
+
+        public bool IsDesktop =>
+            !IsBrowser && !IsMobile;
+
+        public bool IsBrowser =>
+            OperatingSystem.IsBrowser();
+
+        public bool IsMobile =>
+            OperatingSystem.IsAndroid() || OperatingSystem.IsIOS();
+
+        public bool IsPhone =>
+            IsMobile && !IsTablet;
+
+        public bool IsTablet => false;
 
         public bool IsDark {
             get => Prefs.Instance.IsThemeDark;
@@ -73,70 +89,95 @@ namespace Calcuchord {
         public Dictionary<PaletteColorType,string> P {
             get {
                 if(_fullPalette == null) {
-                    _fullPalette = new() {
+                    _fullPalette = new()
+                    {
                         // LIGHT / DARK
                         {
                             PaletteColorType.None,
                             ("#00000000","#00000000")
-                        }, {
+                        },
+                        {
+                            PaletteColorType.HttTransparent,
+                            ("#01000000","#01000000")
+                        },
+                        {
                             PaletteColorType.Bg,
                             ("#FFFFFF","#000000")
-                        }, {
+                        },
+                        {
                             PaletteColorType.Fg,
                             ("#000000","#FFFFFF")
-                        }, {
+                        },
+                        {
                             PaletteColorType.UserFretBg,
                             //("#EC3E7B","#EC3E7B")
                             ("#DC143C","#DC143C")
-                        }, {
+                        },
+                        {
                             PaletteColorType.UserFretFg,
                             ("#FFFFFF","#FFFFFF")
-                        }, {
+                        },
+                        {
                             PaletteColorType.RootFretBg,
                             ("#000000","#000000")
-                        }, {
+                        },
+                        {
                             PaletteColorType.RootFretFg,
                             ("#FFFFFF","#FFFFFF")
-                        }, {
+                        },
+                        {
                             PaletteColorType.Finger1Bg,
                             ("#77DD77","#77DD77")
-                        }, {
+                        },
+                        {
                             PaletteColorType.Finger1Fg,
                             ("#FFFFFF","#FFFFFF")
-                        }, {
+                        },
+                        {
                             PaletteColorType.Finger2Bg,
                             ("#21CEE1","#21CEE1")
-                        }, {
+                        },
+                        {
                             PaletteColorType.Finger2Fg,
                             ("#FFFFFF","#FFFFFF")
-                        }, {
+                        },
+                        {
                             PaletteColorType.Finger3Bg,
                             ("#A240E8","#A240E8")
-                        }, {
+                        },
+                        {
                             PaletteColorType.Finger3Fg,
                             ("#FFFFFF","#FFFFFF")
-                        }, {
+                        },
+                        {
                             PaletteColorType.Finger4Bg,
                             ("#FA8C00","#FA8C00")
-                        }, {
+                        },
+                        {
                             PaletteColorType.Finger4Fg,
                             ("#FFFFFF","#FFFFFF")
-                        }, {
+                        },
+                        {
                             PaletteColorType.NutBg,
                             ("#FAEBD7","#FAEBD7")
-                        }, {
+                        },
+                        {
                             PaletteColorType.NutFg,
                             ("#000000","#000000")
-                        }, {
+                        },
+                        {
                             PaletteColorType.PianoWhiteKeyBg,
                             ("#FFFFFF","#000000")
-                        }, {
+                        },
+                        {
                             PaletteColorType.PianoWhiteKeyFg,
                             ("#000000","#FFFFFF")
-                        }, {
+                        },
+                        {
                             PaletteColorType.PianoBlackKeyBg,
                             ("#000000","#FFFFFF")
-                        }, {
+                        },
+                        {
                             PaletteColorType.PianoBlackKeyFg,
                             ("#000000","#FFFFFF")
                         }

@@ -9,52 +9,66 @@
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
-             xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:TuningViewModel"
              x:Class="Calcuchord.KeyboardView">
     <UserControl.Styles>
         <Style Selector="local|KeyView">
-            <Setter Property="ZIndex"
-                    Value="0" />
             <Setter Property="BorderThickness"
                     Value="2" />
-            <Setter Property="Width"
-                    Value="40" />
-            <Setter Property="Height"
-                    Value="228" />
             <Setter Property="Background"
                     Value="{DynamicResource PianoWhiteKeyBg}" />
             <Setter Property="BorderBrush"
                     Value="{DynamicResource PianoWhiteKeyFg}" />
         </Style>
         <Style Selector="local|KeyView.black">
-            <Setter Property="ZIndex"
+            <Setter Property="BorderThickness"
                     Value="1" />
-            <Setter Property="Width"
-                    Value="20" />
-            <Setter Property="Height"
-                    Value="144.4" />
             <Setter Property="Background"
                     Value="{DynamicResource PianoBlackKeyBg}" />
             <Setter Property="BorderBrush"
                     Value="{DynamicResource PianoBlackKeyFg}" />
         </Style>
 
+        <Style Selector="local|KeyView TextBlock">
+            <Setter Property="FontSize"
+                    Value="14" />
+            <Setter Property="Padding"
+                    Value="5,3" />
+        </Style>
+
+        <Style Selector="local|KeyView.black TextBlock">
+            <Setter Property="FontSize"
+                    Value="12" />
+            <Setter Property="Padding"
+                    Value="0.5" />
+        </Style>
+
+        <Style Selector="local|KeyView.desired-root TextBlock">
+            <Setter Property="Background"
+                    Value="{DynamicResource RootFretBg}" />
+            <Setter Property="Foreground"
+                    Value="{DynamicResource RootFretFg}" />
+        </Style>
+
     </UserControl.Styles>
     <Viewbox Margin="10">
         <ItemsControl x:Name="KeyboardItemsControl"
-                      Width="{x:Static local:KeyViewModel.KeyboardWidth}"
-                      Height="{x:Static local:KeyViewModel.KeyboardHeight}"
-                      ItemsSource="{Binding AllFrets}">
+                      ItemsSource="{Binding AllNotes}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Canvas Classes="keyboard" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="local:KeyViewModel">
-                    <local:KeyView Classes.black="{Binding IsAltered}" />
-
+                <DataTemplate x:DataType="local:NoteViewModel">
+                    <local:KeyView Classes="note-btn"
+                                   Classes.black="{Binding IsAltered}"
+                                   Classes.selected="{Binding IsSelected}"
+                                   Classes.desired-root="{Binding IsDesiredRoot}"
+                                   Classes.hover="{Binding IsHovering}"
+                                   Loaded="KeyView_Loaded"
+                                   Unloaded="KeyView_Unloaded" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

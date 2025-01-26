@@ -1,6 +1,12 @@
 using System;
 
 namespace Calcuchord {
+    public enum NoteMarkerState {
+        Off,
+        On,
+        Root
+    }
+
     [Flags]
     public enum SvgFlags {
         None = 0,
@@ -76,7 +82,8 @@ namespace Calcuchord {
         Lydian,
         Mixolydian,
         Locrian,
-        AhavaRaba,
+
+        AhavaRaba
         // missing:
         // Ionian,
         // Aeolian

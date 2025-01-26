@@ -40,17 +40,18 @@ namespace Calcuchord {
 
         #region View Models
 
-        public IEnumerable<StringRowViewModel> SortedStringRows =>
-            StringRows.OrderBy(
-                x => x.StringNum < 0 ? -1 : IsStringsDescending ? StringCount - x.StringNum : x.StringNum);
+        public IEnumerable<NoteRowViewModel> SortedRows =>
+            NoteRows.OrderBy(
+                x => x.RowNum < 0 ? -1 :
+                    IsStringsDescending ? StringCount - x.RowNum : x.RowNum);
 
-        public ObservableCollection<StringRowViewModel> StringRows { get; } = [];
+        public ObservableCollection<NoteRowViewModel> NoteRows { get; } = [];
 
-        public IEnumerable<FretViewModel> AllFrets =>
-            StringRows.SelectMany(x => x.Frets);
+        public IEnumerable<NoteViewModel> AllNotes =>
+            NoteRows.SelectMany(x => x.Notes).OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum);
 
-        public IEnumerable<FretViewModel> SelectedFrets =>
-            AllFrets.Where(x => x.IsSelected);
+        public IEnumerable<NoteViewModel> SelectedNotes =>
+            AllNotes.Where(x => x.IsSelected);
 
         #endregion
 
@@ -125,9 +126,9 @@ namespace Calcuchord {
             Tuning = tuning;
             Tuning.SetParent(Parent.Instrument);
 
-            Tuning.OpenNotes.OrderBy(x => x.StringNum).ForEach(x => StringRows.Add(new(this,x)));
+            Tuning.OpenNotes.OrderBy(x => x.RowNum).ForEach(x => NoteRows.Add(new(this,x)));
             if(!Parent.IsKeyboard) {
-                StringRows.Insert(0,new(this,null));
+                NoteRows.Insert(0,new(this,null));
             }
 
             OnPropertyChanged(nameof(IsStringsDescending));
@@ -153,7 +154,12 @@ namespace Calcuchord {
             }
 
             Parent.Instrument.RefreshModelTree();
+
             IsBusy = false;
+        }
+
+        public void ResetSelection() {
+            NoteRows.ForEach(x => x.ResetSelection());
         }
 
         #endregion
@@ -168,10 +174,11 @@ namespace Calcuchord {
             switch(e.PropertyName) {
                 case nameof(IsSelected):
                     if(IsSelected) {
+                        ResetSelection();
                         Prefs.Instance.SelectedTuningId = Id;
                         MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.SelectedTuning));
                         // if(Parent.IsKeyboard &&
-                        //    AllFrets.OfType<KeyViewModel>() is { } kvml) {
+                        //    AllNotes.OfType<KeyViewModel>() is { } kvml) {
                         //     kvml.ForEach(x => x.OnPropertyChanged(nameof(x.KeyX)));
                         //     kvml.ForEach(x => x.OnPropertyChanged(nameof(x.KeyWidth)));
                         //     kvml.ForEach(x => x.OnPropertyChanged(nameof(x.KeyHeight)));
@@ -195,10 +202,10 @@ namespace Calcuchord {
                             });
                     }
 
-                    OnPropertyChanged(nameof(SortedStringRows));
+                    OnPropertyChanged(nameof(SortedRows));
                     OnPropertyChanged(nameof(StringSortIcon));
-                    AllFrets.ForEach(x => x.OnPropertyChanged(nameof(x.IsTopDotFret)));
-                    AllFrets.ForEach(x => x.OnPropertyChanged(nameof(x.IsBottomDotFret)));
+                    AllNotes.ForEach(x => x.OnPropertyChanged(nameof(x.IsTopDotFret)));
+                    AllNotes.ForEach(x => x.OnPropertyChanged(nameof(x.IsBottomDotFret)));
 
 
                     break;

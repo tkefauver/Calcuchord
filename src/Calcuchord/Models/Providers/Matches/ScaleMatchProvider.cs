@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace Calcuchord {
     public class ScaleMatchProvider : MatchProviderBase {
+
         #region Private Variables
 
         #endregion
@@ -37,7 +38,7 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public override IEnumerable<MatchViewModelBase> GetResults(IEnumerable<FretViewModel> frets) {
+        public override IEnumerable<MatchViewModelBase> GetResults(IEnumerable<NoteViewModel> frets) {
             return null;
         }
 
@@ -54,5 +55,6 @@ namespace Calcuchord {
         #region Commands
 
         #endregion
+
     }
 }

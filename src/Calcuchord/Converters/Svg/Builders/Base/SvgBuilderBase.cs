@@ -51,22 +51,22 @@ namespace Calcuchord {
             "#00000050";
 
         protected virtual string RootBg =>
-            ColorPalette.Instance.P[PaletteColorType.RootFretBg];
+            ThemeViewModel.Instance.P[PaletteColorType.RootFretBg];
 
         protected virtual string RootFg =>
-            ColorPalette.Instance.P[PaletteColorType.RootFretFg];
+            ThemeViewModel.Instance.P[PaletteColorType.RootFretFg];
 
         protected virtual string UserBg =>
-            ColorPalette.Instance.P[PaletteColorType.UserFretBg];
+            ThemeViewModel.Instance.P[PaletteColorType.UserFretBg];
 
         protected virtual string UserFg =>
-            ColorPalette.Instance.P[PaletteColorType.UserFretFg];
+            ThemeViewModel.Instance.P[PaletteColorType.UserFretFg];
 
         protected string Fg =>
-            ColorPalette.Instance.P[PaletteColorType.Fg];
+            ThemeViewModel.Instance.P[PaletteColorType.Fg];
 
         protected string Bg =>
-            ColorPalette.Instance.P[PaletteColorType.Bg];
+            ThemeViewModel.Instance.P[PaletteColorType.Bg];
 
         protected string Transparent => "transparent";
 
@@ -107,7 +107,7 @@ namespace Calcuchord {
                 PaletteColorType.Finger3Bg,
                 PaletteColorType.Finger4Bg
             ];
-            FingerBg = fbg.Select(x => ColorPalette.Instance.P[x]).ToArray();
+            FingerBg = fbg.Select(x => ThemeViewModel.Instance.P[x]).ToArray();
             PaletteColorType[] ffg = [
                 PaletteColorType.NutFg,
                 PaletteColorType.Finger1Fg,
@@ -115,7 +115,7 @@ namespace Calcuchord {
                 PaletteColorType.Finger3Fg,
                 PaletteColorType.Finger4Fg
             ];
-            FingerFg = ffg.Select(x => ColorPalette.Instance.P[x]).ToArray();
+            FingerFg = ffg.Select(x => ThemeViewModel.Instance.P[x]).ToArray();
         }
 
         #endregion
@@ -128,7 +128,8 @@ namespace Calcuchord {
             if(Design.IsDesignMode) {
                 return;
             }
-            HtmlDocument doc = new();
+
+            HtmlDocument doc = new HtmlDocument();
 
             HtmlNode body = doc.CreateElement("body");
             doc.DocumentNode.AppendChild(body);
@@ -171,9 +172,10 @@ namespace Calcuchord {
             if(note is null ||
                MainViewModel.Instance is not { } mvm ||
                mvm.SelectedTuning is not { } stvm ||
-               stvm.SelectedFrets.All(x => x.StringNum != note.StringNum && x.FretNum != note.FretNum)) {
+               stvm.SelectedNotes.All(x => x.RowNum != note.RowNum && x.NoteNum != note.FretNum)) {
                 return false;
             }
+
             return true;
         }
 
@@ -217,6 +219,7 @@ namespace Calcuchord {
                 double offset = 0.25; //fs / 16d;
                 AddText(cntr,text,fs,shadow_fill,x + offset,y + offset,isBold,classes);
             }
+
             HtmlNode text_elm = CurrentDoc.CreateElement("text");
             text_elm.Attributes.Add("font-size",fs);
             text_elm.Attributes.Add("font-family",DefaultFontFamily);
@@ -252,6 +255,7 @@ namespace Calcuchord {
                 double offset = 0.25; //fs / 16d;
                 AddCircle(cntr,shadow_fill,stroke,x + offset,y + offset,r,sw,classes);
             }
+
             HtmlNode circle = CurrentDoc.CreateElement("circle");
             circle.Attributes.Add("fill",fill);
             circle.Attributes.Add("stroke",stroke);

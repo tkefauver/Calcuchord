@@ -4,8 +4,8 @@ using PropertyChanged;
 namespace Calcuchord {
     [DoNotNotify]
     public partial class FretView : UserControl {
-        public FretViewModel BindingContext =>
-            DataContext as FretViewModel;
+        public NoteViewModel BindingContext =>
+            DataContext as NoteViewModel;
 
         public FretView() {
             InitializeComponent();

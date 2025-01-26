@@ -4,10 +4,10 @@ using HtmlAgilityPack;
 namespace Calcuchord {
     public class PianoSvgBuilder : SvgBuilderBase {
         protected override string UserBg =>
-            ColorPalette.Instance.P[PaletteColorType.Finger1Bg];
+            ThemeViewModel.Instance.P[PaletteColorType.Finger1Bg];
 
         protected override string UserFg =>
-            ColorPalette.Instance.P[PaletteColorType.Finger1Fg];
+            ThemeViewModel.Instance.P[PaletteColorType.Finger1Fg];
 
 
         public override HtmlNode Build(NoteGroup ng) {
@@ -27,19 +27,18 @@ namespace Calcuchord {
 
             SvgFlags flags = DefaultSvgFlags;
 
-
             double lw = FretLineFixedAxisSize * 2;
             double bw = lw * 1;
             double wkw = StringFixedAxisLength;
-            double bkw = wkw * KeyViewModel.WHITE_TO_BLACK_WIDTH_RATIO;
-            double wkh = wkw * KeyViewModel.WHITE_WIDTH_TO_HEIGHT_RATIO;
-            double bkh = wkh * KeyViewModel.WHITE_TO_BLACK_HEIGHT_RATIO;
+            double bkw = wkw * KeyboardView.WHITE_TO_BLACK_WIDTH_RATIO;
+            double wkh = wkw * KeyboardView.WHITE_WIDTH_TO_HEIGHT_RATIO;
+            double bkh = wkh * KeyboardView.WHITE_TO_BLACK_HEIGHT_RATIO;
 
             string bkf = Fg;
             string wkf = Bg;
             string stroke = bkf;
-            string pattern_bg = ColorPalette.Instance.P[PaletteColorType.UserFretBg];
-            string pattern_fg = ColorPalette.Instance.P[PaletteColorType.UserFretFg];
+            string pattern_bg = ThemeViewModel.Instance.P[PaletteColorType.UserFretBg];
+            string pattern_fg = ThemeViewModel.Instance.P[PaletteColorType.UserFretFg];
 
             var pattern_notes = ng.Notes.OrderBy(x => x.FretNum);
             InstrumentNote root_note = ng.Parent.Parent.OpenNotes.FirstOrDefault();
@@ -83,11 +82,13 @@ namespace Calcuchord {
                     ReduceDims();
                     AddRect(cntr,RootBg,RootBg,x,y,w,h,lw);
                 }
+
                 // user
                 if(is_user && flags.HasFlag(SvgFlags.Matches)) {
                     ReduceDims();
                     AddRect(cntr,UserBg,UserBg,x,y,w,h,lw);
                 }
+
                 if(pattern_note != null) {
                     ReduceDims();
                     AddRect(cntr,pattern_bg,pattern_bg,x,y,w,h,lw);
@@ -106,6 +107,7 @@ namespace Calcuchord {
                     cur_x += wkw;
                 }
             }
+
             double tw = cur_x;
             double th = wkh;
 

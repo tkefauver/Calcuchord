@@ -227,12 +227,12 @@ namespace Calcuchord {
 
         bool RejectNotStartOnRoot(InstrumentNote[] notes,NoteType[] pattern,
             IEnumerable<IEnumerable<InstrumentNote>> existing) {
-            return notes.OrderBy(x => x.StringNum).ThenBy(x => x.FretNum).FirstOrDefault().Key != pattern[0];
+            return notes.OrderBy(x => x.RowNum).ThenBy(x => x.FretNum).FirstOrDefault().Key != pattern[0];
         }
 
         bool RejectNotesOnSameString(InstrumentNote[] notes,NoteType[] pattern,
             IEnumerable<IEnumerable<InstrumentNote>> existing) {
-            return notes.GroupBy(x => x.StringNum).Any(x => x.Count() > 1);
+            return notes.GroupBy(x => x.RowNum).Any(x => x.Count() > 1);
         }
 
         bool RejectExists(InstrumentNote[] notes,NoteType[] pattern,IEnumerable<IEnumerable<InstrumentNote>> existing) {
@@ -274,7 +274,7 @@ namespace Calcuchord {
                     .Where(x => x.FretNum > 0)
                     .GroupBy(x => x.FretNum)
                     .OrderBy(x => x.Key)
-                    .ToDictionary(x => x.Key,x => x.OrderBy(y => y.StringNum).Select(y => y));
+                    .ToDictionary(x => x.Key,x => x.OrderBy(y => y.RowNum).Select(y => y));
             if(fingered_fret_note_lookup.Count != 0) {
                 int min_fingered_fret = fingered_fret_note_lookup.Keys.Min();
                 int max_fingered_fret = fingered_fret_note_lookup.Keys.Max();
@@ -286,8 +286,8 @@ namespace Calcuchord {
                     if(fingered_fret_note_lookup.TryGetValue(cur_fret_num,out var cur_fret_notes)) {
                         // fret has notes
 
-                        int min_fret_str = cur_fret_notes.Min(x => x.StringNum);
-                        int max_fret_str = cur_fret_notes.Max(x => x.StringNum);
+                        int min_fret_str = cur_fret_notes.Min(x => x.RowNum);
+                        int max_fret_str = cur_fret_notes.Max(x => x.RowNum);
                         bool do_bar = cur_fret_notes.Skip(1).Any() &&
                                       fingered_fret_note_lookup.Keys.Any(x => x > cur_fret_num);
                         // check if any lower frets in str range have notes (then can't bar)
@@ -296,8 +296,8 @@ namespace Calcuchord {
                                            .Any(
                                                x => x.FretNum >= 0 &&
                                                     x.FretNum < cur_fret_num &&
-                                                    x.StringNum >= min_fret_str &&
-                                                    x.StringNum <= max_fret_str);
+                                                    x.RowNum >= min_fret_str &&
+                                                    x.RowNum <= max_fret_str);
                         foreach(InstrumentNote cur_fret_note in cur_fret_notes) {
                             if(cur_finger > 4) {
                                 // reject
@@ -322,7 +322,7 @@ namespace Calcuchord {
             notes.Where(x => x.FretNum == 0).ForEach(x => pnl.Add(new(0,x)));
             // add mutes
             Enumerable
-                .Range(0,StringCount).Where(x => notes.All(y => y.StringNum != x))
+                .Range(0,StringCount).Where(x => notes.All(y => y.RowNum != x))
                 .ForEach(x => pnl.Add(new(-1,InstrumentNote.Mute(x))));
 
             return pnl;
@@ -365,13 +365,13 @@ namespace Calcuchord {
 
                     NoteGroupCollection ngc = new NoteGroupCollection(PatternType,cur_key,suffix);
                     foreach((var vp,int idx) in valid_patterns.OrderBy(x => x.Min(y => y.FretNum))
-                                .ThenBy(x => x.Min(y => y.StringNum)).WithIndex()) {
+                                .ThenBy(x => x.Min(y => y.RowNum)).WithIndex()) {
                         if(AddChordFingerings(vp) is not { } fingerings) {
                             continue;
                         }
 
                         ngc.Groups.Add(
-                            new(ngc,idx,fingerings.OrderBy(x => x.StringNum).ThenBy(x => x.FretNum))
+                            new(ngc,idx,fingerings.OrderBy(x => x.RowNum).ThenBy(x => x.FretNum))
                                 { Id = Guid.NewGuid().ToString() });
                         cur_chord_count++;
                     }

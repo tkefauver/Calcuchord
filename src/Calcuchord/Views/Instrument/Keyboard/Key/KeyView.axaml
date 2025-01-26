@@ -9,7 +9,16 @@
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
-             xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia"
-             x:DataType="local:FretViewModel"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:NoteViewModel"
              x:Class="Calcuchord.KeyView">
+    <Border x:Name="KeyMarker"
+            BorderThickness="0"
+            Classes="note-marker">
+        <TextBlock Text="{Binding MarkerLabel}"
+                   IsVisible="{Binding !IsPhone, Source={x:Static local:ThemeViewModel.Instance}}"
+                   Margin="0,0,0,5"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Bottom" />
+    </Border>
 </UserControl>

@@ -4,17 +4,58 @@
         xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
         xmlns:local="clr-namespace:Calcuchord"
-        xmlns:common="clr-namespace:MonkeyPaste;assembly=MonkeyPaste.Common.Avalonia">
-    <Design.PreviewWith>
-        <Border Padding="20">
-            <!-- Add Controls for Previewer Here -->
-        </Border>
-    </Design.PreviewWith>
+        xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia">
     <Styles.Resources>
         <FontFamily x:Key="NunitoFont">avares://Calcuchord/Assets/Fonts#Nunito</FontFamily>
-
         <FontFamily x:Key="GaramondFont">avares://Calcuchord/Assets/Fonts#EB Garamond Regular</FontFamily>
+
+        <!-- UNKNOWN BRUSH -->
+        <LinearGradientBrush x:Key="UnknownBrush"
+                             StartPoint="0%,0%"
+                             EndPoint="5%,0%"
+                             SpreadMethod="Reflect">
+            <LinearGradientBrush.Transform>
+                <SkewTransform AngleX="22" />
+            </LinearGradientBrush.Transform>
+            <GradientStops>
+                <GradientStop Color="Black"
+                              Offset="0" />
+                <GradientStop Color="Yellow"
+                              Offset="1" />
+            </GradientStops>
+        </LinearGradientBrush>
     </Styles.Resources>
+
+    <!-- TOOLTIPS -->
+    <Style Selector=":is(ToolTip)">
+        <Setter Property="Margin"
+                Value="0" />
+        <Setter Property="Padding"
+                Value="0" />
+    </Style>
+    <Style Selector=":is(ToolTip) controls|ColorZone">
+        <Setter Property="Mode"
+                Value="Accent" />
+        <Setter Property="Margin"
+                Value="0" />
+        <Setter Property="Padding"
+                Value="10" />
+        <Setter Property="CornerRadius"
+                Value="7" />
+    </Style>
+
+    <!-- FONTS -->
+    <Style Selector=":is(TextBlock)">
+        <Setter Property="FontFamily"
+                Value="{StaticResource GaramondFont}" />
+    </Style>
+
+    <!-- CURSOR -->
+
+    <Style Selector=":is(Control)">
+        <Setter Property="Cursor"
+                Value="Hand" />
+    </Style>
 
     <Style Selector=":is(Button)">
         <Setter Property="Cursor"
@@ -25,11 +66,7 @@
                 Value="Hand" />
     </Style>
 
-
-    <Style Selector=":is(TextBlock)">
-        <Setter Property="FontFamily"
-                Value="{StaticResource GaramondFont}" />
-    </Style>
+    <!-- BUTTONS -->
 
     <Style Selector="Button.float">
         <Setter Property="Theme"
@@ -54,5 +91,19 @@
         <Setter Property="Height"
                 Value="24" />
     </Style>
+
+    <!-- TRANSITIONS -->
+    <Style Selector=":is(Control).fade">
+        <Setter Property="Transitions">
+            <Setter.Value>
+                <Transitions>
+                    <DoubleTransition Property="Opacity"
+                                      Duration="0:0:0.125" />
+                </Transitions>
+
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 
 </Styles>

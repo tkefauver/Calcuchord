@@ -2,6 +2,7 @@ using System.Runtime.Serialization;
 
 namespace Calcuchord {
     public class PatternNote : InstrumentNote {
+
         #region Properties
 
         #region Members
@@ -34,13 +35,13 @@ namespace Calcuchord {
         }
 
         public PatternNote(int fingerNum,InstrumentNote inn) : this(
-            fingerNum,inn.FretNum,inn.StringNum,inn.Key,
+            fingerNum,inn.FretNum,inn.RowNum,inn.Key,
             inn.Register) {
         }
 
-        public PatternNote(int fingerNum,int fretNum,int stringNum,NoteType nt,int register) : base(
+        public PatternNote(int fingerNum,int fretNum,int rowNum,NoteType nt,int register) : base(
             fretNum,
-            stringNum,nt,register) {
+            rowNum,nt,register) {
             FingerNum = fingerNum;
         }
 
@@ -61,5 +62,6 @@ namespace Calcuchord {
         #region Private Methods
 
         #endregion
+
     }
 }

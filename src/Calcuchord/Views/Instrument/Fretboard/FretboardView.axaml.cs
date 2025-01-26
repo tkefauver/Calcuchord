@@ -38,6 +38,7 @@ namespace Calcuchord {
             MeasureFretboard();
         }
 
+
         void MeasureFretboard() {
             if(DataContext is not TuningViewModel tvm) {
                 return;
@@ -77,7 +78,7 @@ namespace Calcuchord {
                         return;
                     }
 
-                    int fn = x.BindingContext.FretNum;
+                    int fn = x.BindingContext.NoteNum;
                     cp.Width = fn < 0 ? label_width :
                         fn == 0 ? nut_width :
                         fret_widths[fn - 1];
@@ -93,6 +94,24 @@ namespace Calcuchord {
             FretboardBgImage.Width = frets_width;
             FretboardBgImage.Height = th - str_h;
             FretboardBgImage.Margin = new(lt,tt,0,0);
+        }
+
+        void FretView_Loaded(object sender,RoutedEventArgs e) {
+            if(sender is not Control c ||
+               InstrumentView.Instance is not { } iv) {
+                return;
+            }
+
+            iv.AttachHandlers(c);
+        }
+
+        void FretView_Unloaded(object sender,RoutedEventArgs e) {
+            if(sender is not Control c ||
+               InstrumentView.Instance is not { } iv) {
+                return;
+            }
+
+            iv.DetachHandlers(c);
         }
     }
 }

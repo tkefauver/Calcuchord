@@ -7,5 +7,6 @@ namespace Calcuchord {
         public KeyView() {
             InitializeComponent();
         }
+
     }
 }

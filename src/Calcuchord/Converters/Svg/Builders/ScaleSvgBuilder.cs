@@ -110,10 +110,12 @@ namespace Calcuchord {
                             AddRect(bg_g,Fg,Transparent,curx,cury,nw,sh,lw);
                         }
                     }
-                    if(notes.FirstOrDefault(x => x.StringNum == str_num && x.FretNum == fret_num) is not
+
+                    if(notes.FirstOrDefault(x => x.RowNum == str_num && x.FretNum == fret_num) is not
                        { } fret_note) {
                         continue;
                     }
+
                     double cx = curx + fhw;
                     double cy = cury;
                     double dot_r = DotRadius;

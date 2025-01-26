@@ -116,6 +116,8 @@ namespace Calcuchord {
 
         #region State
 
+        public NoteType? DesiredRoot { get; set; }
+
         public int SelectedInstrumentIndex {
             get => Instruments.IndexOf(SelectedInstrument);
             set {
