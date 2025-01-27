@@ -15,6 +15,7 @@ namespace Calcuchord {
             base.RegisterServices();
             AvaloniaWebViewBuilder.Initialize(
                 config => {
+                    PlatformWrapper.Load();
                     PlatformWrapper.WebViewHelper.InitEnv(config);
                 });
         }
@@ -25,11 +26,13 @@ namespace Calcuchord {
             ThemeViewModel.Instance.Init();
 
             if(ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
-                desktop.MainWindow = new MainWindow {
+                desktop.MainWindow = new MainWindow
+                {
                     DataContext = new MainViewModel()
                 };
             } else if(ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform) {
-                singleViewPlatform.MainView = new MainView {
+                singleViewPlatform.MainView = new MainView
+                {
                     DataContext = new MainViewModel()
                 };
             }

@@ -88,11 +88,11 @@ namespace Calcuchord {
 
         #endregion
 
-        public int StringCount =>
+        public int RowCount =>
             Instrument.StringCount;
 
         public int LogicalStringCount =>
-            IsKeyboard ? StringCount : StringCount + 1;
+            IsKeyboard ? RowCount : RowCount + 1;
 
 
         public InstrumentType InstrumentType =>

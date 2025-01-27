@@ -3,7 +3,12 @@ using AvaloniaWebView;
 using WebViewCore.Configurations;
 
 namespace Calcuchord {
+    public interface IStorageHelper {
+        string StorageDir { get; }
+    }
+
     public interface IWebViewHelper {
+        string ToneUrl { get; }
         void InitEnv(WebViewCreationProperties config);
         bool ConfigureWebView(WebView wv);
     }

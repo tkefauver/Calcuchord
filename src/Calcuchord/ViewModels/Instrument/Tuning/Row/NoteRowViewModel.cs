@@ -91,8 +91,8 @@ namespace Calcuchord {
             !IsKeyboard && MainViewModel.Instance.SelectedPatternType == MusicPatternType.Chords;
 
         public bool IsDefaultSelection =>
-            SelectedNotes.All(x => x == DefaultNote) &&
-            DefaultNote.IsDefaultState;
+            (DefaultNote == null && SelectedNote == null) ||
+            (DefaultNote != null && SelectedNotes.All(x => x == DefaultNote));
 
         public int RowNum =>
             OpenNote == null ? -1 : OpenNote.RowNum;
@@ -116,14 +116,9 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public NoteRowViewModel() {
-        }
-
         public NoteRowViewModel(TuningViewModel parent,InstrumentNote openNote) : base(parent) {
             PropertyChanged += NoteRowViewModel_OnPropertyChanged;
             OpenNote = openNote;
-
-
             int min_fret_num = IsKeyboard ? 0 : -1;
             Notes.AddRange(
                 Enumerable.Range(min_fret_num,Parent.LogicalFretCount)
@@ -223,10 +218,10 @@ namespace Calcuchord {
                nvm.IsSelected &&
                nvm.IsNutFret &&
                CanMute) {
-                nvm.WorkingFretNum--;
+                nvm.WorkingNoteNum--;
                 OnPropertyChanged(nameof(IsMuted));
                 OnPropertyChanged(nameof(IsUnknown));
-                if(nvm.WorkingFretNum == 0) {
+                if(nvm.WorkingNoteNum == 0) {
                     SetNoteMarkerState(nvm,NoteMarkerState.Off);
                 }
             } else {
@@ -271,6 +266,7 @@ namespace Calcuchord {
                 }
 
                 ToggleSelected(nvm,false);
+                MainViewModel.Instance.UpdateMatches(MatchUpdateSource.NoteToggle);
             });
 
         public ICommand ToggleNoteAsDesiredRootCommand => new MpCommand<object>(
@@ -281,6 +277,7 @@ namespace Calcuchord {
                 }
 
                 ToggleSelected(nvm,true);
+                MainViewModel.Instance.UpdateMatches(MatchUpdateSource.RootToggle);
             });
 
         #endregion

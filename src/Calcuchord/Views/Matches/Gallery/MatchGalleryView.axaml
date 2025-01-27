@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:MainViewModel"
+             x:Class="Calcuchord.MatchGalleryView">
+    <ScrollViewer x:Name="MatchGalleryScrollViewer">
+        <ItemsRepeater x:Name="MatchItemsRepeater"
+                       ItemsSource="{Binding Matches}">
+            <ItemsRepeater.Layout>
+                <WrapLayout HorizontalSpacing="5"
+                            VerticalSpacing="5"
+                            Orientation="Horizontal" />
+            </ItemsRepeater.Layout>
+            <ItemsRepeater.ItemTemplate>
+                <DataTemplate x:DataType="local:MatchViewModelBase">
+                    <local:MatchView Background="{DynamicResource HttTransparent}"
+                                     common:MpAvIsHoveringExtension.IsEnabled="True"
+                                     common:MpAvIsHoveringExtension.IsHovering="{Binding IsHovering, Mode=TwoWay}"
+                                     Classes="thumb"
+                                     Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
+                                     Classes.selected="{Binding IsSelected}"
+                                     Classes.hover="{Binding IsHovering}" />
+                </DataTemplate>
+            </ItemsRepeater.ItemTemplate>
+        </ItemsRepeater>
+    </ScrollViewer>
+</UserControl>

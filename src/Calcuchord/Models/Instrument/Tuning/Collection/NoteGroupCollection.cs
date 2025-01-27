@@ -26,8 +26,19 @@ namespace Calcuchord {
         #region Ignored
 
         [IgnoreDataMember]
-        public string SuffixDisplayValue =>
-            PatternType.ToDisplayValue(SuffixKey);
+        string _suffixDisplayValue;
+
+        [IgnoreDataMember]
+        public string SuffixDisplayValue {
+            get {
+                if(string.IsNullOrEmpty(_suffixDisplayValue)) {
+                    _suffixDisplayValue = PatternType.ToDisplayValue(SuffixKey);
+                }
+
+                return _suffixDisplayValue;
+            }
+        }
+
 
         [IgnoreDataMember]
         public Tuning Parent { get; set; }

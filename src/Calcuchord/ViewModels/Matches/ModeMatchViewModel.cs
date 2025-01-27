@@ -1,7 +1,5 @@
-using System.Linq;
-
 namespace Calcuchord {
-    public class ScaleMatchViewModel : MatchViewModelBase {
+    public class ModeMatchViewModel : ScaleMatchViewModel {
 
         #region Private Variables
 
@@ -40,7 +38,7 @@ namespace Calcuchord {
         #region State
 
         public override MusicPatternType MatchPatternType =>
-            MusicPatternType.Scales;
+            MusicPatternType.Modes;
 
         #endregion
 
@@ -55,10 +53,8 @@ namespace Calcuchord {
         #endregion
 
         #region Constructors
-
-        public ScaleMatchViewModel(NoteGroup noteGroup,double score) : base(noteGroup,score) {
+        public ModeMatchViewModel(NoteGroup noteGroup,double score) : base(noteGroup,score) {
         }
-
         #endregion
 
         #region Public Methods
@@ -66,10 +62,6 @@ namespace Calcuchord {
         #endregion
 
         #region Protected Methods
-
-        protected override void PlayGroupMidi() {
-            MidiPlayer.Instance.PlayScale(NoteGroup.Notes.Select(x => x.MidiTone).ToArray());
-        }
 
         #endregion
 

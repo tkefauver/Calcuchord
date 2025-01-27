@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:MainViewModel"
+             x:Class="Calcuchord.MainHeaderView">
+    <controls:ColorZone VerticalAlignment="Top"
+                        HorizontalAlignment="Stretch"
+                        DockPanel.Dock="Top"
+                        Height="56"
+                        Mode="PrimaryMid"
+                        ZIndex="1">
+        <DockPanel Margin="16">
+            <ToggleButton x:Name="NavDrawerSwitch"
+                          DockPanel.Dock="Left"
+                          IsChecked="{Binding IsLeftDrawerOpen,Mode=TwoWay}"
+                          Classes="float">
+                <avalonia:MaterialIcon Kind="Menu" />
+            </ToggleButton>
+
+            <ToggleButton x:Name="OptionDrawerSwitch"
+                          DockPanel.Dock="Right"
+                          IsChecked="{Binding IsRightDrawerOpen,Mode=TwoWay}"
+                          Classes="float">
+                <avalonia:MaterialIcon Kind="DotsVertical" />
+            </ToggleButton>
+
+            <TextBlock Classes="Headline6"
+                       Text="Calcuchord"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+        </DockPanel>
+    </controls:ColorZone>
+</UserControl>

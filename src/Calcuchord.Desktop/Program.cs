@@ -16,7 +16,11 @@ namespace Calcuchord.Desktop {
 
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp() {
-            PlatformWrapper.Init(new DesktopWebViewHelper());
+            PlatformWrapper.Init(() => {
+                PlatformWrapper.StorageHelper = new DesktopStorageHelper();
+                PlatformWrapper.WebViewHelper = new DesktopWebViewHelper();
+            });
+
 
             return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
@@ -24,7 +28,10 @@ namespace Calcuchord.Desktop {
                 .UseDesktopWebView()
                 .WithInterFont()
                 .LogToTrace()
-                .AfterSetup(_ => { });
+                .AfterSetup(
+                    _ => {
+                        AssetMover.MoveAllAssets();
+                    });
         }
     }
 }

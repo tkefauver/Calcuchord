@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:MainViewModel"
+             x:Class="Calcuchord.MatchesView">
+    <UserControl.Styles>
+        <Style Selector="local|MatchView.thumb Border#MatchContainerBorder">
+            <Setter Property="Transitions">
+                <Setter.Value>
+                    <Transitions>
+                        <BoxShadowsTransition Property="BoxShadow"
+                                              Duration="0:0:0.25" />
+                    </Transitions>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style
+            Selector="local|MatchView.thumb.hover Border#MatchContainerBorder, local|MatchView.thumb.selected Border#MatchContainerBorder">
+            <Setter Property="BoxShadow"
+                    Value="5 5 10 0 DarkGray" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource Fg}" />
+        </Style>
+        <Style Selector="local|MatchView.thumb.dark.hover Border#MatchContainerBorder">
+            <Setter Property="BoxShadow"
+                    Value="5 5 10 0 Silver" />
+        </Style>
+
+        <Style Selector="StackPanel#MatchButtonStripPanel">
+            <Setter Property="Opacity"
+                    Value="0" />
+        </Style>
+        <Style Selector="local|MatchView.thumb.hover StackPanel#MatchButtonStripPanel">
+            <Setter Property="Opacity"
+                    Value="1" />
+        </Style>
+    </UserControl.Styles>
+    <Grid>
+        <local:MatchGalleryView x:Name="MatchGallery" />
+        <!-- <local:MatchCarouselView x:Name="MatchCarousel" /> -->
+    </Grid>
+
+</UserControl>

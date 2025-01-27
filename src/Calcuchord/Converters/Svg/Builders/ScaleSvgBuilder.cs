@@ -12,7 +12,7 @@ namespace Calcuchord {
             if(ng.ToString() == "C Major #1") {
             }
 
-            SvgFlags flags = DefaultSvgFlags; //Prefs.Instance.CurrentSvgFlags;
+            SvgFlags flags = DefaultSvgFlags; //Prefs.Instance.SelectedSvgFlags;
 
             int vfc = 5;
 
@@ -34,13 +34,13 @@ namespace Calcuchord {
             int max_fret = 0;
             int min_vis_fret = 0;
             // get min/max visual frets
-            if(notes.Where(x => x.FretNum >= 0) is { } real_frets &&
+            if(notes.Where(x => x.NoteNum >= 0) is { } real_frets &&
                real_frets.Any()) {
-                min_fret = real_frets.Min(x => x.FretNum);
-                max_fret = real_frets.Max(x => x.FretNum);
-                if(real_frets.Where(x => x.FretNum > 0) is { } vis_frets &&
+                min_fret = real_frets.Min(x => x.NoteNum);
+                max_fret = real_frets.Max(x => x.NoteNum);
+                if(real_frets.Where(x => x.NoteNum > 0) is { } vis_frets &&
                    vis_frets.Any()) {
-                    min_vis_fret = vis_frets.Min(x => x.FretNum);
+                    min_vis_fret = vis_frets.Min(x => x.NoteNum);
                 }
             }
 
@@ -111,7 +111,7 @@ namespace Calcuchord {
                         }
                     }
 
-                    if(notes.FirstOrDefault(x => x.RowNum == str_num && x.FretNum == fret_num) is not
+                    if(notes.FirstOrDefault(x => x.RowNum == str_num && x.NoteNum == fret_num) is not
                        { } fret_note) {
                         continue;
                     }

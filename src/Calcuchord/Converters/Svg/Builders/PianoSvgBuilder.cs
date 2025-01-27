@@ -40,7 +40,7 @@ namespace Calcuchord {
             string pattern_bg = ThemeViewModel.Instance.P[PaletteColorType.UserFretBg];
             string pattern_fg = ThemeViewModel.Instance.P[PaletteColorType.UserFretFg];
 
-            var pattern_notes = ng.Notes.OrderBy(x => x.FretNum);
+            var pattern_notes = ng.Notes.OrderBy(x => x.NoteNum);
             InstrumentNote root_note = ng.Parent.Parent.OpenNotes.FirstOrDefault();
             int key_count = ng.Parent.Parent.FretCount;
 
@@ -50,7 +50,7 @@ namespace Calcuchord {
             for(int i = 0; i < key_count; i++) {
                 Note cur_note = root_note.Offset(i);
                 bool is_black = cur_note.IsAltered;
-                PatternNote pattern_note = pattern_notes.FirstOrDefault(x => x.FretNum == i);
+                PatternNote pattern_note = pattern_notes.FirstOrDefault(x => x.NoteNum == i);
                 bool is_root = pattern_note != null && pattern_note.IsRoot;
                 bool is_user = is_root || IsUserNote(pattern_note);
 

@@ -21,6 +21,7 @@ namespace Calcuchord {
 
         public static SvgFlags DefaultSvgFlags =>
             //SvgFlags.Fingers |
+            SvgFlags.Bars |
             SvgFlags.Notes |
             SvgFlags.Colors |
             SvgFlags.Tuning |
@@ -48,7 +49,7 @@ namespace Calcuchord {
         protected string[] FingerBg { get; }
 
         protected string BarShadow =>
-            "#00000050";
+            "#000000";
 
         protected virtual string RootBg =>
             ThemeViewModel.Instance.P[PaletteColorType.RootFretBg];
@@ -74,6 +75,7 @@ namespace Calcuchord {
 
         #region Measurements
 
+        protected double ShadowOpacity => 0.3;
         protected double FretLineFixedAxisSize => 0.25;
         protected double NutFixedAxisSize => 1;
 
@@ -100,7 +102,8 @@ namespace Calcuchord {
         #region Constructors
 
         protected SvgBuilderBase() {
-            PaletteColorType[] fbg = [
+            PaletteColorType[] fbg =
+            [
                 PaletteColorType.NutBg,
                 PaletteColorType.Finger1Bg,
                 PaletteColorType.Finger2Bg,
@@ -108,7 +111,8 @@ namespace Calcuchord {
                 PaletteColorType.Finger4Bg
             ];
             FingerBg = fbg.Select(x => ThemeViewModel.Instance.P[x]).ToArray();
-            PaletteColorType[] ffg = [
+            PaletteColorType[] ffg =
+            [
                 PaletteColorType.NutFg,
                 PaletteColorType.Finger1Fg,
                 PaletteColorType.Finger2Fg,
@@ -116,6 +120,11 @@ namespace Calcuchord {
                 PaletteColorType.Finger4Fg
             ];
             FingerFg = ffg.Select(x => ThemeViewModel.Instance.P[x]).ToArray();
+
+            // using Stream font_stream = AssetLoader.Open(
+            //     new("avares://Calcuchord/Assets/Fonts/Garamond/EBGaramond-VariableFont_wght.ttf"));
+            // SKSvgSettings settings = new SKSvgSettings();
+            // settings.TypefaceProviders?.Add(new CustomTypefaceProvider(font_stream));
         }
 
         #endregion
@@ -156,7 +165,8 @@ namespace Calcuchord {
             MpFileIo.WriteTextToFile(fp,result);
 
             Process.Start(
-                new ProcessStartInfo {
+                new ProcessStartInfo
+                {
                     UseShellExecute = true,
                     //WorkingDirectory = Path.GetDirectoryName(fp),
                     FileName = "xdg-open",
@@ -172,7 +182,7 @@ namespace Calcuchord {
             if(note is null ||
                MainViewModel.Instance is not { } mvm ||
                mvm.SelectedTuning is not { } stvm ||
-               stvm.SelectedNotes.All(x => x.RowNum != note.RowNum && x.NoteNum != note.FretNum)) {
+               stvm.SelectedNotes.All(x => x.RowNum != note.RowNum && x.NoteNum != note.NoteNum)) {
                 return false;
             }
 
@@ -279,10 +289,12 @@ namespace Calcuchord {
             double w,
             double h,
             double sw,
-            string classes = null) {
+            string classes = null,
+            double fillOpacity = 1) {
             HtmlNode rect = CurrentDoc.CreateElement("rect");
             rect.Attributes.Add("stroke",stroke);
             rect.Attributes.Add("fill",fill);
+            rect.Attributes.Add("fill-opacity",fillOpacity);
             rect.Attributes.Add("stroke-width",sw);
             rect.Attributes.Add("width",w);
             rect.Attributes.Add("height",h);

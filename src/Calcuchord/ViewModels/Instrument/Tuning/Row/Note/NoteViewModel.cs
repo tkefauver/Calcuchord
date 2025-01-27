@@ -105,10 +105,10 @@ namespace Calcuchord {
 
 
         public bool IsInUnknownState =>
-            WorkingFretNum == UNKNOWN_FRET_NUM;
+            WorkingNoteNum == UNKNOWN_FRET_NUM;
 
         public bool IsInMuteState =>
-            WorkingFretNum == MUTE_FRET_NUM;
+            WorkingNoteNum == MUTE_FRET_NUM;
 
         public bool IsNutFret =>
             !Parent.Parent.Parent.IsKeyboard &&
@@ -137,7 +137,7 @@ namespace Calcuchord {
 
         int? _workingFretNum;
 
-        public int WorkingFretNum {
+        public int WorkingNoteNum {
             get {
                 if(_workingFretNum is { } num) {
                     return num;
@@ -151,7 +151,7 @@ namespace Calcuchord {
         public bool IsDefaultState {
             get {
                 if(IsNutFret) {
-                    return WorkingFretNum == OPEN_FRET_NUM;
+                    return WorkingNoteNum == OPEN_FRET_NUM;
                 }
 
                 return true;
@@ -162,36 +162,28 @@ namespace Calcuchord {
 
         public bool IsTopDotFret {
             get {
-                bool desc = Parent.Parent.IsStringsDescending;
-                double single_top_str_num = 0,dbl_top_str_num1 = 0,dbl_top_str_num2 = 0;
+                int single_top_str_num = 0,dbl_top_str_num1 = 0,dbl_top_str_num2 = 0;
 
-                switch(Parent.Parent.Parent.StringCount) {
+                switch(Parent.Parent.Parent.RowCount) {
                     case 6:
-                        single_top_str_num = desc ? 3 : 2;
-                        dbl_top_str_num1 = desc ? 2 : 1;
-                        dbl_top_str_num2 = desc ? 4 : 3;
+                        single_top_str_num = 2;
+                        dbl_top_str_num1 = 1;
+                        dbl_top_str_num2 = 3;
                         break;
                     case 4:
-                        single_top_str_num = desc ? 2 : 1;
-                        dbl_top_str_num1 = desc ? 3 : 0;
-                        dbl_top_str_num2 = desc ? 1 : 2;
+                        single_top_str_num = 1;
+                        dbl_top_str_num1 = 0;
+                        dbl_top_str_num2 = 2;
                         break;
                     case 3:
-                        single_top_str_num = desc ? 2 : 1;
-                        dbl_top_str_num1 = desc ? 3 : 0;
-                        dbl_top_str_num2 = desc ? 1 : 2;
+                        single_top_str_num = 1;
+                        dbl_top_str_num1 = 0;
+                        dbl_top_str_num2 = 2;
                         break;
                 }
 
                 if(RowNum == single_top_str_num &&
-                   (NoteNum == 3 ||
-                    NoteNum == 5 ||
-                    NoteNum == 7 ||
-                    NoteNum == 9 ||
-                    NoteNum == 15 ||
-                    NoteNum == 17 ||
-                    NoteNum == 19 ||
-                    NoteNum == 21)) {
+                   NoteNum is 3 or 5 or 7 or 9 or 15 or 17 or 19 or 21) {
                     return true;
                 }
 
@@ -205,30 +197,22 @@ namespace Calcuchord {
 
         public bool IsBottomDotFret {
             get {
-                bool desc = Parent.Parent.IsStringsDescending;
-                double single_bottom_str_num = 0,dbl_bottom_str_num1 = 0,dbl_bottom_str_num2 = 0;
-                switch(Parent.Parent.Parent.StringCount) {
+                int single_bottom_str_num = 0,dbl_bottom_str_num1 = 0,dbl_bottom_str_num2 = 0;
+                switch(Parent.Parent.Parent.RowCount) {
                     case 6:
-                        single_bottom_str_num = desc ? 2 : 3;
-                        dbl_bottom_str_num1 = desc ? 1 : 2;
-                        dbl_bottom_str_num2 = desc ? 3 : 4;
+                        single_bottom_str_num = 3;
+                        dbl_bottom_str_num1 = 2;
+                        dbl_bottom_str_num2 = 4;
                         break;
                     case 4:
-                        single_bottom_str_num = desc ? 1 : 2;
-                        dbl_bottom_str_num1 = desc ? 2 : 1;
-                        dbl_bottom_str_num2 = desc ? 0 : 3;
+                        single_bottom_str_num = 2;
+                        dbl_bottom_str_num1 = 1;
+                        dbl_bottom_str_num2 = 3;
                         break;
                 }
 
                 if(RowNum == single_bottom_str_num &&
-                   (NoteNum == 3 ||
-                    NoteNum == 5 ||
-                    NoteNum == 7 ||
-                    NoteNum == 9 ||
-                    NoteNum == 15 ||
-                    NoteNum == 17 ||
-                    NoteNum == 19 ||
-                    NoteNum == 21)) {
+                   NoteNum is 3 or 5 or 7 or 9 or 15 or 17 or 19 or 21) {
                     return true;
                 }
 
@@ -250,13 +234,13 @@ namespace Calcuchord {
             Note.IsAltered;
 
         public int NoteNum =>
-            Note.FretNum;
+            Note.NoteNum;
 
         public int RowNum =>
             Note.RowNum;
 
         public int RowCount =>
-            Parent.Parent.Parent.StringCount;
+            Parent.Parent.Parent.RowCount;
 
         public InstrumentNote Note { get; set; }
 
@@ -269,9 +253,6 @@ namespace Calcuchord {
         #endregion
 
         #region Constructors
-
-        public NoteViewModel() {
-        }
 
         public NoteViewModel(NoteRowViewModel parent,InstrumentNote fretNote) : base(parent) {
             PropertyChanged += NoteViewModel_OnPropertyChanged;
@@ -297,6 +278,8 @@ namespace Calcuchord {
                     if(!IsSelected) {
                         _workingFretNum = null;
                     }
+
+                    Parent.OnPropertyChanged(nameof(Parent.SelectedNotes));
 
                     break;
             }

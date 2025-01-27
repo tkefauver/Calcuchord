@@ -95,13 +95,5 @@
                 </Grid>
             </Viewbox>
         </ScrollViewer>
-
-        <ToggleButton Classes="float"
-                      Margin="5,0,0,0"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Top"
-                      IsChecked="{Binding IsStringsDescending,Mode=TwoWay}">
-            <avalonia:MaterialIcon Kind="{Binding StringSortIcon}" />
-        </ToggleButton>
     </Grid>
 </UserControl>

@@ -4,8 +4,11 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="Avalonia.Svg.Skia" Version="11.2.0.2" />
     <PackageVersion Include="MonkeyPaste.Common.Avalonia" Version="1.0.3.20" />
     <PackageVersion Include="org.matheval" Version="1.0.0.3" />
+    <PackageVersion Include="Svg.Skia" Version="2.0.0.4" />
+    <PackageVersion Include="WebView.Avalonia.Linux" Version="11.0.0.1" />
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />

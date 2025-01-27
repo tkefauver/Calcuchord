@@ -5,6 +5,7 @@
              mc:Ignorable="d"
              d:DesignWidth="360"
              d:DesignHeight="720"
+             xmlns:wv="clr-namespace:AvaloniaWebView;assembly=Avalonia.WebView"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
@@ -16,12 +17,16 @@
         <local:MainViewModel />
     </Design.DataContext>
     <Grid x:Name="MainOuterContainer">
+        <!-- <wv:WebView x:Name="HiddenWebview" -->
+        <!--             IsVisible="False" -->
+        <!--             Width="1" -->
+        <!--             Height="1" /> -->
         <dialogHostAvalonia:DialogHost Identifier="MainDialogHost">
             <controls:SnackbarHost HostName="Root">
                 <controls:NavigationDrawer x:Name="LeftDrawer"
-                                           Classes="permanent"
-                                           LeftDrawerOpened="{Binding ElementName=NavDrawerSwitch, Path=IsChecked, Mode=TwoWay}"
-                                           RightDrawerOpened="{Binding ElementName=OptionDrawerSwitch, Path=IsChecked, Mode=TwoWay}">
+                                           LeftDrawerOpened="{Binding IsLeftDrawerOpen, Mode=TwoWay}"
+                                           RightDrawerOpened="{Binding IsRightDrawerOpen, Mode=TwoWay}"
+                                           Classes="permanent">
                     <controls:NavigationDrawer.LeftDrawerContent>
                         <local:LeftDrawerView />
                     </controls:NavigationDrawer.LeftDrawerContent>
@@ -30,42 +35,71 @@
                     </controls:NavigationDrawer.RightDrawerContent>
                     <DockPanel LastChildFill="true">
                         <!-- HEADER MENU -->
-                        <controls:ColorZone Name="PART_AppBarContainer"
-                                            VerticalAlignment="Top"
-                                            HorizontalAlignment="Stretch"
-                                            DockPanel.Dock="Top"
-                                            Height="56"
-                                            Mode="PrimaryMid"
-                                            ZIndex="1">
-                            <DockPanel Margin="16">
-                                <ToggleButton x:Name="NavDrawerSwitch"
-                                              DockPanel.Dock="Left"
-                                              Classes="float">
-                                    <avalonia:MaterialIcon Kind="Menu" />
-                                </ToggleButton>
+                        <local:MainHeaderView x:Name="HeaderView"
+                                              DockPanel.Dock="Top" />
 
-                                <ToggleButton x:Name="OptionDrawerSwitch"
-                                              DockPanel.Dock="Right"
-                                              Classes="float">
-                                    <avalonia:MaterialIcon Kind="DotsVertical" />
-                                </ToggleButton>
-
-                                <TextBlock Classes="Headline6"
-                                           Text="Calcuchord"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" />
-                            </DockPanel>
-                        </controls:ColorZone>
                         <Grid x:Name="MainContainerGrid"
                               RowDefinitions="Auto,*">
+                            <!-- BG IMAGE -->
                             <Image Grid.RowSpan="2"
                                    Source="/Assets/Images/parchment.jpg"
                                    HorizontalAlignment="Stretch"
                                    VerticalAlignment="Stretch"
                                    Opacity="0.5"
                                    Stretch="None" />
+                            <!-- INSTRUMENT VIEW -->
                             <local:InstrumentView Grid.Row="0"
                                                   DataContext="{Binding SelectedInstrument}" />
+
+                            <!-- MATCHES VIEW -->
+
+                            <local:MatchesView Grid.Row="1">
+                                <local:MatchesView.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="!IsVisible"
+                                                 ElementName="SearchButton" />
+                                        <Binding Path="!IsVisible"
+                                                 ElementName="EmptyTextBlock" />
+                                    </MultiBinding>
+                                </local:MatchesView.IsVisible>
+                            </local:MatchesView>
+
+                            <!-- SEARCH BUTTON -->
+
+                            <Button x:Name="SearchButton"
+                                    Grid.Row="1"
+                                    Classes="accent"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Padding="16"
+                                    MinWidth="64"
+                                    IsVisible="{Binding IsSearchButtonVisible}"
+                                    Height="{Binding $self.Bounds.Width}"
+                                    Command="{Binding FindMatchesCommand}">
+                                <avalonia:MaterialIcon Kind="Search"
+                                                       MinWidth="48"
+                                                       Height="{Binding $self.Bounds.Width}" />
+                            </Button>
+
+                            <!-- EMPTY LABEL -->
+
+                            <TextBlock x:Name="EmptyTextBlock"
+                                       Grid.Row="1"
+                                       Classes="Headline4"
+                                       VerticalAlignment="Center"
+                                       TextAlignment="Center"
+                                       Text="{Binding EmptyMatchLabel}">
+                                <TextBlock.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="!IsVisible"
+                                                 ElementName="SearchButton" />
+                                        <Binding Path="IsMatchesEmpty"
+                                                 TargetNullValue="True"
+                                                 FallbackValue="True" />
+                                    </MultiBinding>
+                                </TextBlock.IsVisible>
+                            </TextBlock>
+
                         </Grid>
                     </DockPanel>
                 </controls:NavigationDrawer>

@@ -15,10 +15,7 @@ namespace Calcuchord {
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
             svg.AppendChild(bg_g);
 
-            if(ng.ToString() == "G Major chord #5") {
-            }
-
-            SvgFlags flags = DefaultSvgFlags; //Prefs.Instance.CurrentSvgFlags;
+            SvgFlags flags = DefaultSvgFlags; //Prefs.Instance.SelectedSvgFlags;
 
             int vfc = 4;
             double lw = FretLineFixedAxisSize;
@@ -33,46 +30,46 @@ namespace Calcuchord {
             int max_fret = 0;
             int min_vis_fret = 0;
             // get min/max visual frets
-            if(notes.Where(x => x.FretNum >= 0) is { } real_frets &&
+            if(notes.Where(x => x.NoteNum >= 0) is { } real_frets &&
                real_frets.Any()) {
-                min_fret = real_frets.Min(x => x.FretNum);
-                max_fret = real_frets.Max(x => x.FretNum);
-                if(real_frets.Where(x => x.FretNum > 0) is { } vis_frets &&
+                min_fret = real_frets.Min(x => x.NoteNum);
+                max_fret = real_frets.Max(x => x.NoteNum);
+                if(real_frets.Where(x => x.NoteNum > 0) is { } vis_frets &&
                    vis_frets.Any()) {
-                    min_vis_fret = vis_frets.Min(x => x.FretNum);
+                    min_vis_fret = vis_frets.Min(x => x.NoteNum);
                 }
             }
 
             // find barres
             int? shadow_barre_fret_num = null;
             Dictionary<int,(int min_str,int max_str)> barred_fret_lookup = [];
-            if(notes.Where(x => x.FretNum > 0 && x.FingerNum > 0)
+            if(notes.Where(x => x.NoteNum > 0 && x.FingerNum > 0)
                    .GroupBy(x => x.FingerNum)
                    .Where(x => x.Count() > 1) is { } barre_groups &&
                barre_groups.Any()) {
                 var barre_frets = barre_groups.SelectMany(x => x);
-                if(notes.All(x => x.FretNum != 0)) {
+                if(notes.All(x => x.NoteNum != 0)) {
                     // only show shadow when no open notes
                     // and min barre fret doesn't have other fingers
-                    int min_barre_fret_num = barre_frets.Min(x => x.FretNum);
+                    int min_barre_fret_num = barre_frets.Min(x => x.NoteNum);
                     if(min_barre_fret_num == min_vis_fret &&
                        notes
-                           .Where(x => x.FingerNum > 0 && x.FretNum == min_barre_fret_num)
+                           .Where(x => x.FingerNum > 0 && x.NoteNum == min_barre_fret_num)
                            .Select(x => x.FingerNum).Distinct().Count() ==
                        1) {
                         shadow_barre_fret_num = min_barre_fret_num;
                     }
                 }
 
-                var barre_fret_nums = barre_frets.Select(x => x.FretNum).Distinct();
+                var barre_fret_nums = barre_frets.Select(x => x.NoteNum).Distinct();
                 foreach(int barre_fret_num in barre_fret_nums) {
-                    int min_str = barre_frets.Where(x => x.FretNum == barre_fret_num).Min(x => x.RowNum);
-                    int max_str = barre_frets.Where(x => x.FretNum == barre_fret_num).Max(x => x.RowNum);
+                    int min_str = barre_frets.Where(x => x.NoteNum == barre_fret_num).Min(x => x.RowNum);
+                    int max_str = barre_frets.Where(x => x.NoteNum == barre_fret_num).Max(x => x.RowNum);
                     barred_fret_lookup.Add(barre_fret_num,(min_str,max_str));
                 }
             }
 
-            bool show_header_labels = notes.Any(x => x.FretNum <= 0);
+            bool show_header_labels = notes.Any(x => x.NoteNum <= 0);
             bool show_nut = max_fret < vfc;
             bool show_fret_marker = !show_nut;
             if(show_nut) {
@@ -129,8 +126,8 @@ namespace Calcuchord {
                 double header_y = fh; //-1;
                 for(int i = 0; i < str_count; i++) {
                     if(notes.FirstOrDefault(x => x.RowNum == i) is { } str_fret &&
-                       str_fret.FretNum <= 0) {
-                        bool is_mute = str_fret.FretNum < 0;
+                       str_fret.NoteNum <= 0) {
+                        bool is_mute = str_fret.NoteNum < 0;
                         if(is_mute) {
                             double mute_size = 3;
                             double margin_y = 1;
@@ -182,8 +179,8 @@ namespace Calcuchord {
                     double cy = cury + (fh / 2d); //(fh + cury) - (fh / 2d);
                     double bar_y = cy - (BarHeight / 2d);
                     double dot_r = DotRadius;
-                    PatternNote fret_note = notes.Where(x => x.FretNum > 0)
-                        .FirstOrDefault(x => x.RowNum == str_num && x.FretNum == fret_num);
+                    PatternNote fret_note = notes.Where(x => x.NoteNum > 0)
+                        .FirstOrDefault(x => x.RowNum == str_num && x.NoteNum == fret_num);
                     string fret_bg = null;
                     string fret_fg = null;
 
@@ -204,53 +201,58 @@ namespace Calcuchord {
                     }
 
                     bool is_barred_fret = false;
-                    if(barred_fret_lookup.TryGetValue(fret_num,out (int min_str,int max_str) bar_extent) &&
-                       str_num >= bar_extent.min_str &&
-                       str_num < bar_extent.max_str) {
-                        if(fret_note != null) {
-                            last_barre_note = fret_note;
+                    if(flags.HasFlag(SvgFlags.Bars)) {
+                        if(barred_fret_lookup.TryGetValue(fret_num,out (int min_str,int max_str) bar_extent) &&
+                           str_num >= bar_extent.min_str &&
+                           str_num < bar_extent.max_str) {
+                            if(fret_note != null) {
+                                last_barre_note = fret_note;
+                            }
+
+                            cur_bar_extent = bar_extent;
+                            is_barred_fret = true;
                         }
 
-                        cur_bar_extent = bar_extent;
-                        is_barred_fret = true;
+                        if(!is_barred_fret &&
+                           shadow_barre_fret_num.HasValue &&
+                           shadow_barre_fret_num.Value == fret_num) {
+                            if(str_num < str_count - 1) {
+                                // shadow rect
+                                AddRect(bg_g,BarShadow,Transparent,curx,bar_y,fw,BarHeight,0,
+                                    fillOpacity: ShadowOpacity);
+                            }
+
+                            if(fret_note == null &&
+                               (str_num == 0 || str_num == str_count - 1)) {
+                                // shadow edge
+                                HtmlNode shadow_g = CurrentDoc.CreateElement("g");
+                                shadow_g.Attributes.Add("transform",$"translate({cx},{cy})");
+                                bg_g.AppendChild(shadow_g);
+                                HtmlNode shadow_path = CurrentDoc.CreateElement("path");
+                                shadow_path.Attributes.Add("fill",BarShadow);
+                                shadow_path.Attributes.Add("fill-opacity",ShadowOpacity);
+                                double angle = str_num == 0 ? -90 : 90;
+                                shadow_path.Attributes.Add("transform",$"rotate({angle})");
+                                double sh = BarHeight;
+                                double shh = BarHeight / 2d;
+                                shadow_path.Attributes.Add("d",$"M 0, 0 m -{shh}, 0 a {shh},{shh} 0 1,1 {sh},0");
+                                shadow_g.AppendChild(shadow_path);
+                            }
+                        }
+
+                        if(last_barre_note != null) {
+                            bool is_tail = cur_bar_extent.Value.max_str == str_num;
+                            if(is_tail) {
+                                last_barre_note = null;
+                                cur_bar_extent = null;
+                            } else {
+                                // bar rect
+                                AddRect(bg_g,fret_bg,Transparent,curx,bar_y,fw,BarHeight,0);
+                                last_barre_note = fret_note ?? last_barre_note;
+                            }
+                        }
                     }
 
-                    if(!is_barred_fret &&
-                       shadow_barre_fret_num.HasValue &&
-                       shadow_barre_fret_num.Value == fret_num) {
-                        if(str_num < str_count - 1) {
-                            // shadow rect
-                            AddRect(bg_g,BarShadow,Transparent,curx,bar_y,fw,BarHeight,0);
-                        }
-
-                        if(fret_note == null &&
-                           (str_num == 0 || str_num == str_count - 1)) {
-                            // shadow edge
-                            HtmlNode shadow_g = CurrentDoc.CreateElement("g");
-                            shadow_g.Attributes.Add("transform",$"translate({cx},{cy})");
-                            bg_g.AppendChild(shadow_g);
-                            HtmlNode shadow_path = CurrentDoc.CreateElement("path");
-                            shadow_path.Attributes.Add("fill",BarShadow);
-                            double angle = str_num == 0 ? -90 : 90;
-                            shadow_path.Attributes.Add("transform",$"rotate({angle})");
-                            double sh = BarHeight;
-                            double shh = BarHeight / 2d;
-                            shadow_path.Attributes.Add("d",$"M 0, 0 m -{shh}, 0 a {shh},{shh} 0 1,1 {sh},0");
-                            shadow_g.AppendChild(shadow_path);
-                        }
-                    }
-
-                    if(last_barre_note != null) {
-                        bool is_tail = cur_bar_extent.Value.max_str == str_num;
-                        if(is_tail) {
-                            last_barre_note = null;
-                            cur_bar_extent = null;
-                        } else {
-                            // bar rect
-                            AddRect(bg_g,fret_bg,Transparent,curx,bar_y,fw,BarHeight,0);
-                            last_barre_note = fret_note ?? last_barre_note;
-                        }
-                    }
 
                     if(fret_note != null) {
                         bool is_root = fret_note.IsRoot;

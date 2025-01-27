@@ -35,7 +35,8 @@ namespace Calcuchord {
 
         #region Properties
 
-        Dictionary<ChordSuffixType,int[]> Chords { get; } = new Dictionary<ChordSuffixType,int[]> {
+        Dictionary<ChordSuffixType,int[]> Chords { get; } = new Dictionary<ChordSuffixType,int[]>
+        {
             { ChordSuffixType.Num5,[0,7] },
             { ChordSuffixType.major,[0,4,3] },
             { ChordSuffixType.minor,[0,3,4] },
@@ -56,7 +57,8 @@ namespace Calcuchord {
             { ChordSuffixType.m11,[0,3,4,3,4,3] }
         };
 
-        Dictionary<ScaleSuffixType,int[]> Scales { get; } = new Dictionary<ScaleSuffixType,int[]> {
+        Dictionary<ScaleSuffixType,int[]> Scales { get; } = new Dictionary<ScaleSuffixType,int[]>
+        {
             { ScaleSuffixType.Major,[0,2,2,1,2,2,2,1] },
             { ScaleSuffixType.NaturalMinor,[0,2,1,2,2,1,2,2] },
             { ScaleSuffixType.HarmonicMinor,[0,2,1,2,2,1,3,1] },
@@ -66,7 +68,8 @@ namespace Calcuchord {
             { ScaleSuffixType.Blues,[0,3,2,1,1,3] }
         };
 
-        Dictionary<ModeSuffixType,int[]> Modes { get; } = new Dictionary<ModeSuffixType,int[]> {
+        Dictionary<ModeSuffixType,int[]> Modes { get; } = new Dictionary<ModeSuffixType,int[]>
+        {
             { ModeSuffixType.Dorian,[0,2,1,2,2,2,1,2] },
             { ModeSuffixType.Phrygian,[0,1,2,2,2,1,2,2] },
             { ModeSuffixType.Lydian,[0,2,2,2,1,2,2,1] },
@@ -80,14 +83,17 @@ namespace Calcuchord {
         Dictionary<MusicPatternType,Dictionary<string,int[]>> PatternsLookup {
             get {
                 if(_patterns == null) {
-                    _patterns = new() {
+                    _patterns = new()
+                    {
                         {
                             MusicPatternType.Chords,
                             Chords.ToDictionary(x => x.Key.ToString(),x => x.Value)
-                        }, {
+                        },
+                        {
                             MusicPatternType.Scales,
                             Scales.ToDictionary(x => x.Key.ToString(),x => x.Value)
-                        }, {
+                        },
+                        {
                             MusicPatternType.Modes,
                             Modes.ToDictionary(x => x.Key.ToString(),x => x.Value)
                         }
@@ -204,7 +210,7 @@ namespace Calcuchord {
                     var pattern = GenPattern(cur_key,suffix);
                     var pattern_inst_notes = GenNotes(pattern);
                     var blocks = pattern_inst_notes
-                        .GroupBy(x => Math.Floor((x.FretNum + 0) / (double)PatternFretSpan));
+                        .GroupBy(x => Math.Floor((x.NoteNum + 0) / (double)PatternFretSpan));
                     NoteGroupCollection ngc = new NoteGroupCollection(PatternType,cur_key,suffix);
                     ngc.Groups.AddRange(
                         blocks.Select(
@@ -227,7 +233,7 @@ namespace Calcuchord {
 
         bool RejectNotStartOnRoot(InstrumentNote[] notes,NoteType[] pattern,
             IEnumerable<IEnumerable<InstrumentNote>> existing) {
-            return notes.OrderBy(x => x.RowNum).ThenBy(x => x.FretNum).FirstOrDefault().Key != pattern[0];
+            return notes.OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum).FirstOrDefault().Key != pattern[0];
         }
 
         bool RejectNotesOnSameString(InstrumentNote[] notes,NoteType[] pattern,
@@ -236,11 +242,12 @@ namespace Calcuchord {
         }
 
         bool RejectExists(InstrumentNote[] notes,NoteType[] pattern,IEnumerable<IEnumerable<InstrumentNote>> existing) {
-            return existing.Any(x => !x.Where(y => y.FretNum > 0).Difference(notes.Where(z => z.FretNum > 0)).Any());
+            return existing.Any(x => !x.Where(y => y.NoteNum > 0).Difference(notes.Where(z => z.NoteNum > 0)).Any());
         }
 
         bool IsValidCombo(InstrumentNote[] notes,NoteType[] pattern,IEnumerable<IEnumerable<InstrumentNote>> existing) {
-            Func<InstrumentNote[],NoteType[],IEnumerable<IEnumerable<InstrumentNote>>,bool>[] reject_funcs = [
+            Func<InstrumentNote[],NoteType[],IEnumerable<IEnumerable<InstrumentNote>>,bool>[] reject_funcs =
+            [
                 RejectNotAllNotes,
                 RejectNotStartOnRoot,
                 RejectNotesOnSameString,
@@ -271,8 +278,8 @@ namespace Calcuchord {
             var pnl = new List<PatternNote>();
             var fingered_fret_note_lookup =
                 notes
-                    .Where(x => x.FretNum > 0)
-                    .GroupBy(x => x.FretNum)
+                    .Where(x => x.NoteNum > 0)
+                    .GroupBy(x => x.NoteNum)
                     .OrderBy(x => x.Key)
                     .ToDictionary(x => x.Key,x => x.OrderBy(y => y.RowNum).Select(y => y));
             if(fingered_fret_note_lookup.Count != 0) {
@@ -294,8 +301,8 @@ namespace Calcuchord {
                         bool can_bar = do_bar &&
                                        !notes
                                            .Any(
-                                               x => x.FretNum >= 0 &&
-                                                    x.FretNum < cur_fret_num &&
+                                               x => x.NoteNum >= 0 &&
+                                                    x.NoteNum < cur_fret_num &&
                                                     x.RowNum >= min_fret_str &&
                                                     x.RowNum <= max_fret_str);
                         foreach(InstrumentNote cur_fret_note in cur_fret_notes) {
@@ -319,7 +326,7 @@ namespace Calcuchord {
             }
 
             // add opens
-            notes.Where(x => x.FretNum == 0).ForEach(x => pnl.Add(new(0,x)));
+            notes.Where(x => x.NoteNum == 0).ForEach(x => pnl.Add(new(0,x)));
             // add mutes
             Enumerable
                 .Range(0,StringCount).Where(x => notes.All(y => y.RowNum != x))
@@ -352,7 +359,7 @@ namespace Calcuchord {
                         }
 
                         var block_notes = pattern_inst_notes.Where(
-                            x => x.FretNum >= min_fret_num && x.FretNum <= max_fret_num);
+                            x => x.NoteNum >= min_fret_num && x.NoteNum <= max_fret_num);
                         var combos = block_notes.Combinations().Where(x => x.Length >= pattern.Length);
                         foreach(var combo in combos) {
                             if(!IsValidCombo(combo,pattern,valid_patterns)) {
@@ -364,14 +371,14 @@ namespace Calcuchord {
                     }
 
                     NoteGroupCollection ngc = new NoteGroupCollection(PatternType,cur_key,suffix);
-                    foreach((var vp,int idx) in valid_patterns.OrderBy(x => x.Min(y => y.FretNum))
+                    foreach((var vp,int idx) in valid_patterns.OrderBy(x => x.Min(y => y.NoteNum))
                                 .ThenBy(x => x.Min(y => y.RowNum)).WithIndex()) {
                         if(AddChordFingerings(vp) is not { } fingerings) {
                             continue;
                         }
 
                         ngc.Groups.Add(
-                            new(ngc,idx,fingerings.OrderBy(x => x.RowNum).ThenBy(x => x.FretNum))
+                            new(ngc,idx,fingerings.OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum))
                                 { Id = Guid.NewGuid().ToString() });
                         cur_chord_count++;
                     }
@@ -435,13 +442,13 @@ namespace Calcuchord {
         }
 
         IEnumerable<PatternNote> AddScaleFingering(IEnumerable<InstrumentNote> notes) {
-            int min_fret = notes.Where(x => x.FretNum > 0).Min(x => x.FretNum);
-            int max_fret = notes.Where(x => x.FretNum > 0).Max(x => x.FretNum);
+            int min_fret = notes.Where(x => x.NoteNum > 0).Min(x => x.NoteNum);
+            int max_fret = notes.Where(x => x.NoteNum > 0).Max(x => x.NoteNum);
             var pnl = new List<PatternNote>();
             foreach(InstrumentNote note in notes) {
                 int finger = 0;
-                if(note.FretNum >= min_fret) {
-                    finger = Math.Min(4,(note.FretNum - min_fret) + 1);
+                if(note.NoteNum >= min_fret) {
+                    finger = Math.Min(4,(note.NoteNum - min_fret) + 1);
                 }
 
                 pnl.Add(new(finger,note));
@@ -454,7 +461,7 @@ namespace Calcuchord {
             var innl = new List<InstrumentNote>();
             foreach(InstrumentNote open_note in OpenNotes) {
                 InstrumentNote cur_note = open_note; //.Clone();
-                while(cur_note.FretNum <= FretCount) {
+                while(cur_note.NoteNum <= FretCount) {
                     if(pattern.Contains(cur_note.Key)) {
                         innl.Add(cur_note);
                     }

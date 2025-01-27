@@ -1,5 +1,8 @@
+using System.Linq;
+
 namespace Calcuchord {
     public class ChordMatchViewModel : MatchViewModelBase {
+
         #region Private Variables
 
         #endregion
@@ -36,6 +39,9 @@ namespace Calcuchord {
 
         #region State
 
+        public override MusicPatternType MatchPatternType =>
+            MusicPatternType.Chords;
+
         #endregion
 
         #region Model
@@ -50,6 +56,9 @@ namespace Calcuchord {
 
         #region Constructors
 
+        public ChordMatchViewModel(NoteGroup noteGroup,double score) : base(noteGroup,score) {
+        }
+
         #endregion
 
         #region Public Methods
@@ -57,6 +66,10 @@ namespace Calcuchord {
         #endregion
 
         #region Protected Methods
+
+        protected override void PlayGroupMidi() {
+            MidiPlayer.Instance.PlayChord(NoteGroup.Notes.Select(x => x.MidiTone).ToArray());
+        }
 
         #endregion
 
@@ -67,5 +80,6 @@ namespace Calcuchord {
         #region Commands
 
         #endregion
+
     }
 }

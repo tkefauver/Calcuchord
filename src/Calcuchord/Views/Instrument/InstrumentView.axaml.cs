@@ -1,3 +1,4 @@
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
 using MonkeyPaste.Common.Avalonia;
@@ -13,6 +14,24 @@ namespace Calcuchord {
         public InstrumentView() {
             Instance = this;
             InitializeComponent();
+        }
+
+        public void ScrollSelectionIntoView() {
+            // TODO find min/max sel notes and bring into 
+            if(MainViewModel.Instance is not { } mvm ||
+               mvm.IsPianoSelected ||
+               mvm.SelectedTuning is not { } stvm ||
+               stvm.SelectedNotes is not { } sel_notes ||
+               sel_notes.OrderBy(x => x.NoteNum).FirstOrDefault() is not { } low_note_vm ||
+               sel_notes.OrderByDescending(x => x.NoteNum).FirstOrDefault() is not { } hi_note_vm ||
+               this.GetVisualDescendants<FretView>() is not { } fvl ||
+               fvl.FirstOrDefault(x => x.DataContext == low_note_vm) is not { } low_note_v ||
+               fvl.FirstOrDefault(x => x.DataContext == hi_note_vm) is not { } hi_note_v) {
+                return;
+            }
+
+            low_note_v.BringIntoView();
+            hi_note_v.BringIntoView();
         }
 
         public void AttachHandlers(Control c) {

@@ -6,7 +6,7 @@ namespace Calcuchord {
         public bool HasModelChanged { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ViewModelBase() {
+        protected ViewModelBase() {
             PropertyChanged += OnPropertyChanged_internal;
         }
 
@@ -31,10 +31,7 @@ namespace Calcuchord {
     public abstract class ViewModelBase<T> : ViewModelBase where T : ViewModelBase {
         public T Parent { get; set; }
 
-        public ViewModelBase() {
-        }
-
-        public ViewModelBase(T parent) {
+        protected ViewModelBase(T parent) {
             Parent = parent;
         }
     }

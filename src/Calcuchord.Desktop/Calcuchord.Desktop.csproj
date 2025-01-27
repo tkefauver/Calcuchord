@@ -22,6 +22,7 @@
         </PackageReference>
         <PackageReference Include="Avalonia.ReactiveUI"/>
         <PackageReference Include="webview.avalonia.desktop"/>
+        <PackageReference Include="WebView.Avalonia.Linux" Condition="$([MSBuild]::IsOSPlatform('Linux'))"/>
     </ItemGroup>
 
     <ItemGroup>

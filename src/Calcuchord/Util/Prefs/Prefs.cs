@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using Avalonia;
 using Avalonia.Controls;
@@ -116,10 +117,7 @@ namespace Calcuchord {
         }
 
         [DataMember]
-        public bool IsStringsDescending { get; set; }
-
-        [DataMember]
-        public SvgFlags CurrentSvgFlags { get; set; } = SvgBuilderBase.DefaultSvgFlags;
+        public SvgFlags SelectedSvgFlags { get; set; } = SvgBuilderBase.DefaultSvgFlags;
 
         [DataMember]
         public bool IsThemeDark { get; set; }
@@ -205,7 +203,7 @@ namespace Calcuchord {
             foreach(Instrument inst in Instruments) {
                 foreach(Tuning tuning in inst.Tunings) {
                     Debug.WriteLine(
-                        $"{inst} Chords: {tuning.Chords.Count} Scales: {tuning.Scales.Count} Modes: {tuning.Modes.Count}");
+                        $"{inst} Chords: {tuning.Chords.SelectMany(x => x.Groups).Count()} Scales: {tuning.Scales.SelectMany(x => x.Groups).Count()} Modes: {tuning.Modes.SelectMany(x => x.Groups).Count()}");
                 }
             }
 

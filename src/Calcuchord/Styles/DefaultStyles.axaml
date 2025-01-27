@@ -52,19 +52,14 @@
 
     <!-- CURSOR -->
 
-    <Style Selector=":is(Control)">
-        <Setter Property="Cursor"
-                Value="Hand" />
-    </Style>
-
-    <Style Selector=":is(Button)">
-        <Setter Property="Cursor"
-                Value="Hand" />
-    </Style>
-    <Style Selector=":is(ListBoxItem)">
-        <Setter Property="Cursor"
-                Value="Hand" />
-    </Style>
+    <!-- <Style Selector=":is(Button)"> -->
+    <!--     <Setter Property="Cursor" -->
+    <!--             Value="Hand" /> -->
+    <!-- </Style> -->
+    <!-- <Style Selector=":is(ListBoxItem)"> -->
+    <!--     <Setter Property="Cursor" -->
+    <!--             Value="Hand" /> -->
+    <!-- </Style> -->
 
     <!-- BUTTONS -->
 

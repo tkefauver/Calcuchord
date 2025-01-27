@@ -35,12 +35,12 @@ namespace Calcuchord {
         }
 
         public PatternNote(int fingerNum,InstrumentNote inn) : this(
-            fingerNum,inn.FretNum,inn.RowNum,inn.Key,
+            fingerNum,inn.NoteNum,inn.RowNum,inn.Key,
             inn.Register) {
         }
 
-        public PatternNote(int fingerNum,int fretNum,int rowNum,NoteType nt,int register) : base(
-            fretNum,
+        public PatternNote(int fingerNum,int noteNum,int rowNum,NoteType nt,int register) : base(
+            noteNum,
             rowNum,nt,register) {
             FingerNum = fingerNum;
         }

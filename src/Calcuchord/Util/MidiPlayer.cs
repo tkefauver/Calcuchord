@@ -1,13 +1,16 @@
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using AvaloniaWebView;
 
 namespace Calcuchord {
+
     public class MidiPlayer {
+
         #region Private Variables
 
-        readonly WebView _wv;
+        WebView _wv;
 
         #endregion
 
@@ -16,6 +19,9 @@ namespace Calcuchord {
         #endregion
 
         #region Statics
+
+        static MidiPlayer _instance;
+        public static MidiPlayer Instance => _instance ??= new();
 
         #endregion
 
@@ -28,7 +34,7 @@ namespace Calcuchord {
         int ChordDelayMs => 30;
         int ScaleDelayMs => 300;
 
-        bool CanPlay { get; set; }
+        public bool CanPlay { get; private set; }
 
         DateTime? NextStopDt { get; set; }
 
@@ -52,22 +58,43 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public MidiPlayer(WebView wv) {
-            _wv = wv;
-            CanPlay = PlatformWrapper.WebViewHelper.ConfigureWebView(_wv);
-        }
-
         #endregion
 
         #region Public Methods
 
+        public void Init(WebView wv) {
+            _wv = wv;
+            if(PlatformWrapper.WebViewHelper is not { } wvh) {
+                return;
+            }
+
+            _wv.Loaded += (sender,args) => {
+                bool success = wvh.ConfigureWebView(_wv);
+                if(!success ||
+                   wvh.ToneUrl is not { } tone_url) {
+                    Debug.WriteLine("Error loading Tone.html assets");
+                    return;
+                }
+
+                _wv.NavigationCompleted += async (sender,args) => {
+                    if(args.IsSuccess) {
+                        CanPlay = true;
+                        Debug.WriteLine("Tone.html successfully loaded");
+                    } else {
+                        Debug.WriteLine("Error loading Tone.html page");
+                    }
+                };
+                _wv.Url = new(tone_url);
+            };
+        }
+
         public void PlayChord(int[] notes) {
-            SetStopDt(notes.Length,isScale: false);
+            SetStopDt(notes.Length,false);
             _wv.ExecuteScriptAsync($"playChord({string.Join(",",notes)})");
         }
 
         public void PlayScale(int[] notes) {
-            SetStopDt(notes.Length,isScale: true);
+            SetStopDt(notes.Length,true);
             _wv.ExecuteScriptAsync($"playScale({string.Join(",",notes)})");
         }
 
@@ -98,9 +125,9 @@ namespace Calcuchord {
                     await Task.Delay(delay);
                     StopPlayback();
                 });
-
         }
 
         #endregion
+
     }
 }

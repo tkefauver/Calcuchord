@@ -7,6 +7,15 @@ namespace Calcuchord {
         Root
     }
 
+    public enum MatchUpdateSource {
+        FindClick,
+        NoteToggle,
+        RootToggle,
+        FilterToggle,
+        SvgToggle
+    }
+
+
     [Flags]
     public enum SvgFlags {
         None = 0,
@@ -16,7 +25,8 @@ namespace Calcuchord {
         Matches = 8,
         Colors = 16,
         Frets = 32,
-        Tuning = 64
+        Tuning = 64,
+        Bars = 128
     }
 
     public enum NoteType {

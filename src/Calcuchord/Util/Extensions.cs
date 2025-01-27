@@ -5,16 +5,22 @@ using HtmlAgilityPack;
 
 namespace Calcuchord {
     public static class Extensions {
-        public static bool IsFlagEnabled(this InstrumentType it,SvgFlags flag) {
+        public static bool IsFlagEnabled(this SvgFlags flag,InstrumentType it,MusicPatternType pt) {
             if(it != InstrumentType.Piano) {
+                if(pt != MusicPatternType.Chords && flag == SvgFlags.Bars) {
+                    return false;
+                }
+
                 return true;
             }
+
             if(flag == SvgFlags.Colors ||
                flag == SvgFlags.Fingers ||
                flag == SvgFlags.Frets ||
                flag == SvgFlags.Tuning) {
                 return false;
             }
+
             return true;
         }
 

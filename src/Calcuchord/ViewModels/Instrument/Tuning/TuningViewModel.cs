@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Avalonia.Threading;
 using Calcuchord.JsonChords;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
@@ -41,24 +40,24 @@ namespace Calcuchord {
         #region View Models
 
         public IEnumerable<NoteRowViewModel> SortedRows =>
-            NoteRows.OrderBy(
-                x => x.RowNum < 0 ? -1 :
-                    IsStringsDescending ? StringCount - x.RowNum : x.RowNum);
+            NoteRows.OrderBy(x => x.RowNum < 0 ? -1 : x.RowNum);
 
         public ObservableCollection<NoteRowViewModel> NoteRows { get; } = [];
 
         public IEnumerable<NoteViewModel> AllNotes =>
             NoteRows.SelectMany(x => x.Notes).OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum);
 
-        public IEnumerable<NoteViewModel> SelectedNotes =>
-            AllNotes.Where(x => x.IsSelected);
+        public IEnumerable<NoteViewModel> SelectedNotes {
+            get => AllNotes.Where(x => x.IsSelected);
+            set {
+                AllNotes.ForEach(x => x.IsSelected = value == null ? false : value.Contains(x));
+                OnPropertyChanged(nameof(SelectedNotes));
+            }
+        }
 
         #endregion
 
         #region Appearance
-
-        public string StringSortIcon =>
-            IsStringsDescending ? "SortDescending" : "SortAscending";
 
         #endregion
 
@@ -67,14 +66,6 @@ namespace Calcuchord {
         #endregion
 
         #region State
-
-        public bool IsStringsDescending {
-            get => Prefs.Instance.IsStringsDescending;
-            set {
-                Prefs.Instance.IsStringsDescending = value;
-                OnPropertyChanged(nameof(IsStringsDescending));
-            }
-        }
 
         public bool IsLoaded =>
             Tuning.Chords.Any() && Tuning.Scales.Any();
@@ -95,7 +86,7 @@ namespace Calcuchord {
             Tuning.FretCount;
 
         int StringCount =>
-            Parent.StringCount;
+            Parent.RowCount;
 
         // +2 for label and nut
         public int LogicalFretCount =>
@@ -123,6 +114,7 @@ namespace Calcuchord {
 
         public async Task InitAsync(Tuning tuning) {
             IsBusy = true;
+
             Tuning = tuning;
             Tuning.SetParent(Parent.Instrument);
 
@@ -130,8 +122,6 @@ namespace Calcuchord {
             if(!Parent.IsKeyboard) {
                 NoteRows.Insert(0,new(this,null));
             }
-
-            OnPropertyChanged(nameof(IsStringsDescending));
 
             if(!Tuning.Chords.Any()) {
                 await CreateChordsAsync();
@@ -185,28 +175,6 @@ namespace Calcuchord {
                         //     Debug.WriteLine(string.Join(",",kvml.Select(x => x.KeyX)));
                         // }
                     }
-
-                    break;
-                case nameof(IsStringsDescending):
-                    if(IsSelected &&
-                       !Parent.IsKeyboard &&
-                       InstrumentView.Instance is { } iv &&
-                       iv.InstrumentContentControl is { } icc) {
-                        Dispatcher.UIThread.Post(
-                            async () => {
-                                MainViewModel.Instance.IsBusy = true;
-                                icc.Content = null;
-                                await Task.Delay(500);
-                                icc.Content = this;
-                                MainViewModel.Instance.IsBusy = false;
-                            });
-                    }
-
-                    OnPropertyChanged(nameof(SortedRows));
-                    OnPropertyChanged(nameof(StringSortIcon));
-                    AllNotes.ForEach(x => x.OnPropertyChanged(nameof(x.IsTopDotFret)));
-                    AllNotes.ForEach(x => x.OnPropertyChanged(nameof(x.IsBottomDotFret)));
-
 
                     break;
             }
