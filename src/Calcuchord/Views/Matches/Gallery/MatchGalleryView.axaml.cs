@@ -7,6 +7,10 @@ namespace Calcuchord {
 
         public MatchGalleryView() {
             InitializeComponent();
+            MatchItemsRepeater.ElementPrepared += MatchItemsRepeaterOnElementPrepared;
+        }
+
+        void MatchItemsRepeaterOnElementPrepared(object sender,ItemsRepeaterElementPreparedEventArgs e) {
         }
     }
 }

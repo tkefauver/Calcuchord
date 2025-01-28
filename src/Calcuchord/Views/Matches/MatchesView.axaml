@@ -13,6 +13,10 @@
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.MatchesView">
     <UserControl.Styles>
+        <Style Selector="local|MatchView.thumb">
+            <Setter Property="Margin"
+                    Value="5" />
+        </Style>
         <Style Selector="local|MatchView.thumb Border#MatchContainerBorder">
             <Setter Property="Transitions">
                 <Setter.Value>

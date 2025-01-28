@@ -13,7 +13,12 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:MatchViewModelBase"
              x:Class="Calcuchord.MatchView">
+    <Design.DataContext>
+        <local:DesignChordMatchViewModel />
+    </Design.DataContext>
     <Border x:Name="MatchContainerBorder"
+            Background="{DynamicResource HttTransparent}"
+            PointerReleased="MatchContainerBorder_OnPointerReleased"
             BorderThickness="1">
 
         <Grid RowDefinitions="Auto,*,Auto">
@@ -25,28 +30,53 @@
                 <TextBlock.Inlines>
                     <Run Text="{Binding PrimaryLabel}"
                          FontWeight="Bold"
-                         FontSize="18" />
+                         FontSize="48" />
                     <Run Text="{Binding SecondaryLabel}"
-                         FontSize="16" />
+                         FontSize="36" />
                     <Run Text="{Binding TertiaryLabel}"
                          FontSize="14"
                          BaselineAlignment="TextTop" />
                 </TextBlock.Inlines>
             </TextBlock>
 
-            <Svg Grid.Row="1"
+            <Svg x:Name="MatchSvg"
+                 Grid.Row="1"
                  Source="{Binding NoteGroup, Converter={x:Static local:MatchToSvgConverter.Instance}}"
                  Stretch="Uniform" />
             <StackPanel x:Name="MatchButtonStripPanel"
                         Grid.Row="2"
+                        Margin="10"
                         Spacing="5"
                         Classes="fade"
                         HorizontalAlignment="Center"
                         Orientation="Horizontal">
-                <ToggleButton Classes="float"
-                              IsChecked="{Binding IsMatchPlaying, Mode=OneWay}"
-                              Command="{Binding ToggleMatchPlayback}">
+                <StackPanel.Styles>
+                    <Style Selector="ToggleButton">
+                        <Setter Property="Padding"
+                                Value="3" />
+                        <Setter Property="MinWidth"
+                                Value="48" />
+                        <Setter Property="Height"
+                                Value="{Binding $self.Bounds.Width}" />
+                    </Style>
+                </StackPanel.Styles>
+
+                <!-- SET NECK BTN -->
+                <ToggleButton IsChecked="{Binding IsMatchPlaying, Mode=OneWay}"
+                              Command="{Binding SetMatchToInstrumentCommand}">
+                    <avalonia:MaterialIcon Kind="ContentCopy" />
+                </ToggleButton>
+
+                <!-- PLAY SAMPLE BTN -->
+                <ToggleButton IsChecked="{Binding IsMatchPlaying, Mode=OneWay}"
+                              Command="{Binding ToggleMatchPlaybackCommand}">
                     <avalonia:MaterialIcon Kind="{Binding PlaybackIcon}" />
+                </ToggleButton>
+
+                <!-- BOOKMARK BTN  -->
+                <ToggleButton IsChecked="{Binding IsBookmarked, Mode=OneWay}"
+                              Command="{Binding ToggleBookmarkCommand}">
+                    <avalonia:MaterialIcon Kind="{Binding BookmarkIcon}" />
                 </ToggleButton>
             </StackPanel>
 

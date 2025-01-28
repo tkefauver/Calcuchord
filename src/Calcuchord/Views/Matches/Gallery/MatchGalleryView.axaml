@@ -14,6 +14,7 @@
              x:Class="Calcuchord.MatchGalleryView">
     <ScrollViewer x:Name="MatchGalleryScrollViewer">
         <ItemsRepeater x:Name="MatchItemsRepeater"
+                       Margin="0,0,5,0"
                        ItemsSource="{Binding Matches}">
             <ItemsRepeater.Layout>
                 <WrapLayout HorizontalSpacing="5"
@@ -26,6 +27,7 @@
                                      common:MpAvIsHoveringExtension.IsEnabled="True"
                                      common:MpAvIsHoveringExtension.IsHovering="{Binding IsHovering, Mode=TwoWay}"
                                      Classes="thumb"
+                                     MaxWidth="350"
                                      Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
                                      Classes.selected="{Binding IsSelected}"
                                      Classes.hover="{Binding IsHovering}" />

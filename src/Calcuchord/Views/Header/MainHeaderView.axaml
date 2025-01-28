@@ -18,7 +18,7 @@
                         Height="56"
                         Mode="PrimaryMid"
                         ZIndex="1">
-        <DockPanel Margin="16">
+        <DockPanel Margin="4">
             <ToggleButton x:Name="NavDrawerSwitch"
                           DockPanel.Dock="Left"
                           IsChecked="{Binding IsLeftDrawerOpen,Mode=TwoWay}"

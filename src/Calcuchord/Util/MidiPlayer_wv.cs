@@ -1,16 +1,15 @@
 using System;
-using System.Linq;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using AvaloniaWebView;
-using Commons.Music.Midi;
-using MonkeyPaste.Common;
 
 namespace Calcuchord {
-
-    public class MidiPlayer {
+    public class MidiPlayer_wv {
 
         #region Private Variables
+
+        WebView _wv;
 
         #endregion
 
@@ -20,8 +19,8 @@ namespace Calcuchord {
 
         #region Statics
 
-        static MidiPlayer _instance;
-        public static MidiPlayer Instance => _instance ??= new();
+        static MidiPlayer_wv _instance;
+        public static MidiPlayer_wv Instance => _instance ??= new();
 
         #endregion
 
@@ -34,7 +33,7 @@ namespace Calcuchord {
         int ChordDelayMs => 30;
         int ScaleDelayMs => 300;
 
-        public bool CanPlay { get; private set; } = true;
+        public bool CanPlay { get; private set; }
 
         DateTime? NextStopDt { get; set; }
 
@@ -63,38 +62,44 @@ namespace Calcuchord {
         #region Public Methods
 
         public void Init(WebView wv) {
+            _wv = wv;
+            if(PlatformWrapper.WebViewHelper is not { } wvh) {
+                return;
+            }
 
+            _wv.Loaded += (sender,args) => {
+                bool success = wvh.ConfigureWebView(_wv);
+                if(!success ||
+                   wvh.ToneUrl is not { } tone_url) {
+                    Debug.WriteLine("Error loading Tone.html assets");
+                    return;
+                }
+
+                _wv.NavigationCompleted += async (sender,args) => {
+                    if(args.IsSuccess) {
+                        CanPlay = true;
+                        Debug.WriteLine("Tone.html successfully loaded");
+                    } else {
+                        Debug.WriteLine("Error loading Tone.html page");
+                    }
+                };
+                _wv.Url = new(tone_url);
+            };
         }
 
         public void PlayChord(int[] notes) {
             SetStopDt(notes.Length,false);
-            Dispatcher.UIThread.Post(async void () => {
-                try {
-                    //_wv.ExecuteScriptAsync($"playChord({string.Join(",",notes)})");
-                    IMidiAccess access = MidiAccessManager.Default;
-                    IMidiOutput output = await access.OpenOutputAsync(access.Outputs.Last().Id);
-                    output.Send([0xC0,GeneralMidi.Instruments.AcousticGrandPiano],0,2,
-                        0); // There are constant fields for each GM instrument
-                    output.Send([MidiEvent.NoteOn,0x40,0x70],0,3,0); // There are constant fields for each MIDI event
-                    output.Send([MidiEvent.NoteOff,0x40,0x70],0,3,0);
-                    output.Send([MidiEvent.Program,0x30],0,2,0); // Strings Ensemble
-                    output.Send([0x90,0x40,0x70],0,3,0);
-                    output.Send([0x80,0x40,0x70],0,3,0);
-                    //await output.CloseAsync();
-                } catch(Exception e) {
-                    e.Dump();
-                }
-            });
+            _wv.ExecuteScriptAsync($"playChord({string.Join(",",notes)})");
         }
 
         public void PlayScale(int[] notes) {
             SetStopDt(notes.Length,true);
-            //_wv.ExecuteScriptAsync($"playScale({string.Join(",",notes)})");
+            _wv.ExecuteScriptAsync($"playScale({string.Join(",",notes)})");
         }
 
         public void StopPlayback() {
             if(IsPlaying) {
-                //_wv.ExecuteScriptAsync("stopPlayback()");
+                _wv.ExecuteScriptAsync("stopPlayback()");
             }
 
             if(NextStopDt != null) {
@@ -124,5 +129,4 @@ namespace Calcuchord {
         #endregion
 
     }
-
 }

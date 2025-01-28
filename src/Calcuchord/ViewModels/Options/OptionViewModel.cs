@@ -53,7 +53,7 @@ namespace Calcuchord {
         public bool IsChecked { get; set; }
 
         [DataMember]
-        public bool IsEnabled { get; set; }
+        public bool IsEnabled { get; set; } = true;
 
         #endregion
 

@@ -56,6 +56,9 @@ namespace Calcuchord {
 
         #region Constructors
 
+        public ChordMatchViewModel() {
+        }
+
         public ChordMatchViewModel(NoteGroup noteGroup,double score) : base(noteGroup,score) {
         }
 

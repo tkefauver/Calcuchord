@@ -35,6 +35,9 @@ namespace Calcuchord {
 
         #region Appearance
 
+        public string BookmarkIcon =>
+            IsBookmarked ? "Bookmark" : "BookmarkOutline";
+
         public string PlaybackIcon =>
             IsMatchPlaying ? "Pause" : "Play";
 
@@ -55,6 +58,25 @@ namespace Calcuchord {
 
         #region State
 
+        public bool IsBookmarked {
+            get => Prefs.Instance.BookmarkIds.Contains(NoteGroup.Id);
+            set {
+                if(IsBookmarked != value) {
+                    if(value) {
+                        Prefs.Instance.BookmarkIds.Add(NoteGroup.Id);
+                    } else {
+                        Prefs.Instance.BookmarkIds.Remove(NoteGroup.Id);
+                    }
+
+                    Prefs.Instance.Save();
+                    OnPropertyChanged(nameof(IsBookmarked));
+                    OnPropertyChanged(nameof(BookmarkIcon));
+                }
+
+            }
+        }
+
+
         public bool IsMatchPlaying { get; set; }
 
         public abstract MusicPatternType MatchPatternType { get; }
@@ -68,7 +90,7 @@ namespace Calcuchord {
 
         public double Score { get; set; }
 
-        public NoteGroup NoteGroup { get; }
+        public NoteGroup NoteGroup { get; set; }
 
         #endregion
 
@@ -79,6 +101,9 @@ namespace Calcuchord {
         #endregion
 
         #region Constructors
+
+        protected MatchViewModelBase() {
+        }
 
         protected MatchViewModelBase(NoteGroup noteGroup,double score) {
             NoteGroup = noteGroup;
@@ -103,7 +128,11 @@ namespace Calcuchord {
 
         #region Commands
 
-        public ICommand ToggleMatchPlayback => new MpCommand(
+        public ICommand ToggleBookmarkCommand => new MpCommand(() => {
+            IsBookmarked = !IsBookmarked;
+        });
+
+        public ICommand ToggleMatchPlaybackCommand => new MpCommand(
             () => {
                 if(TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
                    tl.Clipboard is { } cb &&
@@ -137,9 +166,19 @@ namespace Calcuchord {
                     return;
                 }
 
+                // select only notes in group, use open note for mutes
                 stvm.SelectedNotes =
-                    stvm.AllNotes.Where(x => NoteGroup.Notes.Any(y => x.NoteNum == y.NoteNum && x.RowNum == y.RowNum))
+                    stvm.AllNotes.Where(x => x.IsRealNote &&
+                                             NoteGroup.Notes.Any(y =>
+                                                 x.NoteNum == (y.NoteNum == -1 ? 0 : y.NoteNum) &&
+                                                 x.RowNum == y.RowNum))
                         .ToList();
+
+                // set selected open notes to mute when group note is -1
+                NoteGroup.Notes.Where(x => x.NoteNum < 0).ForEach(x =>
+                    stvm.SelectedNotes.Where(y => y.NoteNum == 0 && y.RowNum == x.RowNum)
+                        .ForEach(x => x.WorkingNoteNum = NoteViewModel.MUTE_FRET_NUM));
+
                 InstrumentView.Instance.ScrollSelectionIntoView();
             });
 

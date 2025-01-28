@@ -9,13 +9,16 @@ namespace Calcuchord {
         public override HtmlNode Build(NoteGroup ng) {
             HtmlNode svg = InitBuild();
 
+            HtmlNode cntr_g = CurrentDoc.CreateElement("g");
+            svg.AppendChild(cntr_g);
+
             HtmlNode fret_grid_g = CurrentDoc.CreateElement("g");
-            svg.AppendChild(fret_grid_g);
+            cntr_g.AppendChild(fret_grid_g);
 
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
-            svg.AppendChild(bg_g);
+            cntr_g.AppendChild(bg_g);
 
-            SvgFlags flags = DefaultSvgFlags; //Prefs.Instance.SelectedSvgFlags;
+            SvgFlags flags = Prefs.Instance.SelectedSvgFlags;
 
             int vfc = 4;
             double lw = FretLineFixedAxisSize;
@@ -304,6 +307,22 @@ namespace Calcuchord {
 
                 cury += fh;
             }
+
+            double tox = 0;
+            double toy = 0;
+            if(show_header_labels) {
+                th = th - fh;
+                toy = -(fh / 2d);
+            } else {
+                th = th - (fh * 1.5);
+                toy = -header_h;
+            }
+
+            if(!flags.HasFlag(SvgFlags.Tuning)) {
+                th = th - (fh / 2d);
+            }
+
+            cntr_g.Attributes.Add("transform",$"translate({tox},{toy})");
 
             svg.Attributes.Add("width",tw);
             svg.Attributes.Add("height",th);

@@ -17,7 +17,6 @@ namespace Calcuchord {
         }
 
         public void ScrollSelectionIntoView() {
-            // TODO find min/max sel notes and bring into 
             if(MainViewModel.Instance is not { } mvm ||
                mvm.IsPianoSelected ||
                mvm.SelectedTuning is not { } stvm ||

@@ -21,7 +21,7 @@ namespace Calcuchord {
 
         public static SvgFlags DefaultSvgFlags =>
             //SvgFlags.Fingers |
-            SvgFlags.Bars |
+            //SvgFlags.Bars |
             SvgFlags.Notes |
             SvgFlags.Colors |
             SvgFlags.Tuning |
@@ -38,7 +38,7 @@ namespace Calcuchord {
         #region Properties
 
         protected HtmlDocument CurrentDoc { get; private set; }
-        protected string DefaultFontFamily => "Verdana";
+        protected string DefaultFontFamily => "Nunito"; //"Verdana";
 
         bool IsShadowsEnabled => false;
 
@@ -209,8 +209,8 @@ namespace Calcuchord {
             bool isBold = false,
             string classes = null,
             bool shadow = false) {
-            double tx = (x + (w / 2d)) - ((fs * text.Length) / (text.Length + 2));
-            double ty = y + (h / 2d) + (fs / 3d);
+            double tx = ((x + (w / 2d)) - ((fs * text.Length) / (text.Length + 2))) + 0.25;
+            double ty = y + (h / 2d) + (fs / 2d) + 0.75;
             AddText(cntr,text,fs,fill,tx,ty,isBold,classes,shadow);
         }
 

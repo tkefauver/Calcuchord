@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Threading;
-using Cairo;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
 
@@ -61,7 +60,6 @@ namespace Calcuchord {
         }
 
         #endregion
-
 
         #region Instrument
 
@@ -133,6 +131,9 @@ namespace Calcuchord {
                 _ => throw new ArgumentOutOfRangeException()
             };
 
+        public IEnumerable<OptionViewModel> AvailableSuffixOptions =>
+            SuffixOptions.Where(x => AvailableSuffixes.Contains(x.OptionValue));
+
         IEnumerable<OptionViewModel> SelectedSuffixOptions =>
             SuffixOptions.Where(x => x.IsChecked);
 
@@ -167,6 +168,18 @@ namespace Calcuchord {
         #endregion
 
         #region Layout
+
+        public int MinMatchesPerRow {
+            get {
+                if(MainView.Instance is not { } mv ||
+                   mv.MainContainerGrid is not { } mcg) {
+                    return 1;
+                }
+
+
+                return 1;
+            }
+        }
 
         #endregion
 
@@ -236,7 +249,7 @@ namespace Calcuchord {
         IEnumerable<SvgFlags> AvailableSvgFlags { get; set; } = [];
 
 
-        bool IsLoadingMatches { get; set; }
+        public bool IsLoadingMatches { get; private set; }
         CancellationTokenSource MatchCts { get; set; }
 
         public bool IsMatchesEmpty =>
@@ -387,8 +400,18 @@ namespace Calcuchord {
             SuffixOptions.ForEach(x => x.IsEnabled = AvailableSuffixes.Contains(x.OptionValue));
             SvgOptions.ForEach(x => x.IsEnabled = AvailableSvgFlags.Any(y => y.ToString() == x.OptionValue));
 
+            int old_svg_val = (int)Prefs.Instance.SelectedSvgFlags;
+            int new_svg_val = 0;
+            SelectedSvgOptions.ForEach(x => new_svg_val |= (int)x.ToEnum<SvgFlags>());
+            if(new_svg_val != old_svg_val) {
+                Prefs.Instance.SelectedSvgFlags = (SvgFlags)new_svg_val;
+                Prefs.Instance.Save();
+            }
+
+
             OnPropertyChanged(nameof(KeyOptions));
             OnPropertyChanged(nameof(SuffixOptions));
+            OnPropertyChanged(nameof(AvailableSuffixOptions));
             OnPropertyChanged(nameof(SvgOptions));
         }
 
@@ -484,7 +507,7 @@ namespace Calcuchord {
             if(!all_opts.Any()) {
                 var opt_lookup = new Dictionary<OptionType,Type>
                 {
-                    { OptionType.Pattern,typeof(PatternType) },
+                    { OptionType.Pattern,typeof(MusicPatternType) },
                     { OptionType.DisplayMode,typeof(DisplayModeType) },
                     { OptionType.ChordSuffix,typeof(ChordSuffixType) },
                     { OptionType.ScaleSuffix,typeof(ScaleSuffixType) },
@@ -600,7 +623,7 @@ namespace Calcuchord {
             IsBusy = false;
         }
 
-        IEnumerable<Instrument> CreateDefaultInstruments() {
+        public static IEnumerable<Instrument> CreateDefaultInstruments() {
             var instl = new List<Instrument>();
             var std_inst_lookup = new Dictionary<InstrumentType,(string[],int,double?)>
             {
@@ -633,12 +656,51 @@ namespace Calcuchord {
 
         #region Commands
 
-        public ICommand SelectDisplayModeCommand => new MpCommand<object>(
-            args => {
-            });
-
         public ICommand SelectOptionCommand => new MpCommand<object>(
             args => {
+                if(args is not OptionViewModel ovm ||
+                   !ovm.OptionType.TryToEnum(out OptionType optionType)) {
+                    return;
+                }
+
+                bool needs_inst_update = false;
+                bool needs_filter_update = false;
+                bool needs_matches_update = false;
+
+
+                switch(optionType) {
+                    case OptionType.DisplayMode:
+                    case OptionType.Pattern:
+                        OptionLookup[optionType].ForEach(x => x.IsChecked = x == ovm);
+                        //needs_inst_update = true;
+                        InitInstrumentAsync().FireAndForgetSafeAsync();
+                        break;
+                    case OptionType.Key:
+                    case OptionType.ChordSuffix:
+                    case OptionType.ScaleSuffix:
+                    case OptionType.ModeSuffix:
+                        ovm.IsChecked = !ovm.IsChecked;
+                        //needs_filter_update = true;
+                        UpdateMatches(MatchUpdateSource.FilterToggle);
+                        break;
+                    case OptionType.Svg:
+                        ovm.IsChecked = !ovm.IsChecked;
+                        if(ovm.IsChecked &&
+                           ovm.OptionValue.TryToEnum(out SvgFlags flag) &&
+                           (flag == SvgFlags.Fingers || flag == SvgFlags.Notes)) {
+                            SvgFlags other_flag = flag == SvgFlags.Fingers ? SvgFlags.Notes : SvgFlags.Fingers;
+                            if(SvgOptions.FirstOrDefault(x => x.OptionValue == other_flag.ToString()) is
+                               { } other_ovm) {
+                                other_ovm.IsChecked = false;
+
+                            }
+                        }
+
+                        InstrumentView.Instance.InvalidateAll();
+                        break;
+                }
+
+
             });
 
         public ICommand FindMatchesCommand => new MpCommand(

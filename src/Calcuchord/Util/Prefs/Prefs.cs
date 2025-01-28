@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -67,7 +66,7 @@ namespace Calcuchord {
         }
 
         public static void Init() {
-            //File.Delete(PrefsFilePath);
+            File.Delete(PrefsFilePath);
             bool is_initial_startup = !File.Exists(PrefsFilePath);
 
             if(Application.Current != null &&
@@ -122,14 +121,9 @@ namespace Calcuchord {
         [DataMember]
         public bool IsThemeDark { get; set; }
 
-        [DataMember]
-        public ObservableCollection<string> ChordBookmarkIds { get; set; } = [];
 
         [DataMember]
-        public ObservableCollection<string> ScaleBookmarkIds { get; set; } = [];
-
-        // [DataMember]
-        // public ObservableCollection<string> ModeBookmarkIds { get; set; } = [];
+        public ObservableCollection<string> BookmarkIds { get; set; } = [];
 
         [DataMember]
         public ObservableCollection<Instrument> Instruments { get; set; } = [];
@@ -140,25 +134,6 @@ namespace Calcuchord {
         #endregion
 
         #region Ignored
-
-        [IgnoreDataMember]
-        Dictionary<MusicPatternType,ObservableCollection<string>> _bookmarkLookup;
-
-        [IgnoreDataMember]
-        public Dictionary<MusicPatternType,ObservableCollection<string>> BookmarkLookup {
-            get {
-                if(_bookmarkLookup == null) {
-                    _bookmarkLookup = new()
-                    {
-                        { MusicPatternType.Chords,ChordBookmarkIds },
-                        { MusicPatternType.Scales,ScaleBookmarkIds }
-                        //{ MusicPatternType.Modes,ModeBookmarkIds }
-                    };
-                }
-
-                return _bookmarkLookup;
-            }
-        }
 
         #endregion
 

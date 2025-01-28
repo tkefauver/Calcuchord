@@ -18,7 +18,6 @@ namespace Calcuchord {
 
     [Flags]
     public enum SvgFlags {
-        None = 0,
         Fingers = 1,
         Notes = 2,
         Roots = 4,

@@ -14,7 +14,7 @@
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.MainView">
     <Design.DataContext>
-        <local:MainViewModel />
+        <local:DesignMainViewModel />
     </Design.DataContext>
     <Grid x:Name="MainOuterContainer">
         <!-- <wv:WebView x:Name="HiddenWebview" -->
@@ -96,6 +96,7 @@
                                         <Binding Path="IsMatchesEmpty"
                                                  TargetNullValue="True"
                                                  FallbackValue="True" />
+                                        <Binding Path="!IsLoadingMatches" />
                                     </MultiBinding>
                                 </TextBlock.IsVisible>
                             </TextBlock>
