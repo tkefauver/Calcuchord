@@ -20,9 +20,9 @@ namespace Calcuchord {
         #region Statics
 
         public static SvgFlags DefaultSvgFlags =>
-            //SvgFlags.Fingers |
-            //SvgFlags.Bars |
-            SvgFlags.Notes |
+            SvgFlags.Fingers |
+            SvgFlags.Bars |
+            //SvgFlags.Notes |
             SvgFlags.Colors |
             SvgFlags.Tuning |
             SvgFlags.Roots |
@@ -208,9 +208,11 @@ namespace Calcuchord {
             double h,
             bool isBold = false,
             string classes = null,
-            bool shadow = false) {
+            bool shadow = false,
+            double ox = 0,
+            double oy = 0) {
             double tx = ((x + (w / 2d)) - ((fs * text.Length) / (text.Length + 2))) + 0.25;
-            double ty = y + (h / 2d) + (fs / 2d) + 0.75;
+            double ty = y + (h / 2d) + (fs / 2d); // + 1.5; //0.75;
             AddText(cntr,text,fs,fill,tx,ty,isBold,classes,shadow);
         }
 

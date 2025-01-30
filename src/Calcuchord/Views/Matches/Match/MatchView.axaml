@@ -46,7 +46,7 @@
             <StackPanel x:Name="MatchButtonStripPanel"
                         Grid.Row="2"
                         Margin="10"
-                        Spacing="5"
+                        Spacing="20"
                         Classes="fade"
                         HorizontalAlignment="Center"
                         Orientation="Horizontal">
@@ -56,6 +56,12 @@
                                 Value="3" />
                         <Setter Property="MinWidth"
                                 Value="48" />
+                        <Setter Property="Height"
+                                Value="{Binding $self.Bounds.Width}" />
+                    </Style>
+                    <Style Selector="avalonia|MaterialIcon">
+                        <Setter Property="MinWidth"
+                                Value="36" />
                         <Setter Property="Height"
                                 Value="{Binding $self.Bounds.Width}" />
                     </Style>

@@ -41,12 +41,22 @@ namespace Calcuchord {
 
         #region Public Methods
 
+        public IEnumerable<MatchViewModelBase> GetAll() {
+            return Items.Select(x => CreateMatchViewModel(x,1));
+        }
+
+        public IEnumerable<MatchViewModelBase> GetBookmarks() {
+            return
+                Items
+                    .Where(x => Prefs.Instance.BookmarkIds.Contains(x.Id))
+                    .Select(x => CreateMatchViewModel(x,1));
+        }
+
         public IEnumerable<MatchViewModelBase> GetMatches(IEnumerable<NoteViewModel> matchNotes) {
             var results =
                 Items.Select(x => (x,GetScore(x,matchNotes)))
                     .Where(x => x.Item2 > 0)
                     .Select(x => CreateMatchViewModel(x.Item1,x.Item2));
-            int test = results.Count();
             return results;
         }
 

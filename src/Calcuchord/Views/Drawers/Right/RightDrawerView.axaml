@@ -13,14 +13,6 @@
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.RightDrawerView">
     <UserControl.Styles>
-        <Style Selector="controls|ColorZone">
-            <Setter Property="Mode"
-                    Value="PrimaryLight" />
-        </Style>
-        <Style Selector="controls|ColorZone.dark">
-            <Setter Property="Mode"
-                    Value="PrimaryDark" />
-        </Style>
         <Style Selector="StackPanel.options > TextBlock">
             <Setter Property="FontSize"
                     Value="24" />
@@ -31,10 +23,12 @@
                     Value="0" />
             <Setter Property="InsideClipping"
                     Value="True" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+            <Setter Property="MaxHeight"
+                    Value="150" />
         </Style>
         <Style Selector="StackPanel.options ItemsControl">
-            <Setter Property="MaxWidth"
-                    Value="{Binding $parent[ScrollViewer].Bounds.Width}" />
             <Setter Property="HorizontalAlignment"
                     Value="Center" />
             <Setter Property="ItemsPanel">
@@ -47,7 +41,9 @@
             <Setter Property="ItemTemplate">
                 <Setter.Value>
                     <DataTemplate x:DataType="local:OptionViewModel">
-                        <ToggleButton IsChecked="{Binding IsChecked,Mode=OneWay}"
+                        <ToggleButton CornerRadius="0"
+                                      Theme="{StaticResource MaterialFlatToggleButton}"
+                                      IsChecked="{Binding IsChecked,Mode=OneWay}"
                                       IsEnabled="{Binding IsEnabled}"
                                       Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}"
                                       CommandParameter="{Binding .}">
@@ -73,51 +69,74 @@
             <Setter Property="Text"
                     Value="{Binding Label, Converter={x:Static local:SuffixDisplayValueConverter.Instance}}" />
         </Style>
+        <Style Selector="ItemsControl.svg WrapPanel"
+               x:DataType="local:OptionViewModel">
+            <Setter Property="ItemWidth"
+                    Value="70" />
+        </Style>
+        <Style Selector="ItemsControl.svg TextBlock"
+               x:DataType="local:OptionViewModel">
+            <Setter Property="ClipToBounds"
+                    Value="False" />
+        </Style>
 
     </UserControl.Styles>
-    <controls:ColorZone Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}">
+    <controls:ColorZone Mode="Accent"
+                        Foreground="{DynamicResource Fg}">
         <DockPanel Margin="5">
-            <ToggleButton x:Name="CloseRightDrawerToggleButton"
-                          DockPanel.Dock="Top"
-                          HorizontalAlignment="Left"
-                          Classes="float"
-                          IsChecked="{Binding IsRightDrawerOpen, Mode=TwoWay}">
+            <Button x:Name="CloseRightDrawerButton"
+                    DockPanel.Dock="Top"
+                    Command="{Binding CloseRightDrawerCommand}"
+                    HorizontalAlignment="Left"
+                    Classes="float">
                 <avalonia:MaterialIcon Kind="Close" />
-            </ToggleButton>
+            </Button>
             <ScrollViewer Margin="0,20,0,0">
                 <StackPanel Classes="options"
                             Orientation="Vertical"
                             Margin="10"
                             Spacing="10">
                     <!-- MODE -->
+                    <TextBlock Text="Mode" />
                     <controls:Card>
-                        <ItemsControl ItemsSource="{Binding DisplayModeOptions}" />
+                        <ScrollViewer>
+                            <ItemsControl ItemsSource="{Binding DisplayModeOptions}" />
+                        </ScrollViewer>
                     </controls:Card>
 
                     <!-- PATTERN -->
                     <TextBlock Text="Type" />
                     <controls:Card>
-                        <ItemsControl ItemsSource="{Binding PatternOptions}" />
+                        <ScrollViewer>
+                            <ItemsControl ItemsSource="{Binding PatternOptions}" />
+                        </ScrollViewer>
                     </controls:Card>
 
                     <!-- KEY -->
                     <TextBlock Text="Key" />
                     <controls:Card>
-                        <ItemsControl ItemsSource="{Binding KeyOptions}" />
+                        <ScrollViewer>
+                            <ItemsControl ItemsSource="{Binding KeyOptions}" />
+                        </ScrollViewer>
                     </controls:Card>
 
                     <!-- SUFFIX -->
                     <TextBlock Text="Suffix" />
                     <controls:Card>
-                        <ItemsControl Classes="suffix"
-                                      ItemsSource="{Binding AvailableSuffixOptions}" />
+                        <ScrollViewer>
+                            <ItemsControl Classes="suffix"
+                                          ItemsSource="{Binding SuffixOptions}" />
+                        </ScrollViewer>
                     </controls:Card>
 
                     <!-- SVG -->
 
                     <TextBlock Text="Display" />
                     <controls:Card>
-                        <ItemsControl ItemsSource="{Binding SvgOptions}" />
+                        <ScrollViewer>
+                            <ItemsControl Classes="svg"
+                                          ItemsSource="{Binding SvgOptions}" />
+                        </ScrollViewer>
                     </controls:Card>
 
 

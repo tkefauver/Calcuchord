@@ -71,7 +71,7 @@ namespace Calcuchord {
         #region Protected Methods
 
         protected override void PlayGroupMidi() {
-            MidiPlayer.Instance.PlayChord(NoteGroup.Notes.Select(x => x.MidiTone).ToArray());
+            MidiPlayer.Instance.PlayChord(NoteGroup.Notes.ToArray());
         }
 
         #endregion

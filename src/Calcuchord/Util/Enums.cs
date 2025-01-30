@@ -12,7 +12,9 @@ namespace Calcuchord {
         NoteToggle,
         RootToggle,
         FilterToggle,
-        SvgToggle
+        SvgToggle,
+        InstrumentInit,
+        BookmarkToggle
     }
 
 

@@ -130,6 +130,9 @@ namespace Calcuchord {
 
         public ICommand ToggleBookmarkCommand => new MpCommand(() => {
             IsBookmarked = !IsBookmarked;
+            if(MainViewModel.Instance.SelectedDisplayMode == DisplayModeType.Bookmarks) {
+                MainViewModel.Instance.UpdateMatches(MatchUpdateSource.BookmarkToggle);
+            }
         });
 
         public ICommand ToggleMatchPlaybackCommand => new MpCommand(

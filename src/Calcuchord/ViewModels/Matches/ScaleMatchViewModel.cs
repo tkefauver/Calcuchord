@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Calcuchord {
     public class ScaleMatchViewModel : MatchViewModelBase {
 
@@ -68,7 +66,7 @@ namespace Calcuchord {
         #region Protected Methods
 
         protected override void PlayGroupMidi() {
-            MidiPlayer.Instance.PlayScale(NoteGroup.Notes.Select(x => x.MidiTone).ToArray());
+            MidiPlayer.Instance.PlayScale(NoteGroup.Notes);
         }
 
         #endregion

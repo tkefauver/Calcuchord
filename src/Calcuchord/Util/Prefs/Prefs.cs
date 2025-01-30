@@ -66,7 +66,7 @@ namespace Calcuchord {
         }
 
         public static void Init() {
-            File.Delete(PrefsFilePath);
+            //File.Delete(PrefsFilePath);
             bool is_initial_startup = !File.Exists(PrefsFilePath);
 
             if(Application.Current != null &&

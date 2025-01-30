@@ -9,10 +9,7 @@ namespace Calcuchord {
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
             svg.AppendChild(bg_g);
 
-            if(ng.ToString() == "C Major #1") {
-            }
-
-            SvgFlags flags = DefaultSvgFlags; //Prefs.Instance.SelectedSvgFlags;
+            SvgFlags flags = Prefs.Instance.SelectedSvgFlags;
 
             int vfc = 5;
 
@@ -166,6 +163,11 @@ namespace Calcuchord {
                         AddCenteredText(bg_g,dot_text,bfs,fret_fg,tx,ty,dot_r,dot_r,shadow: true);
                     }
                 }
+            }
+
+            if(show_fret_marker) {
+                // fret marker doesn't take up a full row's height
+                th -= 5;
             }
 
             svg.Attributes.Add("width",tw);
