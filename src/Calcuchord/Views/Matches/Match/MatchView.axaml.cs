@@ -25,5 +25,14 @@ namespace Calcuchord {
 
             mtvm.SelectMatchCommand.Execute(null);
         }
+
+        protected override void OnPointerReleased(PointerReleasedEventArgs e) {
+            if(DataContext is not MatchViewModelBase mtvm) {
+                return;
+            }
+
+            mtvm.SelectMatchCommand.Execute(null);
+            this.BringIntoView();
+        }
     }
 }

@@ -9,11 +9,11 @@ namespace Calcuchord {
         public static MATERIAL_WrapContentIntoContentPresenterConverter Instance { get; } =
             new MATERIAL_WrapContentIntoContentPresenterConverter();
 
-        public object Convert(object? value,Type targetType,object? parameter,CultureInfo culture) {
+        public object Convert(object value,Type targetType,object parameter,CultureInfo culture) {
             return value is Control ? value : new ContentPresenter { Content = value };
         }
 
-        public object ConvertBack(object? value,Type targetType,object? parameter,CultureInfo culture) {
+        public object ConvertBack(object value,Type targetType,object parameter,CultureInfo culture) {
             throw new NotSupportedException();
         }
     }

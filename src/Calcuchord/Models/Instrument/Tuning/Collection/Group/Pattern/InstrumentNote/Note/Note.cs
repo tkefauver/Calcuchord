@@ -1,8 +1,8 @@
 using System;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace Calcuchord {
-    [DataContract]
+    [JsonObject]
     public class Note {
 
         #region Private Variables
@@ -37,6 +37,7 @@ namespace Calcuchord {
             if(id < 0) {
                 return new(null,null);
             }
+
             int register = (int)Math.Floor(id / (double)MAX_NOTE_TYPE);
             NoteType nt = (NoteType)(id - (register * MAX_NOTE_TYPE));
             return new(nt,register);
@@ -48,20 +49,19 @@ namespace Calcuchord {
 
         #region Members
 
-        [DataMember]
         public NoteType Key { get; set; }
 
-        [DataMember]
+
         public int Register { get; set; }
 
-        [DataMember]
+
         public bool IsMute { get; set; }
 
         #endregion
 
         #region Ignored
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public bool IsAltered =>
             Key == NoteType.Db ||
             Key == NoteType.Eb ||
@@ -69,18 +69,18 @@ namespace Calcuchord {
             Key == NoteType.Ab ||
             Key == NoteType.Bb;
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public virtual string Name =>
             Key.ToDisplayValue();
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public virtual string FullName =>
             Key.ToDisplayValue(Register);
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         int _id = -1;
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public int NoteId {
             get {
                 if(_id < 0) {
@@ -91,10 +91,10 @@ namespace Calcuchord {
             }
         }
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         int _midiTone = -1;
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public int MidiTone {
             get {
                 if(_midiTone < 0) {
@@ -111,7 +111,7 @@ namespace Calcuchord {
             }
         }
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public Note Next =>
             IsMute ? null : GetNote(NoteId + 1);
 
@@ -150,6 +150,7 @@ namespace Calcuchord {
             if(IsMute) {
                 return null;
             }
+
             return GetNote(Math.Max(0,NoteId + offset));
         }
 

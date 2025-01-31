@@ -1,8 +1,8 @@
 #nullable enable
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace Calcuchord {
-    [DataContract]
+    [JsonObject]
     public class InstrumentNote : Note {
 
         #region Private Variables
@@ -29,17 +29,16 @@ namespace Calcuchord {
 
         #region Members
 
-        [DataMember]
         public int NoteNum { get; set; }
 
-        [DataMember]
+
         public int RowNum { get; set; }
 
         #endregion
 
         #region Ignored
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public new InstrumentNote Next => new InstrumentNote(NoteNum + 1,RowNum,base.Next);
 
         #endregion

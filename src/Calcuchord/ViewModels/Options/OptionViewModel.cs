@@ -1,8 +1,8 @@
-using System.Runtime.Serialization;
 using System.Windows.Input;
+using Newtonsoft.Json;
 
 namespace Calcuchord {
-    [DataContract]
+    [JsonObject]
     public class OptionViewModel : ViewModelBase {
 
         #region Private Variables
@@ -33,11 +33,9 @@ namespace Calcuchord {
 
         #region Appearance
 
-        [DataMember]
-
         public string Label { get; set; }
 
-        [DataMember]
+
         public string Icon { get; set; }
 
         #endregion
@@ -48,27 +46,24 @@ namespace Calcuchord {
 
         #region State
 
-        [DataMember]
-
         public bool IsChecked { get; set; }
 
-        [DataMember]
+
         public bool IsEnabled { get; set; } = true;
 
         #endregion
 
         #region Model
 
-        [DataMember]
         public OptionType OptionType { get; set; }
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public ICommand Command { get; set; }
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public object CommandParameter { get; set; }
 
-        [DataMember]
+
         public string OptionValue { get; set; }
 
         #endregion

@@ -1,28 +1,28 @@
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace Calcuchord {
+    [JsonObject]
     public class PatternNote : InstrumentNote {
 
         #region Properties
 
         #region Members
 
-        [DataMember]
         public int FingerNum { get; set; }
 
         #endregion
 
         #region Ignored
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public override string FullName =>
             $"F{FingerNum} " + base.FullName;
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public bool IsRoot =>
             Key == Parent.Key;
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public NoteGroup Parent { get; private set; }
 
         #endregion

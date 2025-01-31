@@ -1,49 +1,46 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Runtime.Serialization;
-using MonkeyPaste.Common;
+using Newtonsoft.Json;
 
 namespace Calcuchord {
-    [DataContract]
+    [JsonObject]
     public class NoteGroup {
 
         #region Properties
 
         #region Members
 
-        [DataMember]
         public string Id { get; set; }
 
-        [DataMember]
+
         public int Position { get; set; }
 
-        [DataMember]
-        public ObservableCollection<PatternNote> Notes { get; set; } = [];
+
+        public List<PatternNote> Notes { get; set; } = [];
 
         #endregion
 
         #region Ignored
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public string SuffixKey =>
             Parent.SuffixKey;
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public string SuffixDisplayValue =>
             Parent.SuffixDisplayValue;
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public NoteGroupCollection Parent { get; private set; }
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public NoteType Key =>
             Parent.Key;
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public string Name =>
             $"{Key} {SuffixDisplayValue}";
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public string FullName =>
             $"{Name} #{Position + 1}";
 

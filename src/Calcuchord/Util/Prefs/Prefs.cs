@@ -1,25 +1,18 @@
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.ReactiveUI;
-using ReactiveUI;
+using MonkeyPaste.Common;
+using Newtonsoft.Json;
 
 namespace Calcuchord {
-    [DataContract]
+    [JsonObject]
     public class Prefs : ViewModelBase {
 
         #region Private Variables
-
-        [IgnoreDataMember]
-        bool _isSavingIgnored;
 
         #endregion
 
@@ -29,65 +22,47 @@ namespace Calcuchord {
 
         #region Statics
 
-        [IgnoreDataMember]
+        static bool RESET_PREFS => false;
+
+        [JsonIgnore]
         static string _prefsFilePath;
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         static string PrefsFilePath {
             get {
-                string fp = "appstate.json";
-                if(_prefsFilePath == null) {
-                    if(Application.Current is { } ac &&
-                       ac.ApplicationLifetime is ISingleViewApplicationLifetime) {
-                        fp = Path.Combine(
-                            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                            "appstate.json");
-                    }
-
-                    _prefsFilePath = fp;
+                if(_prefsFilePath == null &&
+                   PlatformWrapper.StorageHelper is { } sh &&
+                   sh.StorageDir is { } sd) {
+                    string fn = "appstate.json";
+                    _prefsFilePath = Path.Combine(sd,fn);
                 }
 
                 return _prefsFilePath;
             }
         }
 
-        [IgnoreDataMember]
-        static ISuspensionDriver _driver;
-
-        [IgnoreDataMember]
-        public static ISuspensionDriver Driver {
-            get {
-                if(_driver == null) {
-                    _driver = new NewtonsoftJsonSuspensionDriver(PrefsFilePath);
-                }
-
-                return _driver;
-            }
-        }
-
         public static void Init() {
-            File.Delete(PrefsFilePath);
+            if(RESET_PREFS) {
+                File.Delete(PrefsFilePath);
+            }
+
+            //
             bool is_initial_startup = !File.Exists(PrefsFilePath);
 
-            if(Application.Current != null &&
-               Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime) {
-                AutoSuspendHelper suspension = new AutoSuspendHelper(lifetime);
-                RxApp.SuspensionHost.CreateNewAppState = () => new Prefs();
-                RxApp.SuspensionHost.SetupDefaultSuspendResume(Driver);
-                suspension.OnFrameworkInitializationCompleted();
+            if(is_initial_startup) {
+                _ = new Prefs();
+                Instance.Save();
+            } else {
+                try {
+                    _ = JsonConvert.DeserializeObject<Prefs>(File.ReadAllText(PrefsFilePath));
+                    Instance.Instruments.ForEach(x => x.RefreshModelTree());
+                } catch(Exception e) {
+                    e.Dump();
+                    _ = new Prefs();
+                }
             }
 
-            // Load the saved view model state.
-            if(Design.IsDesignMode) {
-                _ = new Prefs();
-            } else {
-                _ = RxApp.SuspensionHost.GetAppState<Prefs>();
-                if(is_initial_startup) {
-                    //RxApp.SuspensionHost.CreateNewAppState.Invoke();
-                    //_ = new Prefs();
-                }
-                //
-            }
+
         }
 
         public static Prefs Instance { get; private set; }
@@ -102,36 +77,22 @@ namespace Calcuchord {
 
         #region Members
 
-        [IgnoreDataMember]
-        string _selectedTuningId;
+        public string SelectedTuningId { get; set; }
 
-        [DataMember]
 
-        public string SelectedTuningId {
-            get => _selectedTuningId;
-            set {
-                if(SelectedTuningId != value) {
-                    _selectedTuningId = value;
-                    OnPropertyChanged(nameof(SelectedTuningId));
-                }
-            }
-        }
-
-        [DataMember]
         public SvgFlags SelectedSvgFlags { get; set; } = SvgBuilderBase.DefaultSvgFlags;
 
-        [DataMember]
+
         public bool IsThemeDark { get; set; }
 
 
-        [DataMember]
-        public ObservableCollection<string> BookmarkIds { get; set; } = [];
+        public List<string> BookmarkIds { get; set; } = [];
 
-        [DataMember]
-        public ObservableCollection<Instrument> Instruments { get; set; } = [];
 
-        [DataMember]
-        public ObservableCollection<OptionViewModel> Options { get; set; } = [];
+        public List<Instrument> Instruments { get; set; } = [];
+
+
+        public List<OptionViewModel> Options { get; set; } = [];
 
         #endregion
 
@@ -155,7 +116,7 @@ namespace Calcuchord {
 
             Instance = this;
 
-            PropertyChanged += PropertyChanged_OnPropertyChanged;
+            //PropertyChanged += PropertyChanged_OnPropertyChanged;
             // Instruments.CollectionChanged += Coll_OnCollectionChanged;
             // ChordBookmarkIds.CollectionChanged += Coll_OnCollectionChanged;
             // ScaleBookmarkIds.CollectionChanged += Coll_OnCollectionChanged;
@@ -166,15 +127,6 @@ namespace Calcuchord {
         #region Public Methods
 
         public void Save() {
-            if(_isSavingIgnored) {
-                Debug.WriteLine("Save ignored");
-                return;
-            }
-
-            if(Driver == null) {
-            }
-
-            Driver?.SaveState(this);
             Debug.WriteLine("");
             string tuning_str = MainViewModel.Instance == null || MainViewModel.Instance.SelectedTuning == null
                 ? string.Empty
@@ -188,6 +140,14 @@ namespace Calcuchord {
             }
 
             Debug.WriteLine("");
+            string pref_json = JsonConvert.SerializeObject(this);
+            MpFileIo.WriteTextToFile(PrefsFilePath,pref_json);
+
+            try {
+                Prefs test = JsonConvert.DeserializeObject<Prefs>(pref_json);
+            } catch(Exception e) {
+                e.Dump();
+            }
         }
 
         #endregion

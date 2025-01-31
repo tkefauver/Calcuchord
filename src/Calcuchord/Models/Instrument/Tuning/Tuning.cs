@@ -1,60 +1,69 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Runtime.Serialization;
 using MonkeyPaste.Common;
+using Newtonsoft.Json;
 
 namespace Calcuchord {
-    [DataContract]
+    [JsonObject]
     public class Tuning {
 
         #region Properties
 
         #region Members
 
-        [DataMember]
+        string _id;
 
-        public string Id { get; set; }
+        public string Id {
+            get => _id;
+            set {
+                if(_id == "c2a9ea0c-1e64-46fa-8b09-92f675b19917" || value == "c2a9ea0c-1e64-46fa-8b09-92f675b19917") {
 
-        [DataMember]
+                }
+
+                _id = value;
+            }
+        }
+
+
         public string Name { get; set; }
 
-        [DataMember]
+
         public int CapoFretNum { get; set; }
 
-        [DataMember]
+
         public bool IsReadOnly { get; set; }
 
-        [DataMember]
+
         public bool IsDefault { get; set; }
 
-        [DataMember]
-        public ObservableCollection<InstrumentNote> OpenNotes { get; set; } = [];
 
-        [DataMember]
-        public ObservableCollection<NoteGroupCollection> Chords { get; set; } = [];
+        public List<InstrumentNote> OpenNotes { get; set; } = [];
 
-        [DataMember]
-        public ObservableCollection<NoteGroupCollection> Scales { get; set; } = [];
 
-        [DataMember]
-        public ObservableCollection<NoteGroupCollection> Modes { get; set; } = [];
+        public List<NoteGroupCollection> Chords { get; set; } = [];
+
+
+        public List<NoteGroupCollection> Scales { get; set; } = [];
+
+
+        public List<NoteGroupCollection> Modes { get; set; } = [];
 
         #endregion
 
         #region Ignored
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public int FretCount =>
             Parent.FretCount - CapoFretNum;
 
-        [IgnoreDataMember]
-        Dictionary<MusicPatternType,ObservableCollection<NoteGroupCollection>> _collections;
+        [JsonIgnore]
+        Dictionary<MusicPatternType,List<NoteGroupCollection>> _collections;
 
-        [IgnoreDataMember]
-        public Dictionary<MusicPatternType,ObservableCollection<NoteGroupCollection>> Collections {
+        [JsonIgnore]
+        public Dictionary<MusicPatternType,List<NoteGroupCollection>> Collections {
             get {
                 if(_collections == null) {
-                    _collections = new() {
+                    _collections = new()
+                    {
                         { MusicPatternType.Chords,Chords },
                         { MusicPatternType.Scales,Scales },
                         { MusicPatternType.Modes,Modes }
@@ -65,7 +74,7 @@ namespace Calcuchord {
             }
         }
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public Instrument Parent { get; private set; }
 
         #endregion

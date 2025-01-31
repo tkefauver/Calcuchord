@@ -1,34 +1,33 @@
-using System.Collections.ObjectModel;
-using System.Runtime.Serialization;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Calcuchord {
-    [DataContract]
+    [JsonObject]
     public class NoteGroupCollection {
 
         #region Properties
 
         #region Members
 
-        [DataMember]
         public string SuffixKey { get; set; }
 
-        [DataMember]
+
         public NoteType Key { get; set; }
 
-        [DataMember]
+
         public MusicPatternType PatternType { get; set; }
 
-        [DataMember]
-        public ObservableCollection<NoteGroup> Groups { get; set; } = [];
+
+        public List<NoteGroup> Groups { get; set; } = [];
 
         #endregion
 
         #region Ignored
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         string _suffixDisplayValue;
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public string SuffixDisplayValue {
             get {
                 if(string.IsNullOrEmpty(_suffixDisplayValue)) {
@@ -40,7 +39,7 @@ namespace Calcuchord {
         }
 
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public Tuning Parent { get; set; }
 
         #endregion

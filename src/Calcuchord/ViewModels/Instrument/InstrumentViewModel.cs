@@ -149,6 +149,7 @@ namespace Calcuchord {
                         }
 
                         Prefs.Instance.SelectedTuningId = SelectedTuning.Id;
+                        Prefs.Instance.Save();
                     } else {
                         Tunings.ForEach(x => x.IsSelected = false);
                     }

@@ -103,12 +103,11 @@
                                 HorizontalContentAlignment="Left"
                                 Padding="10">
 
-                <Button Classes="float">
+                <Button>
                     <StackPanel Orientation="Horizontal"
                                 Spacing="5">
                         <avalonia:MaterialIcon Kind="About" />
-                        <TextBlock Foreground="{DynamicResource Bg}"
-                                   Text="About" />
+                        <TextBlock Text="About" />
 
                     </StackPanel>
                 </Button>

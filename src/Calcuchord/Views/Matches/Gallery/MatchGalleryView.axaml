@@ -12,27 +12,66 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.MatchGalleryView">
-    <ScrollViewer x:Name="MatchGalleryScrollViewer">
-        <ItemsRepeater x:Name="MatchItemsRepeater"
-                       Margin="0,0,5,0"
-                       ItemsSource="{Binding Matches}">
-            <ItemsRepeater.Layout>
-                <WrapLayout HorizontalSpacing="5"
-                            VerticalSpacing="5"
-                            Orientation="Horizontal" />
-            </ItemsRepeater.Layout>
-            <ItemsRepeater.ItemTemplate>
-                <DataTemplate x:DataType="local:MatchViewModelBase">
-                    <local:MatchView Background="{DynamicResource HttTransparent}"
-                                     common:MpAvIsHoveringExtension.IsEnabled="True"
-                                     common:MpAvIsHoveringExtension.IsHovering="{Binding IsHovering, Mode=TwoWay}"
-                                     Classes="thumb"
-                                     MaxWidth="350"
-                                     Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
-                                     Classes.selected="{Binding IsSelected}"
-                                     Classes.hover="{Binding IsHovering}" />
-                </DataTemplate>
-            </ItemsRepeater.ItemTemplate>
-        </ItemsRepeater>
-    </ScrollViewer>
+    <Grid RowDefinitions="Auto,*">
+        <Button x:Name="ShowZoomButton"
+                Grid.Row="0"
+                Classes="float"
+                HorizontalAlignment="Right">
+            <Button.Styles>
+                <Style Selector="FlyoutPresenter">
+                    <Setter Property="Width"
+                            Value="150" />
+                    <Setter Property="Height"
+                            Value="30" />
+                    <Setter Property="Padding"
+                            Value="10" />
+                </Style>
+            </Button.Styles>
+            <Button.Flyout>
+                <Flyout HorizontalOffset="-80"
+                        PlacementAnchor="None"
+                        Placement="Center">
+                    <Slider x:Name="MatchZoomSlider"
+                            Orientation="Horizontal"
+                            IsEnabled="{Binding !IsMatchZoomChanging}"
+                            Minimum="0.1"
+                            Maximum="1"
+                            Value="{Binding MatchZoom, Mode=TwoWay}" />
+                </Flyout>
+            </Button.Flyout>
+            <avalonia:MaterialIcon Kind="Magnify" />
+        </Button>
+
+        <ScrollViewer x:Name="MatchGalleryScrollViewer"
+                      Grid.Row="1">
+            <ItemsRepeater x:Name="MatchItemsRepeater"
+                           Margin="0,0,5,0"
+                           ItemsSource="{Binding Matches}">
+                <ItemsRepeater.RenderTransform>
+                    <TranslateTransform />
+                </ItemsRepeater.RenderTransform>
+                <ItemsRepeater.Layout>
+                    <WrapLayout HorizontalSpacing="5"
+                                VerticalSpacing="5"
+                                Orientation="Horizontal" />
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="local:MatchViewModelBase">
+                        <Viewbox x:Name="MatchViewbox"
+                                 MaxWidth="{Binding MaxMatchWidth, Source={x:Static local:MainViewModel.Instance}}">
+                            <local:MatchView Background="{DynamicResource HttTransparent}"
+                                             common:MpAvIsHoveringExtension.IsEnabled="True"
+                                             common:MpAvIsHoveringExtension.IsHovering="{Binding IsHovering, Mode=TwoWay}"
+                                             Classes="thumb"
+                                             MaxWidth="{Binding DefaultMatchWidth, Source={x:Static local:MainViewModel.Instance}}"
+                                             Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
+                                             Classes.selected="{Binding IsSelected}"
+                                             Classes.hover="{Binding IsHovering}" />
+                        </Viewbox>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+        </ScrollViewer>
+    </Grid>
+
 </UserControl>

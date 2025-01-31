@@ -95,7 +95,10 @@ namespace Calcuchord {
             RowNum >= 0 && NoteNum >= 0;
 
         public bool IsRowSolid =>
-            RowNum >= 4;
+            !IsRowNylon && RowNum >= 4;
+
+        public bool IsRowNylon =>
+            Parent.Parent.Parent.InstrumentType == InstrumentType.Ukulele;
 
         public bool IsRowMuted =>
             Parent.IsMuted;

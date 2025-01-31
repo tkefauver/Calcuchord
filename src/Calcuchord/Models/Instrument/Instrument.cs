@@ -1,32 +1,30 @@
-using System.Collections.ObjectModel;
-using System.Runtime.Serialization;
-using MonkeyPaste.Common;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Calcuchord {
-    [DataContract]
+    [JsonObject]
     public class Instrument {
 
         #region Properties
 
         #region Members
 
-        [DataMember]
         public string Name { get; set; }
 
-        [DataMember]
+
         public InstrumentType InstrumentType { get; set; }
 
-        [DataMember]
+
         public double? NeckLengthInInches { get; set; }
 
-        [DataMember]
+
         public int FretCount { get; set; }
 
-        [DataMember]
+
         public int StringCount { get; set; }
 
-        [DataMember]
-        public ObservableCollection<Tuning> Tunings { get; set; } = [];
+
+        public List<Tuning> Tunings { get; set; } = [];
 
         #endregion
 

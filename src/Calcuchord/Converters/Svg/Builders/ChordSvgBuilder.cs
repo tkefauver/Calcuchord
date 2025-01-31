@@ -310,13 +310,13 @@ namespace Calcuchord {
 
             double tox = 0;
             double toy = 0;
-            if(show_header_labels) {
-                th = th - fh;
-                toy = -(fh / 2d);
-            } else {
-                th = th - (fh * 1.5);
-                toy = -header_h;
-            }
+            //if(show_header_labels) {
+            th = th - fh;
+            toy = -(fh / 2d);
+            // } else {
+            //     th = th - (fh * 1.5);
+            //     toy = -header_h;
+            // }
 
             if(!flags.HasFlag(SvgFlags.Tuning)) {
                 th = th - (fh / 2d);

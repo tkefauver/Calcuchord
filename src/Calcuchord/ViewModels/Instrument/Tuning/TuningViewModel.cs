@@ -173,6 +173,7 @@ namespace Calcuchord {
                     if(IsSelected) {
                         ResetSelection();
                         Prefs.Instance.SelectedTuningId = Id;
+                        Prefs.Instance.Save();
                         MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.SelectedTuning));
                         // if(Parent.IsKeyboard &&
                         //    AllNotes.OfType<KeyViewModel>() is { } kvml) {

@@ -15,10 +15,22 @@
     <Border x:Name="KeyMarker"
             BorderThickness="0"
             Classes="note-marker">
-        <TextBlock Text="{Binding MarkerLabel}"
-                   IsVisible="{Binding !IsPhone, Source={x:Static local:ThemeViewModel.Instance}}"
-                   Margin="0,0,0,5"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Bottom" />
+        <Grid RowDefinitions="*,0.2*">
+
+            <Viewbox Grid.Row="1"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Bottom"
+                     Height="{Binding $self.Bounds.Width}"
+                     Stretch="UniformToFill">
+                <TextBlock Text="{Binding MarkerLabel}"
+                           IsVisible="{Binding !IsPhone, Source={x:Static local:ThemeViewModel.Instance}}"
+                           Width="25"
+                           Height="25"
+                           FontSize="12"
+                           VerticalAlignment="Top"
+                           TextAlignment="Center" />
+
+            </Viewbox>
+        </Grid>
     </Border>
 </UserControl>

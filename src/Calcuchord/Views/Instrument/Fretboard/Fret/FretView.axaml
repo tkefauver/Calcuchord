@@ -64,6 +64,28 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- STRING CHUNK (SOLID) -->
+        <Style Selector="Border#StringChunkBorder.nylon">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush Opacity="0.7"
+                                         StartPoint="0%,0%"
+                                         EndPoint="0%,50%"
+                                         SpreadMethod="Reflect">
+                        <LinearGradientBrush.Transform>
+                            <SkewTransform AngleX="10" />
+                        </LinearGradientBrush.Transform>
+                        <GradientStops>
+                            <GradientStop Color="DarkGoldenrod"
+                                          Offset="0" />
+                            <GradientStop Color="Bisque"
+                                          Offset="0.95" />
+                        </GradientStops>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <!-- STRING CHUNK (UNKNOWN) -->
         <Style Selector="Border#StringChunkBorder.unknown">
             <Setter Property="Background">
@@ -191,6 +213,7 @@
         <!-- STRING CHUNK -->
 
         <Border x:Name="StringChunkBorder"
+                Classes.nylon="{Binding IsRowNylon}"
                 Classes.solid="{Binding IsRowSolid}"
                 Classes.unknown="{Binding IsRowUnknown}"
                 IsVisible="{Binding IsRealNote}"

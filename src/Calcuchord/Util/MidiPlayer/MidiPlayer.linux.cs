@@ -20,10 +20,10 @@ namespace Calcuchord {
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
-            trackChunk.Events.Add(new ProgramChangeEvent((SevenBitNumber)25)
-            {
-                DeltaTime = 0
-            });
+            // trackChunk.Events.Add(new ProgramChangeEvent((SevenBitNumber)25)
+            // {
+            //     DeltaTime = 0
+            // });
             int delta = 0;
             var tones = notes.Select(x => x.MidiTone);
             foreach(int tone in tones) {
@@ -38,7 +38,7 @@ namespace Calcuchord {
             foreach(int tone in tones) {
                 trackChunk.Events.Add(new NoteOffEvent((SevenBitNumber)tone,(SevenBitNumber)0)
                 {
-                    DeltaTime = 480
+                    DeltaTime = 200
                 });
             }
 

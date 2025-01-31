@@ -192,6 +192,18 @@ namespace Calcuchord {
             }
         }
 
+        public void BeginMatchZoom() {
+            //IsMatchZoomChanging = true;
+            MaxMatchWidth = DefaultMatchWidth * MatchZoom;
+        }
+
+        public void FinishMatchZoom() {
+            IsMatchZoomChanging = false;
+        }
+
+        public static double DefaultMatchWidth => 350;
+        public double MaxMatchWidth { get; set; } = DefaultMatchWidth;
+
         #endregion
 
         #region State
@@ -243,6 +255,7 @@ namespace Calcuchord {
 
         #region Matches
 
+        public double MatchZoom { get; set; } = 1.0;
         IEnumerable<NoteType> AvailableKeys { get; set; } = [];
 
         IEnumerable<NoteType> SelectedKeys =>
@@ -259,7 +272,7 @@ namespace Calcuchord {
 
         IEnumerable<SvgFlags> AvailableSvgFlags { get; set; } = [];
 
-
+        public bool IsMatchZoomChanging { get; private set; }
         public bool IsLoadingMatches { get; private set; }
         CancellationTokenSource MatchCts { get; set; }
 
@@ -362,7 +375,11 @@ namespace Calcuchord {
                 needs_save = true;
             }
 
-            Instruments.AddRange(await Task.WhenAll(instl.Select(x => CreateInstrumentAsync(x))));
+            foreach(Instrument inst in instl) {
+                InstrumentViewModel ivm = await CreateInstrumentAsync(inst);
+                Instruments.Add(ivm);
+            }
+
             if(needs_save) {
                 Prefs.Instance.Save();
             }
@@ -451,7 +468,7 @@ namespace Calcuchord {
                 }
 
                 Matches.Add(match);
-                await Task.Delay(1,ct);
+                await Task.Delay(50,ct);
             }
         }
 
@@ -588,7 +605,14 @@ namespace Calcuchord {
                                 })));
             }
 
-            all_opts.GroupBy(x => x.OptionType).ForEach(x => OptionLookup[x.Key].AddRange(x));
+            foreach(var kvp in OptionLookup) {
+                kvp.Value.Clear();
+                kvp.Value.AddRange(all_opts.Where(x => x.OptionType == kvp.Key));
+            }
+
+            // OptionLookup.Clear();
+            //
+            // all_opts.GroupBy(x => x.OptionType).ForEach(x => OptionLookup[x.Key].AddRange(x));
             //OptionLookup = all_opts.GroupBy(x => x.OptionType).ToDictionary(x => x.Key,x => x.Select(y => y));
 
             LoadSvgFlagsIntoOptions();
