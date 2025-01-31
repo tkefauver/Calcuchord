@@ -10,6 +10,7 @@ using System.Windows.Input;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
+using AvSnackbarHost = Material.Styles.Controls.SnackbarHost;
 
 namespace Calcuchord {
     public class MainViewModel : ViewModelBase {
@@ -137,7 +138,17 @@ namespace Calcuchord {
         IEnumerable<OptionViewModel> SelectedSuffixOptions =>
             SuffixOptions.Where(x => x.IsChecked);
 
-        Dictionary<OptionType,IEnumerable<OptionViewModel>> OptionLookup { get; set; }
+        Dictionary<OptionType,List<OptionViewModel>> OptionLookup { get; } =
+            new Dictionary<OptionType,List<OptionViewModel>>
+            {
+                { OptionType.Key,[] },
+                { OptionType.Pattern,[] },
+                { OptionType.Svg,[] },
+                { OptionType.ModeSuffix,[] },
+                { OptionType.ChordSuffix,[] },
+                { OptionType.ScaleSuffix,[] },
+                { OptionType.DisplayMode,[] }
+            };
 
         #endregion
 
@@ -225,7 +236,7 @@ namespace Calcuchord {
 
         public NoteType? DesiredRoot { get; set; }
 
-        bool IsDefaultSelection =>
+        public bool IsDefaultSelection =>
             SelectedTuning == null ? true : SelectedTuning.NoteRows.All(x => x.IsDefaultSelection);
 
         #endregion
@@ -261,7 +272,9 @@ namespace Calcuchord {
                 //     return true;
                 // }
 
-                if(SelectedTuning != null &&
+                if(!IsBusy &&
+                   !IsLoadingMatches &&
+                   SelectedTuning != null &&
                    SelectedTuning.SelectedNotes.Any() &&
                    SelectedTuning.SelectedNotes.Difference(LastNotes).Any()) {
                     return true;
@@ -270,6 +283,8 @@ namespace Calcuchord {
                 return false;
             }
         }
+
+        public bool IsSearchOverlayVisible { get; private set; }
 
         #endregion
 
@@ -318,7 +333,7 @@ namespace Calcuchord {
                     }
 
                     LastSelectedTuning = SelectedTuning;
-                    InitInstrumentAsync().FireAndForgetSafeAsync();
+                    InitInstrument();
                     break;
                 case nameof(SelectedInstrumentIndex):
                     OnPropertyChanged(nameof(SelectedInstrument));
@@ -362,7 +377,7 @@ namespace Calcuchord {
 
             //TestInstruments();
 
-            await InitInstrumentAsync();
+            InitInstrument();
             IsBusy = false;
         }
 
@@ -392,9 +407,22 @@ namespace Calcuchord {
                 FilteredMatches = GetFilterWorkingMatches();
 
                 await Dispatcher.UIThread.InvokeAsync(async () => {
+                    IsLoadingMatches = true;
+                    if(source == MatchUpdateSource.FindClick) {
+                        string count_msg = $"{FilteredMatches.Count()} found";
+                        AvSnackbarHost.Post(
+                            count_msg,
+                            null,
+                            DispatcherPriority.Background);
+                    }
+
                     UpdateFilters();
                     MatchCts = new();
+
                     await LoadMatchesAsync(FilteredMatches,MatchCts.Token);
+
+                    IsLoadingMatches = false;
+                    IsSearchOverlayVisible = true;
                 },DispatcherPriority.Background);
             });
         }
@@ -415,7 +443,6 @@ namespace Calcuchord {
         }
 
         async Task LoadMatchesAsync(IEnumerable<MatchViewModelBase> matches,CancellationToken ct) {
-            IsLoadingMatches = true;
             Matches.Clear();
             foreach(MatchViewModelBase match in matches) {
                 if(ct.IsCancellationRequested) {
@@ -424,10 +451,8 @@ namespace Calcuchord {
                 }
 
                 Matches.Add(match);
-                await Task.Delay(100,ct);
+                await Task.Delay(1,ct);
             }
-
-            IsLoadingMatches = false;
         }
 
         void CreateWorkingMatches(IEnumerable<NoteViewModel> notes) {
@@ -563,7 +588,8 @@ namespace Calcuchord {
                                 })));
             }
 
-            OptionLookup = all_opts.GroupBy(x => x.OptionType).ToDictionary(x => x.Key,x => x.Select(y => y));
+            all_opts.GroupBy(x => x.OptionType).ForEach(x => OptionLookup[x.Key].AddRange(x));
+            //OptionLookup = all_opts.GroupBy(x => x.OptionType).ToDictionary(x => x.Key,x => x.Select(y => y));
 
             LoadSvgFlagsIntoOptions();
 
@@ -651,9 +677,7 @@ namespace Calcuchord {
             LastSelectedTuning = SelectedTuning;
         }
 
-        async Task InitInstrumentAsync() {
-            IsBusy = true;
-            await Task.Delay(1);
+        void InitInstrument() {
 
             //TestSvg();
 
@@ -670,9 +694,6 @@ namespace Calcuchord {
             OnPropertyChanged(nameof(EmptyMatchLabel));
 
             UpdateMatches(MatchUpdateSource.InstrumentInit);
-
-            //MainView.Instance.InvalidateAll();
-            IsBusy = false;
         }
 
         public static IEnumerable<Instrument> CreateDefaultInstruments() {
@@ -708,6 +729,10 @@ namespace Calcuchord {
 
         #region Commands
 
+        public ICommand ResetInstrumentCommand => new MpCommand(() => {
+            SelectedTuning.ResetSelection();
+        });
+
         public ICommand CloseRightDrawerCommand => new MpCommand(() => {
             IsRightDrawerOpen = false;
         });
@@ -724,7 +749,7 @@ namespace Calcuchord {
                     case OptionType.DisplayMode:
                     case OptionType.Pattern:
                         OptionLookup[optionType].ForEach(x => x.IsChecked = x == ovm);
-                        InitInstrumentAsync().FireAndForgetSafeAsync();
+                        InitInstrument();
                         break;
                     case OptionType.Key:
                     case OptionType.ChordSuffix:
@@ -757,6 +782,7 @@ namespace Calcuchord {
 
         public ICommand FindMatchesCommand => new MpCommand(
             () => {
+                IsSearchOverlayVisible = false;
                 UpdateMatches(MatchUpdateSource.FindClick);
             });
 

@@ -1,3 +1,5 @@
+using System;
+using Avalonia;
 using Avalonia.Controls;
 using PropertyChanged;
 
@@ -10,6 +12,14 @@ namespace Calcuchord {
             Instance = this;
             InitializeComponent();
             //MidiPlayer.Instance.Init(HiddenWebview);
+            EmptyTextBlock.GetObservable(IsVisibleProperty).Subscribe(value => Test());
+        }
+
+        void Test() {
+            if(EmptyTextBlock.IsVisible) {
+
+            }
+
         }
     }
 }

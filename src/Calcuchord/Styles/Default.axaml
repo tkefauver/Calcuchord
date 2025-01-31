@@ -6,24 +6,12 @@
         xmlns:local="clr-namespace:Calcuchord"
         xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia">
     <Styles.Resources>
-        <FontFamily x:Key="NunitoFont">avares://Calcuchord/Assets/Fonts#Nunito</FontFamily>
-        <FontFamily x:Key="GaramondFont">avares://Calcuchord/Assets/Fonts#EB Garamond Regular</FontFamily>
-
-        <!-- UNKNOWN BRUSH -->
-        <LinearGradientBrush x:Key="UnknownBrush"
-                             StartPoint="0%,0%"
-                             EndPoint="5%,0%"
-                             SpreadMethod="Reflect">
-            <LinearGradientBrush.Transform>
-                <SkewTransform AngleX="22" />
-            </LinearGradientBrush.Transform>
-            <GradientStops>
-                <GradientStop Color="Black"
-                              Offset="0" />
-                <GradientStop Color="Yellow"
-                              Offset="1" />
-            </GradientStops>
-        </LinearGradientBrush>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="avares://Calcuchord/Styles/Dictionaries/Fonts.axaml" />
+                <MergeResourceInclude Source="avares://Calcuchord/Styles/Themes/Snackbar/TinySnackbarHost.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Styles.Resources>
 
     <!-- TOOLTIPS -->
@@ -97,6 +85,41 @@
                 </Transitions>
 
             </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style Selector=":is(Control).fade.fade-collapse[Opacity=0]">
+        <Setter Property="IsVisible"
+                Value="False" />
+    </Style>
+
+    <!-- HYPERLINK -->
+    <Style Selector="Button.link">
+        <Setter Property="Foreground"
+                Value="Blue" />
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="Cursor"
+                Value="Hand" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="Background"
+                Value="Transparent" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ContentPresenter Content="{TemplateBinding Content}">
+                    <ContentPresenter.Styles>
+                        <Style Selector="TextBlock">
+                            <Setter Property="Foreground"
+                                    Value="{TemplateBinding Foreground}" />
+                            <Setter Property="FontSize"
+                                    Value="{TemplateBinding FontSize}" />
+                            <Setter Property="TextDecorations"
+                                    Value="Underline" />
+                        </Style>
+                    </ContentPresenter.Styles>
+                </ContentPresenter>
+            </ControlTemplate>
         </Setter>
     </Style>
 

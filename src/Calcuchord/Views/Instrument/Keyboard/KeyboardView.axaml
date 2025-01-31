@@ -12,6 +12,22 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:TuningViewModel"
              x:Class="Calcuchord.KeyboardView">
+    <UserControl.Resources>
+        <RadialGradientBrush x:Key="BlackKeyBrush">
+            <RadialGradientBrush.GradientStops>
+                <GradientStops>
+                    <GradientStop Color="{DynamicResource PianoBlackKeyBg3Color}"
+                                  Offset="0" />
+                    <GradientStop Color="{DynamicResource PianoBlackKeyBg2Color}"
+                                  Offset="0.4" />
+                    <GradientStop Color="{DynamicResource PianoBlackKeyBgColor}"
+                                  Offset="1" />
+                </GradientStops>
+
+            </RadialGradientBrush.GradientStops>
+        </RadialGradientBrush>
+
+    </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="local|KeyView">
             <Setter Property="BorderThickness"
@@ -21,13 +37,14 @@
             <Setter Property="BorderBrush"
                     Value="{DynamicResource PianoWhiteKeyFg}" />
         </Style>
+
         <Style Selector="local|KeyView.black">
             <Setter Property="BorderThickness"
                     Value="1" />
-            <Setter Property="Background"
-                    Value="{DynamicResource PianoBlackKeyBg}" />
             <Setter Property="BorderBrush"
                     Value="{DynamicResource PianoBlackKeyFg}" />
+            <Setter Property="Background"
+                    Value="{StaticResource BlackKeyBrush}" />
         </Style>
 
         <Style Selector="local|KeyView TextBlock">
@@ -53,25 +70,41 @@
 
     </UserControl.Styles>
     <Viewbox Margin="10">
-        <ItemsControl x:Name="KeyboardItemsControl"
-                      ItemsSource="{Binding AllNotes}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas Classes="keyboard" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="local:NoteViewModel">
-                    <local:KeyView Classes="note-btn"
-                                   Classes.black="{Binding IsAltered}"
-                                   Classes.selected="{Binding IsSelected}"
-                                   Classes.desired-root="{Binding IsDesiredRoot}"
-                                   Classes.hover="{Binding IsHovering}"
-                                   Loaded="KeyView_Loaded"
-                                   Unloaded="KeyView_Unloaded" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <Grid>
+            <ItemsControl x:Name="KeyboardItemsControl"
+                          ItemsSource="{Binding AllNotes}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas Classes="keyboard" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="local:NoteViewModel">
+                        <local:KeyView Classes="note-btn"
+                                       Classes.black="{Binding IsAltered}"
+                                       Classes.selected="{Binding IsSelected}"
+                                       Classes.desired-root="{Binding IsDesiredRoot}"
+                                       Classes.hover="{Binding IsHovering}"
+                                       Loaded="KeyView_Loaded"
+                                       Unloaded="KeyView_Unloaded" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Border IsHitTestVisible="False">
+                <Border.Background>
+                    <LinearGradientBrush TransformOrigin="50%,50%"
+                                         StartPoint="50%,0%"
+                                         EndPoint="50%,100%">
+                        <GradientStops>
+                            <GradientStop Color="#DD000000"
+                                          Offset="0" />
+                            <GradientStop Color="Transparent"
+                                          Offset="0.2" />
+                        </GradientStops>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+        </Grid>
     </Viewbox>
 
 </UserControl>

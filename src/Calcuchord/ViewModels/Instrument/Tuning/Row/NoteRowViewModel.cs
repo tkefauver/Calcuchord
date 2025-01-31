@@ -97,9 +97,6 @@ namespace Calcuchord {
         public int RowNum =>
             OpenNote == null ? -1 : OpenNote.RowNum;
 
-        public int FretCount =>
-            Parent.Tuning.FretCount;
-
         #endregion
 
         #region Model
@@ -139,6 +136,10 @@ namespace Calcuchord {
             }
         }
 
+        public override string ToString() {
+            return OpenNote == null ? base.ToString() : "Row " + OpenNote;
+        }
+
         #endregion
 
         #region Protected Methods
@@ -154,6 +155,10 @@ namespace Calcuchord {
                     Notes.ForEach(x => x.OnPropertyChanged(nameof(x.IsRowMuted)));
                     Notes.ForEach(x => x.OnPropertyChanged(nameof(x.IsRowUnknown)));
                     Notes.ForEach(x => x.OnPropertyChanged(nameof(x.IsEnabled)));
+                    break;
+                case nameof(SelectedNote):
+                case nameof(SelectedNotes):
+                    MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.IsDefaultSelection));
                     break;
             }
         }

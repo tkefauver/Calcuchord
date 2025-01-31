@@ -31,8 +31,11 @@ namespace Calcuchord {
         NutBg,
         NutFg,
         PianoWhiteKeyBg,
+        PianoWhiteKeyBg2,
         PianoWhiteKeyFg,
         PianoBlackKeyBg,
+        PianoBlackKeyBg2,
+        PianoBlackKeyBg3,
         PianoBlackKeyFg,
         PianoMatch
     }
@@ -178,6 +181,14 @@ namespace Calcuchord {
                             ("#000000","#FFFFFF")
                         },
                         {
+                            PaletteColorType.PianoBlackKeyBg2,
+                            ("#222222","#DDDDDD")
+                        },
+                        {
+                            PaletteColorType.PianoBlackKeyBg3,
+                            ("#444444","#DDDDDD")
+                        },
+                        {
                             PaletteColorType.PianoBlackKeyFg,
                             ("#000000","#FFFFFF")
                         }
@@ -222,16 +233,25 @@ namespace Calcuchord {
 
         void InitResoures() {
             if(Application.Current is not { } ac) {
+                return;
             }
 
-            IResourceDictionary res = Application.Current.Resources;
+            IResourceDictionary res = ac.Resources;
             foreach(var kvp in P) {
-                string brush_name = kvp.Key.ToString(); // + "Brush";
+                string brush_name = kvp.Key.ToString();
                 IBrush brush = kvp.Value.ToAvBrush();
                 if(res.ContainsKey(brush_name)) {
                     res[brush_name] = brush;
                 } else {
                     res.Add(brush_name,brush);
+                }
+
+                string color_name = kvp.Key + "Color";
+                Color color = kvp.Value.ToAvColor();
+                if(res.ContainsKey(color_name)) {
+                    res[color_name] = color;
+                } else {
+                    res.Add(color_name,color);
                 }
             }
         }

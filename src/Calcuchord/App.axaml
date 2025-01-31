@@ -22,7 +22,7 @@
         </themes:CustomMaterialTheme>
         <materialIcons:MaterialIconStyles />
         <dialogHostAvalonia:DialogHostStyles />
-        <StyleInclude Source="avares://Calcuchord/Styles/DefaultStyles.axaml" />
+        <StyleInclude Source="avares://Calcuchord/Styles/Default.axaml" />
     </Application.Styles>
 
     <Application.Resources>

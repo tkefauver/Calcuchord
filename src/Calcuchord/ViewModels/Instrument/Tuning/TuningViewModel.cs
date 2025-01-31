@@ -39,6 +39,9 @@ namespace Calcuchord {
 
         #region View Models
 
+        public IEnumerable<NoteRowViewModel> PitchSortedRows =>
+            NoteRows.OrderBy(x => x.RowNum < 0 ? -1 : x.OpenNote.NoteId);
+
         public IEnumerable<NoteRowViewModel> SortedRows =>
             NoteRows.OrderBy(x => x.RowNum < 0 ? -1 : x.RowNum);
 
@@ -150,6 +153,10 @@ namespace Calcuchord {
 
         public void ResetSelection() {
             NoteRows.ForEach(x => x.ResetSelection());
+        }
+
+        public override string ToString() {
+            return Tuning == null ? base.ToString() : Tuning.ToString();
         }
 
         #endregion

@@ -66,7 +66,7 @@ namespace Calcuchord {
         }
 
         public static void Init() {
-            //File.Delete(PrefsFilePath);
+            File.Delete(PrefsFilePath);
             bool is_initial_startup = !File.Exists(PrefsFilePath);
 
             if(Application.Current != null &&
@@ -84,7 +84,7 @@ namespace Calcuchord {
                 _ = RxApp.SuspensionHost.GetAppState<Prefs>();
                 if(is_initial_startup) {
                     //RxApp.SuspensionHost.CreateNewAppState.Invoke();
-                    _ = new Prefs();
+                    //_ = new Prefs();
                 }
                 //
             }
@@ -102,8 +102,10 @@ namespace Calcuchord {
 
         #region Members
 
-        [DataMember]
+        [IgnoreDataMember]
         string _selectedTuningId;
+
+        [DataMember]
 
         public string SelectedTuningId {
             get => _selectedTuningId;
@@ -174,7 +176,10 @@ namespace Calcuchord {
 
             Driver?.SaveState(this);
             Debug.WriteLine("");
-            Debug.WriteLine($"{DateTime.Now} prefs saved. SelectedTuningId: {SelectedTuningId}");
+            string tuning_str = MainViewModel.Instance == null || MainViewModel.Instance.SelectedTuning == null
+                ? string.Empty
+                : MainViewModel.Instance.SelectedTuning.ToString();
+            Debug.WriteLine($"{DateTime.Now} prefs saved. SelectedTuningId: {SelectedTuningId} {tuning_str}");
             foreach(Instrument inst in Instruments) {
                 foreach(Tuning tuning in inst.Tunings) {
                     Debug.WriteLine(

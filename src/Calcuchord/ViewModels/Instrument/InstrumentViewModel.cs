@@ -127,6 +127,10 @@ namespace Calcuchord {
             IsBusy = false;
         }
 
+        public override string ToString() {
+            return Instrument == null ? base.ToString() : Instrument.ToString();
+        }
+
         #endregion
 
         #region Protected Methods

@@ -16,6 +16,11 @@
 
     </UserControl.Resources>
     <UserControl.Styles>
+        <!-- DROP SHADOW -->
+        <Style Selector=":is(Control).env-shadow">
+            <Setter Property="Effect"
+                    Value="drop-shadow(3 5 7 black)" />
+        </Style>
         <!-- FRETBOARD BG -->
         <Style Selector="Image#FretboardBgImage">
             <Setter Property="Source"
@@ -40,6 +45,7 @@
                     Value="False" />
         </Style>
 
+
     </UserControl.Styles>
     <Grid>
         <ScrollViewer x:Name="FretboardScrollViewer"
@@ -54,7 +60,6 @@
                            Stretch="UniformToFill" />
 
                     <ItemsControl x:Name="StringsItemsControl"
-                                  Effect="drop-shadow(3 5 7 black)"
                                   ItemsSource="{Binding SortedRows}"
                                   Margin="0,0,0,20">
                         <ItemsControl.ItemsPanel>
@@ -74,6 +79,7 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="local:NoteViewModel">
                                             <local:FretView Classes="note-btn"
+                                                            Classes.env-shadow="{Binding IsRealNote}"
                                                             Classes.muted="{Binding IsRowMuted}"
                                                             Classes.unknown="{Binding IsRowUnknown}"
                                                             Classes.nut="{Binding IsNutFret}"

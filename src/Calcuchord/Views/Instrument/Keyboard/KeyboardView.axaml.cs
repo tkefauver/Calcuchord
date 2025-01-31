@@ -8,9 +8,9 @@ namespace Calcuchord {
     [DoNotNotify]
     public partial class KeyboardView : UserControl {
 
-        public const double WHITE_WIDTH_TO_HEIGHT_RATIO = 5.700677201;
-        public const double WHITE_TO_BLACK_WIDTH_RATIO = 0.5;
-        public const double WHITE_TO_BLACK_HEIGHT_RATIO = 0.633563;
+        public static double WHITE_WIDTH_TO_HEIGHT_RATIO => 5.700677201;
+        public static double WHITE_TO_BLACK_WIDTH_RATIO => 0.7;
+        public static double WHITE_TO_BLACK_HEIGHT_RATIO => 0.633563;
 
         public KeyboardView() {
             InitializeComponent();
@@ -20,7 +20,7 @@ namespace Calcuchord {
             base.OnLoaded(e);
 
 
-            double wkw = 40;
+            double wkw = 100;
             double bkw = wkw * WHITE_TO_BLACK_WIDTH_RATIO;
 
             double wkh = wkw * WHITE_WIDTH_TO_HEIGHT_RATIO;

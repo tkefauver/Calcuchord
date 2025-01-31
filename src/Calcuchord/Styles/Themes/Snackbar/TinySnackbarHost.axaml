@@ -1,0 +1,50 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+                    xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+                    xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+                    xmlns:models="clr-namespace:Material.Styles.Models;assembly=Material.Styles"
+                    xmlns:converters="clr-namespace:Material.Styles.Converters;assembly=Material.Styles"
+                    xmlns:local="clr-namespace:Calcuchord"
+                    xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+    <ControlTheme x:Key="TinySnackbarHost"
+                  TargetType="controls:SnackbarHost">
+        <Setter Property="Background"
+                Value="Transparent" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel>
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}" />
+                    <ItemsControl Name="PART_SnackbarHostItemsContainer"
+                                  HorizontalAlignment="{TemplateBinding SnackbarHorizontalAlignment}"
+                                  VerticalAlignment="{TemplateBinding SnackbarVerticalAlignment}"
+                                  ItemsSource="{Binding $parent[controls:SnackbarHost].SnackbarModels}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ReversibleStackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="models:SnackbarModel">
+                                <controls:Card Padding="0"
+                                               Margin="8"
+                                               CornerRadius="7"
+                                               MinWidth="0">
+                                    <TextBlock Name="PART_SnackbarSupportingText"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               TextAlignment="Center"
+                                               Margin="8"
+                                               Text="{Binding Content}"
+                                               Theme="{StaticResource MaterialSnackbarHostSupportingTextBlock}" />
+                                </controls:Card>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

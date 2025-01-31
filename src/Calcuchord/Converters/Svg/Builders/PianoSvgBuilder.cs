@@ -65,9 +65,6 @@ namespace Calcuchord {
                     y += bw;
                     w -= bw * 2;
                     h -= bw * 2;
-                    // if(is_black) {
-                    //     fs -= bw * 2;
-                    // }
                 }
 
                 string fill = is_black ? bkf : wkf;

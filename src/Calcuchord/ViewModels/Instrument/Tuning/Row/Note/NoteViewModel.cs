@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using MonkeyPaste.Common;
 
 namespace Calcuchord {
     public class NoteViewModel : ViewModelBase<NoteRowViewModel> {
@@ -34,6 +35,8 @@ namespace Calcuchord {
         #endregion
 
         #region Appearance
+
+        public double StringChunkHeight => (RowCount - Parent.Parent.PitchSortedRows.IndexOf(Parent)) + 1;
 
         public string MarkerLabel {
             get {
@@ -263,6 +266,10 @@ namespace Calcuchord {
         #endregion
 
         #region Public Methods
+
+        public override string ToString() {
+            return Note.ToString();
+        }
 
         #endregion
 

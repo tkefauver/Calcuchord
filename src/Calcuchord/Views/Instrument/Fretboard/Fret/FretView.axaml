@@ -66,8 +66,25 @@
         </Style>
         <!-- STRING CHUNK (UNKNOWN) -->
         <Style Selector="Border#StringChunkBorder.unknown">
-            <Setter Property="Background"
-                    Value="{StaticResource UnknownBrush}" />
+            <Setter Property="Background">
+                <Setter.Value>
+                    <!-- UNKNOWN BRUSH -->
+                    <LinearGradientBrush StartPoint="0%,0%"
+                                         EndPoint="5%,0%"
+                                         SpreadMethod="Reflect">
+                        <LinearGradientBrush.Transform>
+                            <SkewTransform AngleX="22" />
+                        </LinearGradientBrush.Transform>
+                        <GradientStops>
+                            <GradientStop Color="Black"
+                                          Offset="0" />
+                            <GradientStop Color="Yellow"
+                                          Offset="1" />
+                        </GradientStops>
+                    </LinearGradientBrush>
+
+                </Setter.Value>
+            </Setter>
         </Style>
 
 
@@ -180,7 +197,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
                 Effect="drop-shadow(1 1 2 black)"
-                Height="{local:MathBinding a={Binding RowCount}, b={Binding RowNum}, exp=a-b}" />
+                Height="{Binding StringChunkHeight}" />
 
 
         <!-- MUTE OVERLAY -->

@@ -25,15 +25,17 @@ namespace Calcuchord {
             Prefs.Init();
             ThemeViewModel.Instance.Init();
 
+            _ = new MainViewModel();
+
             if(ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = new MainViewModel()
+                    DataContext = MainViewModel.Instance
                 };
             } else if(ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform) {
                 singleViewPlatform.MainView = new MainView
                 {
-                    DataContext = new MainViewModel()
+                    DataContext = MainViewModel.Instance
                 };
             }
 

@@ -55,6 +55,8 @@
                      ItemsSource="{Binding Instruments}">
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem">
+                        <Setter Property="Cursor"
+                                Value="Hand" />
                         <Setter Property="Height"
                                 Value="48" />
                         <Setter Property="Padding"
