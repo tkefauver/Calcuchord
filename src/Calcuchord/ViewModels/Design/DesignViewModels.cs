@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using MonkeyPaste.Common;
 
 namespace Calcuchord {
     public class DesignMainViewModel : MainViewModel {
@@ -22,7 +23,8 @@ namespace Calcuchord {
                 new PatternNote(1,new(1,4,NoteType.C,4)),
                 new PatternNote(0,new(0,5,NoteType.E,4))
             });
-
+            NoteGroup.SetParent(ngc);
+            instl.ForEach(x => x.RefreshModelTree());
         }
     }
 }

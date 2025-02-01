@@ -171,17 +171,14 @@ namespace Calcuchord {
             switch(e.PropertyName) {
                 case nameof(IsSelected):
                     if(IsSelected) {
+                        if(Parent.InstrumentType != InstrumentType.Ukulele) {
+
+                        }
+
                         ResetSelection();
                         Prefs.Instance.SelectedTuningId = Id;
                         Prefs.Instance.Save();
                         MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.SelectedTuning));
-                        // if(Parent.IsKeyboard &&
-                        //    AllNotes.OfType<KeyViewModel>() is { } kvml) {
-                        //     kvml.ForEach(x => x.OnPropertyChanged(nameof(x.KeyX)));
-                        //     kvml.ForEach(x => x.OnPropertyChanged(nameof(x.KeyWidth)));
-                        //     kvml.ForEach(x => x.OnPropertyChanged(nameof(x.KeyHeight)));
-                        //     Debug.WriteLine(string.Join(",",kvml.Select(x => x.KeyX)));
-                        // }
                     }
 
                     break;

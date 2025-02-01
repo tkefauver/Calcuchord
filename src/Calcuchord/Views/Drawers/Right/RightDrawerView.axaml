@@ -19,10 +19,6 @@
         </Style>
 
         <Style Selector="StackPanel.options controls|Card">
-            <Setter Property="Padding"
-                    Value="0" />
-            <Setter Property="InsideClipping"
-                    Value="True" />
             <Setter Property="HorizontalAlignment"
                     Value="Center" />
             <Setter Property="MaxHeight"
@@ -93,20 +89,19 @@
             </Button>
             <ScrollViewer Margin="0,20,0,0">
                 <StackPanel Classes="options"
-                            Orientation="Vertical"
                             Margin="10"
                             Spacing="10">
                     <!-- MODE -->
-                    <TextBlock Text="Mode" />
-                    <controls:Card>
-                        <ScrollViewer>
-                            <ItemsControl ItemsSource="{Binding DisplayModeOptions}" />
-                        </ScrollViewer>
-                    </controls:Card>
+                    <!-- <TextBlock Text="Mode" /> -->
+                    <!-- <controls:Card Classes="button-group"> -->
+                    <!--     <ScrollViewer> -->
+                    <!--         <ItemsControl ItemsSource="{Binding DisplayModeOptions}" /> -->
+                    <!--     </ScrollViewer> -->
+                    <!-- </controls:Card> -->
 
                     <!-- PATTERN -->
                     <TextBlock Text="Type" />
-                    <controls:Card>
+                    <controls:Card Classes="button-group">
                         <ScrollViewer>
                             <ItemsControl ItemsSource="{Binding PatternOptions}" />
                         </ScrollViewer>
@@ -114,7 +109,7 @@
 
                     <!-- KEY -->
                     <TextBlock Text="Key" />
-                    <controls:Card>
+                    <controls:Card Classes="button-group">
                         <ScrollViewer>
                             <ItemsControl ItemsSource="{Binding KeyOptions}" />
                         </ScrollViewer>
@@ -122,7 +117,7 @@
 
                     <!-- SUFFIX -->
                     <TextBlock Text="Suffix" />
-                    <controls:Card>
+                    <controls:Card Classes="button-group">
                         <ScrollViewer>
                             <ItemsControl Classes="suffix"
                                           ItemsSource="{Binding SuffixOptions}" />
@@ -132,7 +127,7 @@
                     <!-- SVG -->
 
                     <TextBlock Text="Display" />
-                    <controls:Card>
+                    <controls:Card Classes="button-group">
                         <ScrollViewer>
                             <ItemsControl Classes="svg"
                                           ItemsSource="{Binding SvgOptions}" />

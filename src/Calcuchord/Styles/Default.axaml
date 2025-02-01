@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=netstandard"
         xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
@@ -10,6 +11,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <MergeResourceInclude Source="avares://Calcuchord/Styles/Dictionaries/Fonts.axaml" />
                 <MergeResourceInclude Source="avares://Calcuchord/Styles/Themes/Snackbar/TinySnackbarHost.axaml" />
+                <MergeResourceInclude Source="avares://Calcuchord/Styles/Themes/MaterialButtonlikeToggleButton.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Styles.Resources>
@@ -38,16 +40,13 @@
                 Value="{StaticResource GaramondFont}" />
     </Style>
 
-    <!-- CURSOR -->
-
-    <!-- <Style Selector=":is(Button)"> -->
-    <!--     <Setter Property="Cursor" -->
-    <!--             Value="Hand" /> -->
-    <!-- </Style> -->
-    <!-- <Style Selector=":is(ListBoxItem)"> -->
-    <!--     <Setter Property="Cursor" -->
-    <!--             Value="Hand" /> -->
-    <!-- </Style> -->
+    <!-- ICONS -->
+    <Style Selector="avalonia|MaterialIcon">
+        <Setter Property="Width"
+                Value="{x:Static sys:Double.NaN}" />
+        <Setter Property="Height"
+                Value="{x:Static sys:Double.NaN}" />
+    </Style>
 
     <!-- BUTTONS -->
 
@@ -68,11 +67,14 @@
         <Setter Property="Padding"
                 Value="4" />
     </Style>
-    <Style Selector=":is(Button).float avalonia|MaterialIcon">
-        <Setter Property="Width"
-                Value="24" />
-        <Setter Property="Height"
-                Value="24" />
+    <Style Selector="controls|Card ToggleButton">
+        <Setter Property="Theme"
+                Value="{StaticResource MaterialButtonlikeToggleButton}" />
+    </Style>
+
+    <Style Selector="controls|Card RadioButton">
+        <Setter Property="Theme"
+                Value="{StaticResource MaterialButtonlikeRadioButton}" />
     </Style>
 
     <!-- TRANSITIONS -->
@@ -120,6 +122,43 @@
                     </ContentPresenter.Styles>
                 </ContentPresenter>
             </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <!-- BUTTON GROUP -->
+    <Style Selector="controls|Card.button-group">
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="InsideClipping"
+                Value="True" />
+    </Style>
+
+    <!-- BUSY -->
+    <Style Selector="Border.busy-cntr">
+        <Setter Property="IsHitTestVisible"
+                Value="False" />
+        <Setter Property="Background">
+            <Setter.Value>
+                <SolidColorBrush Color="Black"
+                                 Opacity="0.5" />
+
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Child">
+            <Setter.Value>
+                <!-- ReSharper disable once Xaml.InvalidType -->
+                <Template>
+                    <controls:Card CornerRadius="24"
+                                   Padding="4"
+                                   Margin="4"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center">
+                        <ProgressBar Classes="circular"
+                                     IsIndeterminate="True" />
+                    </controls:Card>
+                    <!-- ReSharper disable once Xaml.InvalidType -->
+                </Template>
+            </Setter.Value>
         </Setter>
     </Style>
 

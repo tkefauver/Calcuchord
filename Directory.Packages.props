@@ -1,12 +1,15 @@
 <Project>
-    <!-- https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management -->
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     </PropertyGroup>
+    <PropertyGroup>
+        <AvaloniaVersion>11.2.3</AvaloniaVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageVersion Include="MonkeyPaste.Common.Avalonia" Version="1.0.3.22"/>
+    </ItemGroup>
     <ItemGroup>
         <PackageVersion Include="Avalonia.Svg.Skia" Version="11.2.0.2"/>
-        <PackageVersion Include="managed-midi" Version="1.10.1"/>
-        <PackageVersion Include="MonkeyPaste.Common.Avalonia" Version="1.0.3.21"/>
         <PackageVersion Include="org.matheval" Version="1.0.0.3"/>
         <PackageVersion Include="Svg.Skia" Version="2.0.0.4"/>
         <PackageVersion Include="WebView.Avalonia.Linux" Version="11.0.0.1"/>

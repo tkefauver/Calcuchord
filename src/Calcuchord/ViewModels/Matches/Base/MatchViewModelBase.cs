@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows.Input;
 using Avalonia.Controls;
 using MonkeyPaste.Common;
+using MonkeyPaste.Common.Avalonia;
 
 namespace Calcuchord {
     public abstract class MatchViewModelBase : ViewModelBase {
@@ -82,7 +83,6 @@ namespace Calcuchord {
         public abstract MusicPatternType MatchPatternType { get; }
 
         public bool IsSelected { get; set; }
-        public bool IsHovering { get; set; }
 
         #endregion
 
@@ -192,6 +192,13 @@ namespace Calcuchord {
                 }
 
                 mvm.SelectedMatch = this;
+
+                if(MatchesView.Instance is not { } msv ||
+                   msv.GetVisualDescendants<MatchView>().FirstOrDefault(x => x.DataContext == this) is not { } mv) {
+                    return;
+                }
+
+                mv.BringIntoView();
             });
 
         #endregion

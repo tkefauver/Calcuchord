@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -7,6 +8,8 @@ using WebViewCore.Configurations;
 
 namespace Calcuchord {
     public class WebViewHelperBase : IWebViewHelper {
+        public virtual bool IsSupported => !OperatingSystem.IsLinux();
+
         public virtual string ToneUrl {
             get {
                 if(PlatformWrapper.StorageHelper is { } sh &&

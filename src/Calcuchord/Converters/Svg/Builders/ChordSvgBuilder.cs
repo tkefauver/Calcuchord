@@ -249,8 +249,8 @@ namespace Calcuchord {
                                 last_barre_note = null;
                                 cur_bar_extent = null;
                             } else {
-                                // bar rect
-                                AddRect(bg_g,fret_bg,Transparent,curx,bar_y,fw,BarHeight,0);
+                                // bar rect (adding extra 1 to left/right to cover bg grid)
+                                AddRect(bg_g,fret_bg,Transparent,curx - 1,bar_y,fw + 2,BarHeight,0);
                                 last_barre_note = fret_note ?? last_barre_note;
                             }
                         }

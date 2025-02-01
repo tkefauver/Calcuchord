@@ -12,6 +12,7 @@ namespace Calcuchord {
         string ToneUrl { get; }
         void InitEnv(WebViewCreationProperties config);
         bool ConfigureWebView(WebView wv);
+        bool IsSupported { get; }
     }
 
     public interface IProgressIndicator {

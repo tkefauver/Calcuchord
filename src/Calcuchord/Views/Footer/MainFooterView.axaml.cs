@@ -3,8 +3,8 @@ using PropertyChanged;
 
 namespace Calcuchord {
     [DoNotNotify]
-    public partial class MatchCarouselView : UserControl {
-        public MatchCarouselView() {
+    public partial class MainFooterView : UserControl {
+        public MainFooterView() {
             InitializeComponent();
         }
     }

@@ -32,6 +32,7 @@ namespace Calcuchord {
         NutFg,
         PianoWhiteKeyBg,
         PianoWhiteKeyBg2,
+        PianoWhiteKeyBg3,
         PianoWhiteKeyFg,
         PianoBlackKeyBg,
         PianoBlackKeyBg2,
@@ -171,6 +172,14 @@ namespace Calcuchord {
                         {
                             PaletteColorType.PianoWhiteKeyBg,
                             ("#FFFFFF","#000000")
+                        },
+                        {
+                            PaletteColorType.PianoWhiteKeyBg2,
+                            ("#FFFFFF","#222222")
+                        },
+                        {
+                            PaletteColorType.PianoWhiteKeyBg3,
+                            ("#FFFFFF","#444444")
                         },
                         {
                             PaletteColorType.PianoWhiteKeyFg,

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Avalonia.Data;
@@ -47,13 +48,17 @@ namespace Calcuchord {
                 var errors = Exp.GetError();
                 if(errors.Count == 0) {
                     double result = Exp.Eval<double>();
+                    if(!result.IsNumber() || result == 0) {
+
+                    }
+
                     return result;
                 }
 
                 // get variables
                 var variables = Exp.getVariables();
                 foreach(string variable in variables) {
-                    Console.WriteLine(variable); // will print x, a
+                    Debug.WriteLine(variable); // will print x, a
                 }
 
                 return null;

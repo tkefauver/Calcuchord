@@ -1,0 +1,81 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=netstandard"
+                    xmlns:assists="clr-namespace:Material.Styles.Assists"
+                    xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple">
+    <!-- RadioButton but looks like buttons -->
+    <ControlTheme x:Key="MaterialButtonlikeToggleButton"
+                  TargetType="ToggleButton"
+                  BasedOn="{StaticResource {x:Type RadioButton}}">
+        <Setter Property="VerticalContentAlignment"
+                Value="Center" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        <Setter Property="Foreground"
+                Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        <Setter Property="ClipToBounds"
+                Value="False" />
+        <Setter Property="Padding"
+                Value="16 4" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border Name="PART_RootBorder">
+                        <Panel Name="PART_RootPanel">
+                            <ripple:RippleEffect Name="PART_Ripple">
+                                <ContentPresenter Name="PART_ContentPresenter"
+                                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                  Content="{TemplateBinding Content}"
+                                                  Padding="{TemplateBinding Padding}"
+                                                  TextBlock.Foreground="{TemplateBinding Foreground}"
+                                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            </ripple:RippleEffect>
+                            <Border Name="PART_BehaviourEffect" />
+                        </Panel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style Selector="^ /template/ Border#PART_BehaviourEffect">
+            <Setter Property="Opacity"
+                    Value="0" />
+            <Setter Property="Background"
+                    Value="{DynamicResource MaterialFlatButtonRippleBrush}" />
+            <Setter Property="IsHitTestVisible"
+                    Value="False" />
+        </Style>
+
+        <Style Selector="^ /template/ ripple|RippleEffect#PART_Ripple">
+            <Setter Property="RippleFill"
+                    Value="{DynamicResource MaterialFlatButtonRippleBrush}" />
+        </Style>
+
+        <Style Selector="^:not(.no-transitions) /template/ Border#PART_BehaviourEffect">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity"
+                                      Duration="0.2"
+                                      Easing="CircularEaseOut" />
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="^:checked /template/ Border#PART_BehaviourEffect">
+            <Setter Property="Opacity"
+                    Value="0.24" />
+        </Style>
+
+        <Style Selector="^.accent">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource MaterialSecondaryMidBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource MaterialSecondaryMidBrush}" />
+        </Style>
+    </ControlTheme>
+</ResourceDictionary>

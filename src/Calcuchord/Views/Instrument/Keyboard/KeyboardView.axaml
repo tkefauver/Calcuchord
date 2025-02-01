@@ -13,7 +13,7 @@
              x:DataType="local:TuningViewModel"
              x:Class="Calcuchord.KeyboardView">
     <UserControl.Resources>
-        <RadialGradientBrush x:Key="BlackKeyBrush">
+        <RadialGradientBrush x:Key="BlackKeyBgBrush">
             <RadialGradientBrush.GradientStops>
                 <GradientStops>
                     <GradientStop Color="{DynamicResource PianoBlackKeyBg3Color}"
@@ -27,15 +27,29 @@
             </RadialGradientBrush.GradientStops>
         </RadialGradientBrush>
 
+        <RadialGradientBrush x:Key="WhiteKeyBgBrush">
+            <RadialGradientBrush.GradientStops>
+                <GradientStops>
+                    <GradientStop Color="{DynamicResource PianoWhiteKeyBg3Color}"
+                                  Offset="0" />
+                    <GradientStop Color="{DynamicResource PianoWhiteKeyBg2Color}"
+                                  Offset="0.4" />
+                    <GradientStop Color="{DynamicResource PianoWhiteKeyBgColor}"
+                                  Offset="1" />
+                </GradientStops>
+
+            </RadialGradientBrush.GradientStops>
+        </RadialGradientBrush>
+
     </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="local|KeyView">
             <Setter Property="BorderThickness"
                     Value="2" />
-            <Setter Property="Background"
-                    Value="{DynamicResource PianoWhiteKeyBg}" />
             <Setter Property="BorderBrush"
                     Value="{DynamicResource PianoWhiteKeyFg}" />
+            <Setter Property="Background"
+                    Value="{DynamicResource WhiteKeyBgBrush}" />
         </Style>
 
         <Style Selector="local|KeyView.black">
@@ -44,22 +58,8 @@
             <Setter Property="BorderBrush"
                     Value="{DynamicResource PianoBlackKeyFg}" />
             <Setter Property="Background"
-                    Value="{StaticResource BlackKeyBrush}" />
+                    Value="{StaticResource BlackKeyBgBrush}" />
         </Style>
-
-        <!-- <Style Selector="local|KeyView TextBlock"> -->
-        <!--     <Setter Property="FontSize" -->
-        <!--             Value="14" /> -->
-        <!--     <Setter Property="Padding" -->
-        <!--             Value="5,3" /> -->
-        <!-- </Style> -->
-        <!-- -->
-        <!-- <Style Selector="local|KeyView.black TextBlock"> -->
-        <!--     <Setter Property="FontSize" -->
-        <!--             Value="12" /> -->
-        <!--     <Setter Property="Padding" -->
-        <!--             Value="0.5" /> -->
-        <!-- </Style> -->
 
         <Style Selector="local|KeyView.desired-root TextBlock">
             <Setter Property="Background"

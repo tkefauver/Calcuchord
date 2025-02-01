@@ -1,6 +1,9 @@
 <Project>
-	<PropertyGroup>
-		<AvaloniaVersion>11.2.3</AvaloniaVersion>
-		<DotNetVersion>8.0</DotNetVersion>
-	</PropertyGroup>
+    <PropertyGroup>
+        <DotNetVersion>8.0</DotNetVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Browser'))">
+        <!-- This may not be needed -->
+        <DotNetVersion>9.0</DotNetVersion>
+    </PropertyGroup>
 </Project>

@@ -41,22 +41,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="AttachedProperties\"/>
-        <Folder Include="Models\Providers\Patterns\"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Update="Views\Drawers\Left\LeftDrawerView.axaml.cs">
-            <DependentUpon>LeftDrawerView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Drawers\Right\RightDrawerView.axaml.cs">
-            <DependentUpon>LeftDrawerView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
         <Compile Remove="Util\MidiPlayer\MidiPlayer.linux.cs"/>
     </ItemGroup>
 

@@ -16,76 +16,127 @@
     <Design.DataContext>
         <local:DesignChordMatchViewModel />
     </Design.DataContext>
-    <Border x:Name="MatchContainerBorder"
-            Background="{DynamicResource HttTransparent}"
-            PointerReleased="MatchContainerBorder_OnPointerReleased"
-            BorderThickness="1">
+    <UserControl.Styles>
+        <!-- MATCH BG -->
+        <Style Selector="Border#MatchContainerBorder">
+            <Setter Property="Transitions">
+                <Setter.Value>
+                    <Transitions>
+                        <BoxShadowsTransition Property="BoxShadow"
+                                              Duration="0:0:0.25" />
+                    </Transitions>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BoxShadow"
+                    Value="5 5 10 0 transparent" />
+        </Style>
+        <Style Selector="Border#MatchContainerBorder:pointerover:not(.selected) Svg">
+            <Setter Property="Cursor"
+                    Value="Hand" />
+        </Style>
 
-        <Grid RowDefinitions="Auto,*,Auto">
-            <!-- TITLE -->
-            <TextBlock x:Name="MatchTitleTextBlock"
-                       HorizontalAlignment="Center"
-                       TextAlignment="Center"
-                       VerticalAlignment="Center">
-                <TextBlock.Inlines>
-                    <Run Text="{Binding PrimaryLabel}"
-                         FontWeight="Bold"
-                         FontSize="48" />
-                    <Run Text="{Binding SecondaryLabel}"
-                         FontSize="36" />
-                    <Run Text="{Binding TertiaryLabel}"
-                         FontSize="14"
-                         BaselineAlignment="TextTop" />
-                </TextBlock.Inlines>
-            </TextBlock>
+        <Style Selector="Border#MatchContainerBorder:pointerover, Border#MatchContainerBorder.selected">
+            <Setter Property="BoxShadow"
+                    Value="5 5 10 0 DarkGray" />
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource Fg}" />
+        </Style>
+        <Style Selector="Border#MatchContainerBorder:pointerover.dark">
+            <Setter Property="BoxShadow"
+                    Value="5 5 10 0 Silver" />
+        </Style>
 
-            <Svg x:Name="MatchSvg"
-                 Grid.Row="1"
-                 Source="{Binding NoteGroup, Converter={x:Static local:MatchToSvgConverter.Instance}}"
-                 Stretch="Uniform" />
-            <StackPanel x:Name="MatchButtonStripPanel"
-                        Grid.Row="2"
-                        Margin="10"
-                        Spacing="20"
-                        Classes="fade"
-                        HorizontalAlignment="Center"
-                        Orientation="Horizontal">
-                <StackPanel.Styles>
-                    <Style Selector="ToggleButton">
-                        <Setter Property="Padding"
-                                Value="3" />
-                        <Setter Property="MinWidth"
-                                Value="48" />
-                        <Setter Property="Height"
-                                Value="{Binding $self.Bounds.Width}" />
-                    </Style>
-                    <Style Selector="avalonia|MaterialIcon">
-                        <Setter Property="MinWidth"
-                                Value="36" />
-                        <Setter Property="Height"
-                                Value="{Binding $self.Bounds.Width}" />
-                    </Style>
-                </StackPanel.Styles>
+        <!-- MATCH BTNS -->
 
-                <!-- SET NECK BTN -->
-                <ToggleButton IsChecked="{Binding IsMatchPlaying, Mode=OneWay}"
-                              Command="{Binding SetMatchToInstrumentCommand}">
-                    <avalonia:MaterialIcon Kind="ContentCopy" />
-                </ToggleButton>
+        <Style Selector="StackPanel#MatchButtonStripPanel">
+            <Setter Property="Opacity"
+                    Value="0" />
+        </Style>
+        <Style
+            Selector="Border#MatchContainerBorder:pointerover StackPanel#MatchButtonStripPanel, Border#MatchContainerBorder.selected StackPanel#MatchButtonStripPanel">
+            <Setter Property="Opacity"
+                    Value="1" />
+        </Style>
+    </UserControl.Styles>
+    <Viewbox>
+        <Border x:Name="MatchContainerBorder"
+                Background="{DynamicResource HttTransparent}"
+                BorderThickness="1"
+                Margin="10"
+                Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
+                Classes.selected="{Binding IsSelected}"
+                MaxWidth="{Binding DefaultMatchWidth, Source={x:Static local:MainViewModel.Instance}}"
+                PointerReleased="MatchContainerBorder_OnPointerReleased">
 
-                <!-- PLAY SAMPLE BTN -->
-                <ToggleButton IsChecked="{Binding IsMatchPlaying, Mode=OneWay}"
-                              Command="{Binding ToggleMatchPlaybackCommand}">
-                    <avalonia:MaterialIcon Kind="{Binding PlaybackIcon}" />
-                </ToggleButton>
+            <Grid RowDefinitions="Auto,*,Auto">
+                <!-- TITLE -->
+                <TextBlock x:Name="MatchTitleTextBlock"
+                           HorizontalAlignment="Center"
+                           TextAlignment="Center"
+                           VerticalAlignment="Center">
+                    <TextBlock.Inlines>
+                        <Run Text="{Binding PrimaryLabel}"
+                             FontWeight="Bold"
+                             FontSize="48" />
+                        <Run Text="{Binding SecondaryLabel}"
+                             FontSize="36" />
+                        <Run Text="{Binding TertiaryLabel}"
+                             FontSize="14"
+                             BaselineAlignment="TextTop" />
+                    </TextBlock.Inlines>
+                </TextBlock>
 
-                <!-- BOOKMARK BTN  -->
-                <ToggleButton IsChecked="{Binding IsBookmarked, Mode=OneWay}"
-                              Command="{Binding ToggleBookmarkCommand}">
-                    <avalonia:MaterialIcon Kind="{Binding BookmarkIcon}" />
-                </ToggleButton>
-            </StackPanel>
+                <Svg x:Name="MatchSvg"
+                     Grid.Row="1"
+                     Source="{Binding NoteGroup, Converter={x:Static local:MatchToSvgConverter.Instance}}"
+                     Stretch="Uniform" />
+                <StackPanel x:Name="MatchButtonStripPanel"
+                            Grid.Row="2"
+                            Margin="10"
+                            Spacing="20"
+                            Classes="fade"
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal">
+                    <StackPanel.Styles>
+                        <Style Selector="ToggleButton">
+                            <Setter Property="Theme"
+                                    Value="{StaticResource MaterialFlatToggleButton}" />
+                            <Setter Property="Padding"
+                                    Value="3" />
+                            <Setter Property="MinWidth"
+                                    Value="48" />
+                            <Setter Property="Height"
+                                    Value="{Binding $self.Bounds.Width}" />
+                        </Style>
+                        <Style Selector="avalonia|MaterialIcon">
+                            <Setter Property="MinWidth"
+                                    Value="36" />
+                            <Setter Property="Height"
+                                    Value="{Binding $self.Bounds.Width}" />
+                        </Style>
+                    </StackPanel.Styles>
 
-        </Grid>
-    </Border>
+                    <!-- SET NECK BTN -->
+                    <ToggleButton IsChecked="{Binding IsMatchPlaying, Mode=OneWay}"
+                                  Command="{Binding SetMatchToInstrumentCommand}">
+                        <avalonia:MaterialIcon Kind="ContentCopy" />
+                    </ToggleButton>
+
+                    <!-- PLAY SAMPLE BTN -->
+                    <ToggleButton IsChecked="{Binding IsMatchPlaying, Mode=OneWay}"
+                                  Command="{Binding ToggleMatchPlaybackCommand}">
+                        <avalonia:MaterialIcon Kind="{Binding PlaybackIcon}" />
+                    </ToggleButton>
+
+                    <!-- BOOKMARK BTN  -->
+                    <ToggleButton IsChecked="{Binding IsBookmarked, Mode=OneWay}"
+                                  Command="{Binding ToggleBookmarkCommand}">
+                        <avalonia:MaterialIcon Kind="{Binding BookmarkIcon}" />
+                    </ToggleButton>
+                </StackPanel>
+
+            </Grid>
+        </Border>
+
+    </Viewbox>
 </UserControl>

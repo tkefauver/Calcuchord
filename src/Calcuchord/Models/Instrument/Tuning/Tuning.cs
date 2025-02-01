@@ -10,18 +10,7 @@ namespace Calcuchord {
 
         #region Members
 
-        string _id;
-
-        public string Id {
-            get => _id;
-            set {
-                if(_id == "c2a9ea0c-1e64-46fa-8b09-92f675b19917" || value == "c2a9ea0c-1e64-46fa-8b09-92f675b19917") {
-
-                }
-
-                _id = value;
-            }
-        }
+        public string Id { get; set; }
 
 
         public string Name { get; set; }

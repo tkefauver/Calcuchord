@@ -14,7 +14,6 @@
              x:Class="Calcuchord.MainHeaderView">
     <controls:ColorZone VerticalAlignment="Top"
                         HorizontalAlignment="Stretch"
-                        DockPanel.Dock="Top"
                         Height="56"
                         Mode="PrimaryMid"
                         ZIndex="1">

@@ -11,10 +11,7 @@ namespace Calcuchord {
 
         public string Name { get; set; }
 
-
         public InstrumentType InstrumentType { get; set; }
-
-
         public double? NeckLengthInInches { get; set; }
 
 

@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="360"
+             d:DesignHeight="56"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:MainViewModel"
+             x:Class="Calcuchord.MainFooterView">
+    <UserControl.Styles>
+        <Style Selector="RadioButton">
+            <Setter Property="Cursor"
+                    Value="Hand" />
+            <Setter Property="GroupName"
+                    Value="ModeGroup" />
+            <Setter Property="Theme"
+                    Value="{StaticResource MaterialButtonlikeRadioButton}" />
+            <Setter Property="Margin"
+                    Value="0" />
+            <Setter Property="Padding"
+                    Value="0" />
+        </Style>
+        <Style Selector="avalonia|MaterialIcon">
+            <Setter Property="Margin"
+                    Value="15" />
+        </Style>
+    </UserControl.Styles>
+    <controls:ColorZone Mode="Inverted"
+                        HorizontalAlignment="Stretch"
+                        Height="56">
+
+        <UniformGrid Columns="3">
+            <RadioButton DataContext="{Binding SearchOptionViewModel}"
+                         IsChecked="{Binding IsChecked, Mode=OneWay}"
+                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}"
+                         CommandParameter="{Binding .}"
+                         Classes="">
+                <avalonia:MaterialIcon Kind="Magnify" />
+            </RadioButton>
+
+            <RadioButton DataContext="{Binding BookmarksOptionViewModel}"
+                         IsChecked="{Binding IsChecked, Mode=OneWay}"
+                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}"
+                         CommandParameter="{Binding .}"
+                         Classes="">
+                <avalonia:MaterialIcon Kind="Bookmark" />
+            </RadioButton>
+
+            <RadioButton DataContext="{Binding IndexOptionViewModel}"
+                         IsChecked="{Binding IsChecked, Mode=OneWay}"
+                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}"
+                         CommandParameter="{Binding .}"
+                         Classes="">
+                <avalonia:MaterialIcon Kind="Database" />
+            </RadioButton>
+
+        </UniformGrid>
+    </controls:ColorZone>
+</UserControl>

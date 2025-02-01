@@ -1,4 +1,6 @@
 using System;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json.Converters;
 
 namespace Calcuchord {
     public enum NoteMarkerState {
@@ -30,6 +32,7 @@ namespace Calcuchord {
         Bars = 128
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum NoteType {
         C,
         Db,
@@ -45,6 +48,7 @@ namespace Calcuchord {
         B
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum InstrumentType {
         Guitar,
         Ukulele,
@@ -52,18 +56,21 @@ namespace Calcuchord {
         Custom
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MusicPatternType {
         Chords,
         Scales,
         Modes
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum DisplayModeType {
         Search,
         Bookmarks,
         Index
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum OptionType {
         Pattern,
         DisplayMode,
@@ -77,6 +84,7 @@ namespace Calcuchord {
     // _ = '/'
     // Num = ''
     // sharp = 'sharp'
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ScaleSuffixType {
         Major,
         NaturalMinor,
@@ -87,6 +95,7 @@ namespace Calcuchord {
         Blues
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ModeSuffixType {
         Dorian,
         Phrygian,
@@ -100,6 +109,7 @@ namespace Calcuchord {
         // Aeolian
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ChordSuffixType {
         major,
         minor,

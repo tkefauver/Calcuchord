@@ -12,45 +12,63 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.MatchesView">
-    <UserControl.Styles>
-        <Style Selector="local|MatchView.thumb">
-            <Setter Property="Margin"
-                    Value="5" />
-        </Style>
-        <Style Selector="local|MatchView.thumb Border#MatchContainerBorder">
-            <Setter Property="Transitions">
-                <Setter.Value>
-                    <Transitions>
-                        <BoxShadowsTransition Property="BoxShadow"
-                                              Duration="0:0:0.25" />
-                    </Transitions>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style
-            Selector="local|MatchView.thumb.hover Border#MatchContainerBorder, local|MatchView.thumb.selected Border#MatchContainerBorder">
-            <Setter Property="BoxShadow"
-                    Value="5 5 10 0 DarkGray" />
-            <Setter Property="BorderBrush"
-                    Value="{DynamicResource Fg}" />
-        </Style>
-        <Style Selector="local|MatchView.thumb.dark.hover Border#MatchContainerBorder">
-            <Setter Property="BoxShadow"
-                    Value="5 5 10 0 Silver" />
-        </Style>
+    <Grid RowDefinitions="Auto,*">
+        <!-- ZOOM BTNS -->
+        <controls:Card Grid.Row="0"
+                       Classes="button-group"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Margin="10">
+            <StackPanel Orientation="Horizontal">
+                <!-- ZOOM OUT (COLS+1) -->
+                <Button x:Name="ZoomMinusButton"
+                        Classes="float"
+                        IsEnabled="{Binding CanIncreaseMatchColCount}"
+                        Command="{Binding IncreaseMatchColumnsCommand}">
+                    <avalonia:MaterialIcon Kind="Minus" />
+                </Button>
+                <!-- ZOOM IN (COLS-1) -->
+                <Button x:Name="ZoomPlusButton"
+                        Classes="float"
+                        IsEnabled="{Binding CanDecreaseMatchColCount}"
+                        Command="{Binding DecreaseMatchColumnsCommand}">
+                    <avalonia:MaterialIcon Kind="Plus" />
+                </Button>
+            </StackPanel>
+        </controls:Card>
 
-        <Style Selector="StackPanel#MatchButtonStripPanel">
-            <Setter Property="Opacity"
-                    Value="0" />
-        </Style>
-        <Style Selector="local|MatchView.thumb.hover StackPanel#MatchButtonStripPanel">
-            <Setter Property="Opacity"
-                    Value="1" />
-        </Style>
-    </UserControl.Styles>
-    <Grid>
-        <local:MatchGalleryView x:Name="MatchGallery" />
-        <!-- <local:MatchCarouselView x:Name="MatchCarousel" /> -->
+        <ScrollViewer x:Name="MatchGalleryScrollViewer"
+                      Grid.Row="1"
+                      Padding="5,0">
+            <!-- NOTE no margin/padding on repeater to get accurate bounds -->
+            <ItemsRepeater x:Name="MatchItemsRepeater"
+                           ItemsSource="{Binding Matches}">
+                <ItemsRepeater.RenderTransform>
+                    <TranslateTransform />
+                </ItemsRepeater.RenderTransform>
+                <ItemsRepeater.Layout>
+                    <WrapLayout Orientation="Horizontal" />
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="local:MatchViewModelBase">
+                        <local:MatchView Background="{DynamicResource HttTransparent}"
+                                         Width="{Binding MatchWidth, Source={x:Static local:MainViewModel.Instance}}" />
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+        </ScrollViewer>
+
+        <Border x:Name="MatchesBusyOverlay"
+                Grid.Row="0"
+                Grid.RowSpan="2"
+                Classes="busy-cntr">
+            <Border.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                    <Binding Path="IsSearchInitiating" />
+                    <Binding Path="IsMatchZoomChanging" />
+                </MultiBinding>
+            </Border.IsVisible>
+        </Border>
     </Grid>
 
 </UserControl>

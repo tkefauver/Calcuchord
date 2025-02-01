@@ -16,20 +16,20 @@
     <Design.DataContext>
         <local:DesignMainViewModel />
     </Design.DataContext>
+    <UserControl.Styles>
+        <!-- SNACKBAR TOAST -->
+        <Style Selector="controls|SnackbarHost /template/ controls|Card">
+            <Setter Property="CornerRadius"
+                    Value="7" />
+            <Setter Property="MinWidth"
+                    Value="0" />
+        </Style>
+
+        <!-- MATCHES BG -->
+
+    </UserControl.Styles>
     <Grid x:Name="MainOuterContainer">
-        <!-- <wv:WebView x:Name="HiddenWebview" -->
-        <!--             IsVisible="False" -->
-        <!--             Width="1" -->
-        <!--             Height="1" /> -->
         <dialogHostAvalonia:DialogHost Identifier="MainDialogHost">
-            <dialogHostAvalonia:DialogHost.Styles>
-                <Style Selector="controls|SnackbarHost /template/ controls|Card">
-                    <Setter Property="CornerRadius"
-                            Value="7" />
-                    <Setter Property="MinWidth"
-                            Value="0" />
-                </Style>
-            </dialogHostAvalonia:DialogHost.Styles>
             <controls:SnackbarHost HostName="Root"
                                    Theme="{StaticResource TinySnackbarHost}"
                                    SnackbarHorizontalAlignment="Center"
@@ -48,8 +48,11 @@
                         <!-- HEADER MENU -->
                         <local:MainHeaderView x:Name="HeaderView"
                                               DockPanel.Dock="Top" />
+                        <local:MainFooterView x:Name="FooterView"
+                                              DockPanel.Dock="Bottom" />
 
                         <Grid x:Name="MainContainerGrid"
+                              Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
                               RowDefinitions="Auto,*">
                             <!-- BG IMAGE -->
                             <Image Grid.RowSpan="2"
@@ -60,7 +63,8 @@
                                    Stretch="None" />
                             <!-- INSTRUMENT VIEW -->
                             <local:InstrumentView Grid.Row="0"
-                                                  MaxHeight="{local:MathBinding a={Binding $parent.Bounds.Height}, exp=a*0.3}"
+                                                  IsVisible="{Binding IsInstrumentVisible, Source={x:Static local:MainViewModel.Instance}}"
+                                                  MaxHeight="{local:MathBinding a={Binding $parent.Bounds.Height}, exp=a*0.35}"
                                                   DataContext="{Binding SelectedInstrument}" />
 
                             <!-- MATCHES VIEW -->
@@ -73,6 +77,10 @@
                                                  ElementName="EmptyTextBlock" />
                                     </MultiBinding>
                                 </local:MatchesView.IsVisible>
+                                <local:MatchesView.Background>
+                                    <SolidColorBrush Color="{DynamicResource BgColor}"
+                                                     Opacity="0.3" />
+                                </local:MatchesView.Background>
                             </local:MatchesView>
 
                             <StackPanel x:Name="SearchOverlay"
@@ -143,26 +151,12 @@
             </controls:SnackbarHost>
         </dialogHostAvalonia:DialogHost>
         <Border x:Name="MainContainerBusyOverlay"
-                IsHitTestVisible="False">
+                Classes="busy-cntr">
             <Border.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.Or}">
                     <Binding Path="IsBusy" />
-                    <Binding Path="IsLoadingMatches" />
-                    <Binding Path="IsMatchZoomChanging" />
                 </MultiBinding>
             </Border.IsVisible>
-            <Border.Background>
-                <SolidColorBrush Color="Black"
-                                 Opacity="0.5" />
-            </Border.Background>
-            <controls:Card CornerRadius="24"
-                           Padding="4"
-                           Margin="4"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center">
-                <ProgressBar Classes="circular"
-                             IsIndeterminate="True" />
-            </controls:Card>
         </Border>
 
     </Grid>
