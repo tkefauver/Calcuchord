@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using MonkeyPaste.Common;
 using Newtonsoft.Json;
 
@@ -10,7 +12,7 @@ namespace Calcuchord {
 
         #region Members
 
-        public string Id { get; set; }
+        public string Id { get; private set; }
 
 
         public string Name { get; set; }
@@ -95,6 +97,15 @@ namespace Calcuchord {
                     col.SetParent(this);
                 }
             }
+        }
+
+        public void CreateId() {
+            if(!string.IsNullOrEmpty(Id)) {
+                // error
+                Debugger.Break();
+            }
+
+            Id = Guid.NewGuid().ToString();
         }
 
         public void ClearCollections() {

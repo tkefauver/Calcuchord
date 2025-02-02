@@ -66,6 +66,9 @@ namespace Calcuchord {
 
         #region Instrument
 
+        public ViewModelBase EditModeViewModel { get; set; }
+
+
         public ObservableCollection<InstrumentViewModel> Instruments { get; } = [];
 
         public InstrumentViewModel SelectedInstrument {
@@ -414,6 +417,8 @@ namespace Calcuchord {
 
             if(needs_save) {
                 InitInstrument();
+            } else {
+                InitSelection();
             }
 
             IsBusy = false;
@@ -718,51 +723,6 @@ namespace Calcuchord {
 
         #region Instruments
 
-        void TestInstruments() {
-
-            if(Instruments
-                   .FirstOrDefault(x => x.Instrument.InstrumentType == InstrumentType.Guitar) is { } guitar_vm) {
-                if(guitar_vm.Tunings.FirstOrDefault(x => x.Tuning.Name == "Open D") is not { } open_d) {
-                    guitar_vm.AddTuningCommand.Execute(
-                        new object[]
-                        {
-                            new[] { "D3","A3","D3","F#3","A3","D4" }.Select(x => Note.Parse(x)),
-                            0,
-                            "Open D"
-                        });
-                } else if(guitar_vm.Tunings.FirstOrDefault(x => x.Tuning.Name == "Standard") is { } std) {
-                    std.IsSelected = false;
-                    std.IsSelected = true;
-                }
-            }
-
-            if(Instruments
-                   .FirstOrDefault(x => x.Instrument.InstrumentType == InstrumentType.Ukulele) is { } ukulele_vm) {
-                SelectedInstrument = ukulele_vm;
-                if(ukulele_vm.Tunings.FirstOrDefault(x => x.Tuning.Name == "Standard") is { } std) {
-                    std.IsSelected = false;
-                    std.IsSelected = true;
-                }
-            }
-
-            if(Instruments
-                   .FirstOrDefault(x => x.Instrument.InstrumentType == InstrumentType.Piano) is { } piano_vm) {
-                SelectedInstrument = piano_vm;
-                if(piano_vm.Tunings.FirstOrDefault(x => x.Tuning.Name == "Standard") is { } std) {
-                    std.IsSelected = false;
-                    std.IsSelected = true;
-                }
-            }
-        }
-
-        void TestSvg() {
-
-            new PianoSvgBuilder().Test(
-                SelectedTuning.Tuning,SelectedTuning.Tuning.Chords.SelectMany(x => x.Groups));
-            new PianoSvgBuilder().Test(
-                SelectedTuning.Tuning,SelectedTuning.Tuning.Scales.SelectMany(x => x.Groups));
-        }
-
         async Task<InstrumentViewModel> CreateInstrumentAsync(Instrument instrument) {
             InstrumentViewModel ivm = new InstrumentViewModel(this);
             await ivm.InitAsync(instrument);
@@ -806,30 +766,46 @@ namespace Calcuchord {
         }
 
         public static IEnumerable<Instrument> CreateDefaultInstruments() {
+            // var instl = new List<Instrument>();
+            // var std_inst_lookup = new Dictionary<InstrumentType,(string[],int,double?)>
+            // {
+            //     { InstrumentType.Guitar,(["E2","A2","D3","G3","B3","E4"],23,25.5d) },
+            //     { InstrumentType.Ukulele,(["G4","C4","E4","A4"],15,13d) },
+            //     { InstrumentType.Piano,(["C3"],24,null) }
+            // };
+            // foreach(var kvp in std_inst_lookup) {
+            //     Tuning tuning = new Tuning("Standard",true,true);
+            //     tuning.Id = Guid.NewGuid().ToString();
+            //     tuning.OpenNotes.AddRange(
+            //         kvp.Value.Item1.Select(
+            //             (x,idx) =>
+            //                 new InstrumentNote(
+            //                     0,
+            //                     idx,
+            //                     Note.Parse(x))));
+            //     Instrument inst = new Instrument(
+            //         kvp.Key.ToString(),kvp.Key,kvp.Value.Item2,kvp.Value.Item1.Length,kvp.Value.Item3);
+            //     inst.Tunings.Add(tuning);
+            //     instl.Add(inst);
+            // }
+            //
+            // return instl;
+            InstrumentType[] def_types =
+            [
+                InstrumentType.Guitar,
+                InstrumentType.Ukulele,
+                InstrumentType.Piano
+            ];
             var instl = new List<Instrument>();
-            var std_inst_lookup = new Dictionary<InstrumentType,(string[],int,double?)>
-            {
-                { InstrumentType.Guitar,(["E2","A2","D3","G3","B3","E4"],23,25.5d) },
-                { InstrumentType.Ukulele,(["G4","C4","E4","A4"],15,13d) },
-                { InstrumentType.Piano,(["C3"],24,null) }
-            };
-            foreach(var kvp in std_inst_lookup) {
-                Tuning tuning = new Tuning("Standard",true,true);
-                tuning.Id = Guid.NewGuid().ToString();
-                tuning.OpenNotes.AddRange(
-                    kvp.Value.Item1.Select(
-                        (x,idx) =>
-                            new InstrumentNote(
-                                0,
-                                idx,
-                                Note.Parse(x))));
-                Instrument inst = new Instrument(
-                    kvp.Key.ToString(),kvp.Key,kvp.Value.Item2,kvp.Value.Item1.Length,kvp.Value.Item3);
-                inst.Tunings.Add(tuning);
-                instl.Add(inst);
+            foreach(InstrumentType def_type in def_types) {
+                Instrument def_inst = Instrument.CreateByType(def_type,true);
+                instl.Add(def_inst);
             }
 
             return instl;
+            // yield return Instrument.CreateByType(InstrumentType.Guitar,true);
+            // yield return Instrument.CreateByType(InstrumentType.Ukulele,true);
+            // yield return Instrument.CreateByType(InstrumentType.Piano,true);
         }
 
         #endregion
@@ -837,6 +813,50 @@ namespace Calcuchord {
         #endregion
 
         #region Commands
+
+        public ICommand CancelAddInstrumentCommand => new MpCommand(() => {
+            EditModeViewModel = null;
+        });
+
+        public ICommand AddInstrumentCommand => new MpAsyncCommand(async () => {
+            IsLeftDrawerOpen = false;
+            await Task.Delay(500);
+            Instrument new_inst = new Instrument
+            {
+                //Name = GetUniqueInstrumentName(),
+                // InstrumentType = InstrumentType.Other,
+                // FretCount = 23,
+                // StringCount = 6
+            };
+
+            InstrumentViewModel new_inst_vm = await CreateInstrumentAsync(new_inst);
+            new_inst_vm.IsEditModeEnabled = true;
+            EditModeViewModel = new_inst_vm;
+            while(true) {
+                if(EditModeViewModel == null) {
+                    // create canceled
+                    break;
+                }
+
+                if(!new_inst_vm.IsEditModeEnabled) {
+                    // create complete
+                    break;
+                }
+
+                await Task.Delay(100);
+            }
+
+            if(EditModeViewModel == null) {
+                // canceled
+                return;
+            }
+
+            Instruments.Add(new_inst_vm);
+            SelectedInstrument = new_inst_vm;
+
+            // close popup
+            EditModeViewModel = null;
+        });
 
         public ICommand DecreaseMatchColumnsCommand => new MpAsyncCommand(async () => {
             // plus btn

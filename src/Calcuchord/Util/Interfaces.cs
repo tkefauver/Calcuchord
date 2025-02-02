@@ -8,6 +8,7 @@ namespace Calcuchord {
         string StorageDir { get; }
     }
 
+
     public interface IWebViewHelper {
         string ToneUrl { get; }
         void InitEnv(WebViewCreationProperties config);

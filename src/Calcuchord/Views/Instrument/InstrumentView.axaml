@@ -88,7 +88,7 @@
             <CrossFade Duration="0:0:1.0" />
         </TransitioningContentControl.PageTransition>
         <TransitioningContentControl.DataTemplates>
-            <local:InstrumentTuningTemplateSelector>
+            <local:InstrumentTemplateSelector>
                 <DataTemplate x:Key="KeyboardViewTemplate">
                     <local:KeyboardView />
                 </DataTemplate>
@@ -98,7 +98,7 @@
                 <DataTemplate x:Key="EmptyTemplate">
                     <Border />
                 </DataTemplate>
-            </local:InstrumentTuningTemplateSelector>
+            </local:InstrumentTemplateSelector>
         </TransitioningContentControl.DataTemplates>
     </TransitioningContentControl>
 </UserControl>

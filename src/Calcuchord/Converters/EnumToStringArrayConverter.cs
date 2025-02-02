@@ -3,21 +3,19 @@ using System.Globalization;
 using Avalonia.Data.Converters;
 
 namespace Calcuchord {
-    public class SuffixDisplayValueConverter : IValueConverter {
-        public static readonly SuffixDisplayValueConverter Instance = new SuffixDisplayValueConverter();
+    public class EnumToStringArrayConverter : IValueConverter {
+        public static readonly EnumToStringArrayConverter Instance = new EnumToStringArrayConverter();
 
         public object Convert(object value,Type targetType,object parameter,CultureInfo culture) {
-            if(value is not string suffix ||
-               MainViewModel.Instance is not { } mvm) {
-                return value;
+            if(value is not Type enumType) {
+                return new string[] { };
             }
 
-            return mvm.SelectedPatternType.ToDisplayValue(suffix);
+            return Enum.GetNames(enumType);
         }
 
         public object ConvertBack(object value,Type targetType,object parameter,CultureInfo culture) {
             return null;
         }
     }
-
 }

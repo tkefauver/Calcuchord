@@ -55,6 +55,9 @@ namespace Calcuchord {
         #region Ignored
 
         [JsonIgnore]
+        public bool IsPrefsPersistent { get; private set; }
+
+        [JsonIgnore]
         bool RESET_PREFS => false;
 
         [JsonIgnore]
@@ -128,15 +131,14 @@ namespace Calcuchord {
             }
 
             Debug.WriteLine("");
-            string pref_json = JsonConvert.SerializeObject(this);
-            File.WriteAllText(PrefsFilePath,pref_json);
-            //MpFileIo.WriteTextToFile(PrefsFilePath,pref_json);
-            //
-            // try {
-            //     Prefs test = JsonConvert.DeserializeObject<Prefs>(pref_json);
-            // } catch(Exception e) {
-            //     e.Dump();
-            // }
+            try {
+                string pref_json = JsonConvert.SerializeObject(this);
+                File.WriteAllText(PrefsFilePath,pref_json);
+                IsPrefsPersistent = true;
+            } catch(Exception e) {
+                e.Dump();
+                IsPrefsPersistent = false;
+            }
         }
 
         #endregion

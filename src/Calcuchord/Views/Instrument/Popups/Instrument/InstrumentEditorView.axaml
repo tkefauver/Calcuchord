@@ -1,0 +1,148 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
+             xmlns:p1="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:InstrumentViewModel"
+             x:Class="Calcuchord.InstrumentEditorView">
+    <UserControl.Styles>
+        <Style Selector="TextPresenter">
+            <Setter Property="Margin"
+                    Value="5,0,0,0" />
+        </Style>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Bg}" />
+            <Setter Property="FontSize"
+                    Value="18" />
+        </Style>
+        <Style Selector="UniformGrid.form-element">
+            <Setter Property="Columns"
+                    Value="2" />
+            <Setter Property="Margin"
+                    Value="0,0,0,10" />
+        </Style>
+        <Style Selector="UniformGrid.form-element.sub"
+               x:DataType="local:InstrumentViewModel">
+            <Setter Property="Opacity"
+                    Value="{Binding HasInstrumentType, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}" />
+        </Style>
+        <Style Selector="UniformGrid.form-element > :is(Control):not(:is(Button))">
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="Width"
+                    Value="130" />
+        </Style>
+        <Style Selector="UniformGrid.form-element > ComboBox">
+            <Setter Property="CornerRadius"
+                    Value="5" />
+            <Setter Property="Background"
+                    Value="{DynamicResource Bg}" />
+            <!-- <Setter Property="Theme" -->
+            <!--         Value="{StaticResource MaterialOutlineComboBox}" /> -->
+
+            <Setter Property="Theme"
+                    Value="{StaticResource MaterialComboBox}" />
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <DataTemplate x:DataType="sys:String">
+                        <TextBlock Classes="combo-item"
+                                   Margin="3,0"
+                                   Foreground="{DynamicResource Fg}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Left"
+                                   Text="{Binding .}" />
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style Selector="UniformGrid.form-element > TextBlock">
+            <Setter Property="HorizontalAlignment"
+                    Value="Left" />
+        </Style>
+        <Style Selector="UniformGrid.form-element > TextBox">
+            <Setter Property="Background"
+                    Value="{DynamicResource Bg}" />
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Fg}" />
+            <Setter Property="FontSize"
+                    Value="18" />
+            <Setter Property="CornerRadius"
+                    Value="5" />
+            <Setter Property="Margin"
+                    Value="0,5" />
+            <Setter Property="Padding"
+                    Value="5,0" />
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+        </Style>
+    </UserControl.Styles>
+    <UniformGrid Rows="5">
+        <!-- TYPE -->
+        <UniformGrid Classes="form-element">
+            <TextBlock Text="Type" />
+            <ComboBox SelectedIndex="{Binding SelectedInstrumentTypeIndex, Mode=TwoWay}"
+                      ItemsSource="{Binding InstrumentTypeNames}">
+                <ComboBox.Styles>
+                    <Style Selector="ComboBoxItem:nth-child(1)">
+                        <Setter Property="IsVisible"
+                                Value="False" />
+                    </Style>
+                </ComboBox.Styles>
+            </ComboBox>
+        </UniformGrid>
+
+
+        <!-- NAME -->
+        <UniformGrid Classes="form-element sub">
+            <TextBlock Text="Name" />
+            <TextBox Text="{Binding Name, Mode=TwoWay}" />
+        </UniformGrid>
+
+
+        <!-- STRINGS -->
+        <UniformGrid Classes="form-element sub">
+            <TextBlock Text="Strings" />
+            <ComboBox SelectedIndex="{Binding SelectedStringCountIndex, Mode=TwoWay}"
+                      ItemsSource="{Binding StringCounts}" />
+        </UniformGrid>
+
+        <!-- FRETS -->
+        <UniformGrid Classes="form-element sub">
+            <TextBlock Text="Frets" />
+            <ComboBox SelectedIndex="{Binding SelectedFretCountIndex, Mode=TwoWay}"
+                      ItemsSource="{Binding FretCounts}" />
+        </UniformGrid>
+
+        <!-- NAV -->
+        <UniformGrid Classes="form-element">
+            <Button HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Command="{Binding CancelAddInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}">
+                <Button.Resources>
+                    <SolidColorBrush x:Key="MaterialPrimaryMidBrush">Red</SolidColorBrush>
+                    <SolidColorBrush x:Key="MaterialPrimaryMidForegroundBrush">White</SolidColorBrush>
+                </Button.Resources>
+                <TextBlock FontFamily="{StaticResource NunitoFont}"
+                           Text="Cancel" />
+            </Button>
+            <Button HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Command="{Binding FinishCreateCommand}">
+                <TextBlock FontFamily="{StaticResource NunitoFont}"
+                           Text="Done" />
+            </Button>
+        </UniformGrid>
+
+    </UniformGrid>
+
+</UserControl>

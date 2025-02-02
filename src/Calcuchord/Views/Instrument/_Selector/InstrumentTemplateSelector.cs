@@ -4,7 +4,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Metadata;
 
 namespace Calcuchord {
-    public class InstrumentTuningTemplateSelector : IDataTemplate {
+    public class InstrumentTemplateSelector : IDataTemplate {
         [Content]
         public Dictionary<string,IDataTemplate> AvailableTemplates { get; } = new Dictionary<string,IDataTemplate>();
 
@@ -20,7 +20,7 @@ namespace Calcuchord {
         }
 
         public bool Match(object data) {
-            return true; //data is TuningViewModel;
+            return true;
         }
     }
 }

@@ -144,12 +144,19 @@
 
                             </StackPanel>
 
+                            <!-- EDIT POPUP -->
+
+                            <local:InstPopupContainerView Grid.Row="0"
+                                                          Grid.RowSpan="2"
+                                                          IsVisible="{Binding EditModeViewModel, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
 
                         </Grid>
                     </DockPanel>
                 </controls:NavigationDrawer>
             </controls:SnackbarHost>
         </dialogHostAvalonia:DialogHost>
+
         <Border x:Name="MainContainerBusyOverlay"
                 Classes="busy-cntr">
             <Border.IsVisible>

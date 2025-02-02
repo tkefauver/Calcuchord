@@ -50,7 +50,8 @@ namespace Calcuchord {
             return null;
         }
 
-        static Dictionary<string,string> SuffixTranslations { get; } = new() {
+        static Dictionary<string,string> SuffixTranslations { get; } = new Dictionary<string,string>
+        {
             { "_","/" },
             { "Num",string.Empty },
             { "sharp","#" }
@@ -61,7 +62,21 @@ namespace Calcuchord {
             foreach(var cst_kvp in SuffixTranslations) {
                 dv = dv.Replace(cst_kvp.Key,cst_kvp.Value);
             }
+
             return dv.ToProperCase();
+        }
+
+        public static string ToIconName(this InstrumentType it) {
+            switch(it) {
+                case InstrumentType.Guitar:
+                    return "GuitarElectric";
+                case InstrumentType.Ukulele:
+                    return "GuitarAcoustic";
+                case InstrumentType.Piano:
+                    return "Piano";
+                default:
+                    return "Music";
+            }
         }
     }
 }

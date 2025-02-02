@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Threading;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
@@ -38,6 +37,7 @@ namespace Calcuchord {
 
         public ObservableCollection<TuningViewModel> Tunings { get; } = [];
 
+
         public TuningViewModel DefaultTuning =>
             Tunings.FirstOrDefault(x => x.IsDefault) ?? Tunings.FirstOrDefault();
 
@@ -54,13 +54,14 @@ namespace Calcuchord {
         #region Appearance
 
         public string Icon =>
-            InstrumentType == InstrumentType.Guitar ? "GuitarElectric" :
-            InstrumentType == InstrumentType.Ukulele ? "GuitarAcoustic" :
-            InstrumentType == InstrumentType.Piano ? "Piano" :
-            "Music";
+            InstrumentType.ToIconName();
 
-        public string Name =>
-            Instrument.Name;
+
+        public string[] FretCounts =>
+            Enumerable.Range(MinFretCount,(MaxFretCount - MinFretCount) + 1).Select(x => x.ToString()).ToArray();
+
+        public string[] StringCounts =>
+            Enumerable.Range(MinStringCount,(MaxStringCount - MinStringCount) + 1).Select(x => x.ToString()).ToArray();
 
         #endregion
 
@@ -69,6 +70,21 @@ namespace Calcuchord {
         #endregion
 
         #region State
+
+        public string[] InstrumentTypeNames =>
+            new[] { string.Empty }
+                .Union(Enum.GetNames(typeof(InstrumentType)).Where(x => x != InstrumentType.Piano.ToString()))
+                .ToArray();
+
+        public bool IsCustomSelected => SelectedInstrumentTypeIndex == InstrumentTypeNames.Length - 1;
+
+
+        public int SelectedStringCountIndex { get; set; }
+        public int SelectedFretCountIndex { get; set; }
+        public int SelectedInstrumentTypeIndex { get; set; }
+
+        public bool HasInstrumentType => SelectedInstrumentTypeIndex > 0;
+        public bool IsEditModeEnabled { get; set; }
 
         public bool IsSelected { get; set; }
 
@@ -81,12 +97,27 @@ namespace Calcuchord {
 
         #region Validation
 
+        public string InvalidText { get; set; }
+
+        public bool IsValid =>
+            string.IsNullOrEmpty(InvalidText);
+
         public int MinStringCount => 3;
         public int MaxStringCount => 7;
         public int MinFretCount => 5;
         public int MaxFretCount => 24;
 
         #endregion
+
+        public string Name {
+            get => Instrument.Name;
+            set {
+                if(Name != value) {
+                    Instrument.Name = value;
+                    OnPropertyChanged(nameof(Name));
+                }
+            }
+        }
 
         public int RowCount =>
             Instrument.StringCount;
@@ -95,8 +126,16 @@ namespace Calcuchord {
             IsKeyboard ? RowCount : RowCount + 1;
 
 
-        public InstrumentType InstrumentType =>
-            Instrument.InstrumentType;
+        public InstrumentType InstrumentType {
+            get => Instrument.InstrumentType;
+            set {
+                if(InstrumentType != value) {
+                    Instrument.InstrumentType = value;
+                    OnPropertyChanged(nameof(InstrumentType));
+                }
+            }
+        }
+
 
         public Instrument Instrument { get; set; }
 
@@ -112,7 +151,6 @@ namespace Calcuchord {
 
         public InstrumentViewModel(MainViewModel parent) : base(parent) {
             PropertyChanged += InstrumentViewModel_OnPropertyChanged;
-            Tunings.CollectionChanged += TuningsOnCollectionChanged;
         }
 
         #endregion
@@ -141,8 +179,29 @@ namespace Calcuchord {
 
         void InstrumentViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
-                case nameof(IsSelected):
+                case nameof(SelectedInstrumentTypeIndex):
+                    if(IsEditModeEnabled) {
+                        Dispatcher.UIThread.Post(async () => {
+                            if(SelectedInstrumentTypeIndex == 0) {
+                                OnPropertyChanged(nameof(HasInstrumentType));
+                                return;
+                            }
 
+                            await InitAsync(Instrument.CreateByType(InstrumentTypeNames[SelectedInstrumentTypeIndex]
+                                .ToEnum<InstrumentType>()));
+
+                            OnPropertyChanged(nameof(FretCounts));
+                            OnPropertyChanged(nameof(StringCounts));
+                            OnPropertyChanged(nameof(Name));
+
+                            SelectedFretCountIndex = FretCounts.IndexOf(Instrument.FretCount.ToString());
+                            SelectedStringCountIndex = StringCounts.IndexOf(Instrument.StringCount.ToString());
+                            OnPropertyChanged(nameof(HasInstrumentType));
+                        });
+                    }
+
+                    break;
+                case nameof(IsSelected):
                     if(IsSelected) {
                         if(SelectedTuning == null) {
                             SelectedTuning = DefaultTuning;
@@ -162,9 +221,6 @@ namespace Calcuchord {
 
                     break;
             }
-        }
-
-        void TuningsOnCollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
         }
 
         async Task<TuningViewModel> CreateTuningViewModelAsync(Tuning tuning) {
@@ -204,11 +260,11 @@ namespace Calcuchord {
                 Debug.WriteLine($"'{tuning_vm_to_remove.Tuning.Name}' removed from {Instrument.Name}");
             });
 
-        public ICommand AddTuningCommand => new MpAsyncCommand<object>(
+        public MpIAsyncCommand<object> AddTuningCommand => new MpAsyncCommand<object>(
             async args => {
                 if(args is not object[] arg_parts ||
                    arg_parts.Length < 2 ||
-                   arg_parts[0] is not IEnumerable<Note> notes ||
+                   arg_parts[0] is not string notes_str ||
                    arg_parts[1] is not int capo_fret_num) {
                     return;
                 }
@@ -219,9 +275,12 @@ namespace Calcuchord {
                 }
 
                 var actual_open_notes =
-                    notes.Select((x,idx) => new InstrumentNote(0,idx,x.Offset(capo_fret_num)));
+                    notes_str
+                        .Split(" ")
+                        .Select(x => Note.Parse(x))
+                        .Select((x,idx) => new InstrumentNote(0,idx,x.Offset(capo_fret_num)));
                 Tuning new_tuning = new Tuning(tuning_name,!Tunings.Any(),false,capo_fret_num);
-                new_tuning.Id = Guid.NewGuid().ToString();
+                new_tuning.CreateId();
                 new_tuning.OpenNotes.AddRange(actual_open_notes);
                 Instrument.Tunings.Add(new_tuning);
 
@@ -229,7 +288,23 @@ namespace Calcuchord {
                 Tunings.Add(tvm);
 
                 Tunings.Last().IsSelected = true;
-                Prefs.Instance.Save();
+            });
+
+        public ICommand FinishCreateCommand => new MpAsyncCommand(
+            async () => {
+                if(DefaultTuning is { } def_tuning_vm) {
+                    // clone, just show tunings
+                    MainViewModel.Instance.EditModeViewModel = def_tuning_vm;
+                    return;
+                }
+
+                string GetDefaultStrings() {
+                    // TODO maybe base this off something in inst create
+                    return string.Join(" ",Enumerable.Repeat("E2",RowCount));
+                }
+
+                await AddTuningCommand.ExecuteAsync(new object[] { GetDefaultStrings(),0 });
+                MainViewModel.Instance.EditModeViewModel = SelectedTuning;
             });
 
         #endregion

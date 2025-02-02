@@ -126,24 +126,26 @@ namespace Calcuchord {
                 NoteRows.Insert(0,new(this,null));
             }
 
+            if(Prefs.Instance.Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Id == Id) is not
+               { } tuning_model) {
+                if(!Parent.IsEditModeEnabled) {
+                    // error
+                    Debugger.Break();
+                }
+
+                return;
+            }
+
+
             if(!Tuning.Chords.Any()) {
                 await CreateChordsAsync();
-                if(Prefs.Instance.Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Id == Id) is
-                   { } tuning_model) {
-                    tuning_model.Chords = Tuning.Chords;
-                }
-                // error
+                tuning_model.Chords = Tuning.Chords;
             }
 
             if(!Tuning.Scales.Any() || !Tuning.Modes.Any()) {
                 await CreateScalesAndModesAsync();
-
-                if(Prefs.Instance.Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Id == Id) is
-                   { } tuning_model) {
-                    tuning_model.Scales = Tuning.Scales;
-                    tuning_model.Modes = Tuning.Modes;
-                }
-                // error
+                tuning_model.Scales = Tuning.Scales;
+                tuning_model.Modes = Tuning.Modes;
             }
 
             Parent.Instrument.RefreshModelTree();

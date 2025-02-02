@@ -12,11 +12,8 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.MainHeaderView">
-    <controls:ColorZone VerticalAlignment="Top"
-                        HorizontalAlignment="Stretch"
-                        Height="56"
-                        Mode="PrimaryMid"
-                        ZIndex="1">
+    <controls:ColorZone Height="56"
+                        Mode="PrimaryMid">
         <DockPanel Margin="4">
             <ToggleButton x:Name="NavDrawerSwitch"
                           DockPanel.Dock="Left"

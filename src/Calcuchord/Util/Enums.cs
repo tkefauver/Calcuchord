@@ -53,7 +53,17 @@ namespace Calcuchord {
         Guitar,
         Ukulele,
         Piano,
-        Custom
+
+        // Non-default
+        Bass,
+        Mandolin,
+        Banjo,
+        Violin,
+        Viola,
+        Cello,
+        Lute,
+        Balalaika,
+        Other
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

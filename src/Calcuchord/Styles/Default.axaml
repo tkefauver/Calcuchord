@@ -39,6 +39,10 @@
         <Setter Property="FontFamily"
                 Value="{StaticResource GaramondFont}" />
     </Style>
+    <Style Selector=":is(TextBox)">
+        <Setter Property="FontFamily"
+                Value="{StaticResource GaramondFont}" />
+    </Style>
 
     <!-- ICONS -->
     <Style Selector="avalonia|MaterialIcon">

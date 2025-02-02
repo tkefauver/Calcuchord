@@ -10,10 +10,13 @@ namespace Calcuchord.Desktop {
             get {
                 if(_storageDir == null) {
                     string dir_name = "Calcuchord";
-                    #if DEBUG
+#if DEBUG
                     dir_name += "_DEBUG";
-                    #endif
+#endif
                     _storageDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+#if DEBUG
+                    _storageDir = "/home/tkefauver/Desktop";
+#endif
                     if(!_storageDir.ToLower().Contains(dir_name)) {
                         _storageDir = Path.Combine(_storageDir,dir_name);
                     }

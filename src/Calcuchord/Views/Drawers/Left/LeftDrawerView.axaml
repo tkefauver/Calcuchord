@@ -106,7 +106,9 @@
             <controls:FloatingButton Grid.Row="2"
                                      Margin="5"
                                      IsExtended="True"
-                                     HorizontalAlignment="Right">
+                                     HorizontalAlignment="Right"
+                                     IsEnabled="{Binding IsPrefsPersistent, Source={x:Static local:Prefs.Instance}}"
+                                     Command="{Binding AddInstrumentCommand}">
                 <StackPanel Orientation="Horizontal"
                             Height="24">
                     <Viewbox Stretch="Fill"

@@ -28,9 +28,9 @@ namespace Calcuchord.Desktop {
                 .UseDesktopWebView()
                 .With(new X11PlatformOptions
                 {
-                    EnableMultiTouch = true,
-                    UseDBusMenu = true,
-                    EnableIme = true
+                    // EnableMultiTouch = true,
+                    UseDBusMenu = false,
+                    EnableIme = false
                 })
                 .WithInterFont()
                 .LogToTrace()
