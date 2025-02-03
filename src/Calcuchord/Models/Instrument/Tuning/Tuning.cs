@@ -1,19 +1,15 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using MonkeyPaste.Common;
 using Newtonsoft.Json;
 
 namespace Calcuchord {
     [JsonObject]
-    public class Tuning {
+    public class Tuning : PrimaryModelBase {
 
         #region Properties
 
         #region Members
-
-        public string Id { get; private set; }
-
 
         public string Name { get; set; }
 
@@ -22,9 +18,6 @@ namespace Calcuchord {
 
 
         public bool IsReadOnly { get; set; }
-
-
-        public bool IsDefault { get; set; }
 
 
         public List<InstrumentNote> OpenNotes { get; set; } = [];
@@ -78,9 +71,8 @@ namespace Calcuchord {
         }
 
 
-        public Tuning(string name,bool isDefault,bool isReadOnly,int capoNum = 0) : this() {
+        public Tuning(string name,bool isReadOnly,int capoNum = 0) : this() {
             Name = name;
-            IsDefault = isDefault;
             IsReadOnly = isReadOnly;
             CapoFretNum = capoNum;
         }
@@ -99,17 +91,18 @@ namespace Calcuchord {
             }
         }
 
-        public void CreateId() {
-            if(!string.IsNullOrEmpty(Id)) {
-                // error
-                Debugger.Break();
-            }
-
-            Id = Guid.NewGuid().ToString();
-        }
 
         public void ClearCollections() {
             Collections.ForEach(x => x.Value.Clear());
+        }
+
+        public Tuning Clone() {
+            // NOTE is shallow clone only (no patterns or parent)
+            Tuning clone = new Tuning(Name,IsReadOnly,CapoFretNum);
+            clone.OpenNotes.Clear();
+            clone.OpenNotes.AddRange(OpenNotes.Select(x => x.Clone()));
+            clone.CreateId(null);
+            return clone;
         }
 
         public override string ToString() {

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Calcuchord {
     [JsonObject]
-    public class Note {
+    public class Note : ModelBase {
 
         #region Private Variables
 
@@ -12,15 +12,16 @@ namespace Calcuchord {
         #region Constants
 
         const int MAX_NOTE_TYPE = 12;
+        const int MAX_REGISTER = 8;
+
+        public const int MIN_NOTE_ID = 0;
+        public const int MAX_NOTE_ID = MAX_NOTE_TYPE * MAX_REGISTER;
 
         #endregion
 
         #region Statics
 
         public static Note Parse(string text) {
-            if(text == "F#3") {
-            }
-
             if(MusicHelpers.ParseNote(text) is not { } note_tup ||
                note_tup.register is not { } reg) {
                 return null;

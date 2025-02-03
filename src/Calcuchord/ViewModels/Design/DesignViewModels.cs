@@ -27,4 +27,12 @@ namespace Calcuchord {
             instl.ForEach(x => x.RefreshModelTree());
         }
     }
+
+    public class DesignInstrumentViewModel : InstrumentViewModel {
+        public DesignInstrumentViewModel() {
+            //Parent = new DesignMainViewModel();
+            //IsEditModeEnabled = true;
+            InitAsync(Instrument.CreateByType(InstrumentType.Guitar)).FireAndForgetSafeAsync();
+        }
+    }
 }

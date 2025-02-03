@@ -14,6 +14,9 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:InstrumentViewModel"
              x:Class="Calcuchord.InstrumentEditorView">
+    <Design.DataContext>
+        <local:DesignInstrumentViewModel />
+    </Design.DataContext>
     <UserControl.Styles>
         <Style Selector="TextPresenter">
             <Setter Property="Margin"
@@ -59,7 +62,7 @@
                                    Margin="3,0"
                                    Foreground="{DynamicResource Fg}"
                                    VerticalAlignment="Center"
-                                   HorizontalAlignment="Left"
+                                   TextAlignment="Center"
                                    Text="{Binding .}" />
                     </DataTemplate>
                 </Setter.Value>
@@ -68,6 +71,12 @@
         <Style Selector="UniformGrid.form-element > TextBlock">
             <Setter Property="HorizontalAlignment"
                     Value="Left" />
+        </Style>
+        <Style Selector="UniformGrid.form-element > TextBox /template/ Panel#PART_TextContainer">
+            <Setter Property="Margin"
+                    Value="0,0,0,0" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
         </Style>
         <Style Selector="UniformGrid.form-element > TextBox">
             <Setter Property="Background"
@@ -84,12 +93,14 @@
                     Value="5,0" />
             <Setter Property="VerticalContentAlignment"
                     Value="Center" />
+            <Setter Property="TextAlignment"
+                    Value="Center" />
         </Style>
     </UserControl.Styles>
-    <UniformGrid Rows="5">
+    <UniformGrid Rows="4">
         <!-- TYPE -->
         <UniformGrid Classes="form-element">
-            <TextBlock Text="Type" />
+            <TextBlock Text="Template" />
             <ComboBox SelectedIndex="{Binding SelectedInstrumentTypeIndex, Mode=TwoWay}"
                       ItemsSource="{Binding InstrumentTypeNames}">
                 <ComboBox.Styles>
@@ -101,46 +112,28 @@
             </ComboBox>
         </UniformGrid>
 
-
         <!-- NAME -->
         <UniformGrid Classes="form-element sub">
             <TextBlock Text="Name" />
-            <TextBox Text="{Binding Name, Mode=TwoWay}" />
+            <TextBox MaxHeight="35"
+                     Text="{Binding Name, Mode=TwoWay}" />
         </UniformGrid>
 
 
         <!-- STRINGS -->
         <UniformGrid Classes="form-element sub">
             <TextBlock Text="Strings" />
-            <ComboBox SelectedIndex="{Binding SelectedStringCountIndex, Mode=TwoWay}"
+            <ComboBox IsEnabled="{Binding !IsCustomSelected}"
+                      SelectedIndex="{Binding SelectedStringCountIndex, Mode=TwoWay}"
                       ItemsSource="{Binding StringCounts}" />
         </UniformGrid>
 
         <!-- FRETS -->
         <UniformGrid Classes="form-element sub">
             <TextBlock Text="Frets" />
-            <ComboBox SelectedIndex="{Binding SelectedFretCountIndex, Mode=TwoWay}"
+            <ComboBox IsEnabled="{Binding !IsCustomSelected}"
+                      SelectedIndex="{Binding SelectedFretCountIndex, Mode=TwoWay}"
                       ItemsSource="{Binding FretCounts}" />
-        </UniformGrid>
-
-        <!-- NAV -->
-        <UniformGrid Classes="form-element">
-            <Button HorizontalAlignment="Left"
-                    VerticalAlignment="Bottom"
-                    Command="{Binding CancelAddInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}">
-                <Button.Resources>
-                    <SolidColorBrush x:Key="MaterialPrimaryMidBrush">Red</SolidColorBrush>
-                    <SolidColorBrush x:Key="MaterialPrimaryMidForegroundBrush">White</SolidColorBrush>
-                </Button.Resources>
-                <TextBlock FontFamily="{StaticResource NunitoFont}"
-                           Text="Cancel" />
-            </Button>
-            <Button HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom"
-                    Command="{Binding FinishCreateCommand}">
-                <TextBlock FontFamily="{StaticResource NunitoFont}"
-                           Text="Done" />
-            </Button>
         </UniformGrid>
 
     </UniformGrid>

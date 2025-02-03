@@ -52,6 +52,9 @@ namespace Calcuchord {
             }
         }
 
+        public NoteViewModel OpenNote =>
+            Notes.FirstOrDefault(x => x.NoteNum == 0);
+
 
         NoteViewModel DefaultNote =>
             null; //!IsEnabled || IsKeyboard ? null : Notes.FirstOrDefault(x => x.NoteNum == 0);
@@ -95,13 +98,13 @@ namespace Calcuchord {
             (DefaultNote != null && SelectedNotes.All(x => x == DefaultNote));
 
         public int RowNum =>
-            OpenNote == null ? -1 : OpenNote.RowNum;
+            BaseNote == null ? -1 : BaseNote.RowNum;
 
         #endregion
 
         #region Model
 
-        public InstrumentNote OpenNote { get; set; }
+        public InstrumentNote BaseNote { get; set; }
 
         #endregion
 
@@ -113,9 +116,9 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public NoteRowViewModel(TuningViewModel parent,InstrumentNote openNote) : base(parent) {
+        public NoteRowViewModel(TuningViewModel parent,InstrumentNote baseNote) : base(parent) {
             PropertyChanged += NoteRowViewModel_OnPropertyChanged;
-            OpenNote = openNote;
+            BaseNote = baseNote;
             int min_fret_num = IsKeyboard ? 0 : -1;
             Notes.AddRange(
                 Enumerable.Range(min_fret_num,Parent.LogicalFretCount)
@@ -137,7 +140,7 @@ namespace Calcuchord {
         }
 
         public override string ToString() {
-            return OpenNote == null ? base.ToString() : "Row " + OpenNote;
+            return BaseNote == null ? base.ToString() : "Row " + BaseNote;
         }
 
         #endregion
@@ -165,7 +168,7 @@ namespace Calcuchord {
 
         NoteViewModel CreateFretViewModel(int fretNum) {
             InstrumentNote inn = new InstrumentNote(
-                fretNum,RowNum,OpenNote == null ? null : OpenNote.Offset(fretNum));
+                fretNum,RowNum,BaseNote == null ? null : BaseNote.Offset(fretNum));
 
             return new(this,inn);
         }
@@ -195,7 +198,7 @@ namespace Calcuchord {
             if(nvm.IsDesiredRoot) {
                 mvm.DesiredRoot = null;
             } else if(newState == NoteMarkerState.Root) {
-                mvm.DesiredRoot = nvm.Note.Key;
+                mvm.DesiredRoot = nvm.InstrumentNote.Key;
             }
 
             if(newState == NoteMarkerState.Off) {

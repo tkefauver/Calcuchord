@@ -6,12 +6,25 @@ namespace Calcuchord {
     [JsonObject]
     public class Instrument {
 
+        #region Constants
+
+        public const string STANDARD_GUITAR_TUNING_ID = "4c0cc5d9-da2e-4b99-b18d-1f444b54af2e";
+        public const string STANDARD_UKULELE_TUNING_ID = "a66e4b0b-857b-44f3-ae2e-a39634019c41";
+        public const string STANDARD_PIANO_TUNING_ID = "380b83b7-6882-4ccb-9c5b-9407a715d00f";
+
+        #endregion
+
         #region Statics
 
-        public static Instrument CreateByType(InstrumentType it,bool readOnlyTuning = false,string name = null) {
+        public static Instrument CreateByType(
+            InstrumentType it,
+            bool readOnlyTuning = false,
+            string name = null,
+            int capoNum = 0,
+            double? neckLen = null,
+            string id = null) {
             string tuning_str = string.Empty;
             int fret_count = 23;
-            double? neck_len = null;
             switch(it) {
                 case InstrumentType.Guitar:
                     tuning_str = "E2 A2 D3 G3 B3 E4";
@@ -51,10 +64,10 @@ namespace Calcuchord {
                     break;
             }
 
-            Tuning tuning = new Tuning(name ?? "Standard",true,readOnlyTuning);
-            tuning.CreateId();
+            Tuning tuning = new Tuning("Standard",readOnlyTuning,capoNum);
+            tuning.CreateId(id);
             tuning.OpenNotes.AddRange(tuning_str.Split(" ").Select((x,idx) => new InstrumentNote(0,idx,Note.Parse(x))));
-            Instrument inst = new Instrument(it.ToString(),it,fret_count,tuning.OpenNotes.Count,neck_len);
+            Instrument inst = new Instrument(name ?? it.ToString(),it,fret_count,tuning.OpenNotes.Count,neckLen);
             tuning.SetParent(inst);
             inst.Tunings.Add(tuning);
             return inst;

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Windows.Input;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
@@ -45,11 +46,11 @@ namespace Calcuchord {
                 }
 
                 if(IsRowKeyLabel) {
-                    if(Parent.OpenNote == null) {
+                    if(Parent.BaseNote == null) {
                         return string.Empty;
                     }
 
-                    return Parent.OpenNote.FullName;
+                    return Parent.BaseNote.FullName;
                 }
 
                 if(IsNutFret) {
@@ -62,7 +63,7 @@ namespace Calcuchord {
                     }
                 }
 
-                return Note.Name;
+                return InstrumentNote.Name;
             }
         }
 
@@ -72,7 +73,7 @@ namespace Calcuchord {
                     return string.Empty;
                 }
 
-                return Note.FullName;
+                return InstrumentNote.FullName;
             }
         }
 
@@ -89,7 +90,7 @@ namespace Calcuchord {
 
         public bool IsDesiredRoot =>
             MainViewModel.Instance.DesiredRoot.HasValue &&
-            MainViewModel.Instance.DesiredRoot.Value == Note.Key;
+            MainViewModel.Instance.DesiredRoot.Value == InstrumentNote.Key;
 
         public bool IsEnabled =>
             RowNum >= 0 && NoteNum >= 0;
@@ -236,19 +237,22 @@ namespace Calcuchord {
 
         #region Model
 
+        public int NoteId =>
+            InstrumentNote.NoteId;
+
         public bool IsAltered =>
-            Note.IsAltered;
+            InstrumentNote.IsAltered;
 
         public int NoteNum =>
-            Note.NoteNum;
+            InstrumentNote.NoteNum;
 
         public int RowNum =>
-            Note.RowNum;
+            InstrumentNote.RowNum;
 
         public int RowCount =>
             Parent.Parent.Parent.RowCount;
 
-        public InstrumentNote Note { get; set; }
+        public InstrumentNote InstrumentNote { get; set; }
 
         #endregion
 
@@ -260,9 +264,9 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public NoteViewModel(NoteRowViewModel parent,InstrumentNote fretNote) : base(parent) {
+        public NoteViewModel(NoteRowViewModel parent,InstrumentNote fretInstrumentNote) : base(parent) {
             PropertyChanged += NoteViewModel_OnPropertyChanged;
-            Note = fretNote;
+            InstrumentNote = fretInstrumentNote;
             OnPropertyChanged(nameof(NoteNum));
         }
 
@@ -271,7 +275,15 @@ namespace Calcuchord {
         #region Public Methods
 
         public override string ToString() {
-            return Note.ToString();
+            return InstrumentNote.ToString();
+        }
+
+        public void ChangePitch(int deltaId) {
+            Note new_note = InstrumentNote.Offset(deltaId);
+            InstrumentNote = new(NoteNum,RowNum,new_note);
+
+            OnPropertyChanged(nameof(MarkerLabel));
+            OnPropertyChanged(nameof(MarkerDetail));
         }
 
         #endregion
@@ -298,6 +310,22 @@ namespace Calcuchord {
         #endregion
 
         #region Commands
+
+        public ICommand IncreasePitchCommand => new MpCommand(() => {
+            ChangePitch(1);
+        },() => {
+            return NoteId < Note.MAX_NOTE_ID;
+        });
+
+        public ICommand DecreasePitchCommand => new MpCommand(() => {
+            ChangePitch(-1);
+        },() => {
+            return NoteId > Note.MIN_NOTE_ID;
+        });
+
+        public ICommand SelectThisOpenNoteCommand => new MpCommand(() => {
+            Parent.Parent.SelectedOpenNoteIndex = Parent.Parent.OpenNotes.IndexOf(this);
+        });
 
         #endregion
 

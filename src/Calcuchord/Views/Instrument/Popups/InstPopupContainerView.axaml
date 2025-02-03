@@ -11,66 +11,23 @@
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
-             x:DataType="local:MainViewModel"
+             x:DataType="local:InstrumentViewModel"
              x:Class="Calcuchord.InstPopupContainerView">
     <UserControl.Styles>
-        <Style Selector=":is(Control).grow">
-            <Setter Property="Width"
-                    Value="100" />
-            <Setter Property="Height"
-                    Value="100" />
-            <Style.Animations>
-                <Animation Duration="0:0:1.5"
-                           Delay="0:0:0.5"
-                           FillMode="Forward"
-                           Easing="QuinticEaseOut">
-                    <KeyFrame Cue="0%">
-                        <Setter Property="Width"
-                                Value="100" />
-                        <Setter Property="Height"
-                                Value="100" />
-                    </KeyFrame>
-                    <KeyFrame Cue="33%">
-                        <Setter Property="Width"
-                                Value="100" />
-                        <Setter Property="Height"
-                                Value="100" />
-                    </KeyFrame>
-                    <KeyFrame Cue="66%">
-                        <Setter Property="Width"
-                                Value="1000" />
-                        <Setter Property="Height"
-                                Value="100" />
-                    </KeyFrame>
-                    <KeyFrame Cue="100%">
-                        <Setter Property="Width"
-                                Value="1000" />
-                        <Setter Property="Height"
-                                Value="650" />
-                    </KeyFrame>
-                </Animation>
-            </Style.Animations>
+        <Style Selector="TextBlock.tab-header">
+            <Setter Property="FontSize"
+                    Value="24" />
+            <Setter Property="TextAlignment"
+                    Value="Center" />
+            <Setter Property="Effect"
+                    Value="drop-shadow(1 1 0 white)" />
         </Style>
-
-        <Style Selector=":is(Control).grow-content">
-            <Setter Property="Opacity"
-                    Value="0" />
-            <Style.Animations>
-                <Animation Duration="0:0:1.0"
-                           Delay="0:0:2.25"
-                           FillMode="Forward">
-                    <KeyFrame Cue="0%">
-                        <Setter Property="Opacity"
-                                Value="0" />
-                    </KeyFrame>
-                    <KeyFrame Cue="100%">
-                        <Setter Property="Opacity"
-                                Value="1" />
-                    </KeyFrame>
-                </Animation>
-            </Style.Animations>
+        <Style Selector="TabItem > ScrollViewer">
+            <Setter Property="Margin"
+                    Value="0,30,0,0" />
         </Style>
     </UserControl.Styles>
+
 
     <Border x:Name="PopupOverlayBorder">
         <Border.Background>
@@ -78,6 +35,7 @@
                              Opacity="0.7" />
         </Border.Background>
         <controls:ColorZone x:Name="PopupZone"
+                            MinWidth="300"
                             Mode="Accent"
                             Effect="drop-shadow(-3 -3 5 black)"
                             CornerRadius="10"
@@ -87,28 +45,53 @@
                             BorderBrush="{DynamicResource Bg}"
                             BorderThickness="5"
                             Padding="10">
-            <ScrollViewer x:Name="PopupScrollViewer">
-                <TransitioningContentControl x:Name="InstrumentEditContentControl"
-                                             Content="{Binding EditModeViewModel}">
-                    <TransitioningContentControl.PageTransition>
-                        <CrossFade Duration="0:0:1.0" />
-                    </TransitioningContentControl.PageTransition>
-                    <TransitioningContentControl.DataTemplates>
-                        <local:InstrumentPopupTemplateSelector>
-                            <DataTemplate x:Key="InstrumentEditorTemplate"
-                                          x:DataType="local:InstrumentViewModel">
+            <DockPanel>
+                <!-- NAV -->
+                <UniformGrid DockPanel.Dock="Bottom"
+                             Columns="2"
+                             x:DataType="local:MainViewModel"
+                             DataContext="{x:Static local:MainViewModel.Instance}">
+                    <Button HorizontalAlignment="Left"
+                            VerticalAlignment="Bottom"
+                            Command="{Binding CancelEditInstrumentCommand}">
+                        <Button.Resources>
+                            <SolidColorBrush x:Key="MaterialPrimaryMidBrush">Red</SolidColorBrush>
+                            <SolidColorBrush x:Key="MaterialPrimaryMidForegroundBrush">White</SolidColorBrush>
+                        </Button.Resources>
+                        <TextBlock Text="Cancel" />
+                    </Button>
+                    <Button HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Command="{Binding FinishEditInstrumentCommand}">
+                        <TextBlock Text="Done" />
+                    </Button>
+                </UniformGrid>
+
+                <!-- TABS -->
+                <TabControl>
+                    <TabControl.Items>
+                        <TabItem>
+                            <TabItem.Header>
+                                <TextBlock Classes="tab-header"
+                                           Text="Instrument" />
+                            </TabItem.Header>
+                            <ScrollViewer>
                                 <local:InstrumentEditorView />
-                            </DataTemplate>
-                            <DataTemplate x:Key="TuningEditorTemplate"
-                                          x:DataType="local:TuningViewModel">
+                            </ScrollViewer>
+                        </TabItem>
+                        <TabItem IsEnabled="{Binding CanEditTunings}">
+                            <TabItem.Header>
+                                <TextBlock Classes="tab-header"
+                                           Text="Tunings" />
+                            </TabItem.Header>
+                            <ScrollViewer>
                                 <local:TuningEditorView />
-                            </DataTemplate>
+                            </ScrollViewer>
+                        </TabItem>
+                    </TabControl.Items>
+                </TabControl>
+            </DockPanel>
 
-                        </local:InstrumentPopupTemplateSelector>
-                    </TransitioningContentControl.DataTemplates>
-                </TransitioningContentControl>
-
-            </ScrollViewer>
         </controls:ColorZone>
 
     </Border>

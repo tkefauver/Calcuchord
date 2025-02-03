@@ -91,13 +91,34 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="local:InstrumentViewModel">
-                        <StackPanel Orientation="Horizontal"
-                                    Spacing="5">
+                        <Grid RowDefinitions="*,Auto"
+                              ColumnDefinitions="Auto,*,Auto">
                             <avalonia:MaterialIcon Kind="{Binding Icon}" />
-                            <TextBlock Classes="Headline5"
+                            <TextBlock Grid.Column="1"
+                                       Classes="Headline5"
                                        VerticalAlignment="Center"
                                        Text="{Binding Name}" />
-                        </StackPanel>
+
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="1"
+                                       Text="{Binding SelectedTuningInfo}">
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="{DynamicResource FgColor}"
+                                                     Opacity="0.7" />
+                                </TextBlock.Foreground>
+                            </TextBlock>
+
+                            <Button Grid.RowSpan="2"
+                                    Grid.Column="2"
+                                    Classes="float"
+                                    VerticalAlignment="Center"
+                                    IsVisible="{Binding IsSelected}"
+                                    Command="{Binding BeginEditInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                    CommandParameter="{Binding .}">
+                                <avalonia:MaterialIcon Kind="Cog" />
+                            </Button>
+                        </Grid>
+
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

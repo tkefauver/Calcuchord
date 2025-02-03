@@ -3,14 +3,11 @@ using Newtonsoft.Json;
 
 namespace Calcuchord {
     [JsonObject]
-    public class NoteGroup {
+    public class NoteGroup : PrimaryModelBase {
 
         #region Properties
 
         #region Members
-
-        public string Id { get; set; }
-
 
         public int Position { get; set; }
 

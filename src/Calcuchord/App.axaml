@@ -22,7 +22,9 @@
         </themes:CustomMaterialTheme>
         <materialIcons:MaterialIconStyles />
         <dialogHostAvalonia:DialogHostStyles />
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <!-- <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" /> -->
+        <!-- <StyleInclude Source="avares://Material.Avalonia.DataGrid/MaterialDataGridStyles.axaml" /> -->
+        <StyleInclude Source="avares://Material.Avalonia.DataGrid/DataGrid.xaml" />
         <StyleInclude Source="avares://Calcuchord/Styles/Default.axaml" />
     </Application.Styles>
 

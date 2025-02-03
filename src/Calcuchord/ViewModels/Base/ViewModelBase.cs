@@ -34,5 +34,8 @@ namespace Calcuchord {
         protected ViewModelBase(T parent) {
             Parent = parent;
         }
+
+        protected ViewModelBase() {
+        }
     }
 }

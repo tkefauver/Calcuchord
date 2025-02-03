@@ -24,17 +24,47 @@
             <Setter Property="MinWidth"
                     Value="0" />
         </Style>
-
-        <!-- MATCHES BG -->
-
     </UserControl.Styles>
+
+    <UserControl.DataTemplates>
+        <DataTemplate DataType="local:TuningViewModel">
+            <StackPanel>
+                <StackPanel.Styles>
+                    <Style Selector="TextBlock">
+                        <Setter Property="TextAlignment"
+                                Value="Center" />
+                    </Style>
+                </StackPanel.Styles>
+                <TextBlock>Chords:</TextBlock>
+                <TextBlock Classes="Body1"
+                           Text="{Binding Tuning.Chords.Count}" />
+                <TextBlock>Scales:</TextBlock>
+                <TextBlock Classes="Body1"
+                           Text="{Binding Tuning.Scales.Count}" />
+                <TextBlock>Modes:</TextBlock>
+                <TextBlock Classes="Body1"
+                           Text="{Binding Tuning.Modes.Count}" />
+                <TextBlock>Bookmarks:</TextBlock>
+                <TextBlock Classes="Body1"
+                           Text="{Binding BookmarkCount}" />
+
+                <Button Margin="0 8 0 0"
+                        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=CloseDialogCommand}">
+                    Ok
+                </Button>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.DataTemplates>
     <Grid x:Name="MainOuterContainer">
         <dialogHostAvalonia:DialogHost Identifier="MainDialogHost">
             <controls:SnackbarHost HostName="Root"
                                    Theme="{StaticResource TinySnackbarHost}"
                                    SnackbarHorizontalAlignment="Center"
                                    SnackbarVerticalAlignment="Top">
+                <!-- 
+                                            -->
                 <controls:NavigationDrawer x:Name="LeftDrawer"
+                                           RightDrawerExpandThresholdWidth="{Binding RightDrawerExpandWidth}"
                                            LeftDrawerOpened="{Binding IsLeftDrawerOpen, Mode=TwoWay}"
                                            RightDrawerOpened="{Binding IsRightDrawerOpen, Mode=TwoWay}"
                                            Classes="permanent">
@@ -148,7 +178,8 @@
 
                             <local:InstPopupContainerView Grid.Row="0"
                                                           Grid.RowSpan="2"
-                                                          IsVisible="{Binding EditModeViewModel, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                                          DataContext="{Binding EditModeInstrument}"
+                                                          IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}" />
 
 
                         </Grid>

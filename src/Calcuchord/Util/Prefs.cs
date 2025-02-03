@@ -33,7 +33,7 @@ namespace Calcuchord {
 
         #region Members
 
-        public string SelectedTuningId { get; set; }
+        public string SelectedTuningId { get; set; } = Instrument.STANDARD_GUITAR_TUNING_ID;
 
 
         public SvgFlags SelectedSvgFlags { get; set; } = SvgBuilderBase.DefaultSvgFlags;
@@ -118,6 +118,11 @@ namespace Calcuchord {
         }
 
         public void Save() {
+            if(MainViewModel.Instance is { } mvm &&
+               mvm.EditModeInstrument != null) {
+                // should be avoided
+            }
+
             Debug.WriteLine("");
             string tuning_str = MainViewModel.Instance == null || MainViewModel.Instance.SelectedTuning == null
                 ? string.Empty

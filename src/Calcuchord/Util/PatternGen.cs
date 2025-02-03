@@ -148,7 +148,11 @@ namespace Calcuchord {
                 result = await GenFretboardPatternAsync();
             }
 
-            result.ForEach(x => x.SetParent(Tuning));
+            foreach(NoteGroupCollection ngc in result) {
+                ngc.Groups.ForEach(x => x.CreateId(null));
+                ngc.SetParent(Tuning);
+            }
+
             return result;
         }
 
@@ -214,7 +218,7 @@ namespace Calcuchord {
                     NoteGroupCollection ngc = new NoteGroupCollection(PatternType,cur_key,suffix);
                     ngc.Groups.AddRange(
                         blocks.Select(
-                            (x,idx) => new NoteGroup(ngc,idx,AddScaleFingering(x)) { Id = Guid.NewGuid().ToString() }));
+                            (x,idx) => new NoteGroup(ngc,idx,AddScaleFingering(x))));
                     ngcl.Add(ngc);
                 }
             }
@@ -233,7 +237,11 @@ namespace Calcuchord {
 
         bool RejectNotStartOnRoot(InstrumentNote[] notes,NoteType[] pattern,
             IEnumerable<IEnumerable<InstrumentNote>> existing) {
-            return notes.OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum).FirstOrDefault().Key != pattern[0];
+            if(notes.OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum).FirstOrDefault() is { } root_note) {
+                return root_note.Key != pattern[0];
+            }
+
+            return true;
         }
 
         bool RejectNotesOnSameString(InstrumentNote[] notes,NoteType[] pattern,
@@ -377,9 +385,7 @@ namespace Calcuchord {
                             continue;
                         }
 
-                        ngc.Groups.Add(
-                            new(ngc,idx,fingerings.OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum))
-                                { Id = Guid.NewGuid().ToString() });
+                        ngc.Groups.Add(new(ngc,idx,fingerings.OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum)));
                         cur_chord_count++;
                     }
 

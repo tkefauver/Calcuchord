@@ -4,6 +4,11 @@ using AvaloniaWebView;
 using WebViewCore.Configurations;
 
 namespace Calcuchord {
+    public interface IPrimaryModel {
+        string Id { get; }
+        void CreateId(string forceId);
+    }
+
     public interface IStorageHelper {
         string StorageDir { get; }
     }
