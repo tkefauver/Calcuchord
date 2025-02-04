@@ -5,6 +5,14 @@ using HtmlAgilityPack;
 
 namespace Calcuchord {
     public static class Extensions {
+        public static bool None<TSource>(this IEnumerable<TSource> source) {
+            return !source.Any();
+        }
+
+        public static bool None<TSource>(this IEnumerable<TSource> source,Func<TSource,bool> predicate) {
+            return !source.Any(predicate);
+        }
+
         public static bool IsFlagEnabled(this SvgFlags flag,InstrumentType it,MusicPatternType pt) {
             if(it != InstrumentType.Piano) {
                 if(pt != MusicPatternType.Chords && flag == SvgFlags.Bars) {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -5,8 +6,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Controls;
+using Avalonia.Threading;
 using Calcuchord.JsonChords;
 using DialogHostAvalonia;
 using MonkeyPaste.Common;
@@ -35,6 +39,8 @@ namespace Calcuchord {
         #region Properties
 
         #region Members
+
+        CancellationTokenSource PatternGenCts { get; set; }
 
         #endregion
 
@@ -68,6 +74,14 @@ namespace Calcuchord {
 
         #region Appearance
 
+        public string FullName =>
+            $"{Parent.Name} - {Name}";
+
+        public string ProgressTitle =>
+            $"Calculating {FullName}...";
+
+        public string GenProgressLabel { get; private set; } = "Test label text";
+
         #endregion
 
         #region Layout
@@ -76,7 +90,15 @@ namespace Calcuchord {
 
         #region State
 
+        public bool IsCurGenTuning =>
+            Parent.CurGenTuning == this;
+
+        public double GenProgress { get; private set; }
+
         public int BookmarkCount { get; private set; }
+        public int ChordsCount { get; private set; }
+        public int ScalesCount { get; private set; }
+        public int ModesCount { get; private set; }
 
         bool HasFretNumRow =>
             Parent.InstrumentType != InstrumentType.Piano;
@@ -88,11 +110,18 @@ namespace Calcuchord {
             Tuning.Scales.Any() &&
             Tuning.Modes.Any();
 
-        public bool IsSelected { get; set; }
+        public bool IsSelected {
+            get => Parent.SelectedTuning == this;
+            set {
+                Parent.SelectedTuning = value ? this : null;
+                OnPropertyChanged(nameof(IsSelected));
+            }
+
+        }
 
         #endregion
 
-        #region Model
+        #region Instrument
 
         public int CapoNum {
             get => Tuning.CapoFretNum;
@@ -152,47 +181,37 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public async Task InitAsync(Tuning tuning) {
+        public async Task<bool> InitAsync(Tuning tuning) {
+            bool success = true;
+
             IsBusy = true;
 
             Tuning = tuning;
-            Tuning.SetParent(Parent.Model);
+            Tuning.SetParent(Parent.Instrument);
 
             NoteRows.Clear();
-            Tuning.OpenNotes.OrderBy(x => x.RowNum).ForEach(x => NoteRows.Add(new(this,x)));
+            Tuning.OpenNotes.OrderBy(x => x.RowNum).ForEach(x => NoteRows.Add(new NoteRowViewModel(this,x)));
             if(HasFretNumRow) {
                 // add fret num row
                 NoteRows.Insert(0,new(this,null));
             }
 
             OpenNotes.Clear();
-            OpenNotes.AddRange(NoteRows
-                .Skip(HasFretNumRow ? 1 : 0)
-                .Select(x => x.OpenNote)
-                .OrderBy(x => x.RowNum));
+            OpenNotes.AddRange(
+                NoteRows
+                    .Skip(HasFretNumRow ? 1 : 0)
+                    .Select(x => x.OpenNote)
+                    .OrderBy(x => x.RowNum));
 
-            if(!IsLoaded) {
-                if(Prefs.Instance.Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Id == Id) is not
-                   { } tuning_model) {
-                    if(!Parent.IsEditModeEnabled) {
-                        // error
-                        Debugger.Break();
-                    }
-
-                    return;
-                }
-
-                await CreateChordsAsync();
-                tuning_model.Chords = Tuning.Chords;
-                await CreateScalesAndModesAsync();
-                tuning_model.Scales = Tuning.Scales;
-                tuning_model.Modes = Tuning.Modes;
-
+            if(!IsLoaded &&
+               (!Parent.IsEditModeEnabled || IsCurGenTuning)) {
+                success = await LoadPatternsAsync();
             }
 
-            Parent.Model.RefreshModelTree();
+            Parent.Instrument.RefreshModelTree();
 
             IsBusy = false;
+            return success;
         }
 
         public void ResetSelection() {
@@ -213,8 +232,13 @@ namespace Calcuchord {
 
         void InstrumentTuningViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
+                case nameof(Name):
+                    if(IsSelected) {
+                    }
+
+                    break;
                 case nameof(IsSelected):
-                    if(IsSelected && !Parent.IsEditModeEnabled) {
+                    if(IsSelected) {
                         ResetSelection();
                         Prefs.Instance.SelectedTuningId = Id;
                         Prefs.Instance.Save();
@@ -225,90 +249,163 @@ namespace Calcuchord {
             }
         }
 
-
-        async Task CreateChordsAsync() {
-            bool from_file =
-                Tuning.Id is
-                    Instrument.STANDARD_GUITAR_TUNING_ID or
-                    Instrument.STANDARD_UKULELE_TUNING_ID;
-            //from_file = false;
-            IEnumerable<NoteGroupCollection> chords = null;
-            if(from_file) {
-                chords = GenFromFile(Tuning);
-            } else {
-                chords = await GenFromPatternsAsync(Tuning);
-            }
-
-            Tuning.Chords.AddRange(chords);
-            return;
-
-            async Task<IEnumerable<NoteGroupCollection>> GenFromPatternsAsync(Tuning tuning) {
-                PatternGen pg = new PatternGen(MusicPatternType.Chords,tuning);
-                var result = await pg.GenerateAsync();
-                return result;
-            }
-
-            IEnumerable<NoteGroupCollection> GenFromFile(Tuning tuning) {
-                string json = MpAvFileIo.ReadTextFromResource(
-                    $"avares://Calcuchord/Assets/Text/{tuning.Parent.InstrumentType.ToString().ToLower()}.json");
-                ChordsJsonRoot chordsJsonRoot = JsonConvert.DeserializeObject<ChordsJsonRoot>(json);
-                var ngcl = new List<NoteGroupCollection>();
-
-                foreach(PropertyInfo pi in typeof(Chords).GetProperties()) {
-                    object obj = chordsJsonRoot.chords.GetPropertyValue(pi.Name);
-                    if(obj is not IList keys_obj ||
-                       keys_obj.OfType<Key>().FirstOrDefault() is not { } key_obj ||
-                       MusicHelpers.ParseNote(key_obj.key) is not { } key_note_tup) {
-                        continue;
-                    }
-
-                    NoteType cur_key = key_note_tup.nt;
-
-                    foreach(Key chord_group in keys_obj) {
-                        string cur_suffix = chord_group.suffix;
-                        NoteGroupCollection ngc = new NoteGroupCollection(
-                            MusicPatternType.Chords,cur_key,chord_group.suffix);
-                        foreach((Position pos,int pos_num) in chord_group.positions.WithIndex()) {
-                            NoteGroup ng = new NoteGroup(ngc,pos_num);
-                            ng.CreateId(null);
-                            foreach((int f,int str_num) in pos.real_frets.WithIndex()) {
-                                ng.Notes.Add(
-                                    new(
-                                        pos.fingers[str_num],f,str_num,tuning.OpenNotes[str_num].Offset(f).Key,
-                                        tuning.OpenNotes[str_num].Register));
-                            }
-
-                            ngc.Groups.Add(ng);
-                        }
-
-                        ngcl.Add(ngc);
-                    }
+        async Task<bool> LoadPatternsAsync() {
+            if(Prefs.Instance.Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Id == Id) is not
+               { } tuning_model) {
+                if(!Parent.IsEditModeEnabled) {
+                    // error
+                    Debugger.Break();
                 }
 
-                return ngcl;
+                return false;
+            }
+
+            PatternGenCts = new();
+
+            var progress_lookup = new Dictionary<MusicPatternType,double>
+            {
+                { MusicPatternType.Chords,0 },
+                { MusicPatternType.Scales,0 },
+                { MusicPatternType.Modes,0 }
+            };
+            var tasks = new List<Func<Task>>
+            {
+                CreateScalesAndModesAsync,
+                CreateChordsAsync
+            };
+
+            bool is_done = false;
+
+            _ = Task.Run(
+                async () => {
+                    await Task.WhenAll(tasks.Select(task => task()));
+                    tuning_model.Chords = Tuning.Chords;
+                    tuning_model.Scales = Tuning.Scales;
+                    tuning_model.Modes = Tuning.Modes;
+                    is_done = true;
+                },PatternGenCts.Token);
+            while(true) {
+                if(is_done) {
+                    break;
+                }
+
+                if(PatternGenCts.Token.IsCancellationRequested) {
+                    break;
+                }
+
+                await Task.Delay(100);
+            }
+
+            return is_done;
+
+
+            void OnProgressChanged(object sender,EventArgs e) {
+                if(sender is not PatternGen pg) {
+                    return;
+                }
+
+                progress_lookup[pg.PatternType] = pg.PercentDone;
+
+                Dispatcher.UIThread.Post(
+                    () => {
+                        GenProgress =
+                            progress_lookup
+                                [MusicPatternType.Chords]; //progress_lookup.Values.Sum() / progress_lookup.Count;
+                        GenProgressLabel = $"{pg.CurrentProgressCount:n0} chords found"; //pg.ProgressLabel;
+
+                        Debug.WriteLine($"Total Progress: {GenProgress} Label: '{pg.ProgressLabel}'");
+                    });
+            }
+
+            async Task CreateChordsAsync() {
+                bool from_file =
+                    Tuning.Id is
+                        Instrument.STANDARD_GUITAR_TUNING_ID or
+                        Instrument.STANDARD_UKULELE_TUNING_ID;
+                //from_file = false;
+                IEnumerable<NoteGroupCollection> chords = null;
+                if(from_file) {
+                    chords = GenFromFile(Tuning);
+                } else {
+                    chords = await GenFromPatternsAsync(Tuning);
+                }
+
+                Tuning.Chords.AddRange(chords);
+                return;
+
+                async Task<IEnumerable<NoteGroupCollection>> GenFromPatternsAsync(Tuning tuning) {
+                    PatternGen pg = new PatternGen(MusicPatternType.Chords,tuning);
+                    pg.ProgressChanged += OnProgressChanged;
+                    var result = await pg.GenerateAsync(PatternGenCts.Token);
+                    return result;
+                }
+
+                IEnumerable<NoteGroupCollection> GenFromFile(Tuning tuning) {
+                    string json = MpAvFileIo.ReadTextFromResource(
+                        $"avares://Calcuchord/Assets/Text/{tuning.Parent.InstrumentType.ToString().ToLower()}.json");
+                    ChordsJsonRoot chordsJsonRoot = JsonConvert.DeserializeObject<ChordsJsonRoot>(json);
+                    var ngcl = new List<NoteGroupCollection>();
+
+                    foreach(PropertyInfo pi in typeof(Chords).GetProperties()) {
+                        object obj = chordsJsonRoot.chords.GetPropertyValue(pi.Name);
+                        if(obj is not IList keys_obj ||
+                           keys_obj.OfType<Key>().FirstOrDefault() is not { } key_obj ||
+                           MusicHelpers.ParseNote(key_obj.key) is not { } key_note_tup) {
+                            continue;
+                        }
+
+                        NoteType cur_key = key_note_tup.nt;
+
+                        foreach(Key chord_group in keys_obj) {
+                            string cur_suffix = chord_group.suffix;
+                            NoteGroupCollection ngc = new NoteGroupCollection(
+                                MusicPatternType.Chords,cur_key,chord_group.suffix);
+                            foreach((Position pos,int pos_num) in chord_group.positions.WithIndex()) {
+                                NoteGroup ng = new NoteGroup(ngc,pos_num);
+                                ng.CreateId(null);
+                                foreach((int f,int str_num) in pos.real_frets.WithIndex()) {
+                                    ng.Notes.Add(
+                                        new(
+                                            pos.fingers[str_num],f,str_num,tuning.OpenNotes[str_num].Offset(f).Key,
+                                            tuning.OpenNotes[str_num].Register));
+                                }
+
+                                ngc.Groups.Add(ng);
+                            }
+
+                            ngcl.Add(ngc);
+                        }
+                    }
+
+                    return ngcl;
+                }
+            }
+
+            async Task CreateScalesAndModesAsync() {
+                PatternGen pg1 = new PatternGen(MusicPatternType.Scales,Tuning);
+                pg1.ProgressChanged += OnProgressChanged;
+                var scales = await pg1.GenerateAsync(PatternGenCts.Token);
+                Tuning.Scales.AddRange(scales);
+                Debug.WriteLine(
+                    $"{scales.SelectMany(x => x.Groups).Count()} scales generated for {Tuning}");
+
+                PatternGen pg2 = new PatternGen(MusicPatternType.Modes,Tuning);
+                pg2.ProgressChanged += OnProgressChanged;
+                var modes = await pg2.GenerateAsync(PatternGenCts.Token);
+                Tuning.Modes.AddRange(modes);
+                Debug.WriteLine(
+                    $"{modes.SelectMany(x => x.Groups).Count()} modes generated for {Tuning}");
             }
         }
 
-        async Task CreateScalesAndModesAsync() {
-            PatternGen pg = new PatternGen(MusicPatternType.Scales,Tuning);
-            var scales = await pg.GenerateAsync();
-            Tuning.Scales.AddRange(scales);
-            Debug.WriteLine(
-                $"{scales.SelectMany(x => x.Groups).Count()} scales generated for {Tuning}");
-
-            pg = new(MusicPatternType.Modes,Tuning);
-            var modes = await pg.GenerateAsync();
-            Tuning.Modes.AddRange(modes);
-            Debug.WriteLine(
-                $"{modes.SelectMany(x => x.Groups).Count()} modes generated for {Tuning}");
-        }
 
         async Task AdjustCapoAsync(int capoDelta) {
             CapoNum += capoDelta;
-            var new_open_notes = Tuning.OpenNotes.Select((x,idx) => new InstrumentNote(0,idx,x.Offset(capoDelta)))
-                .ToList();
-            Tuning.OpenNotes.Clear();
-            Tuning.OpenNotes.AddRange(new_open_notes);
+            Tuning.OpenNotes.ForEach(x => x.Adjust(capoDelta));
+            // var new_open_notes = Tuning.OpenNotes.Select((x,idx) => new InstrumentNote(0,idx,x.Offset(capoDelta)))
+            //     .ToList();
+            // Tuning.OpenNotes.Clear();
+            // Tuning.OpenNotes.AddRange(new_open_notes);
             await InitAsync(Tuning);
         }
 
@@ -319,44 +416,68 @@ namespace Calcuchord {
         public bool CanDelete =>
             !IsReadOnly && Parent.Tunings.Count > 1;
 
-        public ICommand DeleteThisTuningCommand => new MpCommand(() => {
-            Parent.RemoveTuningCommand.Execute(Id);
-        },() => {
-            return CanDelete;
-        });
+        public ICommand DeleteThisTuningCommand => new MpCommand(
+            () => {
+                Parent.RemoveTuningCommand.Execute(Id);
+            },() => {
+                return CanDelete;
+            });
 
-        public ICommand DuplicateThisTuningCommand => new MpCommand(() => {
-            Tuning dup_tuning = Tuning.Clone();
-            dup_tuning.IsReadOnly = false;
-            dup_tuning.Name = Parent.GetUniqueTuningName(Name,[]);
-            Parent.AddTuningCommand.Execute(dup_tuning);
-        });
+        public ICommand DuplicateThisTuningCommand => new MpCommand(
+            () => {
+                Tuning dup_tuning = Tuning.Clone();
+                dup_tuning.IsReadOnly = false;
+                dup_tuning.Name = Parent.GetUniqueTuningName(Name,[]);
+                Parent.AddTuningCommand.Execute(dup_tuning);
+            });
 
-        public ICommand IncreaseCapoFretCommand => new MpAsyncCommand(async () => {
-            await AdjustCapoAsync(1);
-        },() => {
-            return FretCount > Parent.MinEditableFretCount;
-        });
+        public ICommand IncreaseCapoFretCommand => new MpAsyncCommand(
+            async () => {
+                await AdjustCapoAsync(1);
+            },() => {
+                return FretCount > Parent.MinEditableFretCount;
+            });
 
-        public ICommand DecreaseCapoFretCommand => new MpAsyncCommand(async () => {
-            await AdjustCapoAsync(-1);
-        },() => {
-            return CapoNum > 0;
-        });
+        public ICommand DecreaseCapoFretCommand => new MpAsyncCommand(
+            async () => {
+                await AdjustCapoAsync(-1);
+            },() => {
+                return CapoNum > 0;
+            });
 
 
-        public ICommand ShowStatsCommand => new MpCommand(() => {
-            BookmarkCount =
-                Tuning.Collections.Values.SelectMany(x => x)
-                    .SelectMany(x => x.Groups)
-                    .Count(x => Prefs.Instance.BookmarkIds.Contains(x.Id));
+        public ICommand ShowStatsCommand => new MpCommand<object>(
+            (args) => {
+                if(args is Button b &&
+                   b.Flyout is { } fo) {
+                    fo.Hide();
+                    // BUG context menu blocks popup and doesn't close 
+                    // so manually closing
+                }
 
-            DialogHost.Show(this,"MainDialogHost");
-        });
+                ChordsCount = Tuning.Chords.SelectMany(x => x.Groups).Count();
+                ScalesCount = Tuning.Scales.SelectMany(x => x.Groups).Count();
+                ModesCount = Tuning.Modes.SelectMany(x => x.Groups).Count();
 
-        public ICommand SelectThisTuningCommand => new MpCommand(() => {
-            Parent.SelectedTuning = this;
-        });
+                BookmarkCount =
+                    Tuning.Collections.Values.SelectMany(x => x)
+                        .SelectMany(x => x.Groups)
+                        .Count(x => Prefs.Instance.BookmarkIds.Contains(x.Id));
+
+
+                DialogHost.Show(this,"MainDialogHost");
+
+            });
+
+        public ICommand SelectThisTuningCommand => new MpCommand(
+            () => {
+                Parent.SelectedTuning = this;
+            });
+
+        public ICommand CancelPatternGenCommand => new MpCommand(
+            () => {
+                PatternGenCts?.Cancel();
+            });
 
         #endregion
 

@@ -42,7 +42,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Model
+        #region Instrument
 
         #endregion
 

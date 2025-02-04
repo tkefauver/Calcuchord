@@ -153,7 +153,7 @@ namespace Calcuchord {
         IEnumerable<OptionViewModel> SelectedSuffixOptions =>
             SuffixOptions.Where(x => x.IsChecked);
 
-        Dictionary<OptionType,ObservableCollection<OptionViewModel>> OptionLookup { get; } =
+        public Dictionary<OptionType,ObservableCollection<OptionViewModel>> OptionLookup { get; } =
             new Dictionary<OptionType,ObservableCollection<OptionViewModel>>
             {
                 { OptionType.Key,[] },
@@ -173,9 +173,13 @@ namespace Calcuchord {
 
         public string EmptyMatchLabel {
             get {
-                string suffix = IsPianoSelected ? "Keys" : "Frets";
-                if(IsDefaultSelection) {
+                if(IsDefaultSelection && IsSearchModeSelected) {
+                    string suffix = IsPianoSelected ? "Keys" : "Frets";
                     return $"Select {suffix}";
+                }
+
+                if(IsBookmarkModeSelected) {
+                    return "No bookmarks found";
                 }
 
                 switch(MpRandom.Rand.Next(4)) {
@@ -204,6 +208,8 @@ namespace Calcuchord {
         #endregion
 
         #region State
+
+        public bool IsLoaded { get; private set; }
 
         #region UI
 
@@ -251,7 +257,7 @@ namespace Calcuchord {
         }
 
         public InstrumentType SelectedInstrumentType =>
-            SelectedInstrument == null ? 0 : SelectedInstrument.Model.InstrumentType;
+            SelectedInstrument == null ? 0 : SelectedInstrument.Instrument.InstrumentType;
 
         public bool IsPianoSelected =>
             SelectedInstrumentType == InstrumentType.Piano;
@@ -265,12 +271,7 @@ namespace Calcuchord {
 
         #region Matches
 
-        public bool CanDecreaseMatchColCount =>
-            MatchColCount > 1;
-
-        public bool CanIncreaseMatchColCount =>
-            MatchColCount < Matches.Count;
-
+        int MatchCount { get; set; }
         int MatchColCount { get; set; } = 1;
 
         public double MatchZoom { get; set; } = 1.0;
@@ -322,7 +323,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Model
+        #region Instrument
 
         #endregion
 
@@ -388,8 +389,6 @@ namespace Calcuchord {
 
                     break;
                 case nameof(IsSearchInitiating):
-                    OnPropertyChanged(nameof(CanDecreaseMatchColCount));
-                    OnPropertyChanged(nameof(CanIncreaseMatchColCount));
                     break;
                 case nameof(SelectedPatternType):
                     InitMatchProvider();
@@ -408,7 +407,9 @@ namespace Calcuchord {
 
 
         async Task InitAsync() {
-            IsBusy = true;
+            Prefs.Instance.IsSaveIgnored = true;
+
+            //IsBusy = true;
             bool needs_save = false;
             if(Prefs.Instance.Instruments is not IEnumerable<Instrument> instl ||
                !instl.Any()) {
@@ -422,9 +423,6 @@ namespace Calcuchord {
                 Instruments.Add(ivm);
             }
 
-            if(needs_save) {
-                Prefs.Instance.Save();
-            }
 
             foreach(InstrumentViewModel inst in Instruments) {
                 foreach(TuningViewModel tun in inst.Tunings) {
@@ -436,13 +434,16 @@ namespace Calcuchord {
 
             //TestInstruments();
 
+            IsLoaded = true;
+
+            InitSelection();
+
+            Prefs.Instance.IsSaveIgnored = false;
             if(needs_save) {
-                InitInstrument();
-            } else {
-                InitSelection();
+                Prefs.Instance.Save();
             }
 
-            IsBusy = false;
+            // IsBusy = false;
         }
 
 
@@ -456,39 +457,41 @@ namespace Calcuchord {
                 return;
             }
 
-            Task.Run(async () => {
-                await CancelMatchLoadAsync();
-                var sel_notes = SelectedTuning.SelectedNotes;
-                if(source is
-                   MatchUpdateSource.FindClick or
-                   MatchUpdateSource.InstrumentInit or
-                   MatchUpdateSource.BookmarkToggle) {
-                    CreateWorkingMatches(sel_notes);
-                }
-
-                LastNotes = sel_notes.ToList();
-                FilteredMatches = GetFilterWorkingMatches();
-
-                await Dispatcher.UIThread.InvokeAsync(async () => {
-                    IsSearchInitiating = true;
-                    IsLoadingMatches = true;
-                    if(source == MatchUpdateSource.FindClick) {
-                        string count_msg = $"{FilteredMatches.Count()} found";
-                        AvSnackbarHost.Post(
-                            count_msg,
-                            null,
-                            DispatcherPriority.Background);
+            Task.Run(
+                async () => {
+                    await CancelMatchLoadAsync();
+                    var sel_notes = SelectedTuning.SelectedNotes;
+                    if(source is
+                       MatchUpdateSource.FindClick or
+                       MatchUpdateSource.InstrumentInit or
+                       MatchUpdateSource.BookmarkToggle) {
+                        CreateWorkingMatches(sel_notes);
                     }
 
-                    UpdateFilters();
-                    MatchCts = new();
+                    LastNotes = sel_notes.ToList();
+                    FilteredMatches = GetFilterWorkingMatches();
 
-                    await LoadMatchesAsync(FilteredMatches,MatchCts.Token);
+                    await Dispatcher.UIThread.InvokeAsync(
+                        async () => {
+                            IsSearchInitiating = true;
+                            IsLoadingMatches = true;
+                            if(source == MatchUpdateSource.FindClick) {
+                                string count_msg = $"{FilteredMatches.Count()} found";
+                                AvSnackbarHost.Post(
+                                    count_msg,
+                                    null,
+                                    DispatcherPriority.Background);
+                            }
 
-                    IsLoadingMatches = false;
-                    IsSearchOverlayVisible = true;
-                },DispatcherPriority.Background);
-            });
+                            UpdateFilters();
+                            MatchCts = new();
+
+                            await LoadMatchesAsync(FilteredMatches,MatchCts.Token);
+
+                            IsLoadingMatches = false;
+                            IsSearchOverlayVisible = true;
+                        },DispatcherPriority.Background);
+                });
         }
 
         void UpdateMatchOverlays() {
@@ -513,9 +516,11 @@ namespace Calcuchord {
 
         async Task LoadMatchesAsync(IEnumerable<MatchViewModelBase> matches,CancellationToken ct) {
             Matches.Clear();
+            MatchCount = 0;
             if(!matches.Any()) {
                 IsSearchInitiating = false;
             }
+
 
             foreach(MatchViewModelBase match in matches) {
                 if(ct.IsCancellationRequested) {
@@ -524,9 +529,13 @@ namespace Calcuchord {
                 }
 
                 Matches.Add(match);
+                MatchCount++;
                 await Task.Delay(50,ct);
                 IsSearchInitiating = false;
             }
+
+            (IncreaseMatchColumnsCommand as MpCommand)?.RaiseCanExecuteChanged();
+            (DecreaseMatchColumnsCommand as MpCommand)?.RaiseCanExecuteChanged();
         }
 
         void CreateWorkingMatches(IEnumerable<NoteViewModel> notes) {
@@ -621,8 +630,6 @@ namespace Calcuchord {
             int cols = (int)Math.Max(1,avail_w / MatchWidth);
             Debug.WriteLine($"Discovered {cols} columns. Was {MatchColCount}");
             MatchColCount = cols;
-            OnPropertyChanged(nameof(CanDecreaseMatchColCount));
-            OnPropertyChanged(nameof(CanIncreaseMatchColCount));
         }
 
         async Task SetMatchColumnCountAsync(int newColCount) {
@@ -719,11 +726,13 @@ namespace Calcuchord {
                                 })));
             }
 
-
-            foreach(var kvp in OptionLookup) {
-                kvp.Value.Clear();
-                kvp.Value.AddRange(all_opts.Where(x => x.OptionType == kvp.Key));
+            if(OptionLookup.Values.SelectMany(x => x).None()) {
+                foreach(var kvp in OptionLookup) {
+                    kvp.Value.Clear();
+                    kvp.Value.AddRange(all_opts.Where(x => x.OptionType == kvp.Key));
+                }
             }
+
 
             LoadSvgFlagsIntoOptions();
 
@@ -732,6 +741,10 @@ namespace Calcuchord {
             OnPropertyChanged(nameof(KeyOptions));
             OnPropertyChanged(nameof(SuffixOptions));
             OnPropertyChanged(nameof(SvgOptions));
+
+            OnPropertyChanged(nameof(SearchOptionViewModel));
+            OnPropertyChanged(nameof(BookmarksOptionViewModel));
+            OnPropertyChanged(nameof(IndexOptionViewModel));
 
             UpdateSvgFlagAvailability();
 
@@ -769,10 +782,13 @@ namespace Calcuchord {
 
         void InitInstrument() {
 
+            Debug.WriteLine("init instrument");
+
             //TestSvg();
 
-            InitSelection();
             InitOptions();
+
+            OptionViewModel test = SearchOptionViewModel;
 
             InitMatchProvider();
 
@@ -810,106 +826,139 @@ namespace Calcuchord {
 
         #region Commands
 
-        public ICommand CancelEditInstrumentCommand => new MpCommand(async () => {
+        public ICommand CancelEditInstrumentCommand => new MpCommand(
+            async () => {
 
-            if(EditModeInstrument is not { } inst_to_restore_vm) {
-                _editInstrumentInitialStateJson = null;
-                return;
-            }
-
-            EditModeInstrument = null;
-            if(!string.IsNullOrEmpty(_editInstrumentInitialStateJson)) {
-                Instrument inst_to_restore = JsonConvert.DeserializeObject<Instrument>(_editInstrumentInitialStateJson);
-                Prefs.Instance.Instruments.Remove(inst_to_restore_vm.Model);
-                Prefs.Instance.Instruments.Add(inst_to_restore);
-                Prefs.Instance.Save();
-                await inst_to_restore_vm.InitAsync(inst_to_restore);
-            }
-
-            _editInstrumentInitialStateJson = null;
-        });
-
-        public ICommand FinishEditInstrumentCommand => new MpCommand(async () => {
-            if(EditModeInstrument is not { } emi_vm) {
-                return;
-            }
-
-            _editInstrumentInitialStateJson = null;
-            EditModeInstrument = null;
-            if(!emi_vm.IsActivated) {
-                // add new inst to list
-                Instruments.Add(emi_vm);
-                Prefs.Instance.Instruments.Add(emi_vm.Model);
-            }
-
-            if(emi_vm.Tunings.Where(x => !x.IsLoaded) is { } unloaded_tunings) {
-                // gen any new tuning patterns
-                // TODO probably need progress thing here
-                await Task.WhenAll(unloaded_tunings.Select(x => x.InitAsync(x.Tuning)));
-            }
-
-            Prefs.Instance.Save();
-        });
-
-        public ICommand BeginEditInstrumentCommand => new MpCommand<object>(async args => {
-            if(args is not InstrumentViewModel edit_inst_vm) {
-                if(args is not TuningViewModel tvm) {
+                if(EditModeInstrument is not { } inst_to_restore_vm) {
+                    _editInstrumentInitialStateJson = null;
                     return;
                 }
 
-                edit_inst_vm = tvm.Parent;
-            }
+                EditModeInstrument = null;
+                if(!string.IsNullOrEmpty(_editInstrumentInitialStateJson)) {
+                    Instrument inst_to_restore =
+                        JsonConvert.DeserializeObject<Instrument>(_editInstrumentInitialStateJson);
+                    Prefs.Instance.Instruments.Remove(inst_to_restore_vm.Instrument);
+                    Prefs.Instance.Instruments.Add(inst_to_restore);
+                    Prefs.Instance.Save();
+                    await inst_to_restore_vm.InitAsync(inst_to_restore);
+                }
 
-            IsLeftDrawerOpen = false;
-            IsRightDrawerOpen = false;
+                _editInstrumentInitialStateJson = null;
+            });
 
-            // wait for drawers to close...
-            await Task.Delay(500);
+        public ICommand FinishEditInstrumentCommand => new MpCommand(
+            async () => {
+                if(EditModeInstrument is not { } emi_vm) {
+                    return;
+                }
 
-            // store full backup of instrument (existing only)
-            _editInstrumentInitialStateJson =
-                edit_inst_vm.IsActivated ? JsonConvert.SerializeObject(edit_inst_vm.Model) : null;
+                _editInstrumentInitialStateJson = null;
+                if(!emi_vm.IsActivated) {
+                    // add new inst to list
+                    Instruments.Add(emi_vm);
+                    Prefs.Instance.Instruments.Add(emi_vm.Instrument);
+                }
 
-            EditModeInstrument = edit_inst_vm;
+                if(emi_vm.Tunings.Where(x => !x.IsLoaded) is { } new_tuning_vms &&
+                   new_tuning_vms.Any()) {
+                    // gen any new tuning patterns
+                    // TODO probably need progress thing here
+                    foreach(TuningViewModel new_tuning_vm in new_tuning_vms) {
+                        emi_vm.CurGenTuning = new_tuning_vm;
+                        await Task.Delay(500);
 
-            if(MainView.Instance is { } mv &&
-               mv.GetVisualDescendant<InstPopupContainerView>() is { } ipuv &&
-               ipuv.GetVisualDescendant<TabControl>() is { } tc) {
-                tc.SelectedItem = tc.Items[EditModeInstrument.IsActivated ? 1 : 0];
-            }
-        });
+                        bool success = await new_tuning_vm.InitAsync(new_tuning_vm.Tuning);
+                        if(!success) {
+                            // gen was canceled, restore edit view
+                            emi_vm.CurGenTuning = null;
+                            return;
+                        }
+                    }
 
-        public ICommand AddInstrumentCommand => new MpCommand(async () => {
-            Instrument new_inst = new Instrument();
-            InstrumentViewModel new_inst_vm = await CreateInstrumentAsync(new_inst);
-            BeginEditInstrumentCommand.Execute(new_inst_vm);
-        });
+                    emi_vm.CurGenTuning = null;
+                    if(new_tuning_vms.Any(x => x.IsSelected)) {
+                        InitInstrument();
+                    }
+                }
 
-        public ICommand DecreaseMatchColumnsCommand => new MpAsyncCommand(async () => {
-            // plus btn
-            IsMatchZoomChanging = true;
-            await SetMatchColumnCountAsync(MatchColCount - 1);
-            IsMatchZoomChanging = false;
-        });
+                Prefs.Instance.Save();
+                EditModeInstrument = null;
+            });
 
-        public ICommand IncreaseMatchColumnsCommand => new MpAsyncCommand(async () => {
-            // minus btn
-            IsMatchZoomChanging = true;
-            await SetMatchColumnCountAsync(MatchColCount + 1);
-            IsMatchZoomChanging = false;
-        });
+        public ICommand BeginEditInstrumentCommand => new MpCommand<object>(
+            async args => {
+                if(args is not InstrumentViewModel edit_inst_vm) {
+                    if(args is not TuningViewModel tvm) {
+                        return;
+                    }
 
-        public ICommand ResetInstrumentCommand => new MpCommand(() => {
-            SelectedTuning.ResetSelection();
-            UpdateMatchOverlays();
-        });
+                    edit_inst_vm = tvm.Parent;
+                }
 
-        public ICommand CloseRightDrawerCommand => new MpCommand(() => {
-            IsRightDrawerOpen = false;
-        });
+                IsLeftDrawerOpen = false;
+                IsRightDrawerOpen = false;
+
+                // wait for drawers to close...
+                await Task.Delay(500);
+
+                // store full backup of instrument (existing only)
+                _editInstrumentInitialStateJson =
+                    edit_inst_vm.IsActivated ? JsonConvert.SerializeObject(edit_inst_vm.Instrument) : null;
+
+                EditModeInstrument = edit_inst_vm;
+                if(EditModeInstrument.IsActivated) {
+                    EditModeInstrument.IsInstrumentTabSelected = false;
+                    EditModeInstrument.IsTuningTabSelected = true;
+                } else {
+                    EditModeInstrument.IsInstrumentTabSelected = true;
+                    EditModeInstrument.IsTuningTabSelected = false;
+                }
+            });
+
+        public ICommand AddInstrumentCommand => new MpCommand(
+            async () => {
+                Instrument new_inst = new Instrument();
+                InstrumentViewModel new_inst_vm = await CreateInstrumentAsync(new_inst);
+                BeginEditInstrumentCommand.Execute(new_inst_vm);
+            });
+
+        public ICommand DecreaseMatchColumnsCommand => new MpCommand(
+            async () => {
+                // plus btn
+                IsMatchZoomChanging = true;
+                await SetMatchColumnCountAsync(MatchColCount - 1);
+                IsMatchZoomChanging = false;
+            },
+            () => {
+                //return MatchColCount > 1;
+                return true;
+            });
+
+        public ICommand IncreaseMatchColumnsCommand => new MpCommand(
+            async () => {
+                // minus btn
+                IsMatchZoomChanging = true;
+                await SetMatchColumnCountAsync(MatchColCount + 1);
+                IsMatchZoomChanging = false;
+            },() => {
+                //return MatchColCount < Matches.Count;
+                return true;
+            });
+
+        public ICommand ResetInstrumentCommand => new MpCommand(
+            () => {
+                SelectedTuning.ResetSelection();
+                UpdateMatchOverlays();
+            });
+
+        public ICommand CloseRightDrawerCommand => new MpCommand(
+            () => {
+                IsRightDrawerOpen = false;
+            });
 
         public ICommand SelectOptionCommand => new MpCommand<object>(
-            args => {
+            (args) => {
                 if(args is not OptionViewModel ovm ||
                    !ovm.OptionType.TryToEnum(out OptionType optionType)) {
                     return;

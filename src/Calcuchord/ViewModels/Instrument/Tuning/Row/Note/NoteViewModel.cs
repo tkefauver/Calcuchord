@@ -117,6 +117,9 @@ namespace Calcuchord {
         public bool IsInMuteState =>
             WorkingNoteNum == MUTE_FRET_NUM;
 
+        public bool IsOpenNote =>
+            NoteNum == 0;
+
         public bool IsNutFret =>
             !Parent.Parent.Parent.IsKeyboard &&
             IsEnabled &&
@@ -235,7 +238,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Model
+        #region Instrument
 
         public int NoteId =>
             InstrumentNote.NoteId;
@@ -279,8 +282,7 @@ namespace Calcuchord {
         }
 
         public void ChangePitch(int deltaId) {
-            Note new_note = InstrumentNote.Offset(deltaId);
-            InstrumentNote = new(NoteNum,RowNum,new_note);
+            InstrumentNote.Adjust(deltaId);
 
             OnPropertyChanged(nameof(MarkerLabel));
             OnPropertyChanged(nameof(MarkerDetail));
@@ -311,21 +313,24 @@ namespace Calcuchord {
 
         #region Commands
 
-        public ICommand IncreasePitchCommand => new MpCommand(() => {
-            ChangePitch(1);
-        },() => {
-            return NoteId < Note.MAX_NOTE_ID;
-        });
+        public ICommand IncreasePitchCommand => new MpCommand(
+            () => {
+                ChangePitch(1);
+            },() => {
+                return NoteId < Note.MAX_NOTE_ID;
+            });
 
-        public ICommand DecreasePitchCommand => new MpCommand(() => {
-            ChangePitch(-1);
-        },() => {
-            return NoteId > Note.MIN_NOTE_ID;
-        });
+        public ICommand DecreasePitchCommand => new MpCommand(
+            () => {
+                ChangePitch(-1);
+            },() => {
+                return NoteId > Note.MIN_NOTE_ID;
+            });
 
-        public ICommand SelectThisOpenNoteCommand => new MpCommand(() => {
-            Parent.Parent.SelectedOpenNoteIndex = Parent.Parent.OpenNotes.IndexOf(this);
-        });
+        public ICommand SelectThisOpenNoteCommand => new MpCommand(
+            () => {
+                Parent.Parent.SelectedOpenNoteIndex = Parent.Parent.OpenNotes.IndexOf(this);
+            });
 
         #endregion
 

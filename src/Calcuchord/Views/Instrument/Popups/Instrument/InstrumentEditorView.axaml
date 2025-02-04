@@ -3,8 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignWidth="800"
-             d:DesignHeight="450"
+             d:DesignWidth="300"
+             d:DesignHeight="350"
              xmlns:sys="clr-namespace:System;assembly=netstandard"
              xmlns:p1="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -17,14 +17,15 @@
     <Design.DataContext>
         <local:DesignInstrumentViewModel />
     </Design.DataContext>
+    <UserControl.Resources>
+
+    </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="TextPresenter">
             <Setter Property="Margin"
                     Value="5,0,0,0" />
         </Style>
         <Style Selector="TextBlock">
-            <Setter Property="Foreground"
-                    Value="{DynamicResource Bg}" />
             <Setter Property="FontSize"
                     Value="18" />
         </Style>
@@ -34,33 +35,43 @@
             <Setter Property="Margin"
                     Value="0,0,0,10" />
         </Style>
-        <Style Selector="UniformGrid.form-element.sub"
-               x:DataType="local:InstrumentViewModel">
-            <Setter Property="Opacity"
-                    Value="{Binding HasInstrumentType, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}" />
-        </Style>
         <Style Selector="UniformGrid.form-element > :is(Control):not(:is(Button))">
             <Setter Property="VerticalAlignment"
                     Value="Center" />
             <Setter Property="Width"
                     Value="130" />
         </Style>
+        <Style Selector="ComboBoxItem">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Bg}" />
+        </Style>
+        <Style Selector="ComboBox:dropdownopen ComboBoxItem">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Fg}" />
+        </Style>
+        <Style Selector="ComboBox[IsHitTestVisible=False]">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource DisabledAccentFg}" />
+            <Setter Property="FontStyle"
+                    Value="Italic" />
+        </Style>
+        <Style Selector="ComboBox[IsHitTestVisible=True]">
+            <Style.Resources>
+                <SolidColorBrush x:Key="MaterialTextBoxBorderBrush"
+                                 Color="{DynamicResource BgColor}" />
+            </Style.Resources>
+        </Style>
         <Style Selector="UniformGrid.form-element > ComboBox">
             <Setter Property="CornerRadius"
                     Value="5" />
-            <Setter Property="Background"
-                    Value="{DynamicResource Bg}" />
-            <!-- <Setter Property="Theme" -->
-            <!--         Value="{StaticResource MaterialOutlineComboBox}" /> -->
-
             <Setter Property="Theme"
-                    Value="{StaticResource MaterialComboBox}" />
+                    Value="{StaticResource MaterialFilledComboBox}" />
             <Setter Property="ItemTemplate">
                 <Setter.Value>
                     <DataTemplate x:DataType="sys:String">
                         <TextBlock Classes="combo-item"
                                    Margin="3,0"
-                                   Foreground="{DynamicResource Fg}"
+                                   ClipToBounds="False"
                                    VerticalAlignment="Center"
                                    TextAlignment="Center"
                                    Text="{Binding .}" />
@@ -69,73 +80,79 @@
             </Setter>
         </Style>
         <Style Selector="UniformGrid.form-element > TextBlock">
-            <Setter Property="HorizontalAlignment"
-                    Value="Left" />
-        </Style>
-        <Style Selector="UniformGrid.form-element > TextBox /template/ Panel#PART_TextContainer">
-            <Setter Property="Margin"
-                    Value="0,0,0,0" />
-            <Setter Property="VerticalAlignment"
-                    Value="Center" />
-        </Style>
-        <Style Selector="UniformGrid.form-element > TextBox">
-            <Setter Property="Background"
-                    Value="{DynamicResource Bg}" />
-            <Setter Property="Foreground"
-                    Value="{DynamicResource Fg}" />
             <Setter Property="FontSize"
-                    Value="18" />
-            <Setter Property="CornerRadius"
-                    Value="5" />
-            <Setter Property="Margin"
-                    Value="0,5" />
-            <Setter Property="Padding"
-                    Value="5,0" />
-            <Setter Property="VerticalContentAlignment"
+                    Value="22" />
+            <Setter Property="HorizontalAlignment"
                     Value="Center" />
             <Setter Property="TextAlignment"
-                    Value="Center" />
+                    Value="Right" />
+            <Setter Property="Margin"
+                    Value="0,0,60,0" />
+        </Style>
+        <Style Selector="Border.sep">
+            <Setter Property="Margin"
+                    Value="0,10,0,20" />
+            <Setter Property="Height"
+                    Value="1" />
+            <Setter Property="Opacity"
+                    Value="0.5" />
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0%,0%"
+                                         EndPoint="100%,0%"
+                                         SpreadMethod="Reflect">
+                        <GradientStops>
+                            <GradientStop Color="Transparent"
+                                          Offset="0" />
+                            <GradientStop Color="{DynamicResource BgColor}"
+                                          Offset="0.25" />
+                            <GradientStop Color="{DynamicResource BgColor}"
+                                          Offset="0.75" />
+                            <GradientStop Color="Transparent"
+                                          Offset="1" />
+                        </GradientStops>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Styles>
-    <UniformGrid Rows="4">
+    <StackPanel Spacing="0">
         <!-- TYPE -->
         <UniformGrid Classes="form-element">
             <TextBlock Text="Template" />
-            <ComboBox SelectedIndex="{Binding SelectedInstrumentTypeIndex, Mode=TwoWay}"
-                      ItemsSource="{Binding InstrumentTypeNames}">
-                <ComboBox.Styles>
-                    <Style Selector="ComboBoxItem:nth-child(1)">
-                        <Setter Property="IsVisible"
-                                Value="False" />
-                    </Style>
-                </ComboBox.Styles>
-            </ComboBox>
+            <ComboBox IsHitTestVisible="{Binding !IsActivated}"
+                      SelectedIndex="{Binding SelectedInstrumentTypeIndex, Mode=TwoWay}"
+                      ItemsSource="{Binding InstrumentTypeNames}" />
         </UniformGrid>
+        <Border Classes="sep" />
 
         <!-- NAME -->
-        <UniformGrid Classes="form-element sub">
+
+        <UniformGrid Classes="form-element">
             <TextBlock Text="Name" />
-            <TextBox MaxHeight="35"
+            <TextBox FontSize="22"
+                     Watermark="Enter name..."
                      Text="{Binding Name, Mode=TwoWay}" />
         </UniformGrid>
-
+        <Border Classes="sep" />
 
         <!-- STRINGS -->
-        <UniformGrid Classes="form-element sub">
+        <UniformGrid Classes="form-element">
             <TextBlock Text="Strings" />
-            <ComboBox IsEnabled="{Binding !IsCustomSelected}"
+            <ComboBox IsHitTestVisible="{Binding !IsActivated}"
                       SelectedIndex="{Binding SelectedStringCountIndex, Mode=TwoWay}"
                       ItemsSource="{Binding StringCounts}" />
         </UniformGrid>
+        <Border Classes="sep" />
 
         <!-- FRETS -->
-        <UniformGrid Classes="form-element sub">
+        <UniformGrid Classes="form-element">
             <TextBlock Text="Frets" />
-            <ComboBox IsEnabled="{Binding !IsCustomSelected}"
+            <ComboBox IsHitTestVisible="{Binding !IsActivated}"
                       SelectedIndex="{Binding SelectedFretCountIndex, Mode=TwoWay}"
                       ItemsSource="{Binding FretCounts}" />
         </UniformGrid>
 
-    </UniformGrid>
+    </StackPanel>
 
 </UserControl>

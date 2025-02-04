@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Calcuchord {
     [JsonObject]
@@ -79,11 +80,23 @@ namespace Calcuchord {
 
         #region Members
 
+        [JsonProperty]
         public string Name { get; set; } = string.Empty;
+
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
         public InstrumentType InstrumentType { get; set; }
+
+        [JsonProperty]
         public double? NeckLengthInInches { get; set; }
+
+        [JsonProperty]
         public int FretCount { get; set; }
+
+        [JsonProperty]
         public int StringCount { get; set; }
+
+        [JsonProperty]
         public List<Tuning> Tunings { get; set; } = [];
 
         #endregion

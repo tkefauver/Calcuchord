@@ -42,7 +42,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Model
+        #region Instrument
 
         #endregion
 
@@ -53,8 +53,10 @@ namespace Calcuchord {
         #endregion
 
         #region Constructors
+
         public ModeMatchViewModel(NoteGroup noteGroup,double score) : base(noteGroup,score) {
         }
+
         #endregion
 
         #region Public Methods

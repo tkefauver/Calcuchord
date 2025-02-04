@@ -8,6 +8,7 @@ namespace Calcuchord {
 
         #region Members
 
+        [JsonProperty]
         public int FingerNum { get; set; }
 
         #endregion

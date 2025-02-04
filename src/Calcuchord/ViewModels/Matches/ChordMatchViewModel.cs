@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Calcuchord {
     public class ChordMatchViewModel : MatchViewModelBase {
 
@@ -44,7 +42,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Model
+        #region Instrument
 
         #endregion
 

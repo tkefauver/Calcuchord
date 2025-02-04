@@ -22,7 +22,7 @@ namespace Calcuchord {
 
 
         public override void OnFrameworkInitializationCompleted() {
-            Prefs.Instance.Init();
+            Prefs.Init();
             ThemeViewModel.Instance.Init();
 
             _ = new MainViewModel();

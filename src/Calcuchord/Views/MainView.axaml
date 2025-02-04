@@ -28,23 +28,30 @@
 
     <UserControl.DataTemplates>
         <DataTemplate DataType="local:TuningViewModel">
-            <StackPanel>
+            <!-- TUNING STATS POPUP -->
+            <StackPanel MinWidth="150">
                 <StackPanel.Styles>
                     <Style Selector="TextBlock">
                         <Setter Property="TextAlignment"
                                 Value="Center" />
                     </Style>
+                    <Style Selector="TextBlock:not(.Body1)">
+                        <Setter Property="Opacity"
+                                Value="0.7" />
+                        <Setter Property="FontWeight"
+                                Value="Bold" />
+                    </Style>
                 </StackPanel.Styles>
-                <TextBlock>Chords:</TextBlock>
+                <TextBlock>Chords</TextBlock>
                 <TextBlock Classes="Body1"
-                           Text="{Binding Tuning.Chords.Count}" />
-                <TextBlock>Scales:</TextBlock>
+                           Text="{Binding ChordsCount}" />
+                <TextBlock>Scales</TextBlock>
                 <TextBlock Classes="Body1"
-                           Text="{Binding Tuning.Scales.Count}" />
-                <TextBlock>Modes:</TextBlock>
+                           Text="{Binding ScalesCount}" />
+                <TextBlock>Modes</TextBlock>
                 <TextBlock Classes="Body1"
-                           Text="{Binding Tuning.Modes.Count}" />
-                <TextBlock>Bookmarks:</TextBlock>
+                           Text="{Binding ModesCount}" />
+                <TextBlock>Bookmarks</TextBlock>
                 <TextBlock Classes="Body1"
                            Text="{Binding BookmarkCount}" />
 
@@ -137,6 +144,8 @@
 
                                 <TextBlock x:Name="EmptyTextBlock"
                                            Classes="Headline4"
+                                           HorizontalAlignment="Stretch"
+                                           TextWrapping="Wrap"
                                            VerticalAlignment="Center"
                                            TextAlignment="Center"
                                            Text="{Binding EmptyMatchLabel}">
@@ -176,7 +185,8 @@
 
                             <!-- EDIT POPUP -->
 
-                            <local:InstPopupContainerView Grid.Row="0"
+                            <local:InstPopupContainerView x:Name="InstEditPopupView"
+                                                          Grid.Row="0"
                                                           Grid.RowSpan="2"
                                                           DataContext="{Binding EditModeInstrument}"
                                                           IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}" />

@@ -23,14 +23,12 @@
                 <!-- ZOOM OUT (COLS+1) -->
                 <Button x:Name="ZoomMinusButton"
                         Classes="float"
-                        IsEnabled="{Binding CanIncreaseMatchColCount}"
                         Command="{Binding IncreaseMatchColumnsCommand}">
                     <avalonia:MaterialIcon Kind="Minus" />
                 </Button>
                 <!-- ZOOM IN (COLS-1) -->
                 <Button x:Name="ZoomPlusButton"
                         Classes="float"
-                        IsEnabled="{Binding CanDecreaseMatchColCount}"
                         Command="{Binding DecreaseMatchColumnsCommand}">
                     <avalonia:MaterialIcon Kind="Plus" />
                 </Button>

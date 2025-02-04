@@ -38,7 +38,8 @@ namespace Calcuchord {
         PianoBlackKeyBg2,
         PianoBlackKeyBg3,
         PianoBlackKeyFg,
-        PianoMatch
+        PianoMatch,
+        DisabledAccentFg
     }
 
     public class ThemeViewModel : ViewModelBase {
@@ -200,6 +201,10 @@ namespace Calcuchord {
                         {
                             PaletteColorType.PianoBlackKeyFg,
                             ("#000000","#FFFFFF")
+                        },
+                        {
+                            PaletteColorType.DisabledAccentFg,
+                            ("#000000","#696969")
                         }
                     };
 

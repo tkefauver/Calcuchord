@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MonkeyPaste.Common;
 
@@ -27,7 +28,7 @@ namespace Calcuchord {
         public event EventHandler ProgressChanged;
 
         double TotalProgressCount { get; set; }
-        double CurrentProgressCount { get; set; }
+        public double CurrentProgressCount { get; set; }
 
         #endregion
 
@@ -104,7 +105,7 @@ namespace Calcuchord {
             }
         }
 
-        MusicPatternType PatternType { get; }
+        public MusicPatternType PatternType { get; }
 
         bool IsKeyboard =>
             Tuning.Parent.InstrumentType == InstrumentType.Piano;
@@ -121,6 +122,8 @@ namespace Calcuchord {
             OpenNotes.Length;
 
         Tuning Tuning { get; }
+
+        CancellationToken Ct { get; set; }
 
         #endregion
 
@@ -140,20 +143,28 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public async Task<IEnumerable<NoteGroupCollection>> GenerateAsync() {
-            IEnumerable<NoteGroupCollection> result = null;
-            if(IsKeyboard) {
-                result = await GenKeyboardPatternAsync();
-            } else {
-                result = await GenFretboardPatternAsync();
+        public async Task<IEnumerable<NoteGroupCollection>> GenerateAsync(CancellationToken ct) {
+            Ct = ct;
+
+            try {
+                IEnumerable<NoteGroupCollection> result = null;
+                if(IsKeyboard) {
+                    result = await GenKeyboardPatternAsync();
+                } else {
+                    result = await GenFretboardPatternAsync();
+                }
+
+                foreach(NoteGroupCollection ngc in result) {
+                    ngc.Groups.ForEach(x => x.CreateId(null));
+                    ngc.SetParent(Tuning);
+                }
+
+                return result;
+            } catch(Exception ex) {
+                ex.Dump();
             }
 
-            foreach(NoteGroupCollection ngc in result) {
-                ngc.Groups.ForEach(x => x.CreateId(null));
-                ngc.SetParent(Tuning);
-            }
-
-            return result;
+            return [];
         }
 
         #endregion
@@ -167,7 +178,7 @@ namespace Calcuchord {
         #region Keyboard
 
         async Task<IEnumerable<NoteGroupCollection>> GenKeyboardPatternAsync() {
-            await Task.Delay(1);
+            await Task.Delay(1,Ct);
             var patterns = PatternsLookup[PatternType];
             var ngcl = new List<NoteGroupCollection>();
             foreach(string suffix in patterns.Select(x => x.Key)) {
@@ -260,7 +271,7 @@ namespace Calcuchord {
                 RejectNotStartOnRoot,
                 RejectNotesOnSameString,
                 RejectExists
-            ]; //10366
+            ];
             foreach(var reject_func in reject_funcs) {
                 if(reject_func.Invoke(notes,pattern,existing)) {
                     return false;
@@ -344,7 +355,7 @@ namespace Calcuchord {
         }
 
         async Task<IEnumerable<NoteGroupCollection>> GetFretboardChordsAsync() {
-            await Task.Delay(1);
+            await Task.Delay(1,Ct);
             var patterns = PatternsLookup[MusicPatternType.Chords];
             var ngcl = new List<NoteGroupCollection>();
             int max_min_fret_num = FretCount - PatternFretSpan - 1;
@@ -390,7 +401,7 @@ namespace Calcuchord {
                     }
 
                     ngcl.Add(ngc);
-                    UpdateProgress(++cur_progress,$"{cur_chord_count} chords found...{sw.ElapsedMilliseconds}ms");
+                    UpdateProgress(++cur_progress,$"{cur_chord_count} chords found...");
                 }
             }
 
@@ -414,9 +425,14 @@ namespace Calcuchord {
         }
 
         void UpdateProgress(int curCount,string label) {
+            if(Ct.IsCancellationRequested) {
+                throw new OperationCanceledException();
+                return;
+            }
+
             CurrentProgressCount = curCount;
             ProgressLabel = label;
-            Debug.WriteLine($"{ProgressLabel} [{(int)(PercentDone * 100)}%]");
+            //Debug.WriteLine($"{ProgressLabel} [{(int)(PercentDone * 100)}%]");
             ProgressChanged?.Invoke(this,EventArgs.Empty);
         }
 

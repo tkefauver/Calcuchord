@@ -9,6 +9,7 @@ namespace Calcuchord {
 
     [JsonObject]
     public abstract class PrimaryModelBase : IPrimaryModel {
+        [JsonProperty]
         public string Id { get; private set; }
 
         public void CreateId(string forcedId) {

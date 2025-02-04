@@ -9,9 +9,10 @@ namespace Calcuchord {
 
         #region Members
 
+        [JsonProperty]
         public int Position { get; set; }
 
-
+        [JsonProperty]
         public List<PatternNote> Notes { get; set; } = [];
 
         #endregion

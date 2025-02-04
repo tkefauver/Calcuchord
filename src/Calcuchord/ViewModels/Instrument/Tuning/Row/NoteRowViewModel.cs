@@ -102,7 +102,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Model
+        #region Instrument
 
         public InstrumentNote BaseNote { get; set; }
 
@@ -122,7 +122,7 @@ namespace Calcuchord {
             int min_fret_num = IsKeyboard ? 0 : -1;
             Notes.AddRange(
                 Enumerable.Range(min_fret_num,Parent.LogicalFretCount)
-                    .Select(x => CreateFretViewModel(x)));
+                    .Select(x => CreateNoteViewModel(x)));
 
             ResetSelection();
         }
@@ -166,11 +166,17 @@ namespace Calcuchord {
             }
         }
 
-        NoteViewModel CreateFretViewModel(int fretNum) {
-            InstrumentNote inn = new InstrumentNote(
-                fretNum,RowNum,BaseNote == null ? null : BaseNote.Offset(fretNum));
+        NoteViewModel CreateNoteViewModel(int fretNum) {
+            InstrumentNote inn = null;
+            // NOTE open note needs to be preserved so it maps 
+            // to the tuning the model (for tuning or capo adjustment)
+            if(fretNum == 0 && BaseNote != null) {
+                inn = BaseNote;
+            } else {
+                inn = new InstrumentNote(fretNum,RowNum,BaseNote?.Offset(fretNum));
+            }
 
-            return new(this,inn);
+            return new NoteViewModel(this,inn);
         }
 
         NoteMarkerState GetNoteMarkerState(NoteViewModel nvm) {

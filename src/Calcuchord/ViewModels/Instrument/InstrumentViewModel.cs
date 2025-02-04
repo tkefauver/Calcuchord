@@ -35,26 +35,19 @@ namespace Calcuchord {
 
         #region View Models
 
+        public TuningViewModel CurGenTuning { get; set; }
+
         public ObservableCollection<TuningViewModel> Tunings { get; } = [];
 
 
         public TuningViewModel DefaultTuning =>
             Tunings.FirstOrDefault();
 
-        public TuningViewModel SelectedTuning {
-            get => Tunings.FirstOrDefault(x => x.IsSelected);
-            set {
-                Tunings.ForEach(x => x.IsSelected = value == x);
-                OnPropertyChanged(nameof(SelectedTuning));
-            }
-        }
+        public TuningViewModel SelectedTuning { get; set; }
 
         #endregion
 
         #region Appearance
-
-        public string SelectedTuningInfo =>
-            SelectedTuning == null ? string.Empty : SelectedTuning.Name;
 
         public string Icon =>
             InstrumentType.ToIconName();
@@ -76,24 +69,27 @@ namespace Calcuchord {
 
         #region State
 
+        public bool IsInstrumentTabSelected { get; set; }
+        public bool IsTuningTabSelected { get; set; }
+
         public string[] InstrumentTypeNames =>
-            new[] { string.Empty }
-                .Union(Enum.GetNames(typeof(InstrumentType)).Where(x => x != InstrumentType.Piano.ToString()))
+            Enum.GetNames(typeof(InstrumentType))
+                .Where(x => x != InstrumentType.Piano.ToString())
                 .ToArray();
-
-        public bool IsCustomSelected => SelectedInstrumentTypeIndex == InstrumentTypeNames.Length - 1;
-
 
         public int SelectedStringCountIndex { get; set; }
         public int SelectedFretCountIndex { get; set; }
-        public int SelectedInstrumentTypeIndex { get; set; }
 
-        InstrumentType? SelectedInstrumentType =>
-            SelectedInstrumentTypeIndex == 0
-                ? null
-                : InstrumentTypeNames[SelectedInstrumentTypeIndex].ToEnum<InstrumentType>();
+        public int SelectedInstrumentTypeIndex {
+            get => InstrumentTypeNames.IndexOf(InstrumentType.ToString());
+            set {
+                if(SelectedInstrumentTypeIndex != value) {
+                    InstrumentType = InstrumentTypeNames[value].ToEnum<InstrumentType>();
+                    OnPropertyChanged(nameof(SelectedInstrumentTypeIndex));
 
-        public bool HasInstrumentType => SelectedInstrumentTypeIndex > 0;
+                }
+            }
+        }
 
         public bool IsEditModeEnabled =>
             Parent.EditModeInstrument == this;
@@ -129,34 +125,34 @@ namespace Calcuchord {
         #endregion
 
         public string Name {
-            get => Model.Name;
+            get => Instrument.Name;
             set {
                 if(Name != value) {
-                    Model.Name = value;
+                    Instrument.Name = value;
                     OnPropertyChanged(nameof(Name));
                 }
             }
         }
 
         public int RowCount =>
-            Model.StringCount;
+            Instrument.StringCount;
 
         public int LogicalStringCount =>
             IsKeyboard ? RowCount : RowCount + 1;
 
 
         public InstrumentType InstrumentType {
-            get => Model.InstrumentType;
+            get => Instrument.InstrumentType;
             set {
                 if(InstrumentType != value) {
-                    Model.InstrumentType = value;
+                    Instrument.InstrumentType = value;
                     OnPropertyChanged(nameof(InstrumentType));
                 }
             }
         }
 
 
-        public Instrument Model { get; set; }
+        public Instrument Instrument { get; set; }
 
         #endregion
 
@@ -183,14 +179,15 @@ namespace Calcuchord {
 
         public async Task InitAsync(Instrument instrument) {
             IsBusy = true;
-            Model = instrument;
-            Tunings.AddRange(await Task.WhenAll(Model.Tunings.Select(x => CreateTuningViewModelAsync(x))));
-            Model.RefreshModelTree();
+            Instrument = instrument;
+            Tunings.Clear();
+            Tunings.AddRange(await Task.WhenAll(Instrument.Tunings.Select(x => CreateTuningViewModelAsync(x))));
+            Instrument.RefreshModelTree();
             IsBusy = false;
         }
 
         public override string ToString() {
-            return Model == null ? base.ToString() : Model.ToString();
+            return Instrument == null ? base.ToString() : Instrument.ToString();
         }
 
         public string GetUniqueTuningName(string desiredName,TuningViewModel[] ignored) {
@@ -217,7 +214,7 @@ namespace Calcuchord {
             switch(e.PropertyName) {
                 case nameof(SelectedInstrumentTypeIndex):
                     if(IsEditModeEnabled) {
-                        ChangeInstrumentTypeAsync(SelectedInstrumentType).FireAndForgetSafeAsync();
+                        ChangeInstrumentTypeAsync().FireAndForgetSafeAsync();
                     }
 
                     break;
@@ -229,17 +226,16 @@ namespace Calcuchord {
 
                         Prefs.Instance.SelectedTuningId = SelectedTuning.Id;
                         Prefs.Instance.Save();
-                    } else {
-                        Tunings.ForEach(x => x.IsSelected = false);
                     }
 
+                    //Tunings.ForEach(x => x.IsSelected = false);
                     break;
                 case nameof(SelectedTuning):
+                    Tunings.ForEach(x => x.OnPropertyChanged(nameof(x.IsSelected)));
+
                     if(IsSelected) {
                         Parent.OnPropertyChanged(nameof(SelectedTuning));
                     }
-
-                    OnPropertyChanged(nameof(SelectedTuningInfo));
 
                     break;
             }
@@ -258,17 +254,13 @@ namespace Calcuchord {
             return tvm;
         }
 
-        async Task ChangeInstrumentTypeAsync(InstrumentType? instrumentType) {
+        async Task ChangeInstrumentTypeAsync() {
             Debug.Assert(IsEditModeEnabled,"Error, only change inst type in edit mode");
-            if(instrumentType is not { } new_inst_type) {
-                OnPropertyChanged(nameof(HasInstrumentType));
-                return;
-            }
 
-            string new_inst_name = new_inst_type.ToString();
+            string new_inst_name = InstrumentType.ToString();
 
             bool needs_default_name =
-                Model == null ||
+                Instrument == null ||
                 string.IsNullOrWhiteSpace(Name) ||
                 Enum.GetNames(typeof(InstrumentType)).Any(x => Name.ToLower().StartsWith(x.ToLower()));
             if(needs_default_name) {
@@ -279,17 +271,14 @@ namespace Calcuchord {
                 new_inst_name = Name;
             }
 
-            await InitAsync(Instrument.CreateByType(new_inst_type,name: new_inst_name));
+            await InitAsync(Instrument.CreateByType(InstrumentType,name: new_inst_name));
 
             OnPropertyChanged(nameof(FretCounts));
             OnPropertyChanged(nameof(StringCounts));
             OnPropertyChanged(nameof(Name));
 
-            SelectedFretCountIndex = FretCounts.IndexOf(Model.FretCount.ToString());
-            SelectedStringCountIndex = StringCounts.IndexOf(Model.StringCount.ToString());
-            OnPropertyChanged(nameof(HasInstrumentType));
-            //Tunings.ForEach(x => x.OpenNotes.ForEach(y => y.OnPropertyChanged(nameof(y.MarkerDetail))));
-
+            SelectedFretCountIndex = FretCounts.IndexOf(Instrument.FretCount.ToString());
+            SelectedStringCountIndex = StringCounts.IndexOf(Instrument.StringCount.ToString());
         }
 
         #endregion
@@ -299,15 +288,21 @@ namespace Calcuchord {
         public ICommand RemoveTuningCommand => new MpCommand<object>(
             args => {
                 if(args is not string tuning_guid ||
-                   Tunings.FirstOrDefault(x => x.Tuning.Id == tuning_guid) is not { } tuning_vm_to_remove ||
-                   !Model.Tunings.Remove(tuning_vm_to_remove.Tuning) ||
-                   !Tunings.Remove(tuning_vm_to_remove)) {
+                   Tunings.FirstOrDefault(x => x.Tuning.Id == tuning_guid) is not { } tuning_vm_to_remove) {
                     return;
                 }
 
+                int to_remove_idx = Tunings.IndexOf(tuning_vm_to_remove);
+                Instrument.Tunings.Remove(tuning_vm_to_remove.Tuning);
+                Tunings.Remove(tuning_vm_to_remove);
+
                 Prefs.Instance.Save();
+
+                int to_sel_idx = to_remove_idx >= Tunings.Count ? to_remove_idx - 1 : to_remove_idx;
+                SelectedTuning = Tunings[to_sel_idx];
                 Tunings.ForEach(x => x.OnPropertyChanged(nameof(x.CanDelete)));
-                Debug.WriteLine($"'{tuning_vm_to_remove.Tuning.Name}' removed from {Model.Name}");
+
+                Debug.WriteLine($"'{tuning_vm_to_remove.Tuning.Name}' removed from {Instrument.Name}");
             });
 
         public MpIAsyncCommand<object> AddTuningCommand => new MpAsyncCommand<object>(
@@ -318,13 +313,14 @@ namespace Calcuchord {
                     new_tuning.Name = GetUniqueTuningName(new_tuning.Name,[]);
                 }
 
-                new_tuning.SetParent(Model);
-                Model.Tunings.Add(new_tuning);
+                new_tuning.SetParent(Instrument);
+                Instrument.Tunings.Add(new_tuning);
 
                 TuningViewModel tvm = await CreateTuningViewModelAsync(new_tuning);
                 Tunings.Add(tvm);
 
-                Tunings.Last().IsSelected = true;
+                SelectedTuning = Tunings.Last();
+                ;
             });
 
         #endregion

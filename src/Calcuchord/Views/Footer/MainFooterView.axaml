@@ -37,24 +37,20 @@
         <UniformGrid Columns="3">
             <RadioButton DataContext="{Binding SearchOptionViewModel}"
                          IsChecked="{Binding IsChecked, Mode=OneWay}"
-                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}"
-                         CommandParameter="{Binding .}"
-                         Classes="">
+                         Command="{Binding SelectThisOptionCommand}">
                 <avalonia:MaterialIcon Kind="Magnify" />
             </RadioButton>
 
             <RadioButton DataContext="{Binding BookmarksOptionViewModel}"
                          IsChecked="{Binding IsChecked, Mode=OneWay}"
-                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}"
-                         CommandParameter="{Binding .}"
+                         Command="{Binding SelectThisOptionCommand}"
                          Classes="">
                 <avalonia:MaterialIcon Kind="Bookmark" />
             </RadioButton>
 
             <RadioButton DataContext="{Binding IndexOptionViewModel}"
                          IsChecked="{Binding IsChecked, Mode=OneWay}"
-                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}"
-                         CommandParameter="{Binding .}"
+                         Command="{Binding SelectThisOptionCommand}"
                          Classes="">
                 <avalonia:MaterialIcon Kind="Database" />
             </RadioButton>

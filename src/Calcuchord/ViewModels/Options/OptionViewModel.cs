@@ -1,5 +1,7 @@
 using System.Windows.Input;
+using MonkeyPaste.Common;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Calcuchord {
     [JsonObject]
@@ -46,15 +48,19 @@ namespace Calcuchord {
 
         #region State
 
+        [JsonProperty]
         public bool IsChecked { get; set; }
 
 
+        [JsonProperty]
         public bool IsEnabled { get; set; } = true;
 
         #endregion
 
-        #region Model
+        #region Instrument
 
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
         public OptionType OptionType { get; set; }
 
         [JsonIgnore]
@@ -64,6 +70,7 @@ namespace Calcuchord {
         public object CommandParameter { get; set; }
 
 
+        [JsonProperty]
         public string OptionValue { get; set; }
 
         #endregion
@@ -91,6 +98,12 @@ namespace Calcuchord {
         #endregion
 
         #region Commands
+
+        public ICommand SelectThisOptionCommand => new MpCommand(
+            () => {
+                MainViewModel.Instance.SelectOptionCommand.Execute(this);
+
+            });
 
         #endregion
 

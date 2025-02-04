@@ -15,16 +15,54 @@
              x:Class="Calcuchord.InstPopupContainerView">
     <UserControl.Styles>
         <Style Selector="TextBlock.tab-header">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Fg}" />
             <Setter Property="FontSize"
                     Value="24" />
             <Setter Property="TextAlignment"
                     Value="Center" />
-            <Setter Property="Effect"
-                    Value="drop-shadow(1 1 0 white)" />
+        </Style>
+        <Style Selector="TabItem:selected TextBlock.tab-header">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Bg}" />
+        </Style>
+        <Style Selector=":is(Button).float-text">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Bg}" />
+        </Style>
+        <Style Selector=":is(Button).float-text TextBlock">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Bg}" />
         </Style>
         <Style Selector="TabItem > ScrollViewer">
             <Setter Property="Margin"
                     Value="0,30,0,0" />
+        </Style>
+
+        <Style Selector="controls|ColorZone#PopupZone">
+            <Setter Property="MinWidth"
+                    Value="300" />
+            <Setter Property="MinHeight"
+                    Value="500" />
+        </Style>
+        <Style Selector="controls|ColorZone#PopupZone local|TuningGenProgressView">
+            <Setter Property="IsVisible"
+                    Value="False" />
+        </Style>
+
+        <Style Selector="controls|ColorZone#PopupZone.progress">
+            <Setter Property="MinWidth"
+                    Value="300" />
+            <Setter Property="MinHeight"
+                    Value="100" />
+        </Style>
+        <Style Selector="controls|ColorZone#PopupZone.progress DockPanel#InstDockPanel">
+            <Setter Property="IsVisible"
+                    Value="False" />
+        </Style>
+        <Style Selector="controls|ColorZone#PopupZone.progress local|TuningGenProgressView">
+            <Setter Property="IsVisible"
+                    Value="True" />
         </Style>
     </UserControl.Styles>
 
@@ -34,65 +72,79 @@
             <SolidColorBrush Color="Black"
                              Opacity="0.7" />
         </Border.Background>
-        <controls:ColorZone x:Name="PopupZone"
-                            MinWidth="300"
-                            Mode="Accent"
-                            Effect="drop-shadow(-3 -3 5 black)"
-                            CornerRadius="10"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Margin="20"
-                            BorderBrush="{DynamicResource Bg}"
-                            BorderThickness="5"
-                            Padding="10">
-            <DockPanel>
-                <!-- NAV -->
-                <UniformGrid DockPanel.Dock="Bottom"
-                             Columns="2"
-                             x:DataType="local:MainViewModel"
-                             DataContext="{x:Static local:MainViewModel.Instance}">
-                    <Button HorizontalAlignment="Left"
-                            VerticalAlignment="Bottom"
-                            Command="{Binding CancelEditInstrumentCommand}">
-                        <Button.Resources>
-                            <SolidColorBrush x:Key="MaterialPrimaryMidBrush">Red</SolidColorBrush>
-                            <SolidColorBrush x:Key="MaterialPrimaryMidForegroundBrush">White</SolidColorBrush>
-                        </Button.Resources>
-                        <TextBlock Text="Cancel" />
-                    </Button>
-                    <Button HorizontalAlignment="Right"
-                            VerticalAlignment="Bottom"
-                            Command="{Binding FinishEditInstrumentCommand}">
-                        <TextBlock Text="Done" />
-                    </Button>
-                </UniformGrid>
+        <Grid>
 
-                <!-- TABS -->
-                <TabControl>
-                    <TabControl.Items>
-                        <TabItem>
-                            <TabItem.Header>
-                                <TextBlock Classes="tab-header"
-                                           Text="Instrument" />
-                            </TabItem.Header>
-                            <ScrollViewer>
-                                <local:InstrumentEditorView />
-                            </ScrollViewer>
-                        </TabItem>
-                        <TabItem IsEnabled="{Binding CanEditTunings}">
-                            <TabItem.Header>
-                                <TextBlock Classes="tab-header"
-                                           Text="Tunings" />
-                            </TabItem.Header>
-                            <ScrollViewer>
-                                <local:TuningEditorView />
-                            </ScrollViewer>
-                        </TabItem>
-                    </TabControl.Items>
-                </TabControl>
-            </DockPanel>
+            <controls:ColorZone x:Name="PopupZone"
+                                Classes.progress="{Binding CurGenTuning, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                Mode="Accent"
+                                CornerRadius="10"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Margin="20"
+                                BorderBrush="{DynamicResource Bg}"
+                                Foreground="{DynamicResource Bg}"
+                                BorderThickness="5"
+                                Padding="10">
+                <Grid>
+                    <DockPanel x:Name="InstDockPanel"
+                               IsVisible="{Binding !IsVisible, ElementName=ProgressView}">
+                        <!-- NAV -->
+                        <UniformGrid DockPanel.Dock="Bottom"
+                                     Columns="2"
+                                     x:DataType="local:MainViewModel"
+                                     DataContext="{x:Static local:MainViewModel.Instance}">
+                            <Button HorizontalAlignment="Left"
+                                    VerticalAlignment="Bottom"
+                                    Classes="float-text"
+                                    Command="{Binding CancelEditInstrumentCommand}">
+                                <Button.Resources>
+                                    <SolidColorBrush x:Key="MaterialPrimaryMidBrush">Red</SolidColorBrush>
+                                    <SolidColorBrush x:Key="MaterialPrimaryMidForegroundBrush">White</SolidColorBrush>
+                                </Button.Resources>
+                                <TextBlock Text="Cancel" />
+                            </Button>
+                            <Button HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Classes="float-text"
+                                    Command="{Binding FinishEditInstrumentCommand}">
+                                <TextBlock Text="Done" />
+                            </Button>
+                        </UniformGrid>
 
-        </controls:ColorZone>
+                        <!-- TABS -->
+                        <TabControl>
+                            <TabControl.Items>
+                                <TabItem IsSelected="{Binding IsInstrumentTabSelected, Mode=TwoWay}">
+                                    <TabItem.Header>
+                                        <TextBlock Classes="tab-header"
+                                                   Text="Instrument" />
+                                    </TabItem.Header>
+                                    <ScrollViewer Margin="0,20,0,20">
+                                        <local:InstrumentEditorView Margin="0,0,20,0" />
+                                    </ScrollViewer>
+                                </TabItem>
+                                <TabItem IsSelected="{Binding IsTuningTabSelected, Mode=TwoWay}"
+                                         IsEnabled="{Binding CanEditTunings}">
+                                    <TabItem.Header>
+                                        <TextBlock Classes="tab-header"
+                                                   Text="Tunings" />
+                                    </TabItem.Header>
+
+                                    <local:TuningEditorView />
+                                </TabItem>
+                            </TabControl.Items>
+                        </TabControl>
+                    </DockPanel>
+                    <local:TuningGenProgressView x:Name="ProgressView"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 Foreground="{DynamicResource Bg}"
+                                                 DataContext="{Binding CurGenTuning}" />
+                </Grid>
+
+            </controls:ColorZone>
+
+        </Grid>
 
     </Border>
 

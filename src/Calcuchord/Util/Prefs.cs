@@ -20,8 +20,31 @@ namespace Calcuchord {
 
         #region Statics
 
-        static Prefs _instance;
-        public static Prefs Instance => _instance ??= new();
+        public static Prefs Instance { get; private set; }
+
+        public static void Init() {
+            if(RESET_PREFS) {
+                File.Delete(PrefsFilePath);
+            }
+
+            bool is_initial_startup = !File.Exists(PrefsFilePath);
+
+            if(is_initial_startup) {
+                _ = new Prefs();
+                //Instance.Save();
+            } else {
+                try {
+                    string prefs_json = File.ReadAllText(PrefsFilePath);
+                    _ = JsonConvert.DeserializeObject<Prefs>(prefs_json);
+                    Instance.Instruments.ForEach(x => x.RefreshModelTree());
+                } catch(Exception e) {
+                    e.Dump();
+                    _ = new Prefs();
+                }
+            }
+
+            Instance.IsInitialStartup = is_initial_startup;
+        }
 
         #endregion
 
@@ -33,21 +56,22 @@ namespace Calcuchord {
 
         #region Members
 
+        [JsonProperty]
         public string SelectedTuningId { get; set; } = Instrument.STANDARD_GUITAR_TUNING_ID;
 
-
+        [JsonProperty]
         public SvgFlags SelectedSvgFlags { get; set; } = SvgBuilderBase.DefaultSvgFlags;
 
-
+        [JsonProperty]
         public bool IsThemeDark { get; set; }
 
-
+        [JsonProperty]
         public List<string> BookmarkIds { get; set; } = [];
 
-
+        [JsonProperty]
         public List<Instrument> Instruments { get; set; } = [];
 
-
+        [JsonProperty]
         public List<OptionViewModel> Options { get; set; } = [];
 
         #endregion
@@ -55,16 +79,22 @@ namespace Calcuchord {
         #region Ignored
 
         [JsonIgnore]
-        public bool IsPrefsPersistent { get; private set; }
+        public bool IsSaveIgnored { get; set; }
 
         [JsonIgnore]
-        bool RESET_PREFS => false;
+        public bool IsInitialStartup { get; private set; }
 
         [JsonIgnore]
-        string _prefsFilePath;
+        public bool IsPrefsPersistent => File.Exists(PrefsFilePath);
 
         [JsonIgnore]
-        string PrefsFilePath {
+        static bool RESET_PREFS => false;
+
+        [JsonIgnore]
+        static string _prefsFilePath;
+
+        [JsonIgnore]
+        static string PrefsFilePath {
             get {
                 if(_prefsFilePath == null &&
                    PlatformWrapper.StorageHelper is { } sh &&
@@ -87,40 +117,25 @@ namespace Calcuchord {
 
         #region Constructors
 
-        Prefs() {
+        public Prefs() {
             Debug.WriteLine("prefs ctor called");
+            if(Instance != null) {
+                // singleton erro
+                Debugger.Break();
+            }
+
+            Instance = this;
+
         }
 
         #endregion
 
         #region Public Methods
 
-        public void Init() {
-            if(RESET_PREFS) {
-                File.Delete(PrefsFilePath);
-            }
-
-            bool is_initial_startup = !File.Exists(PrefsFilePath);
-
-            if(is_initial_startup) {
-                _ = new Prefs();
-                Save();
-            } else {
-                try {
-                    _ = JsonConvert.DeserializeObject<Prefs>(File.ReadAllText(PrefsFilePath));
-                    Instruments.ForEach(x => x.RefreshModelTree());
-                } catch(Exception e) {
-                    e.Dump();
-                    _ = new Prefs();
-                }
-            }
-
-        }
-
         public void Save() {
-            if(MainViewModel.Instance is { } mvm &&
-               mvm.EditModeInstrument != null) {
-                // should be avoided
+            if(IsSaveIgnored) {
+                Debug.WriteLine("prefs save ignored");
+                return;
             }
 
             Debug.WriteLine("");
@@ -136,13 +151,30 @@ namespace Calcuchord {
             }
 
             Debug.WriteLine("");
+            if(MainViewModel.Instance is { } mvm) {
+                Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
+                Options = mvm.OptionLookup.Values.SelectMany(x => x).ToList();
+                if(mvm.SelectedTuning is { } sel_tun) {
+                    SelectedTuningId = sel_tun.Id;
+                }
+
+                IsThemeDark = ThemeViewModel.Instance.IsDark;
+
+            }
+
+
+            Validate();
             try {
+                bool is_new = !File.Exists(PrefsFilePath);
                 string pref_json = JsonConvert.SerializeObject(this);
                 File.WriteAllText(PrefsFilePath,pref_json);
-                IsPrefsPersistent = true;
+                if(is_new) {
+                    Debug.WriteLine("Prefs CREATED");
+                } else {
+                    Debug.WriteLine("Prefs SAVED");
+                }
             } catch(Exception e) {
                 e.Dump();
-                IsPrefsPersistent = false;
             }
         }
 
@@ -153,6 +185,30 @@ namespace Calcuchord {
         #endregion
 
         #region Private Methods
+
+        void Validate() {
+            if(MainViewModel.Instance is not { } mvm) {
+                return;
+            }
+
+            if(mvm.SelectedTuning == null) {
+                Debug.Assert(string.IsNullOrEmpty(SelectedTuningId),"Save error");
+            } else {
+                Debug.Assert(SelectedTuningId == mvm.SelectedTuning.Id,"Save errror");
+            }
+
+            if(Instruments.Difference(mvm.Instruments.Select(x => x.Instrument)) is { } inst_diffs &&
+               inst_diffs.Any()) {
+                Debugger.Break();
+            }
+
+            if(Options.Difference(mvm.OptionLookup.Values.SelectMany(x => x)) is { } opts_diffs && opts_diffs.Any()) {
+                Debugger.Break();
+            }
+
+            Debug.Assert(IsThemeDark == ThemeViewModel.Instance.IsDark,"save error");
+
+        }
 
         #endregion
 

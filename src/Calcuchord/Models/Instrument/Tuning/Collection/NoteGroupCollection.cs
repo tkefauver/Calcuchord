@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Calcuchord {
     [JsonObject]
@@ -9,15 +10,18 @@ namespace Calcuchord {
 
         #region Members
 
+        [JsonProperty]
         public string SuffixKey { get; set; }
 
-
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
         public NoteType Key { get; set; }
 
-
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
         public MusicPatternType PatternType { get; set; }
 
-
+        [JsonProperty]
         public List<NoteGroup> Groups { get; set; } = [];
 
         #endregion

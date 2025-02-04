@@ -86,7 +86,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Model
+        #region Instrument
 
         public double Score { get; set; }
 
@@ -128,12 +128,13 @@ namespace Calcuchord {
 
         #region Commands
 
-        public ICommand ToggleBookmarkCommand => new MpCommand(() => {
-            IsBookmarked = !IsBookmarked;
-            if(MainViewModel.Instance.SelectedDisplayMode == DisplayModeType.Bookmarks) {
-                MainViewModel.Instance.UpdateMatches(MatchUpdateSource.BookmarkToggle);
-            }
-        });
+        public ICommand ToggleBookmarkCommand => new MpCommand(
+            () => {
+                IsBookmarked = !IsBookmarked;
+                if(MainViewModel.Instance.SelectedDisplayMode == DisplayModeType.Bookmarks) {
+                    MainViewModel.Instance.UpdateMatches(MatchUpdateSource.BookmarkToggle);
+                }
+            });
 
         public ICommand ToggleMatchPlaybackCommand => new MpCommand(
             () => {
@@ -171,16 +172,19 @@ namespace Calcuchord {
 
                 // select only notes in group, use open note for mutes
                 stvm.SelectedNotes =
-                    stvm.AllNotes.Where(x => x.IsRealNote &&
-                                             NoteGroup.Notes.Any(y =>
-                                                 x.NoteNum == (y.NoteNum == -1 ? 0 : y.NoteNum) &&
-                                                 x.RowNum == y.RowNum))
+                    stvm.AllNotes.Where(
+                            x => x.IsRealNote &&
+                                 NoteGroup.Notes.Any(
+                                     y =>
+                                         x.NoteNum == (y.NoteNum == -1 ? 0 : y.NoteNum) &&
+                                         x.RowNum == y.RowNum))
                         .ToList();
 
                 // set selected open notes to mute when group note is -1
-                NoteGroup.Notes.Where(x => x.NoteNum < 0).ForEach(x =>
-                    stvm.SelectedNotes.Where(y => y.NoteNum == 0 && y.RowNum == x.RowNum)
-                        .ForEach(x => x.WorkingNoteNum = NoteViewModel.MUTE_FRET_NUM));
+                NoteGroup.Notes.Where(x => x.NoteNum < 0).ForEach(
+                    x =>
+                        stvm.SelectedNotes.Where(y => y.NoteNum == 0 && y.RowNum == x.RowNum)
+                            .ForEach(x => x.WorkingNoteNum = NoteViewModel.MUTE_FRET_NUM));
 
                 InstrumentView.Instance.ScrollSelectionIntoView();
             });

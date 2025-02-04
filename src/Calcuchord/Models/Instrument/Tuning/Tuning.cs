@@ -11,24 +11,25 @@ namespace Calcuchord {
 
         #region Members
 
+        [JsonProperty]
         public string Name { get; set; }
 
-
+        [JsonProperty]
         public int CapoFretNum { get; set; }
 
-
+        [JsonProperty]
         public bool IsReadOnly { get; set; }
 
-
+        [JsonProperty]
         public List<InstrumentNote> OpenNotes { get; set; } = [];
 
-
+        [JsonProperty]
         public List<NoteGroupCollection> Chords { get; set; } = [];
 
-
+        [JsonProperty]
         public List<NoteGroupCollection> Scales { get; set; } = [];
 
-
+        [JsonProperty]
         public List<NoteGroupCollection> Modes { get; set; } = [];
 
         #endregion

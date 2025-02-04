@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Calcuchord {
     [JsonObject]
@@ -50,12 +51,14 @@ namespace Calcuchord {
 
         #region Members
 
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
         public NoteType Key { get; set; }
 
-
+        [JsonProperty]
         public int Register { get; set; }
 
-
+        [JsonProperty]
         public bool IsMute { get; set; }
 
         #endregion
@@ -146,6 +149,18 @@ namespace Calcuchord {
         #endregion
 
         #region Public Methods
+
+        public void Adjust(int offset) {
+            if(Offset(offset) is not { } adj_note) {
+                return;
+            }
+
+            _id = adj_note.NoteId;
+            _midiTone = adj_note.MidiTone;
+            Key = adj_note.Key;
+            Register = adj_note.Register;
+            IsMute = adj_note.IsMute;
+        }
 
         public virtual Note Offset(int offset) {
             if(IsMute) {

@@ -2,4 +2,5 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <FontFamily x:Key="NunitoFont">avares://Calcuchord/Assets/Fonts#Nunito</FontFamily>
     <FontFamily x:Key="GaramondFont">avares://Calcuchord/Assets/Fonts#EB Garamond Regular</FontFamily>
+    <FontFamily x:Key="GaramondBoldFont">avares://Calcuchord/Assets/Fonts#EB Garamond Bold</FontFamily>
 </ResourceDictionary>
