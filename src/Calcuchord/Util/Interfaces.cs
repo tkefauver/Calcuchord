@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using AvaloniaWebView;
-using WebViewCore.Configurations;
 
 namespace Calcuchord {
     public interface IPrimaryModel {
@@ -16,8 +14,8 @@ namespace Calcuchord {
 
     public interface IWebViewHelper {
         string ToneUrl { get; }
-        void InitEnv(WebViewCreationProperties config);
-        bool ConfigureWebView(WebView wv);
+        void InitEnv(object config);
+        bool ConfigureWebView(object wv);
         bool IsSupported { get; }
     }
 

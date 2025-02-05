@@ -427,7 +427,6 @@ namespace Calcuchord {
         void UpdateProgress(int curCount,string label) {
             if(Ct.IsCancellationRequested) {
                 throw new OperationCanceledException();
-                return;
             }
 
             CurrentProgressCount = curCount;

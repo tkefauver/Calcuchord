@@ -1,10 +1,12 @@
 using System;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using AvaloniaWebView;
 using MonkeyPaste.Common;
+#if SUGAR_WV
+using Avalonia.Media;
+using AvaloniaWebView;
 using WebViewCore.Configurations;
+
+#endif
 
 namespace Calcuchord {
     public class WebViewHelperBase : IWebViewHelper {
@@ -21,7 +23,11 @@ namespace Calcuchord {
             }
         }
 
-        public virtual void InitEnv(WebViewCreationProperties config) {
+        public virtual void InitEnv(object configObj) {
+#if SUGAR_WV
+            if(configObj is not WebViewCreationProperties config) {
+                return;
+            }
             config.AreDevToolEnabled =
 #if DEBUG
                 true;
@@ -39,9 +45,10 @@ namespace Calcuchord {
                 config.BrowserExecutableFolder = Path.GetDirectoryName(tone_path);
                 Debug.WriteLine($"Browser executable folder: {config.BrowserExecutableFolder}");
             }
+#endif
         }
 
-        public virtual bool ConfigureWebView(WebView wv) {
+        public virtual bool ConfigureWebView(object wv) {
             return true;
         }
     }

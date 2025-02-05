@@ -36,20 +36,22 @@
         <PackageReference Include="org.matheval"/>
         <PackageReference Include="PropertyChanged.Fody" PrivateAssets="All"/>
         <PackageReference Include="ReactiveUI"/>
-        <PackageReference Include="webview.avalonia"/>
+        <PackageReference Include="webview.avalonia" Condition="$(BuildOs) != 'LINUX'"/>
         <PackageReference Include="Melanchall.DryWetMidi" Condition="$([MSBuild]::IsOSPlatform('Linux'))"/>
     </ItemGroup>
 
     <ItemGroup>
         <Compile Remove="Util\MidiPlayer\MidiPlayer.linux.cs"/>
+        <Compile Remove="Util\MidiPlayer\MidiPlayer.browser.cs"/>
     </ItemGroup>
 
-    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+    <ItemGroup Condition="$(BuildOs) == 'LINUX'">
         <Compile Remove="Util\MidiPlayer\MidiPlayer.web.cs"/>
         <Compile Include="Util\MidiPlayer\MidiPlayer.linux.cs"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <UpToDateCheckInput Remove="Views\Popups\PopupContainerView.axaml"/>
+    <ItemGroup Condition="$(BuildOs) == 'BROWSER'">
+        <Compile Remove="Util\MidiPlayer\MidiPlayer.web.cs"/>
+        <Compile Include="Util\MidiPlayer\MidiPlayer.browser.cs"/>
     </ItemGroup>
 </Project>

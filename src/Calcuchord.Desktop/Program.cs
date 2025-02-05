@@ -1,7 +1,6 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.ReactiveUI;
-using Avalonia.WebView.Desktop;
 
 namespace Calcuchord.Desktop {
     internal sealed class Program {
@@ -21,7 +20,9 @@ namespace Calcuchord.Desktop {
             return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .UseReactiveUI()
+#if SUGAR_WV
                 .UseDesktopWebView()
+#endif
                 .With(
                     new X11PlatformOptions
                     {
@@ -39,10 +40,6 @@ namespace Calcuchord.Desktop {
                                 PlatformWrapper.StorageHelper = new DefaultStorageHelper();
                                 PlatformWrapper.WebViewHelper = new DesktopWebViewHelper();
                             });
-                    })
-                .AfterSetup(
-                    _ => {
-                        AssetMover.MoveAllAssets();
                     });
         }
     }

@@ -18,6 +18,12 @@ using MonkeyPaste.Common.Avalonia;
 using Newtonsoft.Json;
 
 namespace Calcuchord {
+    public class DialogViewModel : ViewModelBase {
+        public string Label { get; set; }
+        public ICommand OkCommand { get; set; }
+        public ICommand CancelCommand { get; set; }
+    }
+
     public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
 
         #region Private Variables
@@ -417,7 +423,32 @@ namespace Calcuchord {
             !IsReadOnly && Parent.Tunings.Count > 1;
 
         public ICommand DeleteThisTuningCommand => new MpCommand(
-            () => {
+            async () => {
+                bool? confirmed = null;
+                DialogViewModel dlg_vm = new DialogViewModel
+                {
+                    Label = $"Are you sure you want to delete '{Name}?'",
+                    OkCommand = new MpCommand(
+                        () => {
+                            confirmed = true;
+                        }),
+                    CancelCommand = new MpCommand(
+                        () => {
+                            confirmed = false;
+                        })
+                };
+                DialogHost.Show(dlg_vm,MainView.DialogHostName).FireAndForgetSafeAsync();
+
+                while(!confirmed.HasValue) {
+                    await Task.Delay(100);
+                }
+
+                DialogHost.Close(MainView.DialogHostName);
+
+                if(!confirmed.Value) {
+                    return;
+                }
+
                 Parent.RemoveTuningCommand.Execute(Id);
             },() => {
                 return CanDelete;

@@ -182,16 +182,17 @@ namespace Calcuchord {
                     return "No bookmarks found";
                 }
 
-                switch(MpRandom.Rand.Next(4)) {
-                    default:
-                        return "Nothing";
-                    case 1:
-                        return "Nada";
-                    case 2:
-                        return "Zilch";
-                    case 3:
-                        return "Nope";
-                }
+                return "No results";
+                // switch(MpRandom.Rand.Next(4)) {
+                //     default:
+                //         return "Nothing";
+                //     case 1:
+                //         return "Nada";
+                //     case 2:
+                //         return "Zilch";
+                //     case 3:
+                //         return "Nope";
+                // }
             }
         }
 
@@ -521,6 +522,8 @@ namespace Calcuchord {
                 IsSearchInitiating = false;
             }
 
+            int delay = ThemeViewModel.Instance.IsDesktop ? 0 : 50;
+
 
             foreach(MatchViewModelBase match in matches) {
                 if(ct.IsCancellationRequested) {
@@ -530,7 +533,7 @@ namespace Calcuchord {
 
                 Matches.Add(match);
                 MatchCount++;
-                await Task.Delay(50,ct);
+                await Task.Delay(delay,ct);
                 IsSearchInitiating = false;
             }
 

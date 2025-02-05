@@ -81,7 +81,7 @@
                         <Run Text="{Binding SecondaryLabel}"
                              FontSize="36" />
                         <Run Text="{Binding TertiaryLabel}"
-                             FontSize="14"
+                             FontSize="24"
                              BaselineAlignment="TextTop" />
                     </TextBlock.Inlines>
                 </TextBlock>

@@ -1,11 +1,13 @@
-using System;
+#if SUGAR_WV
 using WebViewCore;
 using WebViewCore.Configurations;
 using AvWebView = AvaloniaWebView.WebView;
+#endif
 
 namespace Calcuchord.Desktop {
 
     public class DesktopWebViewHelper : WebViewHelperBase {
+#if SUGAR_WV
         public override void InitEnv(WebViewCreationProperties config) {
             base.InitEnv(config);
             if(OperatingSystem.IsWindows()) {
@@ -26,5 +28,6 @@ namespace Calcuchord.Desktop {
 
             return true;
         }
+#endif
     }
 }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 
@@ -60,6 +62,10 @@ namespace Calcuchord {
         #endregion
 
         #region Protected Methods
+
+        int[] GetMidiNotes(IEnumerable<Note> notes) {
+            return notes.Where(x => !x.IsMute).Select(x => x.MidiTone).ToArray();
+        }
 
         #endregion
 

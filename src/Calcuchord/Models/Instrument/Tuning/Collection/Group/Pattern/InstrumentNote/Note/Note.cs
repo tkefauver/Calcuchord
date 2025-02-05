@@ -108,6 +108,9 @@ namespace Calcuchord {
                     // C3 48 | 36
                     // E3 52
                     // C0 24
+                    // C C# D D# E F F# G G# A A# B
+                    //  D: D3 A3 D3 F#4
+                    // Id: 37 44 37 
                     _midiTone = IsMute ? 0 : NoteId + 12;
                 }
 

@@ -1,9 +1,24 @@
 <Project>
     <PropertyGroup>
-        <DotNetVersion>8.0</DotNetVersion>
-    </PropertyGroup>
-    <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Browser'))">
-        <!-- This may not be needed -->
         <DotNetVersion>9.0</DotNetVersion>
+    </PropertyGroup>
+    <PropertyGroup>
+        <BuildOs>LINUX</BuildOs>
+        <!--        <BuildOs>BROWSER</BuildOs>-->
+        <UseSugarWv>true</UseSugarWv>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(BuildOs) == 'LINUX'">
+        <DefineConstants>$(DefineConstants);LINUX</DefineConstants>
+        <UseSugarWv>false</UseSugarWv>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(BuildOs) == 'BROWSER'">
+        <DefineConstants>$(DefineConstants);BROWSER</DefineConstants>
+        <UseSugarWv>false</UseSugarWv>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(UseSugarWv) == 'True'">
+        <DefineConstants>$(DefineConstants);SUGAR_WV</DefineConstants>
     </PropertyGroup>
 </Project>

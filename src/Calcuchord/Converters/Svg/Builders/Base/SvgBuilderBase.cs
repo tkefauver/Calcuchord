@@ -211,9 +211,9 @@ namespace Calcuchord {
             bool shadow = false,
             double ox = 0,
             double oy = 0) {
-            double tx = ((x + (w / 2d)) - ((fs * text.Length) / (text.Length + 2))) + 0.25;
-            double ty = y + (h / 2d) + (fs / 2d); // + 1.5; //0.75;
-            AddText(cntr,text,fs,fill,tx,ty,isBold,classes,shadow);
+            double tx = (x + (w / 2d)) - ((fs * text.Length) / (text.Length + 2));
+            double ty = y + (h / 2d) + (fs / 2d);
+            AddText(cntr,text,fs,fill,tx + ox,ty + oy,isBold,classes,shadow);
         }
 
         protected void AddText(

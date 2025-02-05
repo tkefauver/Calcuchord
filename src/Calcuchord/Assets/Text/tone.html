@@ -3,63 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <title>Calcuchord Tone Player</title>
-    <script src="http://unpkg.com/tone"></script>
+    <!--    <script src="http://unpkg.com/tone"></script>-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/15.1.3/Tone.min.js"></script>
     <script>
         var synth;
         var volumeDb = -12;
         var delayChordMs = 30;
         var delayScaleMs = 300;
-        
+
         var isPlaying = false;
         var needsStop = false;
-        
+
         const testNotes = [60, 64, 67];
-        
-        window.addEventListener('DOMContentLoaded',function () {
+
+        window.addEventListener('DOMContentLoaded', function () {
             synth = new Tone.PolySynth().toDestination();
             document.getElementById('volumeInput').value = volumeDb;
             document.getElementById('chordDelayInput').value = delayChordMs;
             document.getElementById('scaleDelayInput').value = delayScaleMs;
         });
-        
+
         function stopPlayback() {
             Tone.Transport.stop();
             Tone.Transport.cancel(0);
             synth.stop();
             synth.releaseAll();
         }
-        function playNotes(midiNotes,delayMs) {
+
+        function playNotes(midiNotes, delayMs) {
             Tone.Master.volume.value = volumeDb;
             let cur_delay = 0;
             const notes = midiNotes.map(midiNote => Tone.Midi(midiNote).toNote());
             const now = Tone.now();
-            for (var i = 0;i < notes.length;i++) {
+            for (var i = 0; i < notes.length; i++) {
                 synth.triggerAttackRelease(notes[i], "8n", now + cur_delay);
-                cur_delay += (delayMs/1000);
+                cur_delay += (delayMs / 1000);
             }
         }
-        
+
         function playChord(midiNotes) {
-            playNotes(midiNotes,delayChordMs);
+            playNotes(midiNotes, delayChordMs);
         }
+
         function playScale(midiNotes) {
-            playNotes(midiNotes,delayScaleMs);
+            playNotes(midiNotes, delayScaleMs);
         }
-        
+
         function testChord() {
             playChord(testNotes);
         }
+
         function testScale() {
             playScale(testNotes);
         }
+
         function testVolume() {
             volumeDb = document.getElementById('volumeInput').value;
             testChord();
         }
+
         function testChordDelay() {
             delayChordMs = document.getElementById('chordDelayInput').value;
             testChord();
         }
+
         function testScaleDelay() {
             delayScaleMs = document.getElementById('scaleDelayInput').value;
             testScale();
@@ -67,12 +75,21 @@
     </script>
 </head>
 <body>
-<button onclick="testChord()">Chord</button><br/><br/>
-<button onclick="testScale()">Scale</button><br/><br/>
-<button onclick="stopPlayback()">Stop</button><br/><br/>
-<label for="volumeInput">Volume</label><input id="volumeInput"/><button onclick="testVolume()">Test</button> <br/><br/>
-<label for="chordDelayInput">Chord Delay</label><input id="chordDelayInput"/><button onclick="testChordDelay()">Test</button> <br/><br/>
-<label for="scaleDelayInput">Scale Delay</label><input id="scaleDelayInput"/><button onclick="testScaleDelay()">Test</button> <br/><br/>
+<button onclick="testChord()">Chord</button>
+<br/><br/>
+<button onclick="testScale()">Scale</button>
+<br/><br/>
+<button onclick="stopPlayback()">Stop</button>
+<br/><br/>
+<label for="volumeInput">Volume</label><input id="volumeInput"/>
+<button onclick="testVolume()">Test</button>
+<br/><br/>
+<label for="chordDelayInput">Chord Delay</label><input id="chordDelayInput"/>
+<button onclick="testChordDelay()">Test</button>
+<br/><br/>
+<label for="scaleDelayInput">Scale Delay</label><input id="scaleDelayInput"/>
+<button onclick="testScaleDelay()">Test</button>
+<br/><br/>
 
 </body>
 </html>

@@ -160,7 +160,7 @@ namespace Calcuchord {
                         //AddText(bg_g,dot_text,BodyFontSize,fret_fg,tx,ty,shadow: true);
                         double tx = cx - (dot_r / 2d);
                         double ty = cy - (dot_r / 2d);
-                        AddCenteredText(bg_g,dot_text,bfs,fret_fg,tx,ty,dot_r,dot_r,shadow: true);
+                        AddCenteredText(bg_g,dot_text,bfs,fret_fg,tx,ty,dot_r,dot_r,shadow: true,ox: -0.25,oy: -0.4);
                     }
                 }
             }

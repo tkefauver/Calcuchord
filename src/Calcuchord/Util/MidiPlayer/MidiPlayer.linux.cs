@@ -25,21 +25,25 @@ namespace Calcuchord {
             //     DeltaTime = 0
             // });
             int delta = 0;
-            var tones = notes.Select(x => x.MidiTone);
+            
+            int[] tones = GetMidiNotes(notes);
+            
             foreach(int tone in tones) {
                 int vel = 127;
-                trackChunk.Events.Add(new NoteOnEvent((SevenBitNumber)tone,(SevenBitNumber)vel)
-                {
-                    DeltaTime = delta
-                });
+                trackChunk.Events.Add(
+                    new NoteOnEvent((SevenBitNumber)tone,(SevenBitNumber)vel)
+                    {
+                        DeltaTime = delta
+                    });
                 delta += 5;
             }
 
             foreach(int tone in tones) {
-                trackChunk.Events.Add(new NoteOffEvent((SevenBitNumber)tone,(SevenBitNumber)0)
-                {
-                    DeltaTime = 200
-                });
+                trackChunk.Events.Add(
+                    new NoteOffEvent((SevenBitNumber)tone,(SevenBitNumber)0)
+                    {
+                        DeltaTime = 200
+                    });
             }
 
             PlayFile(midiFile,GetInstrumentSoundFontPath(notes.FirstOrDefault()));
@@ -52,24 +56,27 @@ namespace Calcuchord {
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
 
-            trackChunk.Events.Add(new ProgramChangeEvent((SevenBitNumber)25)
-            {
-                DeltaTime = 0
-            });
+            trackChunk.Events.Add(
+                new ProgramChangeEvent((SevenBitNumber)25)
+                {
+                    DeltaTime = 0
+                });
 
             int delay = 25;
             int deltaTime = 0;
             foreach(int note in notes.Select(x => x.MidiTone)) {
                 int vel = 127;
 
-                trackChunk.Events.Add(new NoteOnEvent((SevenBitNumber)note,(SevenBitNumber)vel)
-                {
-                    DeltaTime = deltaTime
-                });
-                trackChunk.Events.Add(new NoteOffEvent((SevenBitNumber)note,(SevenBitNumber)0)
-                {
-                    DeltaTime = delay
-                });
+                trackChunk.Events.Add(
+                    new NoteOnEvent((SevenBitNumber)note,(SevenBitNumber)vel)
+                    {
+                        DeltaTime = deltaTime
+                    });
+                trackChunk.Events.Add(
+                    new NoteOffEvent((SevenBitNumber)note,(SevenBitNumber)0)
+                    {
+                        DeltaTime = delay
+                    });
                 deltaTime = 0;
             }
 

@@ -14,4 +14,8 @@
     <ItemGroup>
         <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
     </ItemGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="wwwroot\favicon.ico"/>
+    </ItemGroup>
 </Project>
