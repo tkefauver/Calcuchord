@@ -71,6 +71,9 @@ namespace Calcuchord {
 
         #region State
 
+        public int BaseNoteNum =>
+            Parent.CapoNum;
+
         bool IsEnabled =>
             RowNum >= 0;
 
@@ -102,7 +105,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Instrument
+        #region Model
 
         public InstrumentNote BaseNote { get; set; }
 
@@ -120,6 +123,7 @@ namespace Calcuchord {
             PropertyChanged += NoteRowViewModel_OnPropertyChanged;
             BaseNote = baseNote;
             int min_fret_num = IsKeyboard ? 0 : -1;
+
             Notes.AddRange(
                 Enumerable.Range(min_fret_num,Parent.LogicalFretCount)
                     .Select(x => CreateNoteViewModel(x)));
@@ -170,6 +174,15 @@ namespace Calcuchord {
             InstrumentNote inn = null;
             // NOTE open note needs to be preserved so it maps 
             // to the tuning the model (for tuning or capo adjustment)
+            // if(fretNum == BaseNoteNum &&
+            //    BaseNote != null) {
+            //     inn = BaseNote;
+            // } else if(BaseNote != null) {
+            //     inn = BaseNote.Offset(fretNum - BaseNoteNum);
+            //     //
+            // } else {
+            //     inn = new InstrumentNote(fretNum - BaseNoteNum, RowNum, null);
+            // }
             if(fretNum == 0 && BaseNote != null) {
                 inn = BaseNote;
             } else {
@@ -230,7 +243,7 @@ namespace Calcuchord {
 
             if(!root &&
                nvm.IsSelected &&
-               nvm.IsNutFret &&
+               nvm.IsOpenNote &&
                CanMute) {
                 nvm.WorkingNoteNum--;
                 OnPropertyChanged(nameof(IsMuted));

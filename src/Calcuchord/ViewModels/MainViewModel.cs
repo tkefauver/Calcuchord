@@ -697,10 +697,18 @@ namespace Calcuchord {
                 }
             }
 
-            if(new_svg_val != old_svg_val) {
-                Prefs.Instance.SelectedSvgFlags = (SvgFlags)new_svg_val;
-                Prefs.Instance.Save();
+            if(new_svg_val == old_svg_val) {
+                // no change
+                return;
             }
+
+            Prefs.Instance.SelectedSvgFlags = (SvgFlags)new_svg_val;
+            Prefs.Instance.Save();
+            RefreshMatchesSvg();
+        }
+
+        public void RefreshMatchesSvg() {
+            Matches.ForEach(x => x.RefreshSvg());
         }
 
         void InitOptions() {
@@ -997,8 +1005,8 @@ namespace Calcuchord {
                         }
 
                         UpdateSvgFlagsFromOptions();
-                        UpdateMatches(MatchUpdateSource.FilterToggle);
-                        InstrumentView.Instance.InvalidateAll();
+                        // UpdateMatches(MatchUpdateSource.FilterToggle);
+                        // InstrumentView.Instance.InvalidateAll();
                         needs_save = true;
                         break;
                 }

@@ -53,7 +53,7 @@ namespace Calcuchord {
                     return Parent.BaseNote.FullName;
                 }
 
-                if(IsNutFret) {
+                if(IsOpenNote) {
                     if(IsInMuteState) {
                         return "M";
                     }
@@ -93,7 +93,8 @@ namespace Calcuchord {
             MainViewModel.Instance.DesiredRoot.Value == InstrumentNote.Key;
 
         public bool IsEnabled =>
-            RowNum >= 0 && NoteNum >= 0;
+            RowNum >= 0 &&
+            NoteNum >= 0;
 
         public bool IsRowSolid =>
             !IsRowNylon && RowNum >= 4;
@@ -118,11 +119,19 @@ namespace Calcuchord {
             WorkingNoteNum == MUTE_FRET_NUM;
 
         public bool IsOpenNote =>
-            NoteNum == 0;
+            !Parent.Parent.Parent.IsKeyboard &&
+            RowNum >= 0 &&
+            NoteNum == Parent.BaseNoteNum;
+
+        public bool IsCapoFret =>
+            !Parent.Parent.Parent.IsKeyboard &&
+            RowNum >= 0 &&
+            Parent.BaseNoteNum > 0 &&
+            NoteNum == Parent.BaseNoteNum;
 
         public bool IsNutFret =>
             !Parent.Parent.Parent.IsKeyboard &&
-            IsEnabled &&
+            RowNum >= 0 &&
             NoteNum == 0;
 
         public bool IsNoteNumLabel =>
@@ -153,19 +162,9 @@ namespace Calcuchord {
                     return num;
                 }
 
-                return NoteNum;
+                return NoteNum + Parent.BaseNoteNum;
             }
             set => _workingFretNum = value < -2 || value == OPEN_FRET_NUM ? null : value;
-        }
-
-        public bool IsDefaultState {
-            get {
-                if(IsNutFret) {
-                    return WorkingNoteNum == OPEN_FRET_NUM;
-                }
-
-                return true;
-            }
         }
 
         #region Dot
@@ -238,7 +237,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Instrument
+        #region Model
 
         public int NoteId =>
             InstrumentNote.NoteId;

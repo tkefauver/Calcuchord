@@ -29,25 +29,11 @@ namespace Calcuchord {
         }
 
         protected override void OnLoaded(RoutedEventArgs e) {
-            if(PlatformWrapper.WebViewHelper is not { } wvh ||
-               !wvh.IsSupported) {
-                return;
+            if(PlatformWrapper.Services is { } ps &&
+               ps.MidiPlayer is { } mp) {
+                // only handled by sugarwv
+                mp.Init(MainContainerGrid);
             }
-
-#if SUGAR_WV
-           WebView hwv = new WebView
-                {
-                    Width = 0,
-                    Height = 0,
-                    IsVisible = false
-                };
-                hwv.Loaded += (sender,args) => {
-                    wvh.ConfigureWebView(hwv);
-                };
-                MainContainerGrid.Children.Insert(0,hwv);
-#else
-            wvh.ConfigureWebView(MainContainerGrid);
-#endif
         }
 
         void OnMainContainerSizeChanged() {

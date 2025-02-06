@@ -16,7 +16,7 @@ namespace Calcuchord {
         #region Statics
 
         public static InstrumentNote Mute(int stringNum) {
-            return new(-1,stringNum,null);
+            return new InstrumentNote(-1,stringNum,null);
         }
 
         #endregion
@@ -51,17 +51,43 @@ namespace Calcuchord {
         public InstrumentNote() {
         }
 
-        public InstrumentNote(int noteNum,int rowNum,Note? n) : this(noteNum,rowNum,n?.Key,n?.Register) {
+        public InstrumentNote(
+            int noteNum,
+            int rowNum,
+            Note? n) :
+            this(
+                noteNum,
+                rowNum,
+                n?.Key,
+                n?.Register) {
         }
 
-        public InstrumentNote(int noteNum,int rowNum,NoteType? nt,int? register) : base(nt,register) {
+        public InstrumentNote(
+            int noteNum,
+            int rowNum,
+            NoteType? nt,
+            int? register) :
+            base(
+                nt,
+                register) {
             NoteNum = noteNum;
             RowNum = rowNum;
+            IsMute = NoteNum < 0;
         }
 
         #endregion
 
         #region Public Methods
+
+        public override void Adjust(int offset) {
+            base.Adjust(offset);
+            //NoteNum -= offset;
+        }
+
+        // public new InstrumentNote Offset(int offset) {
+        //     Note? offset_note = base.Offset(offset);
+        //     return new InstrumentNote(NoteNum + offset,RowNum,offset_note);
+        // }
 
         public new InstrumentNote Clone() {
             return new(NoteNum,RowNum,Key,Register);

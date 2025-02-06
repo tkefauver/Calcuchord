@@ -1,0 +1,15 @@
+namespace Calcuchord.Browser {
+    public class BrowserPlatformServices : DefaultPlatformServies {
+        IMidiPlayer _midiPlayer;
+
+        public override IMidiPlayer MidiPlayer {
+            get {
+                if(_midiPlayer == null) {
+                    _midiPlayer = new MidiPlayer_browser();
+                }
+
+                return _midiPlayer;
+            }
+        }
+    }
+}

@@ -2,6 +2,7 @@
     <PropertyGroup>
         <DotNetVersion>9.0</DotNetVersion>
     </PropertyGroup>
+
     <PropertyGroup>
         <BuildOs>LINUX</BuildOs>
         <!--        <BuildOs>BROWSER</BuildOs>-->

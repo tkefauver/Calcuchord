@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using AvaloniaWebView;
 using PropertyChanged;
 #if SUGAR_WV
 using AvaloniaWebView;
@@ -15,24 +16,20 @@ namespace Calcuchord {
 
         public override void RegisterServices() {
             base.RegisterServices();
-#if SUGAR_WV
-            AvaloniaWebViewBuilder.Initialize(
-                config => {
-                    PlatformWrapper.Load();
-                    PlatformWrapper.WebViewHelper.InitEnv(config);
-                });
-#endif
+
+            if(PlatformWrapper.Services is { } ps &&
+               ps.MidiPlayer is MidiPlayer_sugarwv mp_swv) {
+                AvaloniaWebViewBuilder.Initialize(
+                    config => {
+                        mp_swv.Init(config);
+                    });
+            }
         }
 
 
         public override void OnFrameworkInitializationCompleted() {
-#if BROWSER
-            PlatformWrapper.Load();
-            PlatformWrapper.WebViewHelper.InitEnv(null);
-#elif LINUX
-            PlatformWrapper.Load();
             AssetMover.MoveAllAssets();
-#endif
+
             Prefs.Init();
             ThemeViewModel.Instance.Init();
 

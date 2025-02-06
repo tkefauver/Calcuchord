@@ -275,6 +275,10 @@ namespace Calcuchord {
         public ICommand ToggleThemeCommand => new MpCommand(
             () => {
                 SetTheme(!IsDark);
+                if(MainViewModel.Instance is { } mvm) {
+                    mvm.RefreshMatchesSvg();
+                }
+
                 OnPropertyChanged(nameof(ThemeIcon));
             });
 

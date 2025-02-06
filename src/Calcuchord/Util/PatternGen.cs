@@ -29,6 +29,7 @@ namespace Calcuchord {
 
         double TotalProgressCount { get; set; }
         public double CurrentProgressCount { get; set; }
+        public int TotalChordCount { get; set; }
 
         #endregion
 
@@ -114,7 +115,7 @@ namespace Calcuchord {
             Tuning.OpenNotes.ToArray();
 
         int FretCount =>
-            Tuning.FretCount;
+            Tuning.Parent.FretCount;
 
         int PatternFretSpan { get; }
 
@@ -361,7 +362,7 @@ namespace Calcuchord {
             int max_min_fret_num = FretCount - PatternFretSpan - 1;
             InitProgress(patterns.Count * 12);
             int cur_progress = 0;
-            int cur_chord_count = 0;
+            TotalChordCount = 0;
             Stopwatch tsw = Stopwatch.StartNew();
 
             foreach(string suffix in patterns.Select(x => x.Key)) {
@@ -397,15 +398,15 @@ namespace Calcuchord {
                         }
 
                         ngc.Groups.Add(new(ngc,idx,fingerings.OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum)));
-                        cur_chord_count++;
+                        TotalChordCount++;
                     }
 
                     ngcl.Add(ngc);
-                    UpdateProgress(++cur_progress,$"{cur_chord_count} chords found...");
+                    UpdateProgress(++cur_progress,$"{TotalChordCount} chords found...");
                 }
             }
 
-            Debug.WriteLine($"{cur_chord_count} total chords for '{Tuning}' in {tsw.ElapsedMilliseconds}ms");
+            Debug.WriteLine($"{TotalChordCount} total chords for '{Tuning}' in {tsw.ElapsedMilliseconds}ms");
 
 
             return ngcl;

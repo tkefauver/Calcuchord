@@ -153,7 +153,7 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public void Adjust(int offset) {
+        public virtual void Adjust(int offset) {
             if(Offset(offset) is not { } adj_note) {
                 return;
             }
@@ -165,7 +165,7 @@ namespace Calcuchord {
             IsMute = adj_note.IsMute;
         }
 
-        public virtual Note Offset(int offset) {
+        public Note Offset(int offset) {
             if(IsMute) {
                 return null;
             }

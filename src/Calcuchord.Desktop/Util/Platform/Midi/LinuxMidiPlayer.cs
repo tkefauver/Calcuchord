@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -6,28 +5,19 @@ using System.Linq;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
 
-namespace Calcuchord {
+namespace Calcuchord.Desktop {
 
-    public partial class MidiPlayer {
+    public class LinuxMidiPlayer : MidiPlayerBase {
 
-
-        public void Init(object obj) {
-            // TODO confirm fluidsynth and 
-        }
-
-        public void PlayChord(IEnumerable<Note> notes) {
+        public override void PlayChord(IEnumerable<Note> notes) {
             SetStopDt(notes.Count(),false);
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
-            // trackChunk.Events.Add(new ProgramChangeEvent((SevenBitNumber)25)
-            // {
-            //     DeltaTime = 0
-            // });
             int delta = 0;
-            
+
             int[] tones = GetMidiNotes(notes);
-            
+
             foreach(int tone in tones) {
                 int vel = 127;
                 trackChunk.Events.Add(
@@ -49,21 +39,16 @@ namespace Calcuchord {
             PlayFile(midiFile,GetInstrumentSoundFontPath(notes.FirstOrDefault()));
         }
 
-        public void PlayScale(IEnumerable<Note> notes) {
+        public override void PlayScale(IEnumerable<Note> notes) {
             SetStopDt(notes.Count(),true);
 
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
 
-            trackChunk.Events.Add(
-                new ProgramChangeEvent((SevenBitNumber)25)
-                {
-                    DeltaTime = 0
-                });
-
             int delay = 25;
             int deltaTime = 0;
+
             foreach(int note in notes.Select(x => x.MidiTone)) {
                 int vel = 127;
 
@@ -84,10 +69,10 @@ namespace Calcuchord {
 
         }
 
-        public void StopPlayback() {
+        public override void StopPlayback() {
             if(NextStopDt != null) {
                 NextStopDt = null;
-                Stopped?.Invoke(this,EventArgs.Empty);
+                TriggerStopped();
             }
         }
 
@@ -112,7 +97,8 @@ namespace Calcuchord {
         }
 
         string GetInstrumentSoundFontPath(Note note) {
-            if(PlatformWrapper.StorageHelper is not { } sh) {
+            if(PlatformWrapper.Services is not { } sv ||
+               sv.StorageHelper is not { } sh) {
                 return string.Empty;
             }
 

@@ -97,7 +97,8 @@ namespace Calcuchord {
         static string PrefsFilePath {
             get {
                 if(_prefsFilePath == null &&
-                   PlatformWrapper.StorageHelper is { } sh &&
+                   PlatformWrapper.Services is { } ps &&
+                   ps.StorageHelper is { } sh &&
                    sh.StorageDir is { } sd) {
                     string fn = "appstate.json";
                     _prefsFilePath = Path.Combine(sd,fn);

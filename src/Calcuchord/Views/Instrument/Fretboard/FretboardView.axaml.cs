@@ -46,7 +46,7 @@ namespace Calcuchord {
 
             ItemsControl cntr = StringsItemsControl;
 
-            double min_width = tvm.FretCount * (1600 / 23d);
+            double min_width = tvm.TotalFretCount * (1600 / 23d);
             double tw = min_width;
             double th = tw * (0.117521368 * 1);
 
@@ -60,7 +60,7 @@ namespace Calcuchord {
                 return d;
             }
 
-            double[] fret_widths = new double[tvm.FretCount];
+            double[] fret_widths = new double[tvm.TotalFretCount];
             double ll = 0;
             for(int i = 1; i <= fret_widths.Length; i++) {
                 double l = GetDistToNut(i);
@@ -79,9 +79,14 @@ namespace Calcuchord {
                     }
 
                     int fn = x.BindingContext.NoteNum;
-                    cp.Width = fn < 0 ? label_width :
-                        fn == 0 ? nut_width :
-                        fret_widths[fn - 1];
+                    cp.Width =
+                        fn < 0 ?
+                            label_width :
+                            fn == 0 ?
+                                nut_width :
+                                fn <= fret_widths.Length ?
+                                    fret_widths[fn - 1] :
+                                    0;
                     cp.Height = str_h;
                 });
             double frets_width = fret_widths.Sum();

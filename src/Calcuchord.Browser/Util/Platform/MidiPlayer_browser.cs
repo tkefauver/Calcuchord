@@ -1,32 +1,29 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices.JavaScript;
 
 namespace Calcuchord.Browser {
-    public class BrowserMidiPlayer : IMidiPlayer {
+    public class MidiPlayer_browser : MidiPlayerBase {
 
-        public bool CanPlay => true;
-
-        public event EventHandler Stopped;
-
-        public void Init(object obj) {
-        }
 
         int GetTone(Note note) {
             return note.NoteId;
         }
 
-        public void PlayChord(IEnumerable<Note> notes) {
-            EmbedMidiInterop.PlayChord(notes.Select(x => GetTone(x)).ToArray());
+        protected override int GetMidiNote(Note note) {
+            return note.NoteId;
         }
 
-        public void PlayScale(IEnumerable<Note> notes) {
-            EmbedMidiInterop.PlayScale(notes.Select(x => GetTone(x)).ToArray());
+        public override void PlayChord(IEnumerable<Note> notes) {
+            EmbedMidiInterop.PlayChord(GetMidiNotes(notes));
         }
 
-        public void StopPlayback() {
+        public override void PlayScale(IEnumerable<Note> notes) {
+            EmbedMidiInterop.PlayScale(GetMidiNotes(notes));
+        }
+
+        public override void StopPlayback() {
             EmbedMidiInterop.StopPlayback();
+            TriggerStopped();
         }
     }
 

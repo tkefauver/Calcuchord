@@ -3,11 +3,16 @@ using System.IO;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
+
     public class DefaultStorageHelper : IStorageHelper {
         string _storageDir;
 
         public string StorageDir {
             get {
+                if(OperatingSystem.IsBrowser()) {
+                    return "/";
+                }
+
                 if(_storageDir == null) {
                     string dir_name = "Calcuchord";
 #if DEBUG

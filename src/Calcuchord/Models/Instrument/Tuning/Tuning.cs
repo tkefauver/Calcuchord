@@ -37,7 +37,7 @@ namespace Calcuchord {
         #region Ignored
 
         [JsonIgnore]
-        public int FretCount =>
+        public int WorkingFretCount =>
             Parent.FretCount - CapoFretNum;
 
         [JsonIgnore]

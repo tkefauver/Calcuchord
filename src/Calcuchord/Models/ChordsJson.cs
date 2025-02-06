@@ -13,20 +13,20 @@ namespace Calcuchord.JsonChords {
     }
 
     public class Chords {
-        public List<Key> C { get; set; }
-        public List<Key> Csharp { get; set; }
-        public List<Key> D { get; set; }
-        public List<Key> Db { get; set; }
-        public List<Key> Eb { get; set; }
-        public List<Key> E { get; set; }
-        public List<Key> F { get; set; }
-        public List<Key> Fsharp { get; set; }
-        public List<Key> G { get; set; }
-        public List<Key> Gb { get; set; }
-        public List<Key> Ab { get; set; }
-        public List<Key> A { get; set; }
-        public List<Key> Bb { get; set; }
-        public List<Key> B { get; set; }
+        public List<MusicKey> C { get; set; }
+        public List<MusicKey> Csharp { get; set; }
+        public List<MusicKey> D { get; set; }
+        public List<MusicKey> Db { get; set; }
+        public List<MusicKey> Eb { get; set; }
+        public List<MusicKey> E { get; set; }
+        public List<MusicKey> F { get; set; }
+        public List<MusicKey> Fsharp { get; set; }
+        public List<MusicKey> G { get; set; }
+        public List<MusicKey> Gb { get; set; }
+        public List<MusicKey> Ab { get; set; }
+        public List<MusicKey> A { get; set; }
+        public List<MusicKey> Bb { get; set; }
+        public List<MusicKey> B { get; set; }
     }
 
     public class Main {
@@ -51,11 +51,10 @@ namespace Calcuchord.JsonChords {
         [JsonIgnore]
         public IEnumerable<int> real_frets {
             get {
-                foreach(var fret in frets) {
+                foreach(int fret in frets) {
                     if(fret <= 0 || baseFret <= 1) {
                         yield return fret;
-                    }
-                    else {
+                    } else {
                         yield return (baseFret - 1) + fret;
                     }
 
@@ -65,51 +64,51 @@ namespace Calcuchord.JsonChords {
         }
     }
 
-    public class Key {
+    public class MusicKey {
         public string key { get; set; }
         public string suffix { get; set; }
         public List<Position> positions { get; set; }
     }
 
-    public class A : Key {
+    public class A : MusicKey {
     }
 
-    public class Ab : Key {
+    public class Ab : MusicKey {
     }
 
-    public class B : Key {
+    public class B : MusicKey {
     }
 
-    public class Bb : Key {
+    public class Bb : MusicKey {
     }
 
-    public class C : Key {
+    public class C : MusicKey {
     }
 
-    public class Csharp : Key {
+    public class Csharp : MusicKey {
     }
 
-    public class D : Key {
+    public class D : MusicKey {
     }
 
-    public class Db : Key {
+    public class Db : MusicKey {
     }
 
-    public class Eb : Key {
+    public class Eb : MusicKey {
     }
 
-    public class E : Key {
+    public class E : MusicKey {
     }
 
-    public class F : Key {
+    public class F : MusicKey {
     }
 
-    public class Fsharp : Key {
+    public class Fsharp : MusicKey {
     }
 
-    public class G : Key {
+    public class G : MusicKey {
     }
 
-    public class Gb : Key {
+    public class Gb : MusicKey {
     }
 }

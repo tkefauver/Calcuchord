@@ -2,6 +2,13 @@ using System;
 using System.Collections.Generic;
 
 namespace Calcuchord {
+
+    public interface IPlatformServices {
+        IStorageHelper StorageHelper { get; }
+        IMidiPlayer MidiPlayer { get; }
+
+    }
+
     public interface IPrimaryModel {
         string Id { get; }
         void CreateId(string forceId);

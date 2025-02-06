@@ -66,7 +66,12 @@ namespace Calcuchord {
         #region Protected Methods
 
         protected override void PlayGroupMidi() {
-            MidiPlayer.Instance.PlayScale(NoteGroup.Notes);
+            if(PlatformWrapper.Services is not { } ps ||
+               ps.MidiPlayer is not { } mp) {
+                return;
+            }
+
+            mp.PlayScale(NoteGroup.Notes);
         }
 
         #endregion

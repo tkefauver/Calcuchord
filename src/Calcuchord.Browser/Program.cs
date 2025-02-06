@@ -10,12 +10,7 @@ internal sealed partial class Program {
             .WithInterFont()
             .AfterPlatformServicesSetup(
                 _ => {
-                    EmbedWebView.Implementation = new EmbedBrowserHandle();
-                    PlatformWrapper.Init(
-                        () => {
-                            PlatformWrapper.StorageHelper = new BrowserStorageHelper();
-                            PlatformWrapper.WebViewHelper = new BrowserWebViewHelper();
-                        });
+                    PlatformWrapper.Init(new BrowserPlatformServices());
                 })
             .StartBrowserAppAsync("out");
     }
@@ -24,10 +19,6 @@ internal sealed partial class Program {
 
 
         return AppBuilder
-            .Configure<App>()
-            .AfterSetup(
-                _ => {
-                    AssetMover.MoveAllAssets();
-                });
+            .Configure<App>();
     }
 }

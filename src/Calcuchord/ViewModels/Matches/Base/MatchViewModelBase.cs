@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 using Avalonia.Controls;
@@ -35,6 +36,20 @@ namespace Calcuchord {
         #endregion
 
         #region Appearance
+
+        string _svgSource;
+
+        public string SvgSource {
+            get {
+                if(_svgSource == null) {
+                    _svgSource =
+                        MatchToSvgConverter.Instance.Convert(
+                            NoteGroup,null,typeof(string),CultureInfo.CurrentCulture) as string;
+                }
+
+                return _svgSource;
+            }
+        }
 
         public string BookmarkIcon =>
             IsBookmarked ? "Bookmark" : "BookmarkOutline";
@@ -86,7 +101,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Instrument
+        #region Model
 
         public double Score { get; set; }
 
@@ -114,6 +129,16 @@ namespace Calcuchord {
 
         #region Public Methods
 
+        public void RefreshSvg() {
+            if(_svgSource == null) {
+                // unused so don't bother
+                return;
+            }
+
+            _svgSource = null;
+            OnPropertyChanged(nameof(SvgSource));
+        }
+
         #endregion
 
         #region Protected Methods
@@ -138,28 +163,33 @@ namespace Calcuchord {
 
         public ICommand ToggleMatchPlaybackCommand => new MpCommand(
             () => {
+                if(PlatformWrapper.Services is not { } ps ||
+                   ps.MidiPlayer is not { } mp) {
+                    return;
+                }
+
                 if(TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
                    tl.Clipboard is { } cb &&
                    MatchToSvgConverter.Instance.Convert(NoteGroup,null,null,null) is string svg) {
                     cb.SetTextAsync(svg.ToPrettyPrintXml()).FireAndForgetSafeAsync();
                 }
 
-                if(!MidiPlayer.Instance.CanPlay) {
+                if(!mp.CanPlay) {
                     return;
                 }
 
                 if(IsMatchPlaying) {
-                    MidiPlayer.Instance.StopPlayback();
+                    mp.StopPlayback();
                     return;
                 }
 
-                MidiPlayer.Instance.Stopped += MidiPlayer_OnStopped;
+                mp.Stopped += MidiPlayer_OnStopped;
 
                 PlayGroupMidi();
 
                 void MidiPlayer_OnStopped(object sender,EventArgs e) {
                     IsMatchPlaying = false;
-                    MidiPlayer.Instance.Stopped -= MidiPlayer_OnStopped;
+                    mp.Stopped -= MidiPlayer_OnStopped;
                 }
             });
 

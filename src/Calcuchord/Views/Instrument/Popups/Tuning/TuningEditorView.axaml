@@ -42,7 +42,9 @@
 
         <Style Selector="TextBox#TuningNameTextBox /template/ Panel#PART_TextContainer">
             <Setter Property="Margin"
-                    Value="0,3,0,0" />
+                    Value="0" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
         </Style>
     </UserControl.Styles>
 
@@ -50,8 +52,8 @@
         <!--  ADD TUNING BUTTON  -->
 
         <controls:FloatingButton Grid.Row="0"
-                                 Classes="float-text"
-                                 Margin="5,10"
+                                 Classes="float-text light"
+                                 Margin="5,10,5,20"
                                  IsExtended="True"
                                  HorizontalAlignment="Left"
                                  Command="{Binding AddTuningCommand}">
@@ -72,93 +74,164 @@
         </controls:FloatingButton>
 
         <ScrollViewer Grid.Row="1">
-            <ItemsControl Margin="0,0,20,0"
+            <ItemsControl Margin="0"
                           ItemsSource="{Binding Tunings}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="local:TuningViewModel">
+                        <Expander Margin="0,0,5,20"
+                                  Padding="10,4,4,4"
+                                  Foreground="{DynamicResource Fg}">
+                            <Expander.Header>
+                                <Grid ColumnDefinitions="Auto,Auto,*"
+                                      VerticalAlignment="Center">
+                                    <Button x:Name="TuningOptionButton"
+                                            Grid.Column="0"
+                                            DockPanel.Dock="Right"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            VerticalContentAlignment="Center"
+                                            Classes="float">
+                                        <Button.Flyout>
+                                            <Flyout>
+                                                <ContextMenu HorizontalAlignment="Right"
+                                                             VerticalAlignment="Top">
+                                                    <MenuItem Header="Duplicate"
+                                                              Command="{Binding DuplicateThisTuningCommand}"
+                                                              CommandParameter="{Binding ElementName=TuningOptionButton}">
+                                                        <MenuItem.Icon>
+                                                            <avalonia:MaterialIcon Kind="Sheep"
+                                                                Width="24"
+                                                                Height="24" />
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem StaysOpenOnClick="False"
+                                                              Header="Stats"
+                                                              Command="{Binding ShowStatsCommand}"
+                                                              CommandParameter="{Binding ElementName=TuningOptionButton}">
+                                                        <MenuItem.Icon>
+                                                            <avalonia:MaterialIcon Kind="ChartBar"
+                                                                Width="24"
+                                                                Height="24" />
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
 
-                        <!-- 
-                                       Effect="drop-shadow(3 3 5 black)" -->
-                        <controls:Card Margin="0,0,5,20"
-                                       Padding="10,4,4,4"
-                                       Foreground="{DynamicResource Fg}">
-                            <Grid>
+                                                    <Separator />
+                                                    <MenuItem Header="Delete"
+                                                              Command="{Binding DeleteThisTuningCommand}"
+                                                              CommandParameter="{Binding ElementName=TuningOptionButton}">
+                                                        <MenuItem.Icon>
+                                                            <avalonia:MaterialIcon Kind="Delete"
+                                                                Width="24"
+                                                                Height="24" />
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                </ContextMenu>
 
-                                <StackPanel Margin="0,4">
-                                    <StackPanel Orientation="Horizontal"
-                                                Spacing="5">
-                                        <!-- IS SELECTED -->
-                                        <CheckBox ToolTip.Tip="Selected"
-                                                  ToolTip.ShowOnDisabled="True"
-                                                  IsEnabled="{Binding !IsSelected}"
-                                                  IsChecked="{Binding IsSelected,Mode=OneWay}"
-                                                  VerticalAlignment="Top"
-                                                  Command="{Binding SelectThisTuningCommand}" />
-                                        <!-- NAME -->
+                                            </Flyout>
+                                        </Button.Flyout>
+                                        <avalonia:MaterialIcon Kind="DotsVertical" />
+                                    </Button>
 
-                                        <TextBox x:Name="TuningNameTextBox"
-                                                 FontSize="24"
-                                                 MaxHeight="40"
-                                                 MaxWidth="230"
-                                                 IsReadOnly="{Binding IsReadOnly}"
-                                                 VerticalAlignment="Center"
-                                                 HorizontalAlignment="Left"
-                                                 HorizontalContentAlignment="Left"
-                                                 VerticalContentAlignment="Center"
-                                                 Text="{Binding Name, Mode=TwoWay}" />
+                                    <!-- IS SELECTED -->
+                                    <CheckBox Grid.Column="1"
+                                              ToolTip.Tip="Selected"
+                                              ToolTip.ShowOnDisabled="True"
+                                              Margin="5,0,0,0"
+                                              IsEnabled="{Binding !IsSelected}"
+                                              IsChecked="{Binding IsSelected,Mode=OneWay}"
+                                              VerticalAlignment="Center"
+                                              Command="{Binding SelectThisTuningCommand}" />
+                                    <!-- NAME -->
 
-                                    </StackPanel>
+                                    <TextBox x:Name="TuningNameTextBox"
+                                             Grid.Column="2"
+                                             Margin="5,0,0,0"
+                                             FontSize="24"
+                                             MaxHeight="40"
+                                             MaxWidth="230"
+                                             IsReadOnly="{Binding IsReadOnly}"
+                                             HorizontalAlignment="Left"
+                                             HorizontalContentAlignment="Left"
+                                             VerticalAlignment="Center"
+                                             VerticalContentAlignment="Center"
+                                             Text="{Binding Name, Mode=TwoWay}" />
+                                </Grid>
+                            </Expander.Header>
+                            <Expander.Content>
+                                <Grid Margin="10"
+                                      RowDefinitions="0.5*,0.5*"
+                                      ColumnDefinitions="35,*">
 
-                                    <!-- CAPO NUM BLOCK -->
-                                    <StackPanel Orientation="Horizontal"
-                                                Spacing="10"
-                                                Margin="0,0,0,10">
+                                    <!-- CAPO LABEL -->
+                                    <TextBlock Grid.Row="0"
+                                               Grid.Column="0"
+                                               Margin="0,0,10,0"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Classes="Body2"
+                                               Text="Capo" />
+
+                                    <!-- CAPO NUM BTN -->
+
+                                    <Button Grid.Row="0"
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Classes="input-box"
+                                            IsEnabled="{Binding IsPatternEditable}"
+                                            Padding="0"
+                                            Theme="{StaticResource MaterialFlatButton}">
+                                        <Button.Flyout>
+                                            <Flyout>
+                                                <!-- PITCH BTNS -->
+
+                                                <controls:Card HorizontalAlignment="Right"
+                                                               VerticalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <!-- DECREASE PITCH BTN -->
+                                                        <RepeatButton x:Name="DecreasePitchButton"
+                                                                      Classes="float"
+                                                                      Command="{Binding DecreaseCapoFretCommand}">
+                                                            <avalonia:MaterialIcon Kind="Minus" />
+                                                        </RepeatButton>
+                                                        <!-- INCREASE PITCH BTN -->
+                                                        <RepeatButton x:Name="IncreasePitchButton"
+                                                                      Classes="float"
+                                                                      Command="{Binding IncreaseCapoFretCommand}">
+                                                            <avalonia:MaterialIcon Kind="Plus" />
+                                                        </RepeatButton>
+                                                    </StackPanel>
+                                                </controls:Card>
+
+                                            </Flyout>
+
+                                        </Button.Flyout>
                                         <TextBlock VerticalAlignment="Center"
-                                                   Classes="Body2"
-                                                   Text="Capo" />
-                                        <Button VerticalAlignment="Center"
-                                                Classes="input-box"
-                                                IsEnabled="{Binding IsPatternEditable}"
-                                                Padding="0"
-                                                Theme="{StaticResource MaterialFlatButton}">
-                                            <Button.Flyout>
-                                                <Flyout>
-                                                    <!-- PITCH BTNS -->
+                                                   HorizontalAlignment="Center"
+                                                   TextAlignment="Center"
+                                                   FontWeight="Bold"
+                                                   FontSize="16"
+                                                   Text="{Binding CapoNum}" />
+                                    </Button>
 
-                                                    <controls:Card HorizontalAlignment="Right"
-                                                                   VerticalAlignment="Center">
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <!-- DECREASE PITCH BTN -->
-                                                            <RepeatButton x:Name="DecreasePitchButton"
-                                                                          Classes="float"
-                                                                          Command="{Binding DecreaseCapoFretCommand}">
-                                                                <avalonia:MaterialIcon Kind="Minus" />
-                                                            </RepeatButton>
-                                                            <!-- INCREASE PITCH BTN -->
-                                                            <RepeatButton x:Name="IncreasePitchButton"
-                                                                          Classes="float"
-                                                                          Command="{Binding IncreaseCapoFretCommand}">
-                                                                <avalonia:MaterialIcon Kind="Plus" />
-                                                            </RepeatButton>
-                                                        </StackPanel>
-                                                    </controls:Card>
+                                    <!-- TUNING LABEL -->
 
-                                                </Flyout>
-
-                                            </Button.Flyout>
-                                            <TextBlock VerticalAlignment="Center"
-                                                       HorizontalAlignment="Center"
-                                                       TextAlignment="Center"
-                                                       FontWeight="Bold"
-                                                       FontSize="16"
-                                                       Text="{Binding CapoNum}" />
-                                        </Button>
-                                    </StackPanel>
+                                    <TextBlock Grid.Row="1"
+                                               Grid.Column="0"
+                                               Margin="0,0,10,0"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Classes="Body2"
+                                               TextWrapping="WrapWithOverflow"
+                                               Text="" />
 
                                     <!-- OPEN NOTE STRIP -->
 
                                     <ListBox x:Name="OpenNoteStripListBox"
-                                             Margin="0,0,0,10"
+                                             Grid.Row="1"
+                                             Grid.Column="1"
+                                             Margin="0,10,0,0"
+                                             HorizontalAlignment="Left"
                                              VerticalAlignment="Center"
                                              IsEnabled="{Binding IsPatternEditable}"
                                              SelectedIndex="{Binding SelectedOpenNoteIndex, Mode=TwoWay}"
@@ -213,54 +286,10 @@
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
-                                </StackPanel>
 
-                                <Button x:Name="TuningOptionButton"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Top"
-                                        Classes="float">
-                                    <Button.Flyout>
-                                        <Flyout>
-                                            <ContextMenu HorizontalAlignment="Right"
-                                                         VerticalAlignment="Top">
-                                                <MenuItem Header="Duplicate"
-                                                          Command="{Binding DuplicateThisTuningCommand}">
-                                                    <MenuItem.Icon>
-                                                        <avalonia:MaterialIcon Kind="Sheep"
-                                                                               Width="24"
-                                                                               Height="24" />
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                                <MenuItem StaysOpenOnClick="False"
-                                                          Header="Stats"
-                                                          Command="{Binding ShowStatsCommand}"
-                                                          CommandParameter="{Binding ElementName=TuningOptionButton}">
-                                                    <MenuItem.Icon>
-                                                        <avalonia:MaterialIcon Kind="ChartBar"
-                                                                               Width="24"
-                                                                               Height="24" />
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-
-                                                <Separator />
-                                                <MenuItem Header="Delete"
-                                                          Command="{Binding DeleteThisTuningCommand}">
-                                                    <MenuItem.Icon>
-                                                        <avalonia:MaterialIcon Kind="Delete"
-                                                                               Width="24"
-                                                                               Height="24" />
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                            </ContextMenu>
-
-                                        </Flyout>
-                                    </Button.Flyout>
-                                    <avalonia:MaterialIcon Kind="DotsVertical" />
-                                </Button>
-
-
-                            </Grid>
-                        </controls:Card>
+                                </Grid>
+                            </Expander.Content>
+                        </Expander>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

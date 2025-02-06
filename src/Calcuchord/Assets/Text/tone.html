@@ -33,7 +33,7 @@
 
         function playNotes(midiNotes, delayMs) {
             Tone.Master.volume.value = volumeDb;
-            let cur_delay = 0;
+            let cur_delay = 300;
             const notes = midiNotes.map(midiNote => Tone.Midi(midiNote).toNote());
             const now = Tone.now();
             for (var i = 0; i < notes.length; i++) {

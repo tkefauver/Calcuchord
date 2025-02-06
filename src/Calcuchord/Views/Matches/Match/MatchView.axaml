@@ -88,7 +88,7 @@
 
                 <Svg x:Name="MatchSvg"
                      Grid.Row="1"
-                     Source="{Binding NoteGroup, Converter={x:Static local:MatchToSvgConverter.Instance}}"
+                     Source="{Binding SvgSource}"
                      Stretch="Uniform" />
                 <StackPanel x:Name="MatchButtonStripPanel"
                             Grid.Row="2"

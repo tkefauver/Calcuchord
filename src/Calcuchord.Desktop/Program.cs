@@ -16,7 +16,6 @@ namespace Calcuchord.Desktop {
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp() {
 
-
             return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .UseReactiveUI()
@@ -34,12 +33,7 @@ namespace Calcuchord.Desktop {
                 .LogToTrace()
                 .AfterPlatformServicesSetup(
                     _ => {
-
-                        PlatformWrapper.Init(
-                            () => {
-                                PlatformWrapper.StorageHelper = new DefaultStorageHelper();
-                                PlatformWrapper.WebViewHelper = new DesktopWebViewHelper();
-                            });
+                        PlatformWrapper.Init(new DesktopPlatformServices());
                     });
         }
     }

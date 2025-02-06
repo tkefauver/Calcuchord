@@ -14,18 +14,14 @@ namespace Calcuchord.Android {
         ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
     public class MainActivity : AvaloniaMainActivity<App> {
         protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) {
-            PlatformWrapper.Init(() => {
-                PlatformWrapper.StorageHelper = new DefaultStorageHelper();
-                PlatformWrapper.WebViewHelper = new AndroidWebViewHelper();
-            });
             return base.CustomizeAppBuilder(builder)
                 .UseReactiveUI()
                 .UseAndroidWebView()
                 .WithInterFont()
                 .LogToTrace()
-                .AfterSetup(
+                .AfterPlatformServicesSetup(
                     _ => {
-                        AssetMover.MoveAllAssets();
+                        PlatformWrapper.Init(new AndroidPlatformServices());
                     });
         }
     }

@@ -13,18 +13,26 @@
         <AndroidSdkDirectory>/home/tkefauver/android-sdk</AndroidSdkDirectory>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <RunAOTCompilation>true</RunAOTCompilation>
+        <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+        <EnableLLVM>true</EnableLLVM>
+        <PublishTrimmed>true</PublishTrimmed>
+        <PublishAot>true</PublishAot>
+    </PropertyGroup>
+
     <ItemGroup>
-        <PackageReference Include="Avalonia.Android" />
-        <PackageReference Include="Avalonia.ReactiveUI" />
-        <PackageReference Include="webview.avalonia.android" />
-        <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" />
+        <PackageReference Include="Avalonia.Android"/>
+        <PackageReference Include="Avalonia.ReactiveUI"/>
+        <PackageReference Include="webview.avalonia.android"/>
+        <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj" />
+        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Resources\drawable\Icon.png" />
+        <AvaloniaResource Include="Resources\drawable\Icon.png"/>
     </ItemGroup>
 </Project>

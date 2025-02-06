@@ -104,7 +104,7 @@
                             </Button>
                             <Button HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
-                                    Classes="float-text"
+                                    Classes="float-text dark"
                                     Command="{Binding FinishEditInstrumentCommand}">
                                 <TextBlock Text="Done" />
                             </Button>

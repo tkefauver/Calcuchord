@@ -7,7 +7,8 @@ using MonkeyPaste.Common.Avalonia;
 namespace Calcuchord {
     public static class AssetMover {
         public static void MoveAllAssets() {
-            if(PlatformWrapper.StorageHelper is not { } sh ||
+            if(PlatformWrapper.Services is not { } ps ||
+               ps.StorageHelper is not { } sh ||
                sh.StorageDir is not { } storage_dir) {
                 return;
             }
@@ -28,11 +29,11 @@ namespace Calcuchord {
                     string output_path = Path.Combine(sound_dir,Path.GetFileName(sr.ToPathFromUri()));
                     File.WriteAllBytes(output_path,bytes);
                 }
-
             }
 
-            if(PlatformWrapper.WebViewHelper is { } wvh &&
-               wvh.ToneUrl is { } tone_target_url &&
+
+            if(ps.MidiPlayer is MidiPlayer_sugarwv wvh &&
+               wvh.PlayerUrl is { } tone_target_url &&
                tone_target_url.ToPathFromUri() is { } tone_target_path &&
                !tone_target_path.IsFile()) {
                 string tone_text = MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/tone.html");

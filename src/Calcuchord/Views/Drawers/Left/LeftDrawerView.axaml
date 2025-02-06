@@ -114,9 +114,14 @@
                                     Classes="float"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Center"
-                                    IsVisible="{Binding IsSelected}"
                                     Command="{Binding BeginEditInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
                                     CommandParameter="{Binding .}">
+                                <Button.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="IsSelected" />
+                                        <Binding Path="CanEdit" />
+                                    </MultiBinding>
+                                </Button.IsVisible>
                                 <avalonia:MaterialIcon Kind="Cog" />
                             </Button>
                         </Grid>
@@ -130,7 +135,6 @@
                                      Margin="5"
                                      IsExtended="True"
                                      HorizontalAlignment="Right"
-                                     IsEnabled="{Binding IsPrefsPersistent, Source={x:Static local:Prefs.Instance}}"
                                      Command="{Binding AddInstrumentCommand}">
                 <StackPanel Orientation="Horizontal"
                             Height="24">

@@ -69,6 +69,8 @@ namespace Calcuchord {
 
         #region State
 
+        public bool CanEdit => !IsKeyboard;
+
         public bool IsInstrumentTabSelected { get; set; }
         public bool IsTuningTabSelected { get; set; }
 
@@ -212,6 +214,12 @@ namespace Calcuchord {
 
         void InstrumentViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
+                case nameof(IsEditModeEnabled):
+                    if(IsEditModeEnabled) {
+                        UpdateEditorSelectionToType();
+                    }
+
+                    break;
                 case nameof(SelectedInstrumentTypeIndex):
                     if(IsEditModeEnabled) {
                         ChangeInstrumentTypeAsync().FireAndForgetSafeAsync();
@@ -248,6 +256,11 @@ namespace Calcuchord {
             MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.CanFinishEdit));
         }
 
+        void UpdateEditorSelectionToType() {
+            SelectedFretCountIndex = FretCounts.IndexOf(Instrument.FretCount.ToString());
+            SelectedStringCountIndex = StringCounts.IndexOf(Instrument.StringCount.ToString());
+        }
+
         async Task<TuningViewModel> CreateTuningViewModelAsync(Tuning tuning) {
             TuningViewModel tvm = new TuningViewModel(this);
             await tvm.InitAsync(tuning);
@@ -277,8 +290,7 @@ namespace Calcuchord {
             OnPropertyChanged(nameof(StringCounts));
             OnPropertyChanged(nameof(Name));
 
-            SelectedFretCountIndex = FretCounts.IndexOf(Instrument.FretCount.ToString());
-            SelectedStringCountIndex = StringCounts.IndexOf(Instrument.StringCount.ToString());
+            UpdateEditorSelectionToType();
         }
 
         #endregion

@@ -157,15 +157,18 @@ namespace Calcuchord {
         public string Id =>
             Tuning.Id;
 
-        public int FretCount =>
-            Tuning.FretCount;
+        public int WorkingFretCount =>
+            Tuning.WorkingFretCount;
+
+        public int TotalFretCount =>
+            Tuning.Parent.FretCount;
 
         int StringCount =>
             Parent.RowCount;
 
         // +2 for label and nut
         public int LogicalFretCount =>
-            FretCount + (Parent.IsKeyboard ? 0 : 2);
+            TotalFretCount + (Parent.IsKeyboard ? 0 : 2);
 
         public Tuning Tuning { get; set; }
 
@@ -199,7 +202,7 @@ namespace Calcuchord {
             Tuning.OpenNotes.OrderBy(x => x.RowNum).ForEach(x => NoteRows.Add(new NoteRowViewModel(this,x)));
             if(HasFretNumRow) {
                 // add fret num row
-                NoteRows.Insert(0,new(this,null));
+                NoteRows.Insert(0,new NoteRowViewModel(this,null));
             }
 
             OpenNotes.Clear();
@@ -266,7 +269,7 @@ namespace Calcuchord {
                 return false;
             }
 
-            PatternGenCts = new();
+            PatternGenCts = new CancellationTokenSource();
 
             var progress_lookup = new Dictionary<MusicPatternType,double>
             {
@@ -317,7 +320,10 @@ namespace Calcuchord {
                         GenProgress =
                             progress_lookup
                                 [MusicPatternType.Chords]; //progress_lookup.Values.Sum() / progress_lookup.Count;
-                        GenProgressLabel = $"{pg.CurrentProgressCount:n0} chords found"; //pg.ProgressLabel;
+                        if(pg.PatternType == MusicPatternType.Chords) {
+                            GenProgressLabel = $"{pg.TotalChordCount:n0} chords found"; //pg.ProgressLabel;    
+                        }
+
 
                         Debug.WriteLine($"Total Progress: {GenProgress} Label: '{pg.ProgressLabel}'");
                     });
@@ -355,14 +361,14 @@ namespace Calcuchord {
                     foreach(PropertyInfo pi in typeof(Chords).GetProperties()) {
                         object obj = chordsJsonRoot.chords.GetPropertyValue(pi.Name);
                         if(obj is not IList keys_obj ||
-                           keys_obj.OfType<Key>().FirstOrDefault() is not { } key_obj ||
+                           keys_obj.OfType<MusicKey>().FirstOrDefault() is not { } key_obj ||
                            MusicHelpers.ParseNote(key_obj.key) is not { } key_note_tup) {
                             continue;
                         }
 
                         NoteType cur_key = key_note_tup.nt;
 
-                        foreach(Key chord_group in keys_obj) {
+                        foreach(MusicKey chord_group in keys_obj) {
                             string cur_suffix = chord_group.suffix;
                             NoteGroupCollection ngc = new NoteGroupCollection(
                                 MusicPatternType.Chords,cur_key,chord_group.suffix);
@@ -370,10 +376,16 @@ namespace Calcuchord {
                                 NoteGroup ng = new NoteGroup(ngc,pos_num);
                                 ng.CreateId(null);
                                 foreach((int f,int str_num) in pos.real_frets.WithIndex()) {
-                                    ng.Notes.Add(
-                                        new(
-                                            pos.fingers[str_num],f,str_num,tuning.OpenNotes[str_num].Offset(f).Key,
-                                            tuning.OpenNotes[str_num].Register));
+                                    InstrumentNote inn = null;
+                                    if(f < 0) {
+                                        inn = InstrumentNote.Mute(str_num);
+                                    } else if(tuning.OpenNotes[str_num].Offset(f) is { } fret_note) {
+                                        inn = new InstrumentNote(f,str_num,fret_note);
+                                    }
+
+                                    Debug.Assert(inn != null,"Parse error");
+                                    PatternNote pattern_note = new PatternNote(pos.fingers[str_num],inn);
+                                    ng.Notes.Add(pattern_note);
                                 }
 
                                 ngc.Groups.Add(ng);
@@ -415,6 +427,17 @@ namespace Calcuchord {
             await InitAsync(Tuning);
         }
 
+        void CloseFlyout(object args) {
+            if(args is not Button b ||
+               b.Flyout is not { } fo) {
+                return;
+            }
+
+            // BUG context menu blocks popup and doesn't close 
+            // so manually closing
+            fo.Hide();
+        }
+
         #endregion
 
         #region Commands
@@ -422,12 +445,14 @@ namespace Calcuchord {
         public bool CanDelete =>
             !IsReadOnly && Parent.Tunings.Count > 1;
 
-        public ICommand DeleteThisTuningCommand => new MpCommand(
-            async () => {
+        public ICommand DeleteThisTuningCommand => new MpCommand<object>(
+            async (args) => {
+                CloseFlyout(args);
+
                 bool? confirmed = null;
                 DialogViewModel dlg_vm = new DialogViewModel
                 {
-                    Label = $"Are you sure you want to delete '{Name}?'",
+                    Label = $"Are you sure you want to delete '{Name}'?",
                     OkCommand = new MpCommand(
                         () => {
                             confirmed = true;
@@ -450,12 +475,13 @@ namespace Calcuchord {
                 }
 
                 Parent.RemoveTuningCommand.Execute(Id);
-            },() => {
+            },(args) => {
                 return CanDelete;
             });
 
-        public ICommand DuplicateThisTuningCommand => new MpCommand(
-            () => {
+        public ICommand DuplicateThisTuningCommand => new MpCommand<object>(
+            (args) => {
+                CloseFlyout(args);
                 Tuning dup_tuning = Tuning.Clone();
                 dup_tuning.IsReadOnly = false;
                 dup_tuning.Name = Parent.GetUniqueTuningName(Name,[]);
@@ -466,7 +492,7 @@ namespace Calcuchord {
             async () => {
                 await AdjustCapoAsync(1);
             },() => {
-                return FretCount > Parent.MinEditableFretCount;
+                return TotalFretCount > Parent.MinEditableFretCount;
             });
 
         public ICommand DecreaseCapoFretCommand => new MpAsyncCommand(
@@ -479,13 +505,7 @@ namespace Calcuchord {
 
         public ICommand ShowStatsCommand => new MpCommand<object>(
             (args) => {
-                if(args is Button b &&
-                   b.Flyout is { } fo) {
-                    fo.Hide();
-                    // BUG context menu blocks popup and doesn't close 
-                    // so manually closing
-                }
-
+                CloseFlyout(args);
                 ChordsCount = Tuning.Chords.SelectMany(x => x.Groups).Count();
                 ScalesCount = Tuning.Scales.SelectMany(x => x.Groups).Count();
                 ModesCount = Tuning.Modes.SelectMany(x => x.Groups).Count();

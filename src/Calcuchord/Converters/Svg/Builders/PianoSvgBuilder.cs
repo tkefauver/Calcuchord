@@ -42,7 +42,7 @@ namespace Calcuchord {
 
             var pattern_notes = ng.Notes.OrderBy(x => x.NoteNum);
             InstrumentNote root_note = ng.Parent.Parent.OpenNotes.FirstOrDefault();
-            int key_count = ng.Parent.Parent.FretCount;
+            int key_count = ng.Parent.Parent.WorkingFretCount;
 
             double cur_x = 0;
             double cur_y = 0;

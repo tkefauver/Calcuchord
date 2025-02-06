@@ -203,6 +203,15 @@
             </Border.Background>
         </Border>
 
+        <!-- CAPO -->
+
+        <Border IsVisible="{Binding IsCapoFret}"
+                Background="DarkOrange"
+                Margin="10,0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch" />
+
+
         <!-- NUT -->
 
         <Border IsVisible="{Binding IsNutFret}"
