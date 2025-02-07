@@ -262,7 +262,8 @@ namespace Calcuchord {
         }
 
         bool RejectExists(InstrumentNote[] notes,NoteType[] pattern,IEnumerable<IEnumerable<InstrumentNote>> existing) {
-            return existing.Any(x => !x.Where(y => y.NoteNum > 0).Difference(notes.Where(z => z.NoteNum > 0)).Any());
+            //return existing.Any(x => !x.Where(y => y.NoteNum > 0).Difference(notes.Where(z => z.NoteNum > 0)).Any());
+            return existing.Any(x => x.Difference(notes).None());
         }
 
         bool IsValidCombo(InstrumentNote[] notes,NoteType[] pattern,IEnumerable<IEnumerable<InstrumentNote>> existing) {
@@ -355,6 +356,10 @@ namespace Calcuchord {
             return pnl;
         }
 
+        string GetSignature(IEnumerable<InstrumentNote> notes) {
+            return string.Join(" ",notes.OrderBy(x => x.RowNum).Select(x => x.NoteNum.ToString()));
+        }
+
         async Task<IEnumerable<NoteGroupCollection>> GetFretboardChordsAsync() {
             await Task.Delay(1,Ct);
             var patterns = PatternsLookup[MusicPatternType.Chords];
@@ -382,6 +387,14 @@ namespace Calcuchord {
                             x => x.NoteNum >= min_fret_num && x.NoteNum <= max_fret_num);
                         var combos = block_notes.Combinations().Where(x => x.Length >= pattern.Length);
                         foreach(var combo in combos) {
+                            if(cur_key == NoteType.E &&
+                               suffix.ToLower() == "major") {
+                                string sig = GetSignature(combo);
+                                if(sig.StartsWith("0 2 2 1 0")) {
+
+                                }
+                            }
+
                             if(!IsValidCombo(combo,pattern,valid_patterns)) {
                                 continue;
                             }

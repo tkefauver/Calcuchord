@@ -80,7 +80,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="local:NoteViewModel">
-                        <local:KeyView Classes="note-btn"
+                        <local:KeyView Classes="note-btn input"
                                        Classes.black="{Binding IsAltered}"
                                        Classes.selected="{Binding IsSelected}"
                                        Classes.desired-root="{Binding IsDesiredRoot}"

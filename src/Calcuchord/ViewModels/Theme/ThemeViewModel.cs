@@ -20,6 +20,10 @@ namespace Calcuchord {
         RootFretFg,
         UserFretBg,
         UserFretFg,
+        UnknownFretBg,
+        UnknownFretFg,
+        MutedFretBg,
+        MutedFretFg,
         Finger1Fg,
         Finger1Bg,
         Finger2Fg,
@@ -204,7 +208,23 @@ namespace Calcuchord {
                         },
                         {
                             PaletteColorType.DisabledAccentFg,
-                            ("#000000","#696969")
+                            ("#333333","#DDDDDD")
+                        },
+                        {
+                            PaletteColorType.UnknownFretBg,
+                            ("#000000","#FFFFFF")
+                        },
+                        {
+                            PaletteColorType.UnknownFretFg,
+                            ("#FFFFFF","#000000")
+                        },
+                        {
+                            PaletteColorType.MutedFretBg,
+                            ("#696969","#DCDCDC")
+                        },
+                        {
+                            PaletteColorType.MutedFretFg,
+                            ("#FFFFFF","#000000")
                         }
                     };
 

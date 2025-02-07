@@ -39,4 +39,29 @@
         <PackageReference Include="webview.avalonia"/>
         <PackageReference Include="Melanchall.DryWetMidi" Condition="$([MSBuild]::IsOSPlatform('Linux'))"/>
     </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Views\Popups\PopupEditor\PopupEditorView.axaml.cs">
+            <DependentUpon>InstPopupContainerView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Popups\Dialogs\TuningGenProgressView.axaml.cs">
+            <DependentUpon>TuningGenProgressView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Views\Instrument\Popups\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="Views\Popups\PopupEditor\Instrument\InstrumentEditorView.axaml"/>
+        <AdditionalFiles Include="Views\Popups\PopupEditor\Tuning\TuningEditorView.axaml"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <UpToDateCheckInput Remove="Views\Instrument\Popups\Progress\TuningGenProgressView.axaml"/>
+        <UpToDateCheckInput Remove="Views\Instrument\Popups\Tuning\TuningEditorView.axaml"/>
+    </ItemGroup>
 </Project>

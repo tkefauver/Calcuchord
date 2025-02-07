@@ -21,6 +21,8 @@ namespace Calcuchord {
         #region Private Variables
 
         string _editInstrumentInitialStateJson;
+        string _editBookmarkIdsStateJson;
+        string _editSelectedTuningId;
 
         #endregion
 
@@ -245,7 +247,8 @@ namespace Calcuchord {
             EditModeInstrument.Tunings.Any();
 
         public bool IsInstrumentVisible =>
-            SelectedDisplayMode == DisplayModeType.Search;
+            SelectedDisplayMode == DisplayModeType.Search &&
+            EditModeInstrument == null;
 
         public int SelectedInstrumentIndex {
             get => Instruments.IndexOf(SelectedInstrument);
@@ -368,6 +371,14 @@ namespace Calcuchord {
 
         void MainViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
+                case nameof(EditModeInstrument):
+                    if(EditModeInstrument is { } em_ivm) {
+                        em_ivm.OnPropertyChanged(nameof(em_ivm.IsEditModeEnabled));
+                    }
+
+                    OnPropertyChanged(nameof(IsInstrumentVisible));
+
+                    break;
                 case nameof(IsRightDrawerOpen):
                     OnPropertyChanged(nameof(RightDrawerExpandWidth));
                     if(IsRightDrawerOpen) {
@@ -584,9 +595,14 @@ namespace Calcuchord {
                     return matches
                         .OrderByDescending(x => x.Score)
                         .ThenBy(x => GetChordSuffixSortOrder(x))
+                        .ThenByDescending(x => GetChordProminanceScore(x))
                         .ThenBy(x => x.SecondaryLabel)
                         .ThenBy(x => x.NoteGroup.Position);
 
+            }
+
+            int GetChordProminanceScore(MatchViewModelBase match) {
+                return match.NoteGroup.Notes.Count(x => !x.IsMute);
             }
 
             int GetChordSuffixSortOrder(MatchViewModelBase match) {
@@ -776,11 +792,10 @@ namespace Calcuchord {
 
         void InitSelection() {
             if(SelectedInstrument == null) {
-                if(Instruments.FirstOrDefault(x => x.Tunings.Any(y => y.Id == Prefs.Instance.SelectedTuningId))
-                   is { } sel_inst) {
-                    SelectedInstrument = sel_inst;
-                    if(SelectedTuning == null) {
-                    }
+                if(Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Id == Prefs.Instance.SelectedTuningId)
+                   is { } sel_tuning) {
+                    sel_tuning.IsSelected = true;
+                    SelectedInstrument = sel_tuning.Parent;
                 } else {
                     SelectedInstrument = DefaultInstrument;
                 }
@@ -842,20 +857,36 @@ namespace Calcuchord {
 
                 if(EditModeInstrument is not { } inst_to_restore_vm) {
                     _editInstrumentInitialStateJson = null;
+                    _editBookmarkIdsStateJson = null;
+                    _editSelectedTuningId = null;
                     return;
                 }
 
                 EditModeInstrument = null;
-                if(!string.IsNullOrEmpty(_editInstrumentInitialStateJson)) {
-                    Instrument inst_to_restore =
-                        JsonConvert.DeserializeObject<Instrument>(_editInstrumentInitialStateJson);
-                    Prefs.Instance.Instruments.Remove(inst_to_restore_vm.Instrument);
-                    Prefs.Instance.Instruments.Add(inst_to_restore);
-                    Prefs.Instance.Save();
-                    await inst_to_restore_vm.InitAsync(inst_to_restore);
+                if(string.IsNullOrEmpty(_editInstrumentInitialStateJson)) {
+                    return;
                 }
 
+                Instrument inst_to_restore =
+                    JsonConvert.DeserializeObject<Instrument>(_editInstrumentInitialStateJson);
+                var bookmarks_to_restore = JsonConvert.DeserializeObject<List<string>>(_editBookmarkIdsStateJson);
+
+                Prefs.Instance.Instruments.Remove(inst_to_restore_vm.Instrument);
+                Prefs.Instance.Instruments.Add(inst_to_restore);
+                Prefs.Instance.BookmarkIds.Clear();
+                Prefs.Instance.BookmarkIds.AddRange(bookmarks_to_restore);
+
+                Prefs.Instance.Save();
+                await inst_to_restore_vm.InitAsync(inst_to_restore);
+                if(inst_to_restore_vm.Tunings.FirstOrDefault(x => x.Id == _editSelectedTuningId) is { } to_sel_tvm) {
+                    inst_to_restore_vm.SelectedTuning = to_sel_tvm;
+                }
+
+                InitInstrument();
+
                 _editInstrumentInitialStateJson = null;
+                _editBookmarkIdsStateJson = null;
+                _editSelectedTuningId = null;
             });
 
         public ICommand FinishEditInstrumentCommand => new MpCommand(
@@ -865,6 +896,8 @@ namespace Calcuchord {
                 }
 
                 _editInstrumentInitialStateJson = null;
+                _editBookmarkIdsStateJson = null;
+                _editSelectedTuningId = null;
                 if(!emi_vm.IsActivated) {
                     // add new inst to list
                     Instruments.Add(emi_vm);
@@ -888,13 +921,16 @@ namespace Calcuchord {
                     }
 
                     emi_vm.CurGenTuning = null;
-                    if(new_tuning_vms.Any(x => x.IsSelected)) {
-                        InitInstrument();
-                    }
                 }
 
                 Prefs.Instance.Save();
                 EditModeInstrument = null;
+
+                if(SelectedInstrument != emi_vm) {
+                    SelectedInstrument = emi_vm;
+                }
+
+                InitInstrument();
             });
 
         public ICommand BeginEditInstrumentCommand => new MpCommand<object>(
@@ -911,11 +947,20 @@ namespace Calcuchord {
                 IsRightDrawerOpen = false;
 
                 // wait for drawers to close...
-                await Task.Delay(500);
+                //await Task.Delay(500);
 
                 // store full backup of instrument (existing only)
                 _editInstrumentInitialStateJson =
                     edit_inst_vm.IsActivated ? JsonConvert.SerializeObject(edit_inst_vm.Instrument) : null;
+                _editBookmarkIdsStateJson =
+                    edit_inst_vm.IsActivated ? JsonConvert.SerializeObject(Prefs.Instance.BookmarkIds) : null;
+                if(edit_inst_vm.SelectedTuning is { } sel_tvm) {
+                    _editSelectedTuningId = sel_tvm.Id;
+                }
+
+                if(edit_inst_vm.SelectedTuning == null) {
+                    edit_inst_vm.SelectedTuning = edit_inst_vm.Tunings.FirstOrDefault();
+                }
 
                 EditModeInstrument = edit_inst_vm;
                 if(EditModeInstrument.IsActivated) {
@@ -929,7 +974,7 @@ namespace Calcuchord {
 
         public ICommand AddInstrumentCommand => new MpCommand(
             async () => {
-                Instrument new_inst = new Instrument();
+                Instrument new_inst = Instrument.CreateByType(InstrumentType.Guitar);
                 InstrumentViewModel new_inst_vm = await CreateInstrumentAsync(new_inst);
                 BeginEditInstrumentCommand.Execute(new_inst_vm);
             });

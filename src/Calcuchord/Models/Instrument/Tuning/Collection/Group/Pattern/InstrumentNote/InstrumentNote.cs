@@ -41,6 +41,8 @@ namespace Calcuchord {
 
         [JsonIgnore]
         public new InstrumentNote Next => new InstrumentNote(NoteNum + 1,RowNum,base.Next);
+        // [JsonIgnore]
+        // public InstrumentString Parent { get; private set; }
 
         #endregion
 

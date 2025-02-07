@@ -30,6 +30,7 @@
             </ToggleButton>
 
             <TextBlock Classes="Headline6"
+                       IsVisible="False"
                        Text="Calcuchord"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center" />

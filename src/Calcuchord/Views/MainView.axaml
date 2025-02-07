@@ -24,69 +24,6 @@
                     Value="0" />
         </Style>
     </UserControl.Styles>
-
-    <UserControl.DataTemplates>
-        <DataTemplate DataType="local:DialogViewModel">
-            <StackPanel MinWidth="200"
-                        Spacing="10">
-                <TextBlock FontSize="16"
-                           MaxWidth="150"
-                           HorizontalAlignment="Center"
-                           TextAlignment="Center"
-                           TextWrapping="Wrap"
-                           Text="{Binding Label}" />
-
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            Spacing="50">
-                    <Button Width="70"
-                            HorizontalAlignment="Left"
-                            Command="{Binding CancelCommand}">
-                        No
-                    </Button>
-                    <Button Width="70"
-                            HorizontalAlignment="Right"
-                            Command="{Binding OkCommand}">
-                        Yes
-                    </Button>
-                </StackPanel>
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate DataType="local:TuningViewModel">
-            <!-- TUNING STATS POPUP -->
-            <StackPanel MinWidth="150">
-                <StackPanel.Styles>
-                    <Style Selector="TextBlock">
-                        <Setter Property="TextAlignment"
-                                Value="Center" />
-                    </Style>
-                    <Style Selector="TextBlock:not(.Body1)">
-                        <Setter Property="Opacity"
-                                Value="0.7" />
-                        <Setter Property="FontWeight"
-                                Value="Bold" />
-                    </Style>
-                </StackPanel.Styles>
-                <TextBlock>Chords</TextBlock>
-                <TextBlock Classes="Body1"
-                           Text="{Binding ChordsCount}" />
-                <TextBlock>Scales</TextBlock>
-                <TextBlock Classes="Body1"
-                           Text="{Binding ScalesCount}" />
-                <TextBlock>Modes</TextBlock>
-                <TextBlock Classes="Body1"
-                           Text="{Binding ModesCount}" />
-                <TextBlock>Bookmarks</TextBlock>
-                <TextBlock Classes="Body1"
-                           Text="{Binding BookmarkCount}" />
-
-                <Button Margin="0 8 0 0"
-                        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=CloseDialogCommand}">
-                    Ok
-                </Button>
-            </StackPanel>
-        </DataTemplate>
-    </UserControl.DataTemplates>
     <Grid x:Name="MainOuterContainer">
         <dialogHostAvalonia:DialogHost Identifier="MainDialogHost">
             <controls:SnackbarHost HostName="Root"
@@ -172,6 +109,7 @@
                                            HorizontalAlignment="Stretch"
                                            TextWrapping="Wrap"
                                            VerticalAlignment="Center"
+                                           MinWidth="70"
                                            TextAlignment="Center"
                                            Text="{Binding EmptyMatchLabel}">
                                     <TextBlock.IsVisible>
@@ -210,11 +148,11 @@
 
                             <!-- EDIT POPUP -->
 
-                            <local:InstPopupContainerView x:Name="InstEditPopupView"
-                                                          Grid.Row="0"
-                                                          Grid.RowSpan="2"
-                                                          DataContext="{Binding EditModeInstrument}"
-                                                          IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}" />
+                            <local:PopupEditorView x:Name="InstEditPopupView"
+                                                   Grid.Row="0"
+                                                   Grid.RowSpan="2"
+                                                   DataContext="{Binding EditModeInstrument}"
+                                                   IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}" />
 
 
                         </Grid>

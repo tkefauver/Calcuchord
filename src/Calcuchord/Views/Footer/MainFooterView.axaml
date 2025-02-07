@@ -25,9 +25,33 @@
             <Setter Property="Padding"
                     Value="0" />
         </Style>
-        <Style Selector="avalonia|MaterialIcon">
+        <Style Selector="RadioButton avalonia|MaterialIcon">
+            <Setter Property="Grid.RowSpan"
+                    Value="3" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
             <Setter Property="Margin"
                     Value="15" />
+        </Style>
+        <Style Selector="RadioButton TextBlock">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Bg}" />
+            <Setter Property="Opacity"
+                    Value="0.3" />
+            <Setter Property="Grid.Row"
+                    Value="2" />
+            <Setter Property="FontSize"
+                    Value="12" />
+            <Setter Property="TextAlignment"
+                    Value="Center" />
+            <Setter Property="VerticalAlignment"
+                    Value="Top" />
+            <Setter Property="Margin"
+                    Value="0,8,0,0" />
+            <!-- <Setter Property="FontFamily" -->
+            <!--         Value="{StaticResource NunitoFont}" /> -->
         </Style>
     </UserControl.Styles>
     <controls:ColorZone Mode="Inverted"
@@ -38,21 +62,30 @@
             <RadioButton DataContext="{Binding SearchOptionViewModel}"
                          IsChecked="{Binding IsChecked, Mode=OneWay}"
                          Command="{Binding SelectThisOptionCommand}">
-                <avalonia:MaterialIcon Kind="Magnify" />
+                <Grid RowDefinitions="25,*,25">
+                    <avalonia:MaterialIcon Kind="Magnify" />
+                    <TextBlock Text="Search" />
+                </Grid>
             </RadioButton>
 
             <RadioButton DataContext="{Binding BookmarksOptionViewModel}"
                          IsChecked="{Binding IsChecked, Mode=OneWay}"
                          Command="{Binding SelectThisOptionCommand}"
                          Classes="">
-                <avalonia:MaterialIcon Kind="Bookmark" />
+                <Grid RowDefinitions="25,*,25">
+                    <avalonia:MaterialIcon Kind="Bookmark" />
+                    <TextBlock Text="Bookmarks" />
+                </Grid>
             </RadioButton>
 
             <RadioButton DataContext="{Binding IndexOptionViewModel}"
                          IsChecked="{Binding IsChecked, Mode=OneWay}"
                          Command="{Binding SelectThisOptionCommand}"
                          Classes="">
-                <avalonia:MaterialIcon Kind="Database" />
+                <Grid RowDefinitions="25,*,25">
+                    <avalonia:MaterialIcon Kind="Database" />
+                    <TextBlock Text="Index" />
+                </Grid>
             </RadioButton>
 
         </UniformGrid>

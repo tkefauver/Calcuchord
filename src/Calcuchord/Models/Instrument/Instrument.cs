@@ -27,6 +27,7 @@ namespace Calcuchord {
             string tuning_str = string.Empty;
             int fret_count = 23;
             switch(it) {
+                default:
                 case InstrumentType.Guitar:
                     tuning_str = "E2 A2 D3 G3 B3 E4";
                     break;
@@ -38,7 +39,8 @@ namespace Calcuchord {
                     fret_count = 15;
                     break;
                 case InstrumentType.Banjo:
-                    tuning_str = "G3 D2 G2 B2 D3";
+                    //tuning_str = "G3 D2 G2 B2 D3";
+                    tuning_str = "D2 G2 B2 D3";
                     fret_count = 22;
                     break;
                 case InstrumentType.Bass:
@@ -46,6 +48,7 @@ namespace Calcuchord {
                     break;
                 case InstrumentType.Balalaika:
                     tuning_str = "E4 E4 A4";
+                    fret_count = 16;
                     break;
                 case InstrumentType.Lute:
                     tuning_str = "G2 C3 F3 A3 D4 G4";

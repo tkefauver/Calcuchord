@@ -40,12 +40,6 @@
                     Value="{DynamicResource Fg}" />
         </Style>
 
-        <Style Selector="TextBox#TuningNameTextBox /template/ Panel#PART_TextContainer">
-            <Setter Property="Margin"
-                    Value="0" />
-            <Setter Property="VerticalAlignment"
-                    Value="Center" />
-        </Style>
     </UserControl.Styles>
 
     <Grid RowDefinitions="Auto,*">
@@ -67,23 +61,28 @@
                                            Height="24" />
                 </Viewbox>
                 <TextBlock Margin="8,0"
+                           FontSize="18"
                            Text="Add"
-                           Classes="Headline6"
                            VerticalAlignment="Center" />
             </StackPanel>
         </controls:FloatingButton>
 
-        <ScrollViewer Grid.Row="1">
+        <ScrollViewer Grid.Row="1"
+                      Margin="0,0,0,10">
             <ItemsControl Margin="0"
                           ItemsSource="{Binding Tunings}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="local:TuningViewModel">
-                        <Expander Margin="0,0,5,20"
+                        <Expander Margin="0,0,5,10"
                                   Padding="10,4,4,4"
+                                  IsExpanded="{Binding IsExpanded, Mode=TwoWay}"
                                   Foreground="{DynamicResource Fg}">
                             <Expander.Header>
                                 <Grid ColumnDefinitions="Auto,Auto,*"
                                       VerticalAlignment="Center">
+
+                                    <!-- TUNING OPTIONS BUTTON -->
+
                                     <Button x:Name="TuningOptionButton"
                                             Grid.Column="0"
                                             DockPanel.Dock="Right"
@@ -133,14 +132,14 @@
                                     </Button>
 
                                     <!-- IS SELECTED -->
+
                                     <CheckBox Grid.Column="1"
-                                              ToolTip.Tip="Selected"
-                                              ToolTip.ShowOnDisabled="True"
                                               Margin="5,0,0,0"
                                               IsEnabled="{Binding !IsSelected}"
-                                              IsChecked="{Binding IsSelected,Mode=OneWay}"
+                                              IsChecked="{Binding IsSelected, Mode=OneWay}"
                                               VerticalAlignment="Center"
                                               Command="{Binding SelectThisTuningCommand}" />
+
                                     <!-- NAME -->
 
                                     <TextBox x:Name="TuningNameTextBox"
@@ -160,12 +159,13 @@
                             <Expander.Content>
                                 <Grid Margin="10"
                                       RowDefinitions="0.5*,0.5*"
-                                      ColumnDefinitions="35,*">
+                                      ColumnDefinitions="Auto,*">
 
                                     <!-- CAPO LABEL -->
                                     <TextBlock Grid.Row="0"
                                                Grid.Column="0"
                                                Margin="0,0,10,0"
+                                               IsVisible="False"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
                                                Classes="Body2"
@@ -175,6 +175,7 @@
 
                                     <Button Grid.Row="0"
                                             Grid.Column="1"
+                                            IsVisible="False"
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Center"
                                             Classes="input-box"
@@ -218,6 +219,7 @@
 
                                     <TextBlock Grid.Row="1"
                                                Grid.Column="0"
+                                               IsVisible="False"
                                                Margin="0,0,10,0"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
@@ -231,7 +233,7 @@
                                              Grid.Row="1"
                                              Grid.Column="1"
                                              Margin="0,10,0,0"
-                                             HorizontalAlignment="Left"
+                                             HorizontalAlignment="Center"
                                              VerticalAlignment="Center"
                                              IsEnabled="{Binding IsPatternEditable}"
                                              SelectedIndex="{Binding SelectedOpenNoteIndex, Mode=TwoWay}"

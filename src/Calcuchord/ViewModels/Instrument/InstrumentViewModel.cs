@@ -82,6 +82,8 @@ namespace Calcuchord {
         public int SelectedStringCountIndex { get; set; }
         public int SelectedFretCountIndex { get; set; }
 
+        int LastSelectedInstrumentTypeIndex { get; set; } = -1;
+
         public int SelectedInstrumentTypeIndex {
             get => InstrumentTypeNames.IndexOf(InstrumentType.ToString());
             set {
@@ -92,6 +94,10 @@ namespace Calcuchord {
                 }
             }
         }
+
+        public bool CanChangeStringCount =>
+            !IsActivated &&
+            Tunings.Count <= 1;
 
         public bool IsEditModeEnabled =>
             Parent.EditModeInstrument == this;
@@ -107,6 +113,8 @@ namespace Calcuchord {
 
         public bool IsKeyboard =>
             InstrumentType == InstrumentType.Piano;
+
+        bool IsInstrumentTypeChanging { get; set; }
 
         #endregion
 
@@ -185,6 +193,7 @@ namespace Calcuchord {
             Tunings.Clear();
             Tunings.AddRange(await Task.WhenAll(Instrument.Tunings.Select(x => CreateTuningViewModelAsync(x))));
             Instrument.RefreshModelTree();
+
             IsBusy = false;
         }
 
@@ -217,10 +226,17 @@ namespace Calcuchord {
                 case nameof(IsEditModeEnabled):
                     if(IsEditModeEnabled) {
                         UpdateEditorSelectionToType();
+                        // BUG sel tuning checkbox not always working
+                        Tunings.ForEach(x => x.OnPropertyChanged(nameof(x.IsSelected)));
                     }
 
                     break;
                 case nameof(SelectedInstrumentTypeIndex):
+                    if(SelectedInstrumentTypeIndex == LastSelectedInstrumentTypeIndex) {
+                        break;
+                    }
+
+                    LastSelectedInstrumentTypeIndex = SelectedInstrumentTypeIndex;
                     if(IsEditModeEnabled) {
                         ChangeInstrumentTypeAsync().FireAndForgetSafeAsync();
                     }
@@ -236,13 +252,37 @@ namespace Calcuchord {
                         Prefs.Instance.Save();
                     }
 
-                    //Tunings.ForEach(x => x.IsSelected = false);
                     break;
                 case nameof(SelectedTuning):
                     Tunings.ForEach(x => x.OnPropertyChanged(nameof(x.IsSelected)));
 
                     if(IsSelected) {
                         Parent.OnPropertyChanged(nameof(SelectedTuning));
+                    }
+
+                    break;
+                case nameof(SelectedStringCountIndex):
+                    if(SelectedStringCountIndex < 0 ||
+                       IsInstrumentTypeChanging) {
+                        break;
+                    }
+
+                    if(int.TryParse(StringCounts[SelectedStringCountIndex],out int new_str_count) &&
+                       Instrument.StringCount != new_str_count) {
+                        ChangeStringCount(new_str_count);
+                    }
+
+                    break;
+                case nameof(SelectedFretCountIndex):
+                    if(SelectedFretCountIndex < 0 ||
+                       IsInstrumentTypeChanging) {
+                        break;
+                    }
+
+                    if(int.TryParse(FretCounts[SelectedFretCountIndex],out int new_fret_count) &&
+                       Instrument.FretCount != new_fret_count) {
+                        Instrument.FretCount = new_fret_count;
+                        InitAsync(Instrument).FireAndForgetSafeAsync();
                     }
 
                     break;
@@ -268,6 +308,8 @@ namespace Calcuchord {
         }
 
         async Task ChangeInstrumentTypeAsync() {
+            IsInstrumentTypeChanging = true;
+
             Debug.Assert(IsEditModeEnabled,"Error, only change inst type in edit mode");
 
             string new_inst_name = InstrumentType.ToString();
@@ -286,11 +328,40 @@ namespace Calcuchord {
 
             await InitAsync(Instrument.CreateByType(InstrumentType,name: new_inst_name));
 
+            SelectedTuning = Tunings.FirstOrDefault();
+
             OnPropertyChanged(nameof(FretCounts));
             OnPropertyChanged(nameof(StringCounts));
             OnPropertyChanged(nameof(Name));
 
+            // BUG init will end up using previous string counts
+            // so block changes until complete 
+            IsInstrumentTypeChanging = false;
             UpdateEditorSelectionToType();
+        }
+
+        void ChangeStringCount(int newStrCount) {
+            Debug.Assert(Instrument.Tunings.Count == 1,"Should have only ONE tuning");
+            Debug.Assert(!IsActivated,"No string count changes for existing instruments");
+
+            int diff = newStrCount - Instrument.StringCount;
+
+            var open_notes = Instrument.Tunings.FirstOrDefault()?.OpenNotes;
+            if(diff > 0) {
+                // completely reset strings
+                open_notes =
+                    "D2 E2 A2 D3 G3 B3 E4"
+                        .Split(" ")
+                        .Take(newStrCount)
+                        .Select((x,idx) => new InstrumentNote(0,idx,Note.Parse(x))).ToList();
+            } else {
+                // trim highest
+                open_notes = open_notes.Take(newStrCount).ToList();
+            }
+
+            Instrument.StringCount = newStrCount;
+            Instrument.Tunings.ForEach(x => x.OpenNotes = open_notes.ToList());
+            InitAsync(Instrument).FireAndForgetSafeAsync();
         }
 
         #endregion
@@ -307,6 +378,19 @@ namespace Calcuchord {
                 int to_remove_idx = Tunings.IndexOf(tuning_vm_to_remove);
                 Instrument.Tunings.Remove(tuning_vm_to_remove.Tuning);
                 Tunings.Remove(tuning_vm_to_remove);
+
+                var to_remove_coll_idl = tuning_vm_to_remove.Tuning.Collections
+                    .SelectMany(x => x.Value)
+                    .SelectMany(x => x.Groups)
+                    .Select(x => x.Id);
+                var bookmarks_to_remove = Prefs.Instance.BookmarkIds.Where(x => to_remove_coll_idl.Contains(x));
+                int test1 = bookmarks_to_remove.Count();
+                int test2 = Prefs.Instance.BookmarkIds.Count;
+                Prefs.Instance.BookmarkIds = Prefs.Instance.BookmarkIds.Except(bookmarks_to_remove).ToList();
+                int test3 = Prefs.Instance.BookmarkIds.Count;
+                if(test3 != test2 - test1) {
+                    // bookmark remove error
+                }
 
                 Prefs.Instance.Save();
 
@@ -332,7 +416,9 @@ namespace Calcuchord {
                 Tunings.Add(tvm);
 
                 SelectedTuning = Tunings.Last();
-                ;
+                if(IsEditModeEnabled) {
+                    SelectedTuning.IsExpanded = true;
+                }
             });
 
         #endregion

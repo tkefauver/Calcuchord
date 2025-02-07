@@ -5,14 +5,22 @@
              mc:Ignorable="d"
              d:DesignWidth="800"
              d:DesignHeight="450"
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:InstrumentViewModel"
-             x:Class="Calcuchord.InstPopupContainerView">
+             x:Class="Calcuchord.PopupEditorView">
     <UserControl.Styles>
+
+        <Style Selector=":is(TextBox) /template/ Panel#PART_TextContainer">
+            <Setter Property="Margin"
+                    Value="0" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+        </Style>
         <Style Selector="TextBlock.tab-header">
             <Setter Property="Foreground"
                     Value="{DynamicResource Fg}" />
@@ -24,6 +32,13 @@
         <Style Selector="TabItem:selected TextBlock.tab-header">
             <Setter Property="Foreground"
                     Value="{DynamicResource Bg}" />
+        </Style>
+
+        <Style Selector="TabItem:disabled TextBlock.tab-header">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource DisabledAccentFg}" />
+            <Setter Property="FontStyle"
+                    Value="Italic" />
         </Style>
         <Style Selector=":is(Button).float-text">
             <Setter Property="Foreground"
@@ -41,7 +56,7 @@
         <Style Selector="controls|ColorZone#PopupZone">
             <Setter Property="MinWidth"
                     Value="300" />
-            <Setter Property="MinHeight"
+            <Setter Property="Height"
                     Value="500" />
         </Style>
         <Style Selector="controls|ColorZone#PopupZone local|TuningGenProgressView">
@@ -50,8 +65,8 @@
         </Style>
 
         <Style Selector="controls|ColorZone#PopupZone.progress">
-            <Setter Property="MinWidth"
-                    Value="300" />
+            <Setter Property="Height"
+                    Value="{x:Static sys:Double.NaN}" />
             <Setter Property="MinHeight"
                     Value="100" />
         </Style>
@@ -100,13 +115,15 @@
                                     <SolidColorBrush x:Key="MaterialPrimaryMidBrush">Red</SolidColorBrush>
                                     <SolidColorBrush x:Key="MaterialPrimaryMidForegroundBrush">White</SolidColorBrush>
                                 </Button.Resources>
-                                <TextBlock Text="Cancel" />
+                                <TextBlock FontSize="18"
+                                           Text="Cancel" />
                             </Button>
                             <Button HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
                                     Classes="float-text dark"
                                     Command="{Binding FinishEditInstrumentCommand}">
-                                <TextBlock Text="Done" />
+                                <TextBlock FontSize="18"
+                                           Text="Done" />
                             </Button>
                         </UniformGrid>
 

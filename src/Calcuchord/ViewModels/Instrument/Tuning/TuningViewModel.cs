@@ -13,16 +13,12 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using Calcuchord.JsonChords;
 using DialogHostAvalonia;
+using Material.Styles.Controls;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
 using Newtonsoft.Json;
 
 namespace Calcuchord {
-    public class DialogViewModel : ViewModelBase {
-        public string Label { get; set; }
-        public ICommand OkCommand { get; set; }
-        public ICommand CancelCommand { get; set; }
-    }
 
     public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
 
@@ -95,6 +91,8 @@ namespace Calcuchord {
         #endregion
 
         #region State
+
+        public bool IsExpanded { get; set; }
 
         public bool IsCurGenTuning =>
             Parent.CurGenTuning == this;
@@ -199,6 +197,7 @@ namespace Calcuchord {
             Tuning.SetParent(Parent.Instrument);
 
             NoteRows.Clear();
+
             Tuning.OpenNotes.OrderBy(x => x.RowNum).ForEach(x => NoteRows.Add(new NoteRowViewModel(this,x)));
             if(HasFretNumRow) {
                 // add fret num row
@@ -252,6 +251,21 @@ namespace Calcuchord {
                         Prefs.Instance.SelectedTuningId = Id;
                         Prefs.Instance.Save();
                         MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.SelectedTuning));
+
+                        Dispatcher.UIThread.Post(
+                            async () => {
+                                while(!MainView.Instance.IsLoaded) {
+                                    // wait until load to prevent showing snackbar on startup
+                                    await Task.Delay(100);
+                                }
+
+                                string sel_msg = $"{FullName} selected";
+                                SnackbarHost.Post(
+                                    sel_msg,
+                                    null,
+                                    DispatcherPriority.Background);
+
+                            });
                     }
 
                     break;
@@ -261,7 +275,7 @@ namespace Calcuchord {
         async Task<bool> LoadPatternsAsync() {
             if(Prefs.Instance.Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Id == Id) is not
                { } tuning_model) {
-                if(!Parent.IsEditModeEnabled) {
+                if(!Parent.IsEditModeEnabled && Parent.IsActivated) {
                     // error
                     Debugger.Break();
                 }
@@ -450,19 +464,22 @@ namespace Calcuchord {
                 CloseFlyout(args);
 
                 bool? confirmed = null;
-                DialogViewModel dlg_vm = new DialogViewModel
+                YesNoDialogView dlg_v = new YesNoDialogView
                 {
-                    Label = $"Are you sure you want to delete '{Name}'?",
-                    OkCommand = new MpCommand(
-                        () => {
-                            confirmed = true;
-                        }),
-                    CancelCommand = new MpCommand(
-                        () => {
-                            confirmed = false;
-                        })
+                    DataContext = new DialogViewModel
+                    {
+                        Label = $"Are you sure you want to delete '{Name}'?",
+                        OkCommand = new MpCommand(
+                            () => {
+                                confirmed = true;
+                            }),
+                        CancelCommand = new MpCommand(
+                            () => {
+                                confirmed = false;
+                            })
+                    }
                 };
-                DialogHost.Show(dlg_vm,MainView.DialogHostName).FireAndForgetSafeAsync();
+                DialogHost.Show(dlg_v,MainView.DialogHostName).FireAndForgetSafeAsync();
 
                 while(!confirmed.HasValue) {
                     await Task.Delay(100);
@@ -515,8 +532,12 @@ namespace Calcuchord {
                         .SelectMany(x => x.Groups)
                         .Count(x => Prefs.Instance.BookmarkIds.Contains(x.Id));
 
+                TuningStatsView stats_view = new TuningStatsView
+                {
+                    DataContext = this
+                };
 
-                DialogHost.Show(this,"MainDialogHost");
+                DialogHost.Show(stats_view,MainView.DialogHostName);
 
             });
 

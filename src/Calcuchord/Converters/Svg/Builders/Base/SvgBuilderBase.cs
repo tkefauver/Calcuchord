@@ -38,7 +38,7 @@ namespace Calcuchord {
         #region Properties
 
         protected HtmlDocument CurrentDoc { get; private set; }
-        protected string DefaultFontFamily => "Nunito"; //"Verdana";
+        protected string DefaultFontFamily => "Mono"; //"Nunito"; //"Verdana";
 
         bool IsShadowsEnabled => false;
 

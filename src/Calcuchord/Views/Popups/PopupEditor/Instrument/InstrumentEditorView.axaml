@@ -50,18 +50,26 @@
                     Value="{DynamicResource Fg}" />
         </Style>
         <Style Selector="ComboBox[IsHitTestVisible=False]">
+            <Style.Resources>
+                <SolidColorBrush x:Key="MaterialTextBoxBorderBrush"
+                                 Color="{DynamicResource DisabledAccentFg}" />
+            </Style.Resources>
             <Setter Property="Foreground"
                     Value="{DynamicResource DisabledAccentFg}" />
             <Setter Property="FontStyle"
                     Value="Italic" />
         </Style>
+
         <Style Selector="ComboBox[IsHitTestVisible=True]">
             <Style.Resources>
                 <SolidColorBrush x:Key="MaterialTextBoxBorderBrush"
                                  Color="{DynamicResource BgColor}" />
             </Style.Resources>
         </Style>
+
         <Style Selector="UniformGrid.form-element > ComboBox">
+            <Setter Property="Cursor"
+                    Value="Hand" />
             <Setter Property="CornerRadius"
                     Value="5" />
             <Setter Property="Theme"
@@ -132,14 +140,19 @@
             <TextBlock Text="Name" />
             <TextBox FontSize="22"
                      Watermark="Enter name..."
-                     Text="{Binding Name, Mode=TwoWay}" />
+                     Text="{Binding Name, Mode=TwoWay}">
+                <!-- <TextBox.Background> -->
+                <!--     <SolidColorBrush Color="{DynamicResource BgColor}" -->
+                <!--                      Opacity="0.3" /> -->
+                <!-- </TextBox.Background> -->
+            </TextBox>
         </UniformGrid>
         <Border Classes="sep" />
 
         <!-- STRINGS -->
         <UniformGrid Classes="form-element">
             <TextBlock Text="Strings" />
-            <ComboBox IsHitTestVisible="{Binding !IsActivated}"
+            <ComboBox IsHitTestVisible="{Binding CanChangeStringCount}"
                       SelectedIndex="{Binding SelectedStringCountIndex, Mode=TwoWay}"
                       ItemsSource="{Binding StringCounts}" />
         </UniformGrid>

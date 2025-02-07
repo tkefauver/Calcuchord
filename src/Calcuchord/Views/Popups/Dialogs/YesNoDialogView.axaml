@@ -10,25 +10,30 @@
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
-             x:Class="Calcuchord.TuningGenProgressView"
-             x:DataType="local:TuningViewModel">
-    <StackPanel>
-        <TextBlock Classes="Body2"
+             x:DataType="local:DialogViewModel"
+             x:Class="Calcuchord.YesNoDialogView">
+    <StackPanel MinWidth="200"
+                Spacing="10">
+        <TextBlock FontSize="16"
+                   MaxWidth="150"
+                   HorizontalAlignment="Center"
+                   TextAlignment="Center"
                    TextWrapping="Wrap"
-                   TextAlignment="6"
-                   Margin="0,0,0,10"
-                   Text="{Binding ProgressTitle}" />
-        <ProgressBar Maximum="1"
-                     Minimum="0"
-                     Value="{Binding GenProgress}" />
-        <TextBlock FontSize="10"
-                   Text="{Binding GenProgressLabel}"
-                   TextAlignment="Center" />
-        <Button Classes="float-text"
-                Margin="0 16 0 0"
-                HorizontalAlignment="Center"
-                Command="{Binding CancelPatternGenCommand}">
-            Cancel
-        </Button>
+                   Text="{Binding Label}" />
+
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Spacing="50">
+            <Button Width="70"
+                    HorizontalAlignment="Left"
+                    Command="{Binding CancelCommand}">
+                No
+            </Button>
+            <Button Width="70"
+                    HorizontalAlignment="Right"
+                    Command="{Binding OkCommand}">
+                Yes
+            </Button>
+        </StackPanel>
     </StackPanel>
 </UserControl>

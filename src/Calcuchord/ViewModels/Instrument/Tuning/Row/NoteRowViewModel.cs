@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using MonkeyPaste.Common;
 
@@ -134,6 +135,10 @@ namespace Calcuchord {
         #endregion
 
         #region Public Methods
+
+        public async Task InitAsync(Note openNote) {
+
+        }
 
         public void ResetSelection() {
             if(DefaultNote is { } dn) {

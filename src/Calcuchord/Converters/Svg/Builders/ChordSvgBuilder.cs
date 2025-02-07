@@ -221,7 +221,8 @@ namespace Calcuchord {
                            shadow_barre_fret_num.Value == fret_num) {
                             if(str_num < str_count - 1) {
                                 // shadow rect
-                                AddRect(bg_g,BarShadow,Transparent,curx,bar_y,fw,BarHeight,0,
+                                AddRect(
+                                    bg_g,BarShadow,Transparent,curx,bar_y,fw,BarHeight,0,
                                     fillOpacity: ShadowOpacity);
                             }
 
@@ -281,24 +282,18 @@ namespace Calcuchord {
 
                         // finger num text
                         string dot_text = null;
-                        double tx = cx;
-                        double ty = cy;
                         if(flags.HasFlag(SvgFlags.Fingers)) {
                             dot_text = finger_num.ToString();
-                            tx -= 1;
-                            ty += 1.5;
                         } else if(flags.HasFlag(SvgFlags.Notes)) {
                             dot_text = fret_note.Name;
-                            tx -= 1.5;
-                            if(dot_text.Length == 2) {
-                                tx -= 1;
-                            }
-
-                            ty += 1;
                         }
 
                         if(dot_text != null) {
-                            AddText(bg_g,dot_text,BodyFontSize,fret_fg,tx,ty,shadow: true);
+                            double tx = cx - dot_r;
+                            double ty = cy - dot_r;
+                            double d = dot_r * 2d;
+                            AddCenteredText(bg_g,dot_text,BodyFontSize,fret_fg,tx,ty,d,d,shadow: true,oy: -0.5);
+                            //AddText(bg_g,dot_text,BodyFontSize,fret_fg,tx,ty,shadow: true);
                         }
                     }
 

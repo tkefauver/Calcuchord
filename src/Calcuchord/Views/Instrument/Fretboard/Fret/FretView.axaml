@@ -141,8 +141,13 @@
 
         <!-- PEARL DOT (TOP) -->
         <Ellipse Classes="dot"
-                 VerticalAlignment="Bottom"
-                 IsVisible="{Binding IsTopDotFret}">
+                 VerticalAlignment="Bottom">
+            <Ellipse.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsTopDotFret" />
+                    <Binding Path="!IsFullDot" />
+                </MultiBinding>
+            </Ellipse.IsVisible>
             <Ellipse.RenderTransform>
                 <TranslateTransform Y="10" />
             </Ellipse.RenderTransform>
@@ -151,12 +156,23 @@
 
         <!-- PEARL DOT (BOTTOM) -->
         <Ellipse Classes="dot"
-                 VerticalAlignment="Top"
-                 IsVisible="{Binding IsBottomDotFret}">
+                 VerticalAlignment="Top">
+            <Ellipse.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsBottomDotFret" />
+                    <Binding Path="!IsFullDot" />
+                </MultiBinding>
+            </Ellipse.IsVisible>
             <Ellipse.RenderTransform>
                 <TranslateTransform Y="-10" />
             </Ellipse.RenderTransform>
         </Ellipse>
+
+        <!-- PEARL DOT (FULL) -->
+        <Ellipse Classes="dot"
+                 IsVisible="{Binding IsFullDot}"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center" />
 
         <!-- FRET BAR (LEFT) -->
         <Border IsVisible="{Binding IsRealNote}"
@@ -236,11 +252,13 @@
         <Border x:Name="MuteOverlay"
                 Classes="fade">
             <Border.Background>
-                <SolidColorBrush Color="DimGray"
+                <SolidColorBrush Color="{DynamicResource MutedFretBgColor}"
                                  Opacity="0.75" />
             </Border.Background>
         </Border>
+
         <!-- FRET MARKER -->
+
         <Border x:Name="FretMarker"
                 Classes="note-marker"
                 Classes.desired-root="{Binding IsDesiredRoot}"

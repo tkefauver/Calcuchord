@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             x:Class="Calcuchord.TuningGenProgressView"
+             x:DataType="local:TuningViewModel">
+    <StackPanel Spacing="16">
+        <TextBlock Classes="Body2"
+                   TextWrapping="Wrap"
+                   TextAlignment="Center"
+                   Text="{Binding ProgressTitle}" />
+        <ProgressBar Maximum="1"
+                     Minimum="0"
+                     Value="{Binding GenProgress}" />
+        <TextBlock FontSize="10"
+                   Text="{Binding GenProgressLabel}"
+                   TextAlignment="Center" />
+        <Button Classes="float-text"
+                HorizontalAlignment="Center"
+                Command="{Binding CancelPatternGenCommand}">
+            <TextBlock Text="Cancel" />
+        </Button>
+    </StackPanel>
+</UserControl>

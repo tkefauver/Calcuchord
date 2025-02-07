@@ -13,7 +13,7 @@
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.RightDrawerView">
     <UserControl.Styles>
-        <Style Selector="StackPanel.options > TextBlock">
+        <Style Selector="TextBlock.header">
             <Setter Property="FontSize"
                     Value="24" />
         </Style>
@@ -91,16 +91,10 @@
                 <StackPanel Classes="options"
                             Margin="10"
                             Spacing="10">
-                    <!-- MODE -->
-                    <!-- <TextBlock Text="Mode" /> -->
-                    <!-- <controls:Card Classes="button-group"> -->
-                    <!--     <ScrollViewer> -->
-                    <!--         <ItemsControl ItemsSource="{Binding DisplayModeOptions}" /> -->
-                    <!--     </ScrollViewer> -->
-                    <!-- </controls:Card> -->
 
                     <!-- PATTERN -->
-                    <TextBlock Text="Type" />
+                    <TextBlock Classes="header"
+                               Text="Type" />
                     <controls:Card Classes="button-group">
                         <ScrollViewer>
                             <ItemsControl ItemsSource="{Binding PatternOptions}" />
@@ -108,7 +102,8 @@
                     </controls:Card>
 
                     <!-- KEY -->
-                    <TextBlock Text="Key" />
+                    <TextBlock Classes="header"
+                               Text="Key" />
                     <controls:Card Classes="button-group">
                         <ScrollViewer>
                             <ItemsControl ItemsSource="{Binding KeyOptions}" />
@@ -116,7 +111,8 @@
                     </controls:Card>
 
                     <!-- SUFFIX -->
-                    <TextBlock Text="Suffix" />
+                    <TextBlock Classes="header"
+                               Text="Suffix" />
                     <controls:Card Classes="button-group">
                         <ScrollViewer>
                             <ItemsControl Classes="suffix"
@@ -126,7 +122,25 @@
 
                     <!-- SVG -->
 
-                    <TextBlock Text="Display" />
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="5">
+                        <TextBlock Classes="header"
+                                   Text="Display" />
+                        <local:HintView>
+                            <ToolTip.Tip>
+                                <Border Padding="3"
+                                        Background="White"
+                                        MaxWidth="200"
+                                        MaxHeight="200">
+                                    <Image Stretch="Uniform"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Source="avares://Calcuchord/Assets/Images/hand.png" />
+                                </Border>
+                            </ToolTip.Tip>
+                        </local:HintView>
+                    </StackPanel>
+
                     <controls:Card Classes="button-group">
                         <ScrollViewer>
                             <ItemsControl Classes="svg"
