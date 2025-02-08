@@ -57,16 +57,11 @@ namespace Calcuchord {
         #region Members
 
         [JsonProperty]
-        public string SelectedTuningId { get; set; } = Instrument.STANDARD_GUITAR_TUNING_ID;
-
-        [JsonProperty]
-        public SvgFlags SelectedSvgFlags { get; set; } = SvgBuilderBase.DefaultSvgFlags;
-
-        [JsonProperty]
         public bool IsThemeDark { get; set; }
 
         [JsonProperty]
-        public List<string> BookmarkIds { get; set; } = [];
+        public int MatchColCount { get; set; } = 1;
+
 
         [JsonProperty]
         public List<Instrument> Instruments { get; set; } = [];
@@ -139,30 +134,13 @@ namespace Calcuchord {
                 return;
             }
 
-            Debug.WriteLine("");
-            string tuning_str = MainViewModel.Instance == null || MainViewModel.Instance.SelectedTuning == null
-                ? string.Empty
-                : MainViewModel.Instance.SelectedTuning.ToString();
-            Debug.WriteLine($"{DateTime.Now} prefs saved. SelectedTuningId: {SelectedTuningId} {tuning_str}");
-            foreach(Instrument inst in Instruments) {
-                foreach(Tuning tuning in inst.Tunings) {
-                    Debug.WriteLine(
-                        $"{inst} Chords: {tuning.Chords.SelectMany(x => x.Groups).Count()} Scales: {tuning.Scales.SelectMany(x => x.Groups).Count()} Modes: {tuning.Modes.SelectMany(x => x.Groups).Count()}");
-                }
-            }
 
-            Debug.WriteLine("");
             if(MainViewModel.Instance is { } mvm) {
                 Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
                 Options = mvm.OptionLookup.Values.SelectMany(x => x).ToList();
-                if(mvm.SelectedTuning is { } sel_tun) {
-                    SelectedTuningId = sel_tun.Id;
-                }
-
                 IsThemeDark = ThemeViewModel.Instance.IsDark;
-
+                MatchColCount = mvm.MatchColCount;
             }
-
 
             Validate();
             try {
@@ -187,15 +165,66 @@ namespace Calcuchord {
 
         #region Private Methods
 
+        void LogPrefs() {
+            Debug.WriteLine("");
+            string tuning_str = MainViewModel.Instance == null || MainViewModel.Instance.SelectedTuning == null
+                ? string.Empty
+                : MainViewModel.Instance.SelectedTuning.ToString();
+            string sel_tuning_full_name = "NONE";
+            if(Instruments.FirstOrDefault(x => x.IsSelected) is { } sel_ivm &&
+               sel_ivm.Tunings.FirstOrDefault(x => x.IsSelected) is { } sel_tvm) {
+                sel_tuning_full_name = sel_tvm.ToString();
+            }
+
+            Debug.WriteLine($"{DateTime.Now} prefs saved. SelectedTuningId: {sel_tuning_full_name} {tuning_str}");
+            foreach(Instrument inst in Instruments) {
+                foreach(Tuning tuning in inst.Tunings) {
+                    Debug.WriteLine(
+                        $"{inst} Chords: {tuning.Chords.SelectMany(x => x.Groups).Count()} Scales: {tuning.Scales.SelectMany(x => x.Groups).Count()} Modes: {tuning.Modes.SelectMany(x => x.Groups).Count()}");
+                }
+            }
+
+            Debug.WriteLine("");
+        }
+
         void Validate() {
             if(MainViewModel.Instance is not { } mvm) {
                 return;
             }
 
             if(mvm.SelectedTuning == null) {
-                Debug.Assert(string.IsNullOrEmpty(SelectedTuningId),"Save error");
-            } else {
-                Debug.Assert(SelectedTuningId == mvm.SelectedTuning.Id,"Save errror");
+                // should always have a selected tuning
+                Debugger.Break();
+            }
+
+            if(Instruments.SelectMany(x => x.Tunings).SelectMany(x => x.Collections.Values).SelectMany(x => x)
+                   .SelectMany(x => x.Groups) is { } all_ngl &&
+               all_ngl.GroupBy(x => x.Id).Where(x => x.Count() > 1) is { } dup_nggl &&
+               dup_nggl.Any()) {
+
+                // BUG randomly bookmarking duplicates the noteGroup
+                // i think its a virtualization thing maybe w/ the items repeater maybe 
+                // foreach(Tuning tuning in all_tunings) {
+                //     bool needs_update = false;
+                //     foreach(var coll in tuning.Collections.Values) {
+                //         if(coll.SelectMany(x => x.Groups).GroupBy(x => x.FullName).Where(x => x.Count() > 1) is
+                //                { } dup_ngl &&
+                //            dup_ngl.Any()) {
+                //             foreach(var dup_group_to_remove in dup_ngl) {
+                //                 foreach(NoteGroup dup_to_remove in dup_group_to_remove.Skip(1)) {
+                //                     dup_to_remove.Parent.Groups.Remove(dup_to_remove);
+                //                     needs_update = true;
+                //                 }
+                //             }
+                //         }
+                //     }
+                //
+                //     if(needs_update &&
+                //        mvm.Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Tuning == tuning) is
+                //            { } tuning_vm) {
+                //         tuning_vm.InitAsync(tuning).FireAndForgetSafeAsync();
+                //     }
+                // }
             }
 
             if(Instruments.Difference(mvm.Instruments.Select(x => x.Instrument)) is { } inst_diffs &&

@@ -16,9 +16,7 @@ namespace Calcuchord {
             InitializeComponent();
         }
 
-        protected override void OnLoaded(RoutedEventArgs e) {
-            base.OnLoaded(e);
-
+        public void MeasureKeyboard() {
 
             double wkw = 100;
             double bkw = wkw * WHITE_TO_BLACK_WIDTH_RATIO;
@@ -50,6 +48,13 @@ namespace Calcuchord {
             KeyboardItemsControl.Width = tvm.AllNotes.Count(x => !x.IsAltered) * wkw;
             KeyboardItemsControl.Height = wkh;
             KeyboardItemsControl.InvalidateAll();
+        }
+
+        protected override void OnLoaded(RoutedEventArgs e) {
+            base.OnLoaded(e);
+            MeasureKeyboard();
+
+
         }
 
         void KeyView_Loaded(object sender,RoutedEventArgs e) {

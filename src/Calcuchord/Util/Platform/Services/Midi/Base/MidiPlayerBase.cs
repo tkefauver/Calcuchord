@@ -30,7 +30,7 @@ namespace Calcuchord {
         protected int ChordDelayMs => 30;
         protected int ScaleDelayMs => 300;
 
-        public bool CanPlay { get; protected set; } = true;
+        public virtual bool CanPlay { get; protected set; } = true;
 
         protected DateTime? NextStopDt { get; set; }
 

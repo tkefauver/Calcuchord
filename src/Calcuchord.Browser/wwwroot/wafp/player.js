@@ -25,7 +25,7 @@ function stopPlayback() {
 }
 
 function playNotes(midiNotes, delayMs) {
-    let cur_delay = 300;
+    let cur_delay = 300 / 1000;
     const notes = midiNotes;//midiNotes.map(midiNote => Tone.Midi(midiNote).toNote());
     for (var i = 0; i < notes.length; i++) {
         player.queueWaveTable(

@@ -19,7 +19,7 @@ namespace Calcuchord {
                     dir_name += "_DEBUG";
 #endif
                     _storageDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-#if DEBUG
+#if DEBUG && LINUX
                     _storageDir = "/home/tkefauver/Desktop";
 #endif
                     if(!_storageDir.ToLower().Contains(dir_name)) {

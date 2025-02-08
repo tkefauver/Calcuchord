@@ -42,13 +42,17 @@ namespace Calcuchord {
         #region Public Methods
 
         public IEnumerable<MatchViewModelBase> GetAll() {
+            if(Items.Where(x => x.Id == "28106b4f-fba8-4061-97ec-62a3375c5f3a") is { } test) {
+
+            }
+
             return Items.Select(x => CreateMatchViewModel(x,1));
         }
 
         public IEnumerable<MatchViewModelBase> GetBookmarks() {
             return
                 Items
-                    .Where(x => Prefs.Instance.BookmarkIds.Contains(x.Id))
+                    .Where(x => x.IsBookmarked)
                     .Select(x => CreateMatchViewModel(x,1));
         }
 

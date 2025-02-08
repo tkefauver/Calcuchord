@@ -25,7 +25,7 @@ namespace Calcuchord {
             if(ng.ToString() == "C Major #1") {
             }
 
-            SvgFlags flags = Prefs.Instance.SelectedSvgFlags;
+            SvgFlags flags = MainViewModel.Instance.SelectedSvgFlags;
 
             double lw = FretLineFixedAxisSize * 2;
             double bw = lw * 1;

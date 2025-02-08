@@ -41,6 +41,14 @@
             <Setter Property="BorderBrush"
                     Value="{DynamicResource Fg}" />
         </Style>
+        <Style Selector="Border#MatchContainerBorder.bookmarked:not(.bookmark-mode)">
+            <Setter Property="BorderBrush"
+                    Value="Goldenrod" />
+        </Style>
+        <Style Selector="Border#MatchContainerBorder.dark.bookmarked:not(.bookmark-mode)">
+            <Setter Property="BorderBrush"
+                    Value="Yellow" />
+        </Style>
         <Style Selector="Border#MatchContainerBorder:pointerover.dark">
             <Setter Property="BoxShadow"
                     Value="5 5 10 0 Silver" />
@@ -65,6 +73,8 @@
                 Margin="10"
                 Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
                 Classes.selected="{Binding IsSelected}"
+                Classes.bookmarked="{Binding IsBookmarked}"
+                Classes.bookmark-mode="{Binding IsBookmarkModeSelected, Source={x:Static local:MainViewModel.Instance}}"
                 MaxWidth="{Binding DefaultMatchWidth, Source={x:Static local:MainViewModel.Instance}}"
                 PointerReleased="MatchContainerBorder_OnPointerReleased">
 

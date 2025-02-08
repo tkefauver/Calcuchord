@@ -74,25 +74,6 @@ namespace Calcuchord {
 
         #region State
 
-        public bool IsBookmarked {
-            get => Prefs.Instance.BookmarkIds.Contains(NoteGroup.Id);
-            set {
-                if(IsBookmarked != value) {
-                    if(value) {
-                        Prefs.Instance.BookmarkIds.Add(NoteGroup.Id);
-                    } else {
-                        Prefs.Instance.BookmarkIds.Remove(NoteGroup.Id);
-                    }
-
-                    Prefs.Instance.Save();
-                    OnPropertyChanged(nameof(IsBookmarked));
-                    OnPropertyChanged(nameof(BookmarkIcon));
-                }
-
-            }
-        }
-
-
         public bool IsMatchPlaying { get; set; }
 
         public abstract MusicPatternType MatchPatternType { get; }
@@ -102,6 +83,19 @@ namespace Calcuchord {
         #endregion
 
         #region Model
+
+        public bool IsBookmarked {
+            get => NoteGroup.IsBookmarked;
+            set {
+                if(IsBookmarked != value) {
+                    NoteGroup.IsBookmarked = value;
+                    HasModelChanged = true;
+                    OnPropertyChanged(nameof(IsBookmarked));
+                    OnPropertyChanged(nameof(BookmarkIcon));
+                }
+
+            }
+        }
 
         public double Score { get; set; }
 
@@ -156,6 +150,7 @@ namespace Calcuchord {
         public ICommand ToggleBookmarkCommand => new MpCommand(
             () => {
                 IsBookmarked = !IsBookmarked;
+
                 if(MainViewModel.Instance.SelectedDisplayMode == DisplayModeType.Bookmarks) {
                     MainViewModel.Instance.UpdateMatches(MatchUpdateSource.BookmarkToggle);
                 }
@@ -168,13 +163,17 @@ namespace Calcuchord {
                     return;
                 }
 
+#if DEBUG
                 if(TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
                    tl.Clipboard is { } cb &&
                    MatchToSvgConverter.Instance.Convert(NoteGroup,null,null,null) is string svg) {
                     cb.SetTextAsync(svg.ToPrettyPrintXml()).FireAndForgetSafeAsync();
                 }
+#endif
 
                 if(!mp.CanPlay) {
+                    // TODO should probably show something here when can't play about local storage 
+
                     return;
                 }
 
@@ -200,6 +199,11 @@ namespace Calcuchord {
                     return;
                 }
 
+                if(!mvm.IsSearchModeSelected) {
+                    // auto switch to search mode
+                    mvm.SelectOptionCommand.Execute(mvm.SearchOptionViewModel);
+                }
+
                 // select only notes in group, use open note for mutes
                 stvm.SelectedNotes =
                     stvm.AllNotes.Where(
@@ -214,7 +218,7 @@ namespace Calcuchord {
                 NoteGroup.Notes.Where(x => x.NoteNum < 0).ForEach(
                     x =>
                         stvm.SelectedNotes.Where(y => y.NoteNum == 0 && y.RowNum == x.RowNum)
-                            .ForEach(x => x.WorkingNoteNum = NoteViewModel.MUTE_FRET_NUM));
+                            .ForEach(z => z.WorkingNoteNum = NoteViewModel.MUTE_FRET_NUM));
 
                 InstrumentView.Instance.ScrollSelectionIntoView();
             });

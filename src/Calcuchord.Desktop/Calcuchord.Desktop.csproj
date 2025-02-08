@@ -24,7 +24,17 @@
         <PackageReference Include="webview.avalonia.desktop"/>
     </ItemGroup>
 
+
     <ItemGroup>
         <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="Util\Platform\Midi\LinuxMidiPlayer.cs"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="$(BuildOs) == 'LINUX'">
+        <Compile Include="Util\Platform\Midi\LinuxMidiPlayer.cs"/>
+
     </ItemGroup>
 </Project>

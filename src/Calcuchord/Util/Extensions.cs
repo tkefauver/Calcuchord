@@ -22,14 +22,17 @@ namespace Calcuchord {
                 return true;
             }
 
-            if(flag == SvgFlags.Colors ||
-               flag == SvgFlags.Fingers ||
-               flag == SvgFlags.Frets ||
-               flag == SvgFlags.Tuning) {
-                return false;
-            }
+            // piano only below here
+            return flag is SvgFlags.Notes or SvgFlags.Roots;
 
-            return true;
+            // if(flag == SvgFlags.Colors ||
+            //    flag == SvgFlags.Fingers ||
+            //    flag == SvgFlags.Frets ||
+            //    flag == SvgFlags.Tuning) {
+            //     return false;
+            // }
+            //
+            // return true;
         }
 
         public static double CentimetersToInches(this double cms) {

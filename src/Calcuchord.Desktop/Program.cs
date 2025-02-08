@@ -1,6 +1,10 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.ReactiveUI;
+#if SUGAR_WV
+using Avalonia.WebView.Desktop;
+#endif
+
 
 namespace Calcuchord.Desktop {
     internal sealed class Program {

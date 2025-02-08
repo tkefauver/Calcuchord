@@ -42,6 +42,7 @@ namespace Calcuchord {
             }
 
             mvm.DiscoverMatchColumnCount();
+            InstrumentView.MeasureInstrument();
         }
     }
 }

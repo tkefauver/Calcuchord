@@ -114,18 +114,24 @@ namespace Calcuchord {
             Tuning.Scales.Any() &&
             Tuning.Modes.Any();
 
-        public bool IsSelected {
-            get => Parent.SelectedTuning == this;
-            set {
-                Parent.SelectedTuning = value ? this : null;
-                OnPropertyChanged(nameof(IsSelected));
-            }
-
-        }
-
         #endregion
 
-        #region Instrument
+        #region Model
+
+        public bool IsSelected {
+            get => Tuning.IsSelected;
+            set {
+                if(IsSelected != value) {
+                    Tuning.IsSelected = value;
+                    if(IsSelected) {
+                        // only trigger save when seleted to avoid a million writes
+                        HasModelChanged = true;
+                    }
+
+                    OnPropertyChanged(nameof(IsSelected));
+                }
+            }
+        }
 
         public int CapoNum {
             get => Tuning.CapoFretNum;
@@ -151,9 +157,6 @@ namespace Calcuchord {
                 }
             }
         }
-
-        public string Id =>
-            Tuning.Id;
 
         public int WorkingFretCount =>
             Tuning.WorkingFretCount;
@@ -247,9 +250,15 @@ namespace Calcuchord {
                     break;
                 case nameof(IsSelected):
                     if(IsSelected) {
+                        if(Parent.SelectedTuning != this) {
+                            Parent.SelectedTuning = this;
+                        }
+
                         ResetSelection();
-                        Prefs.Instance.SelectedTuningId = Id;
-                        Prefs.Instance.Save();
+                        if(!Parent.IsSelected) {
+                            break;
+                        }
+
                         MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.SelectedTuning));
 
                         Dispatcher.UIThread.Post(
@@ -273,15 +282,15 @@ namespace Calcuchord {
         }
 
         async Task<bool> LoadPatternsAsync() {
-            if(Prefs.Instance.Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Id == Id) is not
-               { } tuning_model) {
-                if(!Parent.IsEditModeEnabled && Parent.IsActivated) {
-                    // error
-                    Debugger.Break();
-                }
-
-                return false;
-            }
+            // if(Prefs.Instance.Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Id == Id) is not
+            //    { } tuning_model) {
+            //     if(!Parent.IsEditModeEnabled && Parent.IsActivated) {
+            //         // error
+            //         Debugger.Break();
+            //     }
+            //
+            //     return false;
+            // }
 
             PatternGenCts = new CancellationTokenSource();
 
@@ -302,9 +311,6 @@ namespace Calcuchord {
             _ = Task.Run(
                 async () => {
                     await Task.WhenAll(tasks.Select(task => task()));
-                    tuning_model.Chords = Tuning.Chords;
-                    tuning_model.Scales = Tuning.Scales;
-                    tuning_model.Modes = Tuning.Modes;
                     is_done = true;
                 },PatternGenCts.Token);
             while(true) {
@@ -344,10 +350,7 @@ namespace Calcuchord {
             }
 
             async Task CreateChordsAsync() {
-                bool from_file =
-                    Tuning.Id is
-                        Instrument.STANDARD_GUITAR_TUNING_ID or
-                        Instrument.STANDARD_UKULELE_TUNING_ID;
+                bool from_file = Tuning.IsChordsFromFile;
                 //from_file = false;
                 IEnumerable<NoteGroupCollection> chords = null;
                 if(from_file) {
@@ -491,7 +494,7 @@ namespace Calcuchord {
                     return;
                 }
 
-                Parent.RemoveTuningCommand.Execute(Id);
+                Parent.RemoveTuningCommand.Execute(this);
             },(args) => {
                 return CanDelete;
             });
@@ -530,7 +533,7 @@ namespace Calcuchord {
                 BookmarkCount =
                     Tuning.Collections.Values.SelectMany(x => x)
                         .SelectMany(x => x.Groups)
-                        .Count(x => Prefs.Instance.BookmarkIds.Contains(x.Id));
+                        .Count(x => x.IsBookmarked);
 
                 TuningStatsView stats_view = new TuningStatsView
                 {

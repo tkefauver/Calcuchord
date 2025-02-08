@@ -50,6 +50,16 @@ namespace Calcuchord {
             Gestures.SetIsHoldWithMouseEnabled(c,false);
         }
 
+        public void MeasureInstrument() {
+            if(this.GetVisualDescendant<KeyboardView>() is { } kbv) {
+                kbv.MeasureKeyboard();
+            }
+
+            if(this.GetVisualDescendant<FretboardView>() is { } fbv) {
+                fbv.MeasureFretboard();
+            }
+        }
+
         void NoteView_OnPointerPressed(object sender,PointerPressedEventArgs e) {
             WasLastPressHold = false;
         }

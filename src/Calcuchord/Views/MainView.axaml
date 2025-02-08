@@ -23,6 +23,7 @@
             <Setter Property="MinWidth"
                     Value="0" />
         </Style>
+
     </UserControl.Styles>
     <Grid x:Name="MainOuterContainer">
         <dialogHostAvalonia:DialogHost Identifier="MainDialogHost">
@@ -30,18 +31,16 @@
                                    Theme="{StaticResource TinySnackbarHost}"
                                    SnackbarHorizontalAlignment="Center"
                                    SnackbarVerticalAlignment="Top">
-                <!-- 
-                                            -->
-                <controls:NavigationDrawer x:Name="LeftDrawer"
+                <controls:NavigationDrawer x:Name="MainNavDrawer"
                                            RightDrawerExpandThresholdWidth="{Binding RightDrawerExpandWidth}"
                                            LeftDrawerOpened="{Binding IsLeftDrawerOpen, Mode=TwoWay}"
                                            RightDrawerOpened="{Binding IsRightDrawerOpen, Mode=TwoWay}"
                                            Classes="permanent">
                     <controls:NavigationDrawer.LeftDrawerContent>
-                        <local:LeftDrawerView />
+                        <local:LeftDrawerView x:Name="LeftDrawerView" />
                     </controls:NavigationDrawer.LeftDrawerContent>
                     <controls:NavigationDrawer.RightDrawerContent>
-                        <local:RightDrawerView />
+                        <local:RightDrawerView x:Name="RightDrawerView" />
                     </controls:NavigationDrawer.RightDrawerContent>
                     <DockPanel LastChildFill="true">
                         <!-- HEADER MENU -->
@@ -61,7 +60,8 @@
                                    Opacity="0.5"
                                    Stretch="None" />
                             <!-- INSTRUMENT VIEW -->
-                            <local:InstrumentView Grid.Row="0"
+                            <local:InstrumentView x:Name="InstrumentView"
+                                                  Grid.Row="0"
                                                   IsVisible="{Binding IsInstrumentVisible, Source={x:Static local:MainViewModel.Instance}}"
                                                   MaxHeight="{local:MathBinding a={Binding $parent.Bounds.Height}, exp=a*0.35}"
                                                   DataContext="{Binding SelectedInstrument}" />
@@ -107,9 +107,9 @@
                                 <TextBlock x:Name="EmptyTextBlock"
                                            Classes="Headline4"
                                            HorizontalAlignment="Stretch"
-                                           TextWrapping="Wrap"
+                                           TextWrapping="NoWrap"
                                            VerticalAlignment="Center"
-                                           MinWidth="70"
+                                           MinWidth="150"
                                            TextAlignment="Center"
                                            Text="{Binding EmptyMatchLabel}">
                                     <TextBlock.IsVisible>
@@ -168,6 +168,13 @@
                     <Binding Path="IsBusy" />
                 </MultiBinding>
             </Border.IsVisible>
+
+            <TextBlock IsVisible="{Binding !BusyText, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                       Text="{Binding BusyText}"
+                       TextAlignment="Center"
+                       HorizontalAlignment="Stretch"
+                       RenderTransform="translate(0,100px)"
+                       VerticalAlignment="Center" />
         </Border>
 
     </Grid>

@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using AvaloniaWebView;
 using MonkeyPaste.Common;
@@ -12,6 +14,10 @@ namespace Calcuchord {
 
     public class MidiPlayer_sugarwv : MidiPlayerBase {
         WebView _wv;
+
+        public override bool CanPlay =>
+            !string.IsNullOrEmpty(PlayerUrl) &&
+            File.Exists(PlayerUrl.ToPathFromUri());
 
         public string PlayerUrl {
             get {
@@ -33,6 +39,19 @@ namespace Calcuchord {
             }
         }
 
+        protected virtual async Task ExecuteScriptAsync(string script) {
+            if(_wv is null) {
+                return;
+            }
+
+            try {
+                await _wv.ExecuteScriptAsync(script);
+            } catch(Exception ex) {
+                ex.Dump();
+            }
+
+        }
+
         protected virtual void ConfigurePlatformWebView(WebView wv) {
             // for android and ios
         }
@@ -44,24 +63,39 @@ namespace Calcuchord {
                 Height = 0,
                 IsVisible = false
             };
+            if(OperatingSystem.IsAndroid()) {
+                // NOTE android won't load webview w/o being visible
+                wv.Width = 1;
+                wv.Height = 1;
+                wv.IsVisible = true;
+            }
+
             cntr_grid.Children.Insert(0,wv);
 
             _wv = wv;
+
+            _wv.NavigationStarting += (sender,arg) => {
+                Debug.WriteLine($"Navigating to {arg.Url}");
+            };
+
+            _wv.NavigationCompleted += (_,webViewUrlLoadedEventArg) => {
+                if(webViewUrlLoadedEventArg.IsSuccess) {
+                    CanPlay = true;
+                    Debug.WriteLine("Tone.html successfully loaded");
+                } else {
+                    Debug.WriteLine("Error loading Tone.html page");
+                }
+            };
             _wv.Loaded += (_,_) => {
+                ConfigurePlatformWebView(_wv);
+
                 if(PlayerUrl is null) {
                     Debug.WriteLine("Error loading Tone.html assets");
                     return;
                 }
 
-                _wv.NavigationCompleted += (_,webViewUrlLoadedEventArg) => {
-                    if(webViewUrlLoadedEventArg.IsSuccess) {
-                        CanPlay = true;
-                        Debug.WriteLine("Tone.html successfully loaded");
-                    } else {
-                        Debug.WriteLine("Error loading Tone.html page");
-                    }
-                };
-                _wv.Url = new(PlayerUrl);
+
+                _wv.Url = new Uri(PlayerUrl);
             };
         }
 
@@ -72,6 +106,7 @@ namespace Calcuchord {
 #else
                 false;
 #endif
+
 
             config.AreDefaultContextMenusEnabled = false;
             config.IsStatusBarEnabled = false;
@@ -87,17 +122,19 @@ namespace Calcuchord {
 
         public override void PlayChord(IEnumerable<Note> notes) {
             SetStopDt(notes.Count(),false);
-            _wv.ExecuteScriptAsync($"playChord({string.Join(",",notes.Select(x => x.MidiTone))})");
+            ExecuteScriptAsync($"playChord([{string.Join(",",GetMidiNotes(notes))}])")
+                .FireAndForgetSafeAsync();
         }
 
         public override void PlayScale(IEnumerable<Note> notes) {
             SetStopDt(notes.Count(),true);
-            _wv.ExecuteScriptAsync($"playScale({string.Join(",",notes.Select(x => x.MidiTone))})");
+            ExecuteScriptAsync($"playScale([{string.Join(",",GetMidiNotes(notes))}])")
+                .FireAndForgetSafeAsync();
         }
 
         public override void StopPlayback() {
             if(IsPlaying) {
-                _wv.ExecuteScriptAsync("stopPlayback()");
+                ExecuteScriptAsync("stopPlayback()").FireAndForgetSafeAsync();
             }
 
             if(NextStopDt != null) {

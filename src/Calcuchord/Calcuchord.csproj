@@ -37,7 +37,7 @@
         <PackageReference Include="PropertyChanged.Fody" PrivateAssets="All"/>
         <PackageReference Include="ReactiveUI"/>
         <PackageReference Include="webview.avalonia"/>
-        <PackageReference Include="Melanchall.DryWetMidi" Condition="$([MSBuild]::IsOSPlatform('Linux'))"/>
+        <PackageReference Include="Melanchall.DryWetMidi" Condition="$(BuildOs) == 'LINUX'"/>
     </ItemGroup>
 
     <ItemGroup>

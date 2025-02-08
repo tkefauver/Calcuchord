@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Calcuchord Tone Player</title>
-    <!--    <script src="http://unpkg.com/tone"></script>-->
+    <script src="http://unpkg.com/tone"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/15.1.3/Tone.min.js"></script>
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/15.1.3/Tone.min.js"></script>-->
     <script>
         var synth;
         var volumeDb = -12;
@@ -18,11 +18,17 @@
         const testNotes = [60, 64, 67];
 
         window.addEventListener('DOMContentLoaded', function () {
-            synth = new Tone.PolySynth().toDestination();
             document.getElementById('volumeInput').value = volumeDb;
             document.getElementById('chordDelayInput').value = delayChordMs;
             document.getElementById('scaleDelayInput').value = delayScaleMs;
         });
+
+        function init() {
+            if (synth) {
+                return;
+            }
+            synth = new Tone.PolySynth().toDestination();
+        }
 
         function stopPlayback() {
             Tone.Transport.stop();
@@ -32,9 +38,10 @@
         }
 
         function playNotes(midiNotes, delayMs) {
+            init();
             Tone.Master.volume.value = volumeDb;
-            let cur_delay = 300;
-            const notes = midiNotes.map(midiNote => Tone.Midi(midiNote).toNote());
+            let cur_delay = 300 / 1000;
+            let notes = midiNotes.map(midiNote => Tone.Midi(midiNote).toNote());
             const now = Tone.now();
             for (var i = 0; i < notes.length; i++) {
                 synth.triggerAttackRelease(notes[i], "8n", now + cur_delay);

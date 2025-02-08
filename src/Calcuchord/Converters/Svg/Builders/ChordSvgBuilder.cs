@@ -18,7 +18,7 @@ namespace Calcuchord {
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
             cntr_g.AppendChild(bg_g);
 
-            SvgFlags flags = Prefs.Instance.SelectedSvgFlags;
+            SvgFlags flags = MainViewModel.Instance.SelectedSvgFlags;
 
             int vfc = 4;
             double lw = FretLineFixedAxisSize;

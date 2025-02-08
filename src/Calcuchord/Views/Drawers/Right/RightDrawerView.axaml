@@ -38,11 +38,24 @@
                 <Setter.Value>
                     <DataTemplate x:DataType="local:OptionViewModel">
                         <ToggleButton CornerRadius="0"
+                                      Opacity="{Binding $self.IsEnabled, ConverterParameter=1|0.5, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
                                       Theme="{StaticResource MaterialFlatToggleButton}"
-                                      IsChecked="{Binding IsChecked,Mode=OneWay}"
-                                      IsEnabled="{Binding IsEnabled}"
+                                      IsChecked="{Binding IsChecked, Mode=OneWay}"
                                       Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}"
                                       CommandParameter="{Binding .}">
+                            <ToggleButton.IsEnabled>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="IsEnabled" />
+                                    <Binding Path="!IsSearchInitiating"
+                                             Source="{x:Static local:MainViewModel.Instance}" />
+                                </MultiBinding>
+                            </ToggleButton.IsEnabled>
+                            <ToggleButton.Transitions>
+                                <Transitions>
+                                    <DoubleTransition Property="Opacity"
+                                                      Duration="0:0:0.25" />
+                                </Transitions>
+                            </ToggleButton.Transitions>
                             <TextBlock />
                         </ToggleButton>
                     </DataTemplate>

@@ -23,7 +23,10 @@ namespace Calcuchord {
             string name = null,
             int capoNum = 0,
             double? neckLen = null,
-            string id = null) {
+            string id = null,
+            bool chordsFromFile = false,
+            bool isInstrumentSelected = false,
+            bool isDefTuningSelected = true) {
             string tuning_str = string.Empty;
             int fret_count = 23;
             switch(it) {
@@ -68,12 +71,30 @@ namespace Calcuchord {
                     break;
             }
 
-            Tuning tuning = new Tuning("Standard",readOnlyTuning,capoNum);
-            tuning.CreateId(id);
-            tuning.OpenNotes.AddRange(tuning_str.Split(" ").Select((x,idx) => new InstrumentNote(0,idx,Note.Parse(x))));
-            Instrument inst = new Instrument(name ?? it.ToString(),it,fret_count,tuning.OpenNotes.Count,neckLen);
+            var open_notes = tuning_str.Split(" ").Select(
+                (x,idx) => new InstrumentNote(
+                    noteNum: 0,
+                    rowNum: idx,
+                    Note.Parse(x))).ToArray();
+
+            Instrument inst = new Instrument(
+                name ?? it.ToString(),
+                it: it,
+                fretCount: fret_count,
+                stringCount: open_notes.Length,
+                neckLengthInInches: neckLen);
+            inst.IsSelected = isInstrumentSelected;
+
+            Tuning tuning = new Tuning(
+                "Standard",
+                isReadOnly: readOnlyTuning,
+                capoNum: capoNum);
+            tuning.IsChordsFromFile = chordsFromFile;
+            tuning.IsSelected = isDefTuningSelected;
+            tuning.OpenNotes.AddRange(open_notes);
             tuning.SetParent(inst);
             inst.Tunings.Add(tuning);
+
             return inst;
         }
 
@@ -89,6 +110,9 @@ namespace Calcuchord {
         [JsonProperty]
         [JsonConverter(typeof(StringEnumConverter))]
         public InstrumentType InstrumentType { get; set; }
+
+        [JsonProperty]
+        public bool IsSelected { get; set; }
 
         [JsonProperty]
         public double? NeckLengthInInches { get; set; }

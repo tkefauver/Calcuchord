@@ -15,6 +15,9 @@ namespace Calcuchord {
         [JsonProperty]
         public List<PatternNote> Notes { get; set; } = [];
 
+        [JsonProperty]
+        public bool IsBookmarked { get; set; }
+
         #endregion
 
         #region Ignored

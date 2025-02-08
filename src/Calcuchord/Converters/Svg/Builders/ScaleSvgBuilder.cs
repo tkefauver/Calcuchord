@@ -9,7 +9,7 @@ namespace Calcuchord {
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
             svg.AppendChild(bg_g);
 
-            SvgFlags flags = Prefs.Instance.SelectedSvgFlags;
+            SvgFlags flags = MainViewModel.Instance.SelectedSvgFlags;
 
             int vfc = 5;
 

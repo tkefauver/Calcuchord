@@ -39,7 +39,7 @@ namespace Calcuchord {
         }
 
 
-        void MeasureFretboard() {
+        public void MeasureFretboard() {
             if(DataContext is not TuningViewModel tvm) {
                 return;
             }
@@ -70,7 +70,7 @@ namespace Calcuchord {
 
             double nut_width = fret_widths.Min();
             double label_width = fret_widths.Max() * 0.25;
-            double str_h = th / tvm.Parent.LogicalStringCount;
+            double str_h = th / tvm.Parent.VisualRowCount;
 
             fvl.ForEach(
                 x => {

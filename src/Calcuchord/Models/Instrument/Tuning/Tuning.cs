@@ -5,11 +5,14 @@ using Newtonsoft.Json;
 
 namespace Calcuchord {
     [JsonObject]
-    public class Tuning : PrimaryModelBase {
+    public class Tuning {
 
         #region Properties
 
         #region Members
+
+        [JsonProperty]
+        public bool IsSelected { get; set; }
 
         [JsonProperty]
         public string Name { get; set; }
@@ -35,6 +38,9 @@ namespace Calcuchord {
         #endregion
 
         #region Ignored
+
+        [JsonIgnore]
+        public bool IsChordsFromFile { get; set; }
 
         [JsonIgnore]
         public int WorkingFretCount =>
@@ -102,7 +108,6 @@ namespace Calcuchord {
             Tuning clone = new Tuning(Name,IsReadOnly,CapoFretNum);
             clone.OpenNotes.Clear();
             clone.OpenNotes.AddRange(OpenNotes.Select(x => x.Clone()));
-            clone.CreateId(null);
             return clone;
         }
 
