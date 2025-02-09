@@ -3,17 +3,18 @@ using HtmlAgilityPack;
 
 namespace Calcuchord {
     public class PianoSvgBuilder : SvgBuilderBase {
-        protected override string UserBg =>
-            ThemeViewModel.Instance.P[PaletteColorType.Finger1Bg];
-
-        protected override string UserFg =>
-            ThemeViewModel.Instance.P[PaletteColorType.Finger1Fg];
+        // protected override string UserBg =>
+        //     ThemeViewModel.Instance.P[PaletteColorType.Finger1Bg];
+        //
+        // protected override string UserFg =>
+        //     ThemeViewModel.Instance.P[PaletteColorType.Finger1Fg];
 
 
         public override HtmlNode Build(NoteGroup ng) {
             HtmlNode svg = InitBuild();
 
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
+            bg_g.SetAttributeValue("transform","scale(0.9) translate(10,0)");
             svg.AppendChild(bg_g);
 
             HtmlNode wk_bg_g = CurrentDoc.CreateElement("g");
@@ -25,7 +26,7 @@ namespace Calcuchord {
             if(ng.ToString() == "C Major #1") {
             }
 
-            SvgFlags flags = MainViewModel.Instance.SelectedSvgFlags;
+            //SvgFlags flags = MainViewModel.Instance.SelectedSvgFlags;
 
             double lw = FretLineFixedAxisSize * 2;
             double bw = lw * 1;
@@ -52,7 +53,7 @@ namespace Calcuchord {
                 bool is_black = cur_note.IsAltered;
                 PatternNote pattern_note = pattern_notes.FirstOrDefault(x => x.NoteNum == i);
                 bool is_root = pattern_note != null && pattern_note.IsRoot;
-                bool is_user = is_root || IsUserNote(pattern_note);
+                bool is_user = IsUserNote(pattern_note);
 
                 double w = is_black ? bkw : wkw;
                 double h = is_black ? bkh : wkh;
@@ -74,29 +75,46 @@ namespace Calcuchord {
                 AddRect(cntr,Transparent,stroke,x,y,w,h,lw);
                 // bg
                 AddRect(cntr,fill,stroke,x,y,w,h,lw);
+
                 // root
-                if(is_root && flags.HasFlag(SvgFlags.Roots)) {
-                    ReduceDims();
-                    AddRect(cntr,RootBg,RootBg,x,y,w,h,lw);
+                if(is_root) {
+                    //ReduceDims();
+                    //AddRect(cntr,RootBg,RootBg,x,y,w,h,lw);
+                    //marker_bg = Fg;
                 }
 
+
                 // user
-                if(is_user && flags.HasFlag(SvgFlags.Matches)) {
-                    ReduceDims();
-                    AddRect(cntr,UserBg,UserBg,x,y,w,h,lw);
-                }
+                // if(is_user && flags.HasFlag(SvgFlags.Matches)) {
+                //     ReduceDims();
+                //     AddRect(cntr,UserBg,UserBg,x,y,w,h,lw);
+                // }
 
                 if(pattern_note != null) {
                     ReduceDims();
-                    AddRect(cntr,pattern_bg,pattern_bg,x,y,w,h,lw);
+                    AddRect(cntr,UserBg,UserBg,x,y,w,h,lw);
 
-                    if(flags.HasFlag(SvgFlags.Notes)) {
-                        double txw = w;
-                        double txh = txw;
-                        double txx = x;
-                        double txy = (y + h) - txh;
-                        AddCenteredText(cntr,pattern_note.Name,fs,pattern_fg,txx,txy,txw,txh);
+                    string marker_bg = Transparent;
+                    string marker_fg = Bg;
+
+                    double pad = is_black ? 0.5 : 1;
+                    double mw = w - (pad * 2);
+                    double mh = mw;
+                    double cx = x + (w / 2d);
+                    double cy = (y + h) - pad - (mh / 2d);
+                    double r = mw / 2d;
+                    if(is_root) {
+                        AddShape(cntr,true,RootBg,Transparent,cx,cy,r,0,"root-box");
+                        r -= DotStrokeWidth;
                     }
+
+                    if(is_user) {
+                        AddShape(cntr,is_root,pattern_bg,Transparent,cx,cy,r,0,"user-fill");
+                    }
+
+                    AddCenteredText(
+                        cntr,pattern_note.Name,fs,pattern_fg,cx - r,cy - r,r * 2d,r * 2d,classes: "notes-text",
+                        oy: is_black ? 0 : -0.5);
                 }
 
 

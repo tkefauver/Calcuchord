@@ -166,5 +166,13 @@
         </Setter>
     </Style>
 
+    <!-- ORIENTATION -->
+    <Style Selector="Grid.oriented">
+        <Setter Property="common:MpAvOrientedGridExtension.IsEnabled"
+                Value="True" />
+        <Setter Property="common:MpAvOrientedGridExtension.Orientation"
+                Value="{Binding Orientation, Source={x:Static local:ThemeViewModel.Instance}}" />
+    </Style>
+
 
 </Styles>

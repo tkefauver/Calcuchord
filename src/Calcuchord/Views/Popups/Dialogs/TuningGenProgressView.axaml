@@ -24,6 +24,7 @@
                    Text="{Binding GenProgressLabel}"
                    TextAlignment="Center" />
         <Button Classes="float-text"
+                IsVisible="{Binding !Parent.IsKeyboard}"
                 HorizontalAlignment="Center"
                 Command="{Binding CancelPatternGenCommand}">
             <TextBlock Text="Cancel" />

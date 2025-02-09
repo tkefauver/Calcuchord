@@ -51,10 +51,6 @@ namespace Calcuchord {
         [JsonProperty]
         public bool IsChecked { get; set; }
 
-
-        [JsonIgnore]
-        bool _isEnabled = true;
-
         [JsonProperty]
         public bool IsEnabled { get; set; } = true;
 

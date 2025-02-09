@@ -29,7 +29,8 @@ namespace Calcuchord {
         Colors = 16,
         Frets = 32,
         Tuning = 64,
-        Bars = 128
+        Barres = 128,
+        Shadows = 256
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -85,10 +86,13 @@ namespace Calcuchord {
         Pattern,
         DisplayMode,
         Key,
-        Svg,
+
         ChordSuffix,
         ScaleSuffix,
-        ModeSuffix
+        ModeSuffix,
+        ChordSvg,
+        ScaleSvg,
+        ModeSvg
     }
 
     // _ = '/'

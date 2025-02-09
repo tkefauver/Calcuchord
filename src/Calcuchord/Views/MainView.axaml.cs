@@ -37,9 +37,13 @@ namespace Calcuchord {
         }
 
         void OnMainContainerSizeChanged() {
-            if(MainViewModel.Instance is not { } mvm) {
+            if(MainViewModel.Instance is not { } mvm ||
+               ThemeViewModel.Instance is not { } tvm) {
                 return;
             }
+
+            tvm.OnPropertyChanged(nameof(tvm.IsLandscape));
+            tvm.OnPropertyChanged(nameof(tvm.Orientation));
 
             mvm.DiscoverMatchColumnCount();
             InstrumentView.MeasureInstrument();

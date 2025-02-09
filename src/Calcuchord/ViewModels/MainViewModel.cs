@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -96,6 +97,8 @@ namespace Calcuchord {
 
         #region Options
 
+        #region Display Mode
+
         public OptionViewModel SearchOptionViewModel =>
             DisplayModeOptions.FirstOrDefault(x => x.OptionValue == DisplayModeType.Search.ToString());
 
@@ -111,12 +114,19 @@ namespace Calcuchord {
         OptionViewModel SelectedDisplayModeOption =>
             DisplayModeOptions.FirstOrDefault(x => x.IsChecked);
 
+        #endregion
+
+        #region Pattern
+
         public ObservableCollection<OptionViewModel> PatternOptions =>
             OptionLookup[OptionType.Pattern];
 
         OptionViewModel SelectedPatternOption =>
             PatternOptions.FirstOrDefault(x => x.IsChecked);
 
+        #endregion
+
+        #region Key
 
         public ObservableCollection<OptionViewModel> KeyOptions =>
             OptionLookup[OptionType.Key];
@@ -124,11 +134,27 @@ namespace Calcuchord {
         IEnumerable<OptionViewModel> SelectedKeyOptions =>
             KeyOptions.Where(x => x.IsChecked);
 
+        #endregion
+
+        #region Svg
+
+        public Dictionary<MusicPatternType,ObservableCollection<OptionViewModel>> SvgDisplayModelLookup { get; } =
+            new Dictionary<MusicPatternType,ObservableCollection<OptionViewModel>>
+            {
+                { MusicPatternType.Chords,[] },
+                { MusicPatternType.Scales,[] },
+                { MusicPatternType.Modes,[] }
+            };
+
         public ObservableCollection<OptionViewModel> SvgOptions =>
-            OptionLookup[OptionType.Svg];
+            OptionLookup[CurSvgOptionType];
 
         IEnumerable<OptionViewModel> SelectedSvgOptions =>
             SvgOptions.Where(x => x.IsChecked);
+
+        #endregion
+
+        #region Suffix
 
         ObservableCollection<OptionViewModel> ChordSuffixOptions =>
             OptionLookup[OptionType.ChordSuffix];
@@ -154,12 +180,16 @@ namespace Calcuchord {
         IEnumerable<OptionViewModel> SelectedSuffixOptions =>
             SuffixOptions.Where(x => x.IsChecked);
 
+        #endregion
+
         public Dictionary<OptionType,ObservableCollection<OptionViewModel>> OptionLookup { get; } =
             new Dictionary<OptionType,ObservableCollection<OptionViewModel>>
             {
                 { OptionType.Key,[] },
                 { OptionType.Pattern,[] },
-                { OptionType.Svg,[] },
+                { OptionType.ChordSvg,[] },
+                { OptionType.ScaleSvg,[] },
+                { OptionType.ModeSvg,[] },
                 { OptionType.ModeSuffix,[] },
                 { OptionType.ChordSuffix,[] },
                 { OptionType.ScaleSuffix,[] },
@@ -171,6 +201,8 @@ namespace Calcuchord {
         #endregion
 
         #region Appearance
+
+        public string MatchSvgCss { get; private set; } = string.Empty;
 
         public string BusyText { get; set; }
 
@@ -233,6 +265,13 @@ namespace Calcuchord {
         public bool IsIndexModeSelected =>
             SelectedDisplayMode == DisplayModeType.Index;
 
+        OptionType CurSvgOptionType =>
+            SelectedPatternType == MusicPatternType.Chords ?
+                OptionType.ChordSvg :
+                SelectedPatternType == MusicPatternType.Scales ?
+                    OptionType.ScaleSvg :
+                    OptionType.ModeSvg;
+
         public MusicPatternType SelectedPatternType =>
             SelectedPatternOption == null ? 0 : SelectedPatternOption.OptionValue.ToEnum<MusicPatternType>();
 
@@ -267,6 +306,7 @@ namespace Calcuchord {
         public bool IsPianoSelected =>
             SelectedInstrumentType == InstrumentType.Piano;
 
+        public NoteType? LastDesiredRoot { get; set; }
         public NoteType? DesiredRoot { get; set; }
 
         public bool IsDefaultSelection =>
@@ -308,15 +348,15 @@ namespace Calcuchord {
 
         public bool IsSearchButtonVisible {
             get {
-                // if(FilteredMatches.Difference(LastMatches).Any()) {
-                //     return true;
-                // }
-
                 if(!IsBusy &&
                    !IsLoadingMatches &&
                    SelectedTuning != null &&
                    SelectedTuning.SelectedNotes.Any() &&
                    SelectedTuning.SelectedNotes.Difference(LastNotes).Any()) {
+                    return true;
+                }
+
+                if(DesiredRoot != LastDesiredRoot) {
                     return true;
                 }
 
@@ -399,6 +439,9 @@ namespace Calcuchord {
                     break;
                 case nameof(SelectedPatternType):
                     InitMatchProvider();
+                    OnPropertyChanged(nameof(CurSvgOptionType));
+                    OnPropertyChanged(nameof(SvgOptions));
+                    UpdateSvgFlagsFromOptions();
                     break;
                 case nameof(SelectedDisplayMode):
                     OnPropertyChanged(nameof(IsSearchModeSelected));
@@ -429,17 +472,13 @@ namespace Calcuchord {
         async Task InitAsync() {
             Prefs.Instance.IsSaveIgnored = true;
 
-            //
-            bool needs_save = false;
             if(Prefs.Instance.Instruments is not IEnumerable<Instrument> instl ||
                !instl.Any()) {
-                IsBusy = true;
-                instl = CreateDefaultInstruments();
-                Prefs.Instance.Instruments.AddRange(instl);
-                needs_save = true;
-            } else {
-                MatchColCount = Prefs.Instance.MatchColCount;
+                DoIntroAsync().FireAndForgetSafeAsync();
+                return;
             }
+
+            MatchColCount = Prefs.Instance.MatchColCount;
 
             foreach(Instrument inst in instl) {
                 InstrumentViewModel ivm = await CreateInstrumentAsync(inst);
@@ -447,16 +486,37 @@ namespace Calcuchord {
             }
 
             IsLoaded = true;
-
-            //InitSelection();
             InitInstrument();
 
             Prefs.Instance.IsSaveIgnored = false;
-            if(needs_save) {
-                Prefs.Instance.Save();
+        }
+
+        async Task DoIntroAsync() {
+            // TODO show intro popup
+
+            // allow to add instrument or cancel
+            await AddInstrumentCommand.ExecuteAsync();
+
+            while(EditModeInstrument != null) {
+                await Task.Delay(100);
             }
 
-            IsBusy = false;
+            await Task.Delay(300);
+
+            // add piano
+            var instl = CreateDefaultInstruments([InstrumentType.Piano]);
+            if(instl.FirstOrDefault() is not { } piano) {
+                return;
+            }
+
+            EditModeInstrument = new InstrumentViewModel(this)
+            {
+                Instrument = piano
+            };
+            await EditModeInstrument.InitAsync(EditModeInstrument.Instrument);
+            await FinishEditInstrumentCommand.ExecuteAsync();
+
+            SelectedInstrument = Instruments.FirstOrDefault();
         }
 
 
@@ -483,6 +543,7 @@ namespace Calcuchord {
                         }
                     }
 
+                    LastDesiredRoot = DesiredRoot;
                     LastNotes = sel_notes.ToList();
                     FilteredMatches = GetFilterWorkingMatches();
 
@@ -668,10 +729,9 @@ namespace Calcuchord {
         }
 
         void InitMatchProvider() {
-            MatchProvider = new(
+            MatchProvider = new MatchProvider(
                 SelectedPatternType,
-                SelectedTuning.Tuning);
-
+                SelectedTuning == null ? null : SelectedTuning.Tuning);
         }
 
         public void DiscoverMatchColumnCount() {
@@ -722,7 +782,7 @@ namespace Calcuchord {
 
         void UpdateSvgFlagAvailability() {
             if(!OptionLookup.TryGetValue(
-                   OptionType.Svg,
+                   CurSvgOptionType,
                    out var svg_opts)) {
                 return;
             }
@@ -740,7 +800,8 @@ namespace Calcuchord {
                     .Where(
                         x => x.IsFlagEnabled(
                             SelectedInstrument.InstrumentType,
-                            SelectedPatternType));
+                            SelectedPatternType,
+                            SelectedDisplayMode));
         }
 
         void UpdateSvgFlagsFromOptions() {
@@ -764,23 +825,73 @@ namespace Calcuchord {
             RefreshMatchesSvg();
         }
 
+        public void UpdateMatchCss() {
+            StringBuilder sb = new StringBuilder();
+
+            if(SelectedSvgFlags.HasFlag(SvgFlags.Frets)) {
+                sb.AppendLine(".fret-marker { display:none; }");
+            } else {
+                sb.AppendLine(".fret-labels { display:none; }");
+            }
+
+            if(SelectedSvgFlags.HasFlag(SvgFlags.Roots)) {
+                sb.AppendLine(".root-open { stroke-width: 1.25; }");
+            } else {
+                sb.AppendLine(".root-box { display:none; }");
+                sb.AppendLine(".root-open { stroke-width: 0.25; }");
+            }
+
+            if(!SelectedSvgFlags.HasFlag(SvgFlags.Tuning)) {
+                sb.AppendLine(".string-tuning { display:none; }");
+            }
+
+            if(!SelectedSvgFlags.HasFlag(SvgFlags.Fingers)) {
+                sb.AppendLine(".fingers-text { display:none; }");
+            }
+
+            if(!SelectedSvgFlags.HasFlag(SvgFlags.Colors)) {
+                sb.AppendLine($".fingers-fill {{ fill: {ThemeViewModel.Instance.P[PaletteColorType.RootFretBg]}; }}");
+            }
+
+            if(!SelectedSvgFlags.HasFlag(SvgFlags.Matches)) {
+                sb.AppendLine(".user-fill { fill: transparent; }");
+            }
+
+            if(!SelectedSvgFlags.HasFlag(SvgFlags.Notes)) {
+                sb.AppendLine(".notes-text { display:none; }");
+            }
+
+            if(!SelectedSvgFlags.HasFlag(SvgFlags.Shadows)) {
+                sb.AppendLine(".shadow-elm { display:none; }");
+            }
+
+            if(!SelectedSvgFlags.HasFlag(SvgFlags.Barres)) {
+                sb.AppendLine(".barre-elm { display:none; }");
+            }
+
+            MatchSvgCss = sb.ToString();
+        }
+
         public void RefreshMatchesSvg() {
-            Matches.ForEach(x => x.RefreshSvg());
+            UpdateMatchCss();
+            //Matches.ForEach(x => x.RefreshSvg());
         }
 
         void InitOptions() {
             var all_opts = Prefs.Instance.Options;
-            var opt_lookup = new Dictionary<OptionType,(Type,int)>
-            {
-                { OptionType.Pattern,(typeof(MusicPatternType),0) },
-                { OptionType.DisplayMode,(typeof(DisplayModeType),0) },
-                { OptionType.ChordSuffix,(typeof(ChordSuffixType),-1) },
-                { OptionType.ScaleSuffix,(typeof(ScaleSuffixType),-1) },
-                { OptionType.ModeSuffix,(typeof(ModeSuffixType),-1) },
-                { OptionType.Key,(typeof(NoteType),-1) },
-                { OptionType.Svg,(typeof(SvgFlags),-1) }
-            };
             if(!all_opts.Any()) {
+                var opt_lookup = new Dictionary<OptionType,(Type,int)>
+                {
+                    { OptionType.Pattern,(typeof(MusicPatternType),0) },
+                    { OptionType.DisplayMode,(typeof(DisplayModeType),0) },
+                    { OptionType.ChordSuffix,(typeof(ChordSuffixType),-1) },
+                    { OptionType.ScaleSuffix,(typeof(ScaleSuffixType),-1) },
+                    { OptionType.ModeSuffix,(typeof(ModeSuffixType),-1) },
+                    { OptionType.Key,(typeof(NoteType),-1) },
+                    { OptionType.ChordSvg,(typeof(SvgFlags),-1) },
+                    { OptionType.ScaleSvg,(typeof(SvgFlags),-1) },
+                    { OptionType.ModeSvg,(typeof(SvgFlags),-1) }
+                };
 
                 string GetOptionLabel(OptionType opt,string key) {
                     switch(opt) {
@@ -797,6 +908,7 @@ namespace Calcuchord {
                     }
                 }
 
+                // create all options, labels and default values
                 all_opts.AddRange(
                     opt_lookup.SelectMany(
                         x =>
@@ -810,16 +922,27 @@ namespace Calcuchord {
                                         y),
                                     IsChecked = x.Value.Item2 == idx
                                 })));
+
+                // set all svg sets to default
+                foreach((string key,int idx) in Enum.GetNames(typeof(SvgFlags)).WithIndex()) {
+                    SvgFlags flag = (SvgFlags)(int)Math.Pow(
+                        2,
+                        idx);
+                    if(SvgBuilderBase.DefaultSvgFlags.HasFlag(flag)) {
+                        all_opts.Where(x => x.OptionValue == flag.ToString()).ForEach(x => x.IsChecked = true);
+                    }
+                }
             }
 
             if(OptionLookup.Values.SelectMany(x => x).None()) {
+                // create option lookup (on startup)
                 foreach(var kvp in OptionLookup) {
                     kvp.Value.Clear();
                     kvp.Value.AddRange(all_opts.Where(x => x.OptionType == kvp.Key));
                 }
             } else {
-                // reset match filters on init
-                OptionLookup.Where(x => opt_lookup.Where(y => y.Value.Item2 < 0).Any(y => y.Key == x.Key))
+                // reset match filters
+                OptionLookup.Where(x => x.Key.ToString().EndsWith("Suffix"))
                     .SelectMany(x => x.Value)
                     .ForEach(x => x.IsChecked = false);
             }
@@ -834,7 +957,9 @@ namespace Calcuchord {
             OnPropertyChanged(nameof(BookmarksOptionViewModel));
             OnPropertyChanged(nameof(IndexOptionViewModel));
 
+            UpdateSvgFlagsFromOptions();
             UpdateSvgFlagAvailability();
+            UpdateMatchCss();
 
             OptionLookup.SelectMany(x => x.Value).ForEach(x => x.OnPropertyChanged(nameof(x.IsChecked)));
             OptionLookup.SelectMany(x => x.Value).ForEach(x => x.OnPropertyChanged(nameof(x.IsEnabled)));
@@ -850,16 +975,8 @@ namespace Calcuchord {
             return ivm;
         }
 
-        void InitSelection() {
-            Debug.Assert(SelectedInstrument != null,"selection error");
-
-            SelectedInstrumentIndex = Instruments.IndexOf(SelectedInstrument);
-            LastSelectedTuning = SelectedTuning;
-            ResetInstrumentCommand.Execute(null);
-            OnPropertyChanged(nameof(SelectedInstrumentIndex));
-        }
-
         void InitInstrument() {
+            LastSelectedTuning = SelectedTuning;
 
             Debug.WriteLine("init instrument");
 
@@ -881,13 +998,8 @@ namespace Calcuchord {
             UpdateMatches(MatchUpdateSource.InstrumentInit);
         }
 
-        public static IEnumerable<Instrument> CreateDefaultInstruments() {
-            InstrumentType[] def_itl =
-            [
-                InstrumentType.Guitar,
-                InstrumentType.Ukulele,
-                InstrumentType.Piano
-            ];
+        public static IEnumerable<Instrument> CreateDefaultInstruments(InstrumentType[] def_itl = default) {
+            def_itl = def_itl ?? [InstrumentType.Guitar,InstrumentType.Ukulele,InstrumentType.Piano];
             var instl = new List<Instrument>();
             foreach(InstrumentType def_it in def_itl) {
                 Instrument def_inst = Instrument.CreateByType(
@@ -907,7 +1019,7 @@ namespace Calcuchord {
 
         #region Commands
 
-        public ICommand CancelEditInstrumentCommand => new MpCommand(
+        public MpIAsyncCommand CancelEditInstrumentCommand => new MpAsyncCommand(
             async () => {
 
                 if(EditModeInstrument is not { } inst_to_restore_vm) {
@@ -934,7 +1046,7 @@ namespace Calcuchord {
                 _editInstrumentInitialStateJson = null;
             });
 
-        public ICommand FinishEditInstrumentCommand => new MpCommand(
+        public MpIAsyncCommand FinishEditInstrumentCommand => new MpAsyncCommand(
             async () => {
                 if(EditModeInstrument is not { } emi_vm) {
                     return;
@@ -976,7 +1088,7 @@ namespace Calcuchord {
                 InitInstrument();
             });
 
-        public ICommand BeginEditInstrumentCommand => new MpCommand<object>(
+        public MpIAsyncCommand<object> BeginEditInstrumentCommand => new MpAsyncCommand<object>(
             async args => {
                 if(args is not InstrumentViewModel edit_inst_vm) {
                     if(args is not TuningViewModel tvm) {
@@ -988,6 +1100,8 @@ namespace Calcuchord {
 
                 IsLeftDrawerOpen = false;
                 IsRightDrawerOpen = false;
+
+                await Task.Delay(300);
 
                 // store full backup of instrument (existing only)
                 _editInstrumentInitialStateJson =
@@ -1007,11 +1121,14 @@ namespace Calcuchord {
                 }
             });
 
-        public ICommand AddInstrumentCommand => new MpCommand(
+        public MpIAsyncCommand AddInstrumentCommand => new MpAsyncCommand(
             async () => {
-                Instrument new_inst = Instrument.CreateByType(InstrumentType.Guitar);
-                InstrumentViewModel new_inst_vm = await CreateInstrumentAsync(new_inst);
-                BeginEditInstrumentCommand.Execute(new_inst_vm);
+                EditModeInstrument = new InstrumentViewModel(this)
+                {
+                    Instrument = Instrument.CreateByType(InstrumentType.Guitar)
+                };
+                await EditModeInstrument.InitAsync(EditModeInstrument.Instrument);
+                await BeginEditInstrumentCommand.ExecuteAsync(EditModeInstrument);
             });
 
         public ICommand DecreaseMatchColumnsCommand => new MpCommand(
@@ -1072,7 +1189,9 @@ namespace Calcuchord {
                         ovm.IsChecked = !ovm.IsChecked;
                         UpdateMatches(MatchUpdateSource.FilterToggle);
                         break;
-                    case OptionType.Svg:
+                    case OptionType.ChordSvg:
+                    case OptionType.ScaleSvg:
+                    case OptionType.ModeSvg:
                         ovm.IsChecked = !ovm.IsChecked;
                         if(ovm.IsChecked &&
                            ovm.OptionValue.TryToEnum(out SvgFlags flag) &&

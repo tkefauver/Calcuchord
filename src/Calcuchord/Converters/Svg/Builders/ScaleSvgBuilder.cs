@@ -9,7 +9,7 @@ namespace Calcuchord {
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
             svg.AppendChild(bg_g);
 
-            SvgFlags flags = MainViewModel.Instance.SelectedSvgFlags;
+            //SvgFlags flags = MainViewModel.Instance.SelectedSvgFlags;
 
             int vfc = 5;
 
@@ -60,7 +60,8 @@ namespace Calcuchord {
             double tw = fw * cols;
             double th = sh * rows;
 
-            if(flags.HasFlag(SvgFlags.Tuning)) {
+            // tuning
+            {
                 var open_notes = ng.Parent.Parent.OpenNotes;
                 double fs = bfs;
                 double tuning_text_x = 0;
@@ -68,12 +69,13 @@ namespace Calcuchord {
 
                 for(int i = 0; i < str_count; i++) {
                     string label_text = open_notes[i].FullName;
-                    AddText(bg_g,label_text,fs,Fg,tuning_text_x,tuning_text_y);
+                    AddText(bg_g,label_text,fs,Fg,tuning_text_x,tuning_text_y,classes: "string-tuning");
                     tuning_text_y += sh;
                 }
             }
 
-            if(flags.HasFlag(SvgFlags.Frets)) {
+            // frets
+            {
                 double fret_marker_fs = bfs;
                 double fret_marker_x = min_fret_x;
                 double fret_marker_y = th - (sh * 1.5);
@@ -81,15 +83,19 @@ namespace Calcuchord {
                     // fret num label
                     int fret_num = min_fret + i;
                     string marker_text = fret_num.ToString();
-                    AddCenteredText(bg_g,marker_text,fret_marker_fs,Fg,fret_marker_x,fret_marker_y,fw,sh);
+                    AddCenteredText(
+                        bg_g,marker_text,fret_marker_fs,Fg,fret_marker_x,fret_marker_y,fw,sh,classes: "fret-labels");
                     fret_marker_x += fw;
                 }
-            } else if(show_fret_marker) {
+            }
+
+            if(show_fret_marker) {
                 double fret_marker_fs = hfs;
                 double fret_marker_x = min_fret_x;
                 double fret_marker_y = (th - (sh * 1.5)) + 1;
                 string marker_text = $"{min_vis_fret}fr";
-                AddCenteredText(bg_g,marker_text,fret_marker_fs,Fg,fret_marker_x,fret_marker_y,fw,sh);
+                AddCenteredText(
+                    bg_g,marker_text,fret_marker_fs,Fg,fret_marker_x,fret_marker_y,fw,sh,classes: "fret-marker");
             }
 
             for(int str_num = 0; str_num < str_count; str_num++) {
@@ -120,55 +126,55 @@ namespace Calcuchord {
                     bool is_root = fret_note.IsRoot;
                     bool is_user = IsUserNote(fret_note);
                     int finger_num = fret_note.FingerNum;
-                    string fret_bg = flags.HasFlag(SvgFlags.Colors) ? FingerBg[finger_num] : Fg;
-                    string fret_fg = flags.HasFlag(SvgFlags.Colors) ? FingerFg[finger_num] : Bg;
+                    string fret_bg = FingerBg[finger_num];
+                    string fret_fg = FingerFg[finger_num];
 
-                    if(is_root && flags.HasFlag(SvgFlags.Roots)) {
-                        // root outer circle
-                        AddCircle(bg_g,RootBg,Transparent,cx,cy,dot_r,0);
-                        dot_r -= DotStrokeWidth;
+                    void AddFingerShape(bool is_box,string classes) {
+                        double shape_r = dot_r;
+                        HtmlNode shape_cntr = CreateG(bg_g,classes);
+                        if(is_box) {
+                            // root outer box
+                            AddShape(shape_cntr,true,RootBg,Transparent,cx,cy,shape_r,0,shadow: true);
+                            shape_r -= DotStrokeWidth;
+                        }
+
+                        if(is_user) {
+                            // user outer circle
+                            AddShape(
+                                shape_cntr,is_box,UserBg,Transparent,cx,cy,shape_r,0,
+                                shadow: !is_root,
+                                classes: "user-fill");
+                            shape_r -= DotStrokeWidth;
+                        }
+
+                        // finger circle
+                        AddShape(
+                            shape_cntr,is_box,fret_bg,Transparent,cx,cy,shape_r,0,
+                            shadow: !is_root && !is_user,
+                            classes: "fingers-fill");
                     }
 
-                    if(is_user) {
-                        // user outer circle
-                        AddCircle(bg_g,UserBg,Transparent,cx,cy,dot_r,0,shadow: !is_root);
-                        dot_r -= DotStrokeWidth;
+                    AddFingerShape(false,"note-circle");
+                    if(is_root) {
+                        AddFingerShape(true,"root-box");
                     }
 
-                    // finger circle
-                    AddCircle(
-                        bg_g,fret_bg,Transparent,cx,cy,dot_r,0,shadow: !is_root && !is_user);
-
+                    double tx = cx - dot_r;
+                    double ty = cy - dot_r;
+                    double d = dot_r * 2d;
+                    double oy = -0.5d;
                     // finger num text
-                    string dot_text = null;
-                    // double tx = cx;
-                    // double ty = cy;
-                    if(flags.HasFlag(SvgFlags.Fingers)) {
-                        dot_text = finger_num.ToString();
-                        // tx -= 1;
-                        // ty += 1.5;
-                    } else if(flags.HasFlag(SvgFlags.Notes)) {
-                        dot_text = fret_note.Name;
-                        // tx -= 1.5;
-                        // if(dot_text.Length == 2) {
-                        //     tx -= 1;
-                        // }
-                        // ty += 1;
-                    }
+                    HtmlNode finger_g = CreateG(bg_g,"fingers-text");
+                    AddCenteredText(
+                        finger_g,finger_num.ToString(),BodyFontSize,fret_fg,tx,ty,d,d,shadow: true,oy: oy);
 
-                    if(dot_text != null) {
-                        //AddText(bg_g,dot_text,BodyFontSize,fret_fg,tx,ty,shadow: true);
-                        double tx = cx - (dot_r / 2d);
-                        double ty = cy - (dot_r / 2d);
-                        AddCenteredText(bg_g,dot_text,bfs,fret_fg,tx,ty,dot_r,dot_r,shadow: true,ox: -0.25,oy: -0.4);
-                    }
+                    // fret note text
+                    HtmlNode notes_g = CreateG(bg_g,"notes-text");
+                    AddCenteredText(notes_g,fret_note.Name,BodyFontSize,fret_fg,tx,ty,d,d,shadow: true,oy: oy);
                 }
             }
 
-            if(show_fret_marker) {
-                // fret marker doesn't take up a full row's height
-                th -= 5;
-            }
+            th -= sh;
 
             svg.Attributes.Add("width",tw);
             svg.Attributes.Add("height",th);

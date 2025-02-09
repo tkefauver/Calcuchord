@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
@@ -71,9 +72,29 @@ namespace Calcuchord {
 
         public bool IsTablet => false;
 
+        public bool IsLandscape {
+            get {
+                if(MainView.Instance is not { } mv ||
+                   TopLevel.GetTopLevel(mv) is not { } tl) {
+                    return false;
+                }
+
+                return tl.Bounds.Width > tl.Bounds.Height;
+            }
+        }
+
+        public Orientation Orientation =>
+            IsLandscape ? Orientation.Horizontal : Orientation.Vertical;
+
         public bool IsDark {
             get => Prefs.Instance.IsThemeDark;
-            private set => Prefs.Instance.IsThemeDark = value;
+            private set {
+                if(IsDark != value) {
+                    Prefs.Instance.IsThemeDark = value;
+                    HasModelChanged = true;
+                    OnPropertyChanged(nameof(IsDark));
+                }
+            }
         }
 
         CustomMaterialTheme _theme;
@@ -168,7 +189,7 @@ namespace Calcuchord {
                         },
                         {
                             PaletteColorType.NutBg,
-                            ("#FAEBD7","#FAEBD7")
+                            ("#FFDEAD","#FFDEAD")
                         },
                         {
                             PaletteColorType.NutFg,
@@ -239,6 +260,13 @@ namespace Calcuchord {
             }
         }
 
+        public bool IsDebug =>
+#if DEBUG
+            true;
+#else
+        false;
+#endif
+
         public string Transparent { get; set; } = "#00000000";
 
         public string ThemeIcon =>
@@ -249,7 +277,9 @@ namespace Calcuchord {
         #region Public Methods
 
         public void Init() {
-            SetTheme(Theme.BaseTheme == BaseThemeMode.Dark);
+            bool is_sys_theme_dark = Theme.BaseTheme == BaseThemeMode.Dark;
+            bool is_dark = Prefs.Instance.IsInitialStartup ? is_sys_theme_dark : Prefs.Instance.IsThemeDark;
+            SetTheme(is_dark);
         }
 
         public void SetTheme(bool isDark) {
@@ -300,6 +330,21 @@ namespace Calcuchord {
                 }
 
                 OnPropertyChanged(nameof(ThemeIcon));
+            });
+
+        public ICommand ToggleLandscapeCommand => new MpCommand(
+            () => {
+                if(MainView.Instance is not { } mv ||
+                   TopLevel.GetTopLevel(mv) is not { } tl) {
+                    return;
+                }
+
+                double w = tl.Bounds.Width;
+                double h = tl.Bounds.Height;
+                tl.Width = h;
+                tl.Height = w;
+                // OnPropertyChanged(nameof(IsLandscape));
+                // OnPropertyChanged(nameof(Orientation));
             });
 
     }

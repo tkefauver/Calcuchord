@@ -36,6 +36,7 @@
         <PackageReference Include="org.matheval"/>
         <PackageReference Include="PropertyChanged.Fody" PrivateAssets="All"/>
         <PackageReference Include="ReactiveUI"/>
+        <PackageReference Include="System.Formats.Nrbf"/>
         <PackageReference Include="webview.avalonia"/>
         <PackageReference Include="Melanchall.DryWetMidi" Condition="$(BuildOs) == 'LINUX'"/>
     </ItemGroup>

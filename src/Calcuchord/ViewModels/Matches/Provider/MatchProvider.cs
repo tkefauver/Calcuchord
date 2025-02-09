@@ -23,7 +23,7 @@ namespace Calcuchord {
         #region Properties
 
         IEnumerable<NoteGroup> Items =>
-            Tuning.Collections[PatternType].SelectMany(x => x.Groups);
+            Tuning == null ? [] : Tuning.Collections[PatternType].SelectMany(x => x.Groups);
 
         MusicPatternType PatternType { get; }
         Tuning Tuning { get; }
@@ -42,10 +42,6 @@ namespace Calcuchord {
         #region Public Methods
 
         public IEnumerable<MatchViewModelBase> GetAll() {
-            if(Items.Where(x => x.Id == "28106b4f-fba8-4061-97ec-62a3375c5f3a") is { } test) {
-
-            }
-
             return Items.Select(x => CreateMatchViewModel(x,1));
         }
 

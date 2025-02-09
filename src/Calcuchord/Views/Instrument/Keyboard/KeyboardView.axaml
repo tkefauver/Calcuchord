@@ -52,7 +52,7 @@
                     Value="{DynamicResource WhiteKeyBgBrush}" />
         </Style>
 
-        <Style Selector="local|KeyView.black">
+        <Style Selector="local|KeyView.altered">
             <Setter Property="BorderThickness"
                     Value="1" />
             <Setter Property="BorderBrush"
@@ -61,9 +61,37 @@
                     Value="{StaticResource BlackKeyBgBrush}" />
         </Style>
 
-        <Style Selector="local|KeyView.desired-root TextBlock">
+        <Style Selector="Border#KeyMarkerInnerContainer">
+            <Setter Property="Width"
+                    Value="80" />
+            <Setter Property="Height"
+                    Value="80" />
+            <Setter Property="Margin"
+                    Value="10" />
+        </Style>
+        <Style Selector="Border#KeyMarkerInnerContainer TextBlock">
+            <Setter Property="FontSize"
+                    Value="42" />
+        </Style>
+
+        <Style Selector="local|KeyView.altered Border#KeyMarkerInnerContainer">
+            <Setter Property="Width"
+                    Value="56" />
+            <Setter Property="Height"
+                    Value="56" />
+            <Setter Property="Margin"
+                    Value="5" />
+        </Style>
+        <Style Selector="local|KeyView.altered TextBlock">
+            <Setter Property="FontSize"
+                    Value="36" />
+        </Style>
+
+        <Style Selector="local|KeyView.desired-root Border#KeyMarkerInnerContainer">
             <Setter Property="Background"
                     Value="{DynamicResource RootFretBg}" />
+        </Style>
+        <Style Selector="local|KeyView.desired-root TextBlock">
             <Setter Property="Foreground"
                     Value="{DynamicResource RootFretFg}" />
         </Style>
@@ -81,7 +109,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="local:NoteViewModel">
                         <local:KeyView Classes="note-btn input"
-                                       Classes.black="{Binding IsAltered}"
+                                       Classes.altered="{Binding IsAltered}"
                                        Classes.selected="{Binding IsSelected}"
                                        Classes.desired-root="{Binding IsDesiredRoot}"
                                        Classes.hover="{Binding IsHovering}"

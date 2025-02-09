@@ -18,7 +18,7 @@ namespace Calcuchord {
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
             cntr_g.AppendChild(bg_g);
 
-            SvgFlags flags = MainViewModel.Instance.SelectedSvgFlags;
+            //SvgFlags flags = MainViewModel.Instance.SelectedSvgFlags;
 
             int vfc = 4;
             double lw = FretLineFixedAxisSize;
@@ -90,14 +90,16 @@ namespace Calcuchord {
 
             double tw = fw * cols;
             double th = fh * rows;
-            // double tox = 0;
-            // double toy = 0;
 
             double header_h = fh + 0.25;
             double curx = min_fret_x;
 
-            double cury = header_h; //show_header_labels ? header_h : 0;
-            if(flags.HasFlag(SvgFlags.Frets)) {
+            double cury = header_h;
+
+            // fret labels
+            {
+                HtmlNode fret_g = CreateG(bg_g,"fret-labels");
+
                 double fs = BodyFontSize;
                 double offset_x = fs * 1.25d;
                 double offset_y = fs / 3d;
@@ -113,15 +115,20 @@ namespace Calcuchord {
                         cur_x -= offset_x / 2d;
                     }
 
-                    AddText(bg_g,label_text,fs,Fg,cur_x,marker_y);
+                    AddText(fret_g,label_text,fs,Fg,cur_x,marker_y);
                     marker_y += fh;
                 }
-            } else if(show_fret_marker) {
+            }
+
+            if(show_fret_marker) {
+                double fs = BodyFontSize;
                 double marker_x = 0;
-                double marker_y = cury + (fh / 2d) + (HeaderFontSize / 2d);
+                double marker_y = cury + (fh / 2d) + (fs / 2d);
                 string marker_text = $"{min_vis_fret}fr";
+
                 // open label
-                AddText(bg_g,marker_text,HeaderFontSize,Fg,marker_x,marker_y);
+                HtmlNode marker_g = CreateG(bg_g,"fret-marker");
+                AddText(marker_g,marker_text,fs,Fg,marker_x,marker_y);
             }
 
             if(show_header_labels) {
@@ -147,9 +154,7 @@ namespace Calcuchord {
                             double open_r = 2;
                             double x = header_x;
                             double y = header_y - (fh / 4d);
-                            double width_mul =
-                                str_fret.IsRoot && flags.HasFlag(SvgFlags.Roots) ? 5 : 1;
-                            AddCircle(bg_g,Transparent,Fg,x,y,open_r,lw * width_mul);
+                            AddCircle(bg_g,Transparent,Fg,x,y,open_r,lw,str_fret.IsRoot ? "root-open" : string.Empty);
                         }
                     }
 
@@ -157,16 +162,18 @@ namespace Calcuchord {
                 }
             }
 
-            if(flags.HasFlag(SvgFlags.Tuning)) {
+            // tuning
+            {
                 var open_notes = ng.Parent.Parent.OpenNotes;
                 double fs = BodyFontSize;
                 double offset_x = fs / 2;
                 double cur_x = min_fret_x - offset_x;
                 double cur_y = th - (fh / 2d);
+                HtmlNode tuning_g = CreateG(bg_g,"string-tuning");
 
                 for(int i = 0; i < str_count; i++) {
                     string label_text = open_notes[i].FullName;
-                    AddText(bg_g,label_text,fs,Fg,cur_x,cur_y);
+                    AddText(tuning_g,label_text,fs,Fg,cur_x,cur_y);
                     cur_x += fw;
                 }
             }
@@ -189,8 +196,10 @@ namespace Calcuchord {
 
                     PatternNote primary_note = fret_note ?? last_barre_note;
                     if(primary_note != null) {
-                        fret_bg = flags.HasFlag(SvgFlags.Colors) ? FingerBg[primary_note.FingerNum] : Fg;
-                        fret_fg = flags.HasFlag(SvgFlags.Colors) ? FingerFg[primary_note.FingerNum] : Bg;
+                        // fret_bg = flags.HasFlag(SvgFlags.Colors) ? FingerBg[primary_note.FingerNum] : Fg;
+                        // fret_fg = flags.HasFlag(SvgFlags.Colors) ? FingerFg[primary_note.FingerNum] : Bg;
+                        fret_bg = FingerBg[primary_note.FingerNum];
+                        fret_fg = FingerFg[primary_note.FingerNum];
                     }
 
                     if(str_count == 1 || str_num < str_count - 1) {
@@ -204,97 +213,108 @@ namespace Calcuchord {
                     }
 
                     bool is_barred_fret = false;
-                    if(flags.HasFlag(SvgFlags.Bars)) {
-                        if(barred_fret_lookup.TryGetValue(fret_num,out (int min_str,int max_str) bar_extent) &&
-                           str_num >= bar_extent.min_str &&
-                           str_num < bar_extent.max_str) {
-                            if(fret_note != null) {
-                                last_barre_note = fret_note;
-                            }
-
-                            cur_bar_extent = bar_extent;
-                            is_barred_fret = true;
+                    if(barred_fret_lookup.TryGetValue(fret_num,out (int min_str,int max_str) bar_extent) &&
+                       str_num >= bar_extent.min_str &&
+                       str_num < bar_extent.max_str) {
+                        if(fret_note != null) {
+                            last_barre_note = fret_note;
                         }
 
-                        if(!is_barred_fret &&
-                           shadow_barre_fret_num.HasValue &&
-                           shadow_barre_fret_num.Value == fret_num) {
-                            if(str_num < str_count - 1) {
-                                // shadow rect
-                                AddRect(
-                                    bg_g,BarShadow,Transparent,curx,bar_y,fw,BarHeight,0,
-                                    fillOpacity: ShadowOpacity);
-                            }
+                        cur_bar_extent = bar_extent;
+                        is_barred_fret = true;
+                    }
 
-                            if(fret_note == null &&
-                               (str_num == 0 || str_num == str_count - 1)) {
-                                // shadow edge
-                                HtmlNode shadow_g = CurrentDoc.CreateElement("g");
-                                shadow_g.Attributes.Add("transform",$"translate({cx},{cy})");
-                                bg_g.AppendChild(shadow_g);
-                                HtmlNode shadow_path = CurrentDoc.CreateElement("path");
-                                shadow_path.Attributes.Add("fill",BarShadow);
-                                shadow_path.Attributes.Add("fill-opacity",ShadowOpacity);
-                                double angle = str_num == 0 ? -90 : 90;
-                                shadow_path.Attributes.Add("transform",$"rotate({angle})");
-                                double sh = BarHeight;
-                                double shh = BarHeight / 2d;
-                                shadow_path.Attributes.Add("d",$"M 0, 0 m -{shh}, 0 a {shh},{shh} 0 1,1 {sh},0");
-                                shadow_g.AppendChild(shadow_path);
-                            }
+                    if(!is_barred_fret &&
+                       shadow_barre_fret_num.HasValue &&
+                       shadow_barre_fret_num.Value == fret_num) {
+                        if(str_num < str_count - 1) {
+                            // shadow rect
+                            AddRect(
+                                bg_g,BarShadow,Transparent,curx,bar_y,fw,BarHeight,0,
+                                fillOpacity: ShadowOpacity,
+                                classes: "barre-elm");
                         }
 
-                        if(last_barre_note != null) {
-                            bool is_tail = cur_bar_extent.Value.max_str == str_num;
-                            if(is_tail) {
-                                last_barre_note = null;
-                                cur_bar_extent = null;
-                            } else {
-                                // bar rect (adding extra 1 to left/right to cover bg grid)
-                                AddRect(bg_g,fret_bg,Transparent,curx - 1,bar_y,fw + 2,BarHeight,0);
-                                last_barre_note = fret_note ?? last_barre_note;
-                            }
+                        if(fret_note == null &&
+                           (str_num == 0 || str_num == str_count - 1)) {
+                            // shadow edge
+                            HtmlNode shadow_g = CurrentDoc.CreateElement("g");
+                            shadow_g.Attributes.Add("class","barre-elm");
+                            shadow_g.Attributes.Add("transform",$"translate({cx},{cy})");
+                            bg_g.AppendChild(shadow_g);
+                            HtmlNode shadow_path = CurrentDoc.CreateElement("path");
+                            shadow_path.Attributes.Add("fill",BarShadow);
+                            shadow_path.Attributes.Add("fill-opacity",ShadowOpacity);
+                            double angle = str_num == 0 ? -90 : 90;
+                            shadow_path.Attributes.Add("transform",$"rotate({angle})");
+                            double sh = BarHeight;
+                            double shh = BarHeight / 2d;
+                            shadow_path.Attributes.Add("d",$"M 0, 0 m -{shh}, 0 a {shh},{shh} 0 1,1 {sh},0");
+                            shadow_g.AppendChild(shadow_path);
                         }
                     }
 
+                    if(last_barre_note != null) {
+                        bool is_tail = cur_bar_extent.Value.max_str == str_num;
+                        if(is_tail) {
+                            last_barre_note = null;
+                            cur_bar_extent = null;
+                        } else {
+                            // bar rect (adding extra 1 to left/right to cover bg grid)
+                            double pad = str_num < str_count - 1 ? 1 : 0;
+                            AddRect(
+                                bg_g,fret_bg,Transparent,curx - pad,bar_y,fw + (pad * 2),BarHeight,0,
+                                "barre-elm fingers-fill");
+                            last_barre_note = fret_note ?? last_barre_note;
+                        }
+                    }
 
                     if(fret_note != null) {
                         bool is_root = fret_note.IsRoot;
                         bool is_user = IsUserNote(fret_note);
                         int finger_num = fret_note.FingerNum;
-                        string dot_fg = FingerFg[finger_num];
 
-                        if(is_root && flags.HasFlag(SvgFlags.Roots)) {
-                            // root outer circle
-                            AddCircle(bg_g,RootBg,Transparent,cx,cy,dot_r,0);
-                            dot_r -= DotStrokeWidth;
+                        void AddFingerShape(bool is_box,string classes) {
+                            double shape_r = dot_r;
+                            HtmlNode shape_cntr = CreateG(bg_g,classes);
+                            if(is_box) {
+                                // root outer box
+                                AddShape(shape_cntr,true,RootBg,Transparent,cx,cy,shape_r,0);
+                                shape_r -= DotStrokeWidth;
+                            }
+
+                            if(is_user) {
+                                // user outer circle
+                                AddShape(
+                                    shape_cntr,is_box,UserBg,Transparent,cx,cy,shape_r,0,
+                                    shadow: !is_root && !is_barred_fret,
+                                    classes: "user-fill");
+                                shape_r -= DotStrokeWidth;
+                            }
+
+                            // finger circle
+                            AddShape(
+                                shape_cntr,is_box,fret_bg,Transparent,cx,cy,shape_r,0,
+                                shadow: !is_root && !is_user && !is_barred_fret,
+                                classes: "fingers-fill");
                         }
 
-                        if(is_user) {
-                            // user outer circle
-                            AddCircle(bg_g,UserBg,Transparent,cx,cy,dot_r,0,shadow: !is_root && !is_barred_fret);
-                            dot_r -= DotStrokeWidth;
+                        AddFingerShape(false,"note-circle");
+                        if(is_root) {
+                            AddFingerShape(true,"root-box");
                         }
-
-                        // finger circle
-                        AddCircle(
-                            bg_g,fret_bg,Transparent,cx,cy,dot_r,0,shadow: !is_root && !is_user && !is_barred_fret);
 
                         // finger num text
-                        string dot_text = null;
-                        if(flags.HasFlag(SvgFlags.Fingers)) {
-                            dot_text = finger_num.ToString();
-                        } else if(flags.HasFlag(SvgFlags.Notes)) {
-                            dot_text = fret_note.Name;
-                        }
+                        double tx = cx - dot_r;
+                        double ty = cy - dot_r;
+                        double d = dot_r * 2d;
+                        double oy = -0.5d;
+                        HtmlNode finger_g = CreateG(bg_g,"fingers-text");
+                        AddCenteredText(
+                            finger_g,finger_num.ToString(),BodyFontSize,fret_fg,tx,ty,d,d,shadow: true,oy: oy);
 
-                        if(dot_text != null) {
-                            double tx = cx - dot_r;
-                            double ty = cy - dot_r;
-                            double d = dot_r * 2d;
-                            AddCenteredText(bg_g,dot_text,BodyFontSize,fret_fg,tx,ty,d,d,shadow: true,oy: -0.5);
-                            //AddText(bg_g,dot_text,BodyFontSize,fret_fg,tx,ty,shadow: true);
-                        }
+                        HtmlNode notes_g = CreateG(bg_g,"notes-text");
+                        AddCenteredText(notes_g,fret_note.Name,BodyFontSize,fret_fg,tx,ty,d,d,shadow: true,oy: oy);
                     }
 
                     curx += fw;
@@ -305,17 +325,8 @@ namespace Calcuchord {
 
             double tox = 0;
             double toy = 0;
-            //if(show_header_labels) {
             th = th - fh;
             toy = -(fh / 2d);
-            // } else {
-            //     th = th - (fh * 1.5);
-            //     toy = -header_h;
-            // }
-
-            if(!flags.HasFlag(SvgFlags.Tuning)) {
-                th = th - (fh / 2d);
-            }
 
             cntr_g.Attributes.Add("transform",$"translate({tox},{toy})");
 

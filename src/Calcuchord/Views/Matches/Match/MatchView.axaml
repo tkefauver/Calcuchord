@@ -98,6 +98,7 @@
 
                 <Svg x:Name="MatchSvg"
                      Grid.Row="1"
+                     Css="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}"
                      Source="{Binding SvgSource}"
                      Stretch="Uniform" />
                 <StackPanel x:Name="MatchButtonStripPanel"
@@ -108,9 +109,9 @@
                             HorizontalAlignment="Center"
                             Orientation="Horizontal">
                     <StackPanel.Styles>
-                        <Style Selector="ToggleButton">
+                        <Style Selector="Button">
                             <Setter Property="Theme"
-                                    Value="{StaticResource MaterialFlatToggleButton}" />
+                                    Value="{StaticResource MaterialFlatButton}" />
                             <Setter Property="Padding"
                                     Value="3" />
                             <Setter Property="MinWidth"
@@ -127,22 +128,19 @@
                     </StackPanel.Styles>
 
                     <!-- SET NECK BTN -->
-                    <ToggleButton IsChecked="{Binding IsMatchPlaying, Mode=OneWay}"
-                                  Command="{Binding SetMatchToInstrumentCommand}">
+                    <Button Command="{Binding SetMatchToInstrumentCommand}">
                         <avalonia:MaterialIcon Kind="ContentCopy" />
-                    </ToggleButton>
+                    </Button>
 
                     <!-- PLAY SAMPLE BTN -->
-                    <ToggleButton IsChecked="{Binding IsMatchPlaying, Mode=OneWay}"
-                                  Command="{Binding ToggleMatchPlaybackCommand}">
+                    <Button Command="{Binding ToggleMatchPlaybackCommand}">
                         <avalonia:MaterialIcon Kind="{Binding PlaybackIcon}" />
-                    </ToggleButton>
+                    </Button>
 
                     <!-- BOOKMARK BTN  -->
-                    <ToggleButton IsChecked="{Binding IsBookmarked, Mode=OneWay}"
-                                  Command="{Binding ToggleBookmarkCommand}">
+                    <Button Command="{Binding ToggleBookmarkCommand}">
                         <avalonia:MaterialIcon Kind="{Binding BookmarkIcon}" />
-                    </ToggleButton>
+                    </Button>
                 </StackPanel>
 
             </Grid>

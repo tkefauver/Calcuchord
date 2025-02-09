@@ -39,7 +39,7 @@
             <Setter Property="Foreground"
                     Value="{DynamicResource Bg}" />
             <Setter Property="Opacity"
-                    Value="0.3" />
+                    Value="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}, ConverterParameter=0.6|0.3}" />
             <Setter Property="Grid.Row"
                     Value="2" />
             <Setter Property="FontSize"

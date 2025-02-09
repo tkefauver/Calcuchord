@@ -11,13 +11,14 @@
             Height="16"
             PointerReleased="InputElement_OnPointerReleased"
             BorderThickness="1"
-            BorderBrush="{DynamicResource Bg}"
+            BorderBrush="White"
             Background="Blue"
             CornerRadius="20">
         <TextBlock Text="i"
+                   FontSize="13"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    FontStyle="Italic"
-                   Foreground="{DynamicResource Bg}" />
+                   Foreground="White" />
     </Border>
 </UserControl>

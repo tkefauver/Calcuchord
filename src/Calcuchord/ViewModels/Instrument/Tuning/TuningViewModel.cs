@@ -261,6 +261,10 @@ namespace Calcuchord {
 
                         MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.SelectedTuning));
 
+                        if(Design.IsDesignMode) {
+                            break;
+                        }
+
                         Dispatcher.UIThread.Post(
                             async () => {
                                 while(!MainView.Instance.IsLoaded) {

@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using AvaloniaWebView;
 using PropertyChanged;
 #if SUGAR_WV
 using AvaloniaWebView;
@@ -17,6 +16,7 @@ namespace Calcuchord {
         public override void RegisterServices() {
             base.RegisterServices();
 
+#if SUGAR_WV
             if(PlatformWrapper.Services is { } ps &&
                ps.MidiPlayer is MidiPlayer_sugarwv mp_swv) {
                 AvaloniaWebViewBuilder.Initialize(
@@ -24,6 +24,7 @@ namespace Calcuchord {
                         mp_swv.Init(config);
                     });
             }
+#endif
         }
 
 

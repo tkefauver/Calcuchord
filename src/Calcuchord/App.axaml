@@ -9,7 +9,6 @@
 
 
     <Application.Styles>
-        <!-- <FluentTheme /> -->
         <themes:CustomMaterialTheme>
             <themes:CustomMaterialTheme.Palettes>
                 <themes:CustomMaterialThemeResources x:Key="Dark"

@@ -18,7 +18,6 @@
         <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
         <EnableLLVM>true</EnableLLVM>
         <PublishTrimmed>true</PublishTrimmed>
-        <PublishAot>true</PublishAot>
     </PropertyGroup>
 
     <ItemGroup>

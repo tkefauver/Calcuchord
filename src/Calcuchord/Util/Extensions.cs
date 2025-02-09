@@ -13,9 +13,15 @@ namespace Calcuchord {
             return !source.Any(predicate);
         }
 
-        public static bool IsFlagEnabled(this SvgFlags flag,InstrumentType it,MusicPatternType pt) {
+        public static bool IsFlagEnabled(this SvgFlags flag,InstrumentType it,MusicPatternType pt,DisplayModeType dmt) {
+            if(dmt != DisplayModeType.Search) {
+                if(flag == SvgFlags.Matches) {
+                    return false;
+                }
+            }
+
             if(it != InstrumentType.Piano) {
-                if(pt != MusicPatternType.Chords && flag == SvgFlags.Bars) {
+                if(pt != MusicPatternType.Chords && flag == SvgFlags.Barres) {
                     return false;
                 }
 
@@ -23,16 +29,7 @@ namespace Calcuchord {
             }
 
             // piano only below here
-            return flag is SvgFlags.Notes or SvgFlags.Roots;
-
-            // if(flag == SvgFlags.Colors ||
-            //    flag == SvgFlags.Fingers ||
-            //    flag == SvgFlags.Frets ||
-            //    flag == SvgFlags.Tuning) {
-            //     return false;
-            // }
-            //
-            // return true;
+            return flag is SvgFlags.Notes or SvgFlags.Roots or SvgFlags.Matches;
         }
 
         public static double CentimetersToInches(this double cms) {

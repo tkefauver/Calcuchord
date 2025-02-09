@@ -21,7 +21,7 @@ namespace Calcuchord {
 
         public static SvgFlags DefaultSvgFlags =>
             SvgFlags.Fingers |
-            SvgFlags.Bars |
+            SvgFlags.Barres |
             //SvgFlags.Notes |
             SvgFlags.Colors |
             SvgFlags.Tuning |
@@ -40,7 +40,10 @@ namespace Calcuchord {
         protected HtmlDocument CurrentDoc { get; private set; }
         protected string DefaultFontFamily => "Mono"; //"Nunito"; //"Verdana";
 
-        bool IsShadowsEnabled => false;
+        bool IsShadowsEnabled =>
+            true;
+        // MainViewModel.Instance != null &&
+        // MainViewModel.Instance.SelectedSvgFlags.HasFlag(SvgFlags.Shadows);
 
 
         #region Colors
@@ -85,8 +88,7 @@ namespace Calcuchord {
         protected double DotRadius => 4;
         protected double DotStrokeWidth => 0.775;
 
-        protected double BarHeight => 9;
-        protected double BarOffsetY => 1.5;
+        protected double BarHeight => DotRadius * 2;
 
         protected double BodyFontSize => 4;
         protected double HeaderFontSize => 6;
@@ -181,12 +183,14 @@ namespace Calcuchord {
         protected bool IsUserNote(InstrumentNote note) {
             if(note is null ||
                MainViewModel.Instance is not { } mvm ||
-               mvm.SelectedTuning is not { } stvm ||
-               stvm.SelectedNotes.All(x => x.RowNum != note.RowNum && x.NoteNum != note.NoteNum)) {
+               !mvm.IsSearchModeSelected ||
+               mvm.SelectedTuning is not { } stvm) {
                 return false;
             }
 
-            return true;
+            bool is_user_note = stvm.SelectedNotes.Any(x => x.RowNum == note.RowNum && x.NoteNum == note.NoteNum);
+
+            return is_user_note;
         }
 
         protected HtmlNode InitBuild() {
@@ -194,6 +198,32 @@ namespace Calcuchord {
             HtmlNode svg = CurrentDoc.CreateElement("svg");
             svg.Attributes.Add("xmlns","http://www.w3.org/2000/svg");
             return svg;
+        }
+
+        protected HtmlNode CreateG(HtmlNode cntr,string classes = "") {
+            HtmlNode g = CurrentDoc.CreateElement("g");
+            g.Attributes.Add("class",classes);
+            cntr.AppendChild(g);
+            return g;
+        }
+
+        protected void AddShape(
+            HtmlNode cntr,
+            bool isBox,
+            string fill,
+            string stroke,
+            double cx,
+            double cy,
+            double r,
+            double sw,
+            string classes = null,
+            bool shadow = false,
+            double fillOpacity = 1) {
+            if(isBox) {
+                AddRect(cntr,fill,stroke,cx - r,cy - r,r * 2d,r * 2d,sw,classes,shadow,fillOpacity);
+            } else {
+                AddCircle(cntr,fill,stroke,cx,cy,r,sw,classes,shadow,fillOpacity);
+            }
         }
 
 
@@ -229,7 +259,7 @@ namespace Calcuchord {
             if(shadow && IsShadowsEnabled) {
                 string shadow_fill = fill == "#FFFFFF" ? "#000000" : "#FFFFFF";
                 double offset = 0.25; //fs / 16d;
-                AddText(cntr,text,fs,shadow_fill,x + offset,y + offset,isBold,classes);
+                AddText(cntr,text,fs,shadow_fill,x + offset,y + offset,isBold,classes + " shadow-elm");
             }
 
             HtmlNode text_elm = CurrentDoc.CreateElement("text");
@@ -240,7 +270,7 @@ namespace Calcuchord {
             }
 
             if(classes != null) {
-                text_elm.Attributes.Add("classes",classes);
+                text_elm.Attributes.Add("class",classes);
             }
 
             text_elm.Attributes.Add("fill",fill);
@@ -261,14 +291,16 @@ namespace Calcuchord {
             double r,
             double sw,
             string classes = null,
-            bool shadow = false) {
+            bool shadow = false,
+            double fillOpacity = 1) {
             if(shadow && IsShadowsEnabled) {
                 string shadow_fill = fill == Fg ? Bg : "#000000";
                 double offset = 0.25; //fs / 16d;
-                AddCircle(cntr,shadow_fill,stroke,x + offset,y + offset,r,sw,classes);
+                AddCircle(cntr,shadow_fill,stroke,x + offset,y + offset,r,sw,classes + " shadow-elm");
             }
 
             HtmlNode circle = CurrentDoc.CreateElement("circle");
+            circle.Attributes.Add("fill-opacity",fillOpacity);
             circle.Attributes.Add("fill",fill);
             circle.Attributes.Add("stroke",stroke);
             circle.Attributes.Add("stroke-width",sw);
@@ -276,7 +308,7 @@ namespace Calcuchord {
             circle.Attributes.Add("cx",x);
             circle.Attributes.Add("cy",y);
             if(classes != null) {
-                circle.Attributes.Add("classes",classes);
+                circle.Attributes.Add("class",classes);
             }
 
             cntr.AppendChild(circle);
@@ -292,7 +324,14 @@ namespace Calcuchord {
             double h,
             double sw,
             string classes = null,
+            bool shadow = false,
             double fillOpacity = 1) {
+            if(shadow && IsShadowsEnabled) {
+                string shadow_fill = fill == Fg ? Bg : "#000000";
+                double offset = 0.25; //fs / 16d;
+                AddRect(cntr,shadow_fill,stroke,x + offset,y + offset,w,h,sw,classes + " shadow-elm");
+            }
+
             HtmlNode rect = CurrentDoc.CreateElement("rect");
             rect.Attributes.Add("stroke",stroke);
             rect.Attributes.Add("fill",fill);
@@ -303,7 +342,7 @@ namespace Calcuchord {
             rect.Attributes.Add("x",x);
             rect.Attributes.Add("y",y);
             if(classes != null) {
-                rect.Attributes.Add("classes",classes);
+                rect.Attributes.Add("class",classes);
             }
 
             cntr.AppendChild(rect);
@@ -326,7 +365,7 @@ namespace Calcuchord {
             line.Attributes.Add("x2",x2);
             line.Attributes.Add("y2",y2);
             if(classes != null) {
-                line.Attributes.Add("classes",classes);
+                line.Attributes.Add("class",classes);
             }
 
             cntr.AppendChild(line);

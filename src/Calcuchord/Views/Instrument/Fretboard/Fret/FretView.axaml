@@ -231,7 +231,7 @@
         <!-- NUT -->
 
         <Border IsVisible="{Binding IsNutFret}"
-                Background="AntiqueWhite"
+                Background="{DynamicResource NutBg}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch" />
 

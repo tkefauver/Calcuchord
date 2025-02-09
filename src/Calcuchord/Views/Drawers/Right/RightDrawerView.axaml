@@ -81,7 +81,7 @@
         <Style Selector="ItemsControl.svg WrapPanel"
                x:DataType="local:OptionViewModel">
             <Setter Property="ItemWidth"
-                    Value="70" />
+                    Value="85" />
         </Style>
         <Style Selector="ItemsControl.svg TextBlock"
                x:DataType="local:OptionViewModel">
