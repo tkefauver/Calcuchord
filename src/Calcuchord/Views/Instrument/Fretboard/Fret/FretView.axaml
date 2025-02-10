@@ -109,6 +109,15 @@
             </Setter>
         </Style>
 
+        <Style Selector="Border#FretMarker">
+            <Setter Property="CornerRadius"
+                    Value="15" />
+        </Style>
+        <Style Selector="Border#FretMarker.desired-root">
+            <Setter Property="CornerRadius"
+                    Value="3" />
+        </Style>
+
 
     </UserControl.Styles>
     <Grid>
@@ -240,7 +249,6 @@
         <Border x:Name="StringChunkBorder"
                 Classes.nylon="{Binding IsRowNylon}"
                 Classes.solid="{Binding IsRowSolid}"
-                Classes.unknown="{Binding IsRowUnknown}"
                 IsVisible="{Binding IsRealNote}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
@@ -253,7 +261,7 @@
                 Classes="fade">
             <Border.Background>
                 <SolidColorBrush Color="{DynamicResource MutedFretBgColor}"
-                                 Opacity="0.75" />
+                                 Opacity="0.85" />
             </Border.Background>
         </Border>
 
@@ -265,8 +273,7 @@
                 Width="{Binding $self.Bounds.Height}"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Stretch"
-                Margin="1.5"
-                CornerRadius="15">
+                Margin="1.5">
             <TextBlock HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Text="{Binding MarkerLabel}" />

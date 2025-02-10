@@ -3,8 +3,8 @@ using HtmlAgilityPack;
 
 namespace Calcuchord {
     public class ScaleSvgBuilder : SvgBuilderBase {
-        public override HtmlNode Build(NoteGroup ng) {
-            HtmlNode svg = InitBuild();
+        public override HtmlNode Build(NoteGroup ng,object args) {
+            HtmlNode svg = InitBuild(args);
 
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
             svg.AppendChild(bg_g);

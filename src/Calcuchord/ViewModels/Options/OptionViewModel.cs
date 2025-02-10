@@ -48,6 +48,9 @@ namespace Calcuchord {
 
         #region State
 
+        [JsonIgnore]
+        public bool IsVisible { get; set; } = true;
+
         [JsonProperty]
         public bool IsChecked { get; set; }
 

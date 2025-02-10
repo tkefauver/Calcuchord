@@ -13,7 +13,7 @@ namespace Calcuchord {
 
         public const int OPEN_FRET_NUM = 0;
         public const int MUTE_FRET_NUM = -1;
-        public const int UNKNOWN_FRET_NUM = -2;
+        //public const int UNKNOWN_FRET_NUM = -2;
 
         #endregion
 
@@ -57,10 +57,6 @@ namespace Calcuchord {
                     if(IsInMuteState) {
                         return "M";
                     }
-
-                    if(IsInUnknownState) {
-                        return "?";
-                    }
                 }
 
                 return InstrumentNote.Name;
@@ -75,10 +71,6 @@ namespace Calcuchord {
 
                 if(IsInMuteState) {
                     return "Muted";
-                }
-
-                if(IsInUnknownState) {
-                    return "Unknown";
                 }
 
                 return InstrumentNote.FullName;
@@ -113,15 +105,8 @@ namespace Calcuchord {
         public bool IsRowMuted =>
             Parent.IsMuted;
 
-        public bool IsRowUnknown =>
-            Parent.IsUnknown;
-
         public bool IsRealNote =>
             IsEnabled && NoteNum >= 0;
-
-
-        public bool IsInUnknownState =>
-            WorkingNoteNum == UNKNOWN_FRET_NUM;
 
         public bool IsInMuteState =>
             WorkingNoteNum == MUTE_FRET_NUM;
@@ -172,7 +157,7 @@ namespace Calcuchord {
 
                 return NoteNum + Parent.BaseNoteNum;
             }
-            set => _workingFretNum = value < -2 || value == OPEN_FRET_NUM ? null : value;
+            set => _workingFretNum = value < -1 || value == OPEN_FRET_NUM ? null : value;
         }
 
         #region Dot
@@ -316,6 +301,11 @@ namespace Calcuchord {
             return InstrumentNote.ToString();
         }
 
+        public void Reset() {
+            _workingFretNum = null;
+            OnPropertyChanged(nameof(IsDesiredRoot));
+        }
+
         #endregion
 
         #region Protected Methods
@@ -328,7 +318,7 @@ namespace Calcuchord {
             switch(e.PropertyName) {
                 case nameof(IsSelected):
                     if(!IsSelected) {
-                        _workingFretNum = null;
+                        Reset();
                     }
 
                     Parent.OnPropertyChanged(nameof(Parent.SelectedNotes));

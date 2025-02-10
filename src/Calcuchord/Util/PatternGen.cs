@@ -262,7 +262,6 @@ namespace Calcuchord {
         }
 
         bool RejectExists(InstrumentNote[] notes,NoteType[] pattern,IEnumerable<IEnumerable<InstrumentNote>> existing) {
-            //return existing.Any(x => !x.Where(y => y.NoteNum > 0).Difference(notes.Where(z => z.NoteNum > 0)).Any());
             return existing.Any(x => x.Difference(notes).None());
         }
 
@@ -377,6 +376,7 @@ namespace Calcuchord {
                     var pattern = GenPattern(cur_key,suffix);
                     var pattern_inst_notes = GenNotes(pattern);
                     var valid_patterns = new List<IEnumerable<InstrumentNote>>();
+
                     for(int min_fret_num = 0; min_fret_num <= max_min_fret_num; min_fret_num++) {
                         int max_fret_num = min_fret_num + PatternFretSpan;
                         if(min_fret_num > 0) {
@@ -385,16 +385,8 @@ namespace Calcuchord {
 
                         var block_notes = pattern_inst_notes.Where(
                             x => x.NoteNum >= min_fret_num && x.NoteNum <= max_fret_num);
-                        var combos = block_notes.Combinations().Where(x => x.Length >= pattern.Length);
+                        var combos = block_notes.PowerSet().Where(x => x.Length >= pattern.Length);
                         foreach(var combo in combos) {
-                            if(cur_key == NoteType.E &&
-                               suffix.ToLower() == "major") {
-                                string sig = GetSignature(combo);
-                                if(sig.StartsWith("0 2 2 1 0")) {
-
-                                }
-                            }
-
                             if(!IsValidCombo(combo,pattern,valid_patterns)) {
                                 continue;
                             }

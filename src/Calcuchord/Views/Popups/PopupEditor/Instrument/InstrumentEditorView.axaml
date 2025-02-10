@@ -38,26 +38,40 @@
         <Style Selector="UniformGrid.form-element > :is(Control):not(:is(Button))">
             <Setter Property="VerticalAlignment"
                     Value="Center" />
-            <Setter Property="Width"
+            <Setter Property="MinWidth"
                     Value="130" />
         </Style>
         <Style Selector="ComboBoxItem">
             <Setter Property="Foreground"
                     Value="{DynamicResource Bg}" />
         </Style>
+        <Style Selector="ComboBox Svg">
+            <Setter Property="Css"
+                    Value="{Binding ConverterParameter=Bg, Converter={x:Static local:CssTintConverter.Instance}}" />
+        </Style>
         <Style Selector="ComboBox:dropdownopen ComboBoxItem">
             <Setter Property="Foreground"
                     Value="{DynamicResource Fg}" />
         </Style>
+        <Style Selector="ComboBox:dropdownopen ComboBoxItem Svg">
+            <Setter Property="Css"
+                    Value="{Binding ConverterParameter=Fg, Converter={x:Static local:CssTintConverter.Instance}}" />
+        </Style>
+
         <Style Selector="ComboBox[IsHitTestVisible=False]">
             <Style.Resources>
                 <SolidColorBrush x:Key="MaterialTextBoxBorderBrush"
-                                 Color="{DynamicResource DisabledAccentFg}" />
+                                 Color="{DynamicResource DisabledAccentFgColor}" />
             </Style.Resources>
             <Setter Property="Foreground"
                     Value="{DynamicResource DisabledAccentFg}" />
             <Setter Property="FontStyle"
                     Value="Italic" />
+        </Style>
+
+        <Style Selector="ComboBox[IsHitTestVisible=False] Svg">
+            <Setter Property="Css"
+                    Value="{Binding ConverterParameter=DisabledAccentFg, Converter={x:Static local:CssTintConverter.Instance}}" />
         </Style>
 
         <Style Selector="ComboBox[IsHitTestVisible=True]">
@@ -130,7 +144,25 @@
             <TextBlock Text="Template" />
             <ComboBox IsHitTestVisible="{Binding !IsActivated}"
                       SelectedIndex="{Binding SelectedInstrumentTypeIndex, Mode=TwoWay}"
-                      ItemsSource="{Binding InstrumentTypeNames}" />
+                      ItemsSource="{Binding InstrumentTypeNames}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="sys:String">
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="5">
+                            <Svg IsVisible="False"
+                                 Source="{Binding ., Converter={x:Static local:InstrumentNameToSvgConverter.Instance}}"
+                                 VerticalAlignment="Center"
+                                 Width="20"
+                                 Height="20" />
+                            <TextBlock Classes="combo-item"
+                                       ClipToBounds="False"
+                                       VerticalAlignment="Center"
+                                       TextAlignment="Center"
+                                       Text="{Binding .}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </UniformGrid>
         <Border Classes="sep" />
 

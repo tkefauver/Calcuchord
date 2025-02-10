@@ -245,9 +245,13 @@ namespace Calcuchord {
 
         #region State
 
-        public bool IsLoaded { get; private set; }
-
         #region UI
+
+        public bool IsShowingWelcome { get; set; }
+        public bool IsShowingWelcome2 { get; set; }
+        public bool IsShowingIntroProgress { get; set; }
+        public bool IsDoingIntro { get; private set; }
+        public bool IsLoaded { get; private set; }
 
         public bool IsLeftDrawerOpen { get; set; }
         public bool IsRightDrawerOpen { get; set; }
@@ -370,7 +374,7 @@ namespace Calcuchord {
 
         #endregion
 
-        #region Instrument
+        #region Model
 
         #endregion
 
@@ -492,9 +496,8 @@ namespace Calcuchord {
         }
 
         async Task DoIntroAsync() {
-            // TODO show intro popup
+            IsDoingIntro = true;
 
-            // allow to add instrument or cancel
             await AddInstrumentCommand.ExecuteAsync();
 
             while(EditModeInstrument != null) {
@@ -503,20 +506,12 @@ namespace Calcuchord {
 
             await Task.Delay(300);
 
-            // add piano
-            var instl = CreateDefaultInstruments([InstrumentType.Piano]);
-            if(instl.FirstOrDefault() is not { } piano) {
-                return;
-            }
-
-            EditModeInstrument = new InstrumentViewModel(this)
-            {
-                Instrument = piano
-            };
-            await EditModeInstrument.InitAsync(EditModeInstrument.Instrument);
-            await FinishEditInstrumentCommand.ExecuteAsync();
-
             SelectedInstrument = Instruments.FirstOrDefault();
+
+            IsDoingIntro = false;
+
+            Prefs.Instance.IsSaveIgnored = false;
+            Prefs.Instance.Save();
         }
 
 
@@ -874,7 +869,10 @@ namespace Calcuchord {
 
         public void RefreshMatchesSvg() {
             UpdateMatchCss();
-            //Matches.ForEach(x => x.RefreshSvg());
+        }
+
+        public void ResetMatchSvg() {
+            Matches.ForEach(x => x.RefreshSvg());
         }
 
         void InitOptions() {
@@ -1019,6 +1017,41 @@ namespace Calcuchord {
 
         #region Commands
 
+        public ICommand ConvertMatchesCommand => new MpCommand<object>(
+            async (args) => {
+                await Task.Delay(1);
+                if(MatchCount <= 0 ||
+                   MatchColCount <= 0 ||
+                   MatchesView.Instance is not { } mv ||
+                   mv.MatchItemsRepeater.GetVisualDescendants<MatchView>().FirstOrDefault() is not { } sample_cp) {
+                    return;
+                }
+
+                int cc = MatchColCount;
+                int rc = (int)Math.Ceiling(MatchCount / (double)MatchColCount);
+                double ar = sample_cp.Bounds.Height / sample_cp.Bounds.Width;
+                double mw = 250;
+                double mh = mw * ar;
+                double tw = MatchColCount * mw;
+                double th = rc * mh;
+
+                ChordSvgBuilder cb = new ChordSvgBuilder();
+                cb.Test(SelectedTuning.Tuning,Matches.Select(x => x.NoteGroup));
+            });
+
+        public ICommand ConfirmWelcomeCommand => new MpCommand(
+            () => {
+                if(IsShowingWelcome) {
+                    IsShowingWelcome = false;
+                    return;
+                }
+
+                if(IsShowingWelcome2) {
+                    IsShowingWelcome2 = false;
+                }
+
+            });
+
         public MpIAsyncCommand CancelEditInstrumentCommand => new MpAsyncCommand(
             async () => {
 
@@ -1052,6 +1085,15 @@ namespace Calcuchord {
                     return;
                 }
 
+                if(IsDoingIntro) {
+                    // HACK this extra prop is to prevent editor from flickering back on
+                    IsShowingIntroProgress = true;
+                    IsShowingWelcome2 = true;
+                    while(IsShowingWelcome2) {
+                        await Task.Delay(100);
+                    }
+                }
+
                 _editInstrumentInitialStateJson = null;
                 if(!emi_vm.IsActivated) {
                     // add new inst to list
@@ -1078,6 +1120,7 @@ namespace Calcuchord {
                     emi_vm.CurGenTuning = null;
                 }
 
+                IsShowingIntroProgress = false;
                 Prefs.Instance.Save();
                 EditModeInstrument = null;
 
@@ -1098,10 +1141,17 @@ namespace Calcuchord {
                     edit_inst_vm = tvm.Parent;
                 }
 
-                IsLeftDrawerOpen = false;
-                IsRightDrawerOpen = false;
+                if(IsDoingIntro) {
+                    IsShowingWelcome = true;
+                    while(IsShowingWelcome) {
+                        await Task.Delay(100);
+                    }
+                }
 
-                await Task.Delay(300);
+                // IsLeftDrawerOpen = false;
+                // IsRightDrawerOpen = false;
+                //
+                // await Task.Delay(300);
 
                 // store full backup of instrument (existing only)
                 _editInstrumentInitialStateJson =
@@ -1157,7 +1207,13 @@ namespace Calcuchord {
 
         public ICommand ResetInstrumentCommand => new MpCommand(
             () => {
+                DesiredRoot = null;
                 SelectedTuning.ResetSelection();
+                LastNotes.Clear();
+
+                Matches.Clear();
+                FilteredMatches = [];
+
                 UpdateMatchOverlays();
             });
 

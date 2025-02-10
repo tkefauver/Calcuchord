@@ -14,7 +14,7 @@ namespace Calcuchord {
         public object Convert(object value,Type targetType,object parameter,CultureInfo culture) {
             if(value is not NoteGroup ng ||
                GetBuilder(ng) is not { } builder ||
-               builder.Build(ng) is not { } htmlNode) {
+               builder.Build(ng,parameter) is not { } htmlNode) {
                 return "<svg></svg>";
             }
 

@@ -13,6 +13,19 @@
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.MatchesView">
     <Grid RowDefinitions="Auto,*">
+        <!-- SHARE -->
+        <controls:Card Grid.Row="0"
+                       IsVisible="False"
+                       Classes="button-group"
+                       Margin="10"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center">
+            <Button x:Name="ShareButton"
+                    Classes="float"
+                    Command="{Binding ConvertMatchesCommand}">
+                <avalonia:MaterialIcon Kind="Share" />
+            </Button>
+        </controls:Card>
         <!-- ZOOM BTNS -->
         <controls:Card Grid.Row="0"
                        Classes="button-group"

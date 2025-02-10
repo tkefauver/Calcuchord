@@ -83,10 +83,6 @@ namespace Calcuchord {
         double GetScore(NoteGroup group,IEnumerable<NoteViewModel> matchNotes) {
             double score = 0;
             foreach(NoteViewModel mn in matchNotes) {
-                if(mn.IsInUnknownState) {
-                    continue;
-                }
-
                 if(group.Notes.Any(x => x.NoteNum == mn.WorkingNoteNum && x.RowNum == mn.RowNum)) {
                     score += 1;
                     continue;

@@ -68,21 +68,9 @@
             <Setter Property="Foreground"
                     Value="{DynamicResource RootFretFg}" />
         </Style>
-        <Style Selector=":is(UserControl).note-btn.unknown.nut Border.note-marker">
-            <Setter Property="Background"
-                    Value="{DynamicResource UnknownFretBg}" />
-        </Style>
-        <Style Selector=":is(UserControl).note-btn.unknown.nut Border.note-marker TextBlock">
-            <Setter Property="Foreground"
-                    Value="{DynamicResource UnknownFretFg}" />
-        </Style>
         <Style Selector=":is(UserControl).note-btn.muted.nut Border.note-marker">
             <Setter Property="Background"
                     Value="{DynamicResource MutedFretBg}" />
-        </Style>
-        <Style Selector=":is(UserControl).note-btn.unknown.nut Border.note-marker TextBlock">
-            <Setter Property="Foreground"
-                    Value="{DynamicResource MutedFretFg}" />
         </Style>
         <Style
             Selector=":is(UserControl).note-btn.hover Border.note-marker, :is(UserControl).note-btn.selected Border.note-marker">

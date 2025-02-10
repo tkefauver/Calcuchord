@@ -82,11 +82,6 @@ namespace Calcuchord {
             SelectedNote != null &&
             SelectedNote.IsInMuteState;
 
-        public bool IsUnknown =>
-            CanMute &&
-            SelectedNote != null &&
-            SelectedNote.IsInUnknownState;
-
         bool CanMute =>
             MainViewModel.Instance.SelectedPatternType == MusicPatternType.Chords;
 
@@ -141,6 +136,8 @@ namespace Calcuchord {
             } else {
                 SelectedNotes = [];
             }
+
+            Notes.ForEach(x => x.Reset());
         }
 
         public override string ToString() {
@@ -158,9 +155,7 @@ namespace Calcuchord {
         void NoteRowViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
                 case nameof(IsMuted):
-                case nameof(IsUnknown):
                     Notes.ForEach(x => x.OnPropertyChanged(nameof(x.IsRowMuted)));
-                    Notes.ForEach(x => x.OnPropertyChanged(nameof(x.IsRowUnknown)));
                     Notes.ForEach(x => x.OnPropertyChanged(nameof(x.IsEnabled)));
                     break;
                 case nameof(SelectedNote):
@@ -247,7 +242,6 @@ namespace Calcuchord {
                CanMute) {
                 nvm.WorkingNoteNum--;
                 OnPropertyChanged(nameof(IsMuted));
-                OnPropertyChanged(nameof(IsUnknown));
                 if(nvm.WorkingNoteNum == 0) {
                     SetNoteMarkerState(nvm,NoteMarkerState.Off);
                 }
@@ -271,12 +265,13 @@ namespace Calcuchord {
                 Notes.ForEach(x => x.OnPropertyChanged(nameof(x.IsSelected)));
             }
 
-            if(mvm.DesiredRoot != null && Parent.AllNotes.All(x => !x.IsDesiredRoot)) {
+            bool was_root = false;
+            if(mvm.DesiredRoot != last_root && last_root != null && Parent.AllNotes.All(x => !x.IsDesiredRoot)) {
                 // remove desired root when nothing selected of key
-                mvm.DesiredRoot = null;
+                was_root = true;
             }
 
-            if(root) {
+            if(root || was_root) {
                 Parent.AllNotes.ForEach(x => x.OnPropertyChanged(nameof(x.IsDesiredRoot)));
             }
         }

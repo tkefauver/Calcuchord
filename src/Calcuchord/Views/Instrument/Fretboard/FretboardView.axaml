@@ -40,7 +40,7 @@
             <Setter Property="Opacity"
                     Value="1" />
         </Style>
-        <Style Selector="local|FretView.muted:not(.nut), local|FretView.unknown:not(.nut)">
+        <Style Selector="local|FretView.muted:not(.nut)">
             <Setter Property="IsHitTestVisible"
                     Value="False" />
         </Style>
@@ -82,7 +82,6 @@
                                                             Classes.input="{Binding IsEnabled}"
                                                             Classes.env-shadow="{Binding IsRealNote}"
                                                             Classes.muted="{Binding IsRowMuted}"
-                                                            Classes.unknown="{Binding IsRowUnknown}"
                                                             Classes.nut="{Binding IsNutFret}"
                                                             Classes.str-label="{Binding IsRowKeyLabel}"
                                                             Classes.num-label="{Binding IsNoteNumLabel}"

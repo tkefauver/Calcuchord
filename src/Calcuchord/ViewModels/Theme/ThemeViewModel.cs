@@ -74,7 +74,9 @@ namespace Calcuchord {
 
         public bool IsLandscape {
             get {
-                if(MainView.Instance is not { } mv ||
+
+                if(IsDesktop ||
+                   MainView.Instance is not { } mv ||
                    TopLevel.GetTopLevel(mv) is not { } tl) {
                     return false;
                 }
@@ -326,7 +328,7 @@ namespace Calcuchord {
             () => {
                 SetTheme(!IsDark);
                 if(MainViewModel.Instance is { } mvm) {
-                    mvm.RefreshMatchesSvg();
+                    mvm.ResetMatchSvg();
                 }
 
                 OnPropertyChanged(nameof(ThemeIcon));

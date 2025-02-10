@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Avalonia.Controls;
 using HtmlAgilityPack;
 using MonkeyPaste.Common;
 using Process = System.Diagnostics.Process;
@@ -22,12 +21,12 @@ namespace Calcuchord {
         public static SvgFlags DefaultSvgFlags =>
             SvgFlags.Fingers |
             SvgFlags.Barres |
-            //SvgFlags.Notes |
             SvgFlags.Colors |
             SvgFlags.Tuning |
             SvgFlags.Roots |
             SvgFlags.Matches |
-            SvgFlags.Frets;
+            SvgFlags.Frets |
+            SvgFlags.Shadows;
 
         #endregion
 
@@ -37,13 +36,10 @@ namespace Calcuchord {
 
         #region Properties
 
-        protected HtmlDocument CurrentDoc { get; private set; }
-        protected string DefaultFontFamily => "Mono"; //"Nunito"; //"Verdana";
+        protected bool ForPrint { get; set; }
 
-        bool IsShadowsEnabled =>
-            true;
-        // MainViewModel.Instance != null &&
-        // MainViewModel.Instance.SelectedSvgFlags.HasFlag(SvgFlags.Shadows);
+        protected HtmlDocument CurrentDoc { get; private set; }
+        protected string DefaultFontFamily => "Mono";
 
 
         #region Colors
@@ -133,31 +129,30 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public abstract HtmlNode Build(NoteGroup ng);
+        public abstract HtmlNode Build(NoteGroup ng,object args);
 
         public void Test(Tuning tuning,IEnumerable<NoteGroup> ngl) {
-            if(Design.IsDesignMode) {
-                return;
-            }
-
             HtmlDocument doc = new HtmlDocument();
 
             HtmlNode body = doc.CreateElement("body");
             doc.DocumentNode.AppendChild(body);
             body.Attributes.Add("style","zoom=\"400%\"");
+            HtmlNode style = doc.CreateElement("style");
+            style.InnerHtml = MainViewModel.Instance.MatchSvgCss;
+            body.AppendChild(style);
 
             void AddSvg(HtmlNode svg,NoteGroup ng) {
                 HtmlNode title = doc.CreateElement("span");
                 title.InnerHtml = ng.ToString();
 
-                body.AppendChild(doc.CreateElement("br"));
                 body.AppendChild(title);
                 body.AppendChild(doc.CreateElement("br"));
                 body.AppendChild(svg);
+                body.AppendChild(doc.CreateElement("br"));
             }
 
             foreach(NoteGroup ng in ngl) {
-                AddSvg(Build(ng),ng);
+                AddSvg(Build(ng,null),ng);
             }
 
             string result = doc.DocumentNode.OuterHtml;
@@ -193,10 +188,18 @@ namespace Calcuchord {
             return is_user_note;
         }
 
-        protected HtmlNode InitBuild() {
+        protected HtmlNode InitBuild(object args) {
             CurrentDoc = new();
             HtmlNode svg = CurrentDoc.CreateElement("svg");
             svg.Attributes.Add("xmlns","http://www.w3.org/2000/svg");
+
+            if(args is string arg_str &&
+               arg_str == "PDF") {
+                ForPrint = true;
+            } else {
+                ForPrint = false;
+            }
+
             return svg;
         }
 
@@ -256,7 +259,7 @@ namespace Calcuchord {
             bool isBold = false,
             string classes = null,
             bool shadow = false) {
-            if(shadow && IsShadowsEnabled) {
+            if(shadow) {
                 string shadow_fill = fill == "#FFFFFF" ? "#000000" : "#FFFFFF";
                 double offset = 0.25; //fs / 16d;
                 AddText(cntr,text,fs,shadow_fill,x + offset,y + offset,isBold,classes + " shadow-elm");
@@ -293,7 +296,7 @@ namespace Calcuchord {
             string classes = null,
             bool shadow = false,
             double fillOpacity = 1) {
-            if(shadow && IsShadowsEnabled) {
+            if(shadow) {
                 string shadow_fill = fill == Fg ? Bg : "#000000";
                 double offset = 0.25; //fs / 16d;
                 AddCircle(cntr,shadow_fill,stroke,x + offset,y + offset,r,sw,classes + " shadow-elm");
@@ -326,7 +329,7 @@ namespace Calcuchord {
             string classes = null,
             bool shadow = false,
             double fillOpacity = 1) {
-            if(shadow && IsShadowsEnabled) {
+            if(shadow) {
                 string shadow_fill = fill == Fg ? Bg : "#000000";
                 double offset = 0.25; //fs / 16d;
                 AddRect(cntr,shadow_fill,stroke,x + offset,y + offset,w,h,sw,classes + " shadow-elm");

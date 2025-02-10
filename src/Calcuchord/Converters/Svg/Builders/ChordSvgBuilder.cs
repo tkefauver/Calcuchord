@@ -6,8 +6,8 @@ namespace Calcuchord {
     public class ChordSvgBuilder : SvgBuilderBase {
 
 
-        public override HtmlNode Build(NoteGroup ng) {
-            HtmlNode svg = InitBuild();
+        public override HtmlNode Build(NoteGroup ng,object args) {
+            HtmlNode svg = InitBuild(args);
 
             HtmlNode cntr_g = CurrentDoc.CreateElement("g");
             svg.AppendChild(cntr_g);
@@ -17,8 +17,6 @@ namespace Calcuchord {
 
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
             cntr_g.AppendChild(bg_g);
-
-            //SvgFlags flags = MainViewModel.Instance.SelectedSvgFlags;
 
             int vfc = 4;
             double lw = FretLineFixedAxisSize;
@@ -88,13 +86,20 @@ namespace Calcuchord {
             // +1 fret label
             int cols = str_count + 1;
 
+            double header_h = fh + 0.25;
+            double curx = min_fret_x;
+            double cury = header_h;
+            if(ForPrint) {
+                rows++;
+                cury += fh * 2;
+            }
+
             double tw = fw * cols;
             double th = fh * rows;
 
-            double header_h = fh + 0.25;
-            double curx = min_fret_x;
-
-            double cury = header_h;
+            if(ForPrint) {
+                AddCenteredText(bg_g,ng.FullName,6,Bg,0,0,tw,fh * 2,classes: "match-title");
+            }
 
             // fret labels
             {
@@ -133,7 +138,7 @@ namespace Calcuchord {
 
             if(show_header_labels) {
                 double header_x = min_fret_x;
-                double header_y = fh; //-1;
+                double header_y = fh + (ForPrint ? fh * 2 : 0); //-1;
                 for(int i = 0; i < str_count; i++) {
                     if(notes.FirstOrDefault(x => x.RowNum == i) is { } str_fret &&
                        str_fret.NoteNum <= 0) {
@@ -261,7 +266,7 @@ namespace Calcuchord {
                             cur_bar_extent = null;
                         } else {
                             // bar rect (adding extra 1 to left/right to cover bg grid)
-                            double pad = str_num < str_count - 1 ? 1 : 0;
+                            double pad = str_num < str_count - 1 ? 0.25 : 0;
                             AddRect(
                                 bg_g,fret_bg,Transparent,curx - pad,bar_y,fw + (pad * 2),BarHeight,0,
                                 "barre-elm fingers-fill");
@@ -287,7 +292,7 @@ namespace Calcuchord {
                                 // user outer circle
                                 AddShape(
                                     shape_cntr,is_box,UserBg,Transparent,cx,cy,shape_r,0,
-                                    shadow: !is_root && !is_barred_fret,
+                                    shadow: false, //!is_root && !is_barred_fret,
                                     classes: "user-fill");
                                 shape_r -= DotStrokeWidth;
                             }
@@ -295,7 +300,7 @@ namespace Calcuchord {
                             // finger circle
                             AddShape(
                                 shape_cntr,is_box,fret_bg,Transparent,cx,cy,shape_r,0,
-                                shadow: !is_root && !is_user && !is_barred_fret,
+                                shadow: false, //!is_root && !is_user && !is_barred_fret,
                                 classes: "fingers-fill");
                         }
 

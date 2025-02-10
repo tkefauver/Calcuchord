@@ -118,8 +118,10 @@
                         <Grid Width="{Binding $parent[ListBoxItem].Bounds.Width}"
                               ColumnDefinitions="Auto,*,Auto"
                               RowDefinitions="*,Auto">
-                            <avalonia:MaterialIcon Margin="5,0"
-                                                   Kind="{Binding Icon}" />
+                            <Svg Margin="5,0"
+                                 Width="30"
+                                 Css="{Binding ConverterParameter=Fg, Converter={x:Static local:CssTintConverter.Instance}}"
+                                 Source="{Binding Icon}" />
                             <TextBlock Grid.Row="0"
                                        Grid.Column="1"
                                        Classes="Headline5"

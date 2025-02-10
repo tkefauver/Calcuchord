@@ -13,6 +13,10 @@ namespace Calcuchord {
             return !source.Any(predicate);
         }
 
+        public static string ToIconName(this InstrumentType it) {
+            return $"avares://Calcuchord/Assets/Svg/Instruments/{it.ToString().ToLower()}.svg";
+        }
+
         public static bool IsFlagEnabled(this SvgFlags flag,InstrumentType it,MusicPatternType pt,DisplayModeType dmt) {
             if(dmt != DisplayModeType.Search) {
                 if(flag == SvgFlags.Matches) {
@@ -44,7 +48,7 @@ namespace Calcuchord {
             hac.Add(key,val.ToString());
         }
 
-        public static IEnumerable<T[]> Combinations<T>(this IEnumerable<T> source) {
+        public static IEnumerable<T[]> PowerSet<T>(this IEnumerable<T> source) {
             if(null == source) {
                 throw new ArgumentNullException(nameof(source));
             }

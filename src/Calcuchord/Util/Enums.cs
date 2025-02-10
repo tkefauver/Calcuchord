@@ -54,8 +54,6 @@ namespace Calcuchord {
         Guitar,
         Ukulele,
         Piano,
-
-        // Non-default
         Bass,
         Mandolin,
         Banjo,

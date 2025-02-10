@@ -66,17 +66,5 @@ namespace Calcuchord {
             return dv.ToProperCase();
         }
 
-        public static string ToIconName(this InstrumentType it) {
-            switch(it) {
-                case InstrumentType.Guitar:
-                    return "GuitarElectric";
-                case InstrumentType.Ukulele:
-                    return "GuitarAcoustic";
-                case InstrumentType.Piano:
-                    return "Piano";
-                default:
-                    return "Music";
-            }
-        }
     }
 }

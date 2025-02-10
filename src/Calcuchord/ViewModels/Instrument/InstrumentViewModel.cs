@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -58,19 +59,20 @@ namespace Calcuchord {
         #region Appearance
 
         public string Icon =>
-            InstrumentType.ToIconName();
+            InstrumentNameToSvgConverter.Instance.Convert(
+                InstrumentType.ToString(),typeof(string),null,CultureInfo.CurrentCulture) as string;
 
 
         public string[] FretCounts =>
             Enumerable.Range(
-                    start: MinEditableFretCount,
-                    count: (MaxEditableFretCount - MinEditableFretCount) + 1)
+                    MinEditableFretCount,
+                    (MaxEditableFretCount - MinEditableFretCount) + 1)
                 .Select(x => x.ToString()).ToArray();
 
         public string[] StringCounts =>
             Enumerable.Range(
-                    start: MinEditableStringCount,
-                    count: (MaxEditableStringCount - MinEditableStringCount) + 1)
+                    MinEditableStringCount,
+                    (MaxEditableStringCount - MinEditableStringCount) + 1)
                 .Select(x => x.ToString()).ToArray();
 
         #endregion
@@ -81,14 +83,14 @@ namespace Calcuchord {
 
         #region State
 
-        public bool CanEdit => !IsKeyboard;
+        public bool CanEdit => true; //!IsKeyboard;
 
         public bool IsInstrumentTabSelected { get; set; }
         public bool IsTuningTabSelected { get; set; }
 
         public string[] InstrumentTypeNames =>
             Enum.GetNames(typeof(InstrumentType))
-                .Where(x => x != InstrumentType.Piano.ToString())
+                //.Where(x => x != InstrumentType.Piano.ToString())
                 .ToArray();
 
         public int SelectedStringCountIndex { get; set; }
@@ -294,8 +296,8 @@ namespace Calcuchord {
                     }
 
                     if(int.TryParse(
-                           s: StringCounts[SelectedStringCountIndex],
-                           result: out int new_str_count) &&
+                           StringCounts[SelectedStringCountIndex],
+                           out int new_str_count) &&
                        Instrument.StringCount != new_str_count) {
                         ChangeStringCount(new_str_count);
                     }
@@ -308,8 +310,8 @@ namespace Calcuchord {
                     }
 
                     if(int.TryParse(
-                           s: FretCounts[SelectedFretCountIndex],
-                           result: out int new_fret_count) &&
+                           FretCounts[SelectedFretCountIndex],
+                           out int new_fret_count) &&
                        Instrument.FretCount != new_fret_count) {
                         Instrument.FretCount = new_fret_count;
                         InitAsync(Instrument).FireAndForgetSafeAsync();
@@ -341,7 +343,7 @@ namespace Calcuchord {
             IsInstrumentTypeChanging = true;
 
             Debug.Assert(
-                condition: IsEditModeEnabled,
+                IsEditModeEnabled,
                 "Error, only change inst type in edit mode");
 
             string new_inst_name = InstrumentType.ToString();
@@ -353,8 +355,8 @@ namespace Calcuchord {
             if(needs_default_name) {
                 // user hasn't changed name
                 new_inst_name = MainViewModel.Instance.GetUniqueInstrumentName(
-                    desiredName: new_inst_name,
-                    ignored: [this]);
+                    new_inst_name,
+                    [this]);
             } else {
                 // use current name
                 new_inst_name = Name;
@@ -362,7 +364,7 @@ namespace Calcuchord {
 
             await InitAsync(
                 Instrument.CreateByType(
-                    it: InstrumentType,
+                    InstrumentType,
                     name: new_inst_name));
 
             SelectedTuning = Tunings.FirstOrDefault();
@@ -379,10 +381,10 @@ namespace Calcuchord {
 
         void ChangeStringCount(int newStrCount) {
             Debug.Assert(
-                condition: Instrument.Tunings.Count == 1,
+                Instrument.Tunings.Count == 1,
                 "Should have only ONE tuning");
             Debug.Assert(
-                condition: !IsActivated,
+                !IsActivated,
                 "No string count changes for existing instruments");
 
             int diff = newStrCount - Instrument.StringCount;
@@ -396,9 +398,9 @@ namespace Calcuchord {
                         .Take(newStrCount)
                         .Select(
                             (x,idx) => new InstrumentNote(
-                                noteNum: 0,
-                                rowNum: idx,
-                                n: Note.Parse(x))).ToList();
+                                0,
+                                idx,
+                                Note.Parse(x))).ToList();
             } else {
                 // trim highest
                 open_notes = open_notes.Take(newStrCount).ToList();
@@ -423,11 +425,11 @@ namespace Calcuchord {
                 Instrument.Tunings.Remove(tuning_vm_to_remove.Tuning);
                 Tunings.Remove(tuning_vm_to_remove);
 
-                Prefs.Instance.Save();
-
                 int to_sel_idx = to_remove_idx >= Tunings.Count ? to_remove_idx - 1 : to_remove_idx;
                 SelectedTuning = Tunings[to_sel_idx];
                 Tunings.ForEach(x => x.OnPropertyChanged(nameof(x.CanDelete)));
+
+                Prefs.Instance.Save();
 
                 Debug.WriteLine($"'{tuning_vm_to_remove.Tuning.Name}' removed from {Instrument.Name}");
             });
@@ -438,8 +440,8 @@ namespace Calcuchord {
                     Instrument temp_inst = Instrument.CreateByType(InstrumentType);
                     new_tuning = temp_inst.Tunings.First();
                     new_tuning.Name = GetUniqueTuningName(
-                        desiredName: new_tuning.Name,
-                        ignored: []);
+                        new_tuning.Name,
+                        []);
                 }
 
                 new_tuning.SetParent(Instrument);

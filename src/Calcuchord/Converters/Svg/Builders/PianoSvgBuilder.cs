@@ -10,8 +10,8 @@ namespace Calcuchord {
         //     ThemeViewModel.Instance.P[PaletteColorType.Finger1Fg];
 
 
-        public override HtmlNode Build(NoteGroup ng) {
-            HtmlNode svg = InitBuild();
+        public override HtmlNode Build(NoteGroup ng,object args) {
+            HtmlNode svg = InitBuild(args);
 
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
             bg_g.SetAttributeValue("transform","scale(0.9) translate(10,0)");

@@ -14,7 +14,6 @@
              x:DataType="local:InstrumentViewModel"
              x:Class="Calcuchord.PopupEditorView">
     <UserControl.Styles>
-
         <Style Selector=":is(TextBox) /template/ Panel#PART_TextContainer">
             <Setter Property="Margin"
                     Value="0" />
@@ -59,24 +58,29 @@
             <Setter Property="Height"
                     Value="500" />
         </Style>
-        <Style Selector="controls|ColorZone#PopupZone local|TuningGenProgressView">
-            <Setter Property="IsVisible"
-                    Value="False" />
-        </Style>
 
-        <Style Selector="controls|ColorZone#PopupZone.progress">
+        <Style
+            Selector="controls|ColorZone#PopupZone.welcome, controls|ColorZone#PopupZone.welcome2, controls|ColorZone#PopupZone.progress, controls|ColorZone#PopupZone.intro-progress">
             <Setter Property="Height"
                     Value="{x:Static sys:Double.NaN}" />
-            <Setter Property="MinHeight"
-                    Value="100" />
         </Style>
-        <Style Selector="controls|ColorZone#PopupZone.progress DockPanel#InstDockPanel">
+
+        <Style
+            Selector="controls|ColorZone#PopupZone.intro-progress DockPanel#InstDockPanel, controls|ColorZone#PopupZone.welcome DockPanel#InstDockPanel, controls|ColorZone#PopupZone.welcome2 DockPanel#InstDockPanel, controls|ColorZone#PopupZone.progress DockPanel#InstDockPanel">
             <Setter Property="IsVisible"
                     Value="False" />
         </Style>
-        <Style Selector="controls|ColorZone#PopupZone.progress local|TuningGenProgressView">
+        <Style Selector="controls|ColorZone#PopupZone:not(.progress) local|TuningGenProgressView">
             <Setter Property="IsVisible"
-                    Value="True" />
+                    Value="False" />
+        </Style>
+        <Style Selector="controls|ColorZone#PopupZone:not(.welcome) local|WelcomeView">
+            <Setter Property="IsVisible"
+                    Value="False" />
+        </Style>
+        <Style Selector="controls|ColorZone#PopupZone:not(.welcome2) local|WelcomeView2">
+            <Setter Property="IsVisible"
+                    Value="False" />
         </Style>
     </UserControl.Styles>
 
@@ -90,6 +94,9 @@
 
             <controls:ColorZone x:Name="PopupZone"
                                 Classes.progress="{Binding CurGenTuning, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                Classes.welcome="{Binding IsShowingWelcome, Source={x:Static local:MainViewModel.Instance}}"
+                                Classes.welcome2="{Binding IsShowingWelcome2, Source={x:Static local:MainViewModel.Instance}}"
+                                Classes.intro-progress="{Binding IsShowingIntroProgress, Source={x:Static local:MainViewModel.Instance}}"
                                 Mode="Accent"
                                 CornerRadius="10"
                                 HorizontalAlignment="Center"
@@ -100,8 +107,7 @@
                                 BorderThickness="5"
                                 Padding="10">
                 <Grid>
-                    <DockPanel x:Name="InstDockPanel"
-                               IsVisible="{Binding !IsVisible, ElementName=ProgressView}">
+                    <DockPanel x:Name="InstDockPanel">
                         <!-- NAV -->
                         <UniformGrid DockPanel.Dock="Bottom"
                                      Columns="2"
@@ -110,6 +116,8 @@
                             <Button HorizontalAlignment="Left"
                                     VerticalAlignment="Bottom"
                                     Classes="float-text"
+                                    IsHitTestVisible="{Binding !IsDoingIntro}"
+                                    Opacity="{Binding IsDoingIntro, ConverterParameter=0|1, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
                                     Command="{Binding CancelEditInstrumentCommand}">
                                 <Button.Resources>
                                     <SolidColorBrush x:Key="MaterialPrimaryMidBrush">Red</SolidColorBrush>
@@ -151,11 +159,20 @@
                             </TabControl.Items>
                         </TabControl>
                     </DockPanel>
+
                     <local:TuningGenProgressView x:Name="ProgressView"
                                                  HorizontalAlignment="Center"
                                                  VerticalAlignment="Center"
                                                  Foreground="{DynamicResource Bg}"
                                                  DataContext="{Binding CurGenTuning}" />
+
+                    <local:WelcomeView HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource Bg}" />
+
+                    <local:WelcomeView2 HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Foreground="{DynamicResource Bg}" />
                 </Grid>
 
             </controls:ColorZone>
