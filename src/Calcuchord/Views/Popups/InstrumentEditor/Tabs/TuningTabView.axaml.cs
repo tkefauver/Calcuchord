@@ -3,8 +3,8 @@ using PropertyChanged;
 
 namespace Calcuchord {
     [DoNotNotify]
-    public partial class TuningEditorView : UserControl {
-        public TuningEditorView() {
+    public partial class TuningTabView : UserControl {
+        public TuningTabView() {
             InitializeComponent();
         }
     }

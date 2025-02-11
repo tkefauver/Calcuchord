@@ -7,7 +7,7 @@
              d:DesignHeight="720"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:MainViewModel"
@@ -15,7 +15,9 @@
     <Design.DataContext>
         <local:DesignMainViewModel />
     </Design.DataContext>
+
     <UserControl.Styles>
+
         <!-- SNACKBAR TOAST -->
         <Style Selector="controls|SnackbarHost /template/ controls|Card">
             <Setter Property="CornerRadius"
@@ -25,28 +27,35 @@
         </Style>
 
         <!-- ORIENTATION -->
-        <Style Selector="Grid#MainContainerGrid:not(.landscape) local|InstrumentView">
-            <Setter Property="MaxHeight"
-                    Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Height}, exp=a*0.35}" />
-        </Style>
-
-        <Style Selector="Grid#MainContainerGrid.landscape local|InstrumentView">
-            <Setter Property="Width"
-                    Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Width}, exp=a*0.35}" />
-        </Style>
-
-        <Style Selector="Grid#MainContainerGrid.landscape StackPanel#SearchOverlay">
-            <Setter Property="Width"
-                    Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Width}, exp=a*0.65}" />
-        </Style>
-        <Style Selector="Grid#MainContainerGrid.landscape local|MatchesView">
-            <Setter Property="Width"
-                    Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Width}, exp=a*0.65}" />
-        </Style>
+        <!-- <Style Selector="Grid#MainContainerGrid:not(.landscape) local|InstrumentView"> -->
+        <!--     <Setter Property="MaxHeight" -->
+        <!--             Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Height}, exp=a*0.35}" /> -->
+        <!-- </Style> -->
+        <!-- -->
+        <!-- <Style Selector="Grid#MainContainerGrid.landscape local|InstrumentView"> -->
+        <!--     <Setter Property="Width" -->
+        <!--             Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Width}, exp=a*0.35}" /> -->
+        <!-- </Style> -->
+        <!-- -->
+        <!-- <Style Selector="Grid#MainContainerGrid.landscape StackPanel#SearchOverlay"> -->
+        <!--     <Setter Property="Width" -->
+        <!--             Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Width}, exp=a*0.65}" /> -->
+        <!-- </Style> -->
+        <!-- <Style Selector="Grid#MainContainerGrid.landscape local|MatchesView"> -->
+        <!--     <Setter Property="Width" -->
+        <!--             Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Width}, exp=a*0.65}" /> -->
+        <!-- </Style> -->
 
     </UserControl.Styles>
     <Grid x:Name="MainOuterContainer">
-        <dialogHostAvalonia:DialogHost Identifier="MainDialogHost">
+        <dlg:DialogHost x:Name="MainDialogHost"
+                        BlurBackground="True"
+                        dlg:DialogHostStyle.ClipToBounds="True"
+                        Identifier="MainDialogHost">
+            <dlg:DialogHost.Resources>
+                <SolidColorBrush x:Key="DialogHostOverlayBackgroundMixinBrush">Transparent</SolidColorBrush>
+                <SolidColorBrush x:Key="DialogHostBackgroundMixinBrush">Transparent</SolidColorBrush>
+            </dlg:DialogHost.Resources>
             <controls:SnackbarHost HostName="Root"
                                    Theme="{StaticResource TinySnackbarHost}"
                                    SnackbarHorizontalAlignment="Center"
@@ -65,21 +74,18 @@
                     <DockPanel LastChildFill="true">
                         <!-- HEADER MENU -->
                         <local:MainHeaderView x:Name="HeaderView"
+                                              IsEnabled="{Binding !IsOpen, ElementName=MainDialogHost}"
                                               DockPanel.Dock="Top" />
                         <local:MainFooterView x:Name="FooterView"
                                               DockPanel.Dock="Bottom" />
 
                         <Grid x:Name="MainContainerGrid"
-                              Classes="oriented"
+                              RowDefinitions="Auto,Auto,*"
                               Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
-                              Classes.landscape="{Binding IsLandscape, Source={x:Static local:ThemeViewModel.Instance}}"
-                              common:MpAvOrientedGridExtension.HorizontalRowDefinitions="*"
-                              common:MpAvOrientedGridExtension.HorizontalColumnDefinitions="Auto,*"
-                              common:MpAvOrientedGridExtension.VerticalRowDefinitions="Auto,*"
-                              common:MpAvOrientedGridExtension.VerticalColumnDefinitions="*">
+                              Classes.landscape="{Binding IsLandscape, Source={x:Static local:ThemeViewModel.Instance}}">
                             <!-- BG IMAGE -->
-                            <Image common:MpAvOrientedGridExtension.VerticalRowSpan="2"
-                                   common:MpAvOrientedGridExtension.HorizontalColumnSpan="2"
+                            <Image x:Name="MainBgImage"
+                                   Grid.RowSpan="3"
                                    Source="/Assets/Images/parchment.jpg"
                                    HorizontalAlignment="Stretch"
                                    VerticalAlignment="Stretch"
@@ -93,104 +99,19 @@
 
                             <!-- MATCHES VIEW -->
 
-                            <local:MatchesView common:MpAvOrientedGridExtension.VerticalRow="1"
-                                               common:MpAvOrientedGridExtension.HorizontalColumn="1">
-                                <local:MatchesView.IsVisible>
-                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                        <Binding Path="!IsSearchButtonVisible" />
-                                        <Binding Path="!IsVisible"
-                                                 ElementName="EmptyTextBlock" />
-                                    </MultiBinding>
-                                </local:MatchesView.IsVisible>
-                                <local:MatchesView.Background>
-                                    <SolidColorBrush Color="{DynamicResource BgColor}"
-                                                     Opacity="0.3" />
-                                </local:MatchesView.Background>
-                            </local:MatchesView>
+                            <local:MatchesView x:Name="MatchesView"
+                                               Grid.Row="2" />
 
-                            <StackPanel x:Name="SearchOverlay"
-                                        common:MpAvOrientedGridExtension.VerticalRow="1"
-                                        common:MpAvOrientedGridExtension.HorizontalColumn="1"
-                                        IsVisible="{Binding IsSearchOverlayVisible}"
-                                        Spacing="5"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center">
-                                <!-- SEARCH BUTTON -->
-
-                                <Button x:Name="SearchButton"
-                                        Classes="accent fade fade-collapse"
-                                        Padding="16"
-                                        MinWidth="64"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        IsHitTestVisible="{Binding IsSearchButtonVisible}"
-                                        Opacity="{Binding IsSearchButtonVisible, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
-                                        Height="{Binding $self.Bounds.Width}"
-                                        Command="{Binding FindMatchesCommand}">
-                                    <avalonia:MaterialIcon Kind="Search"
-                                                           MinWidth="48"
-                                                           Height="{Binding $self.Bounds.Width}" />
-                                </Button>
-
-                                <!-- EMPTY LABEL -->
-
-                                <TextBlock x:Name="EmptyTextBlock"
-                                           Classes="Headline4"
-                                           HorizontalAlignment="Stretch"
-                                           TextWrapping="NoWrap"
-                                           VerticalAlignment="Center"
-                                           MinWidth="150"
-                                           TextAlignment="Center"
-                                           Text="{Binding EmptyMatchLabel}">
-                                    <TextBlock.IsVisible>
-                                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                            <Binding Path="!IsSearchButtonVisible" />
-                                            <Binding Path="IsMatchesEmpty"
-                                                     TargetNullValue="False"
-                                                     FallbackValue="False" />
-                                            <Binding Path="!IsLoadingMatches" />
-                                        </MultiBinding>
-                                    </TextBlock.IsVisible>
-                                </TextBlock>
-
-                                <!-- CLEAR INPUT -->
-                                <Button x:Name="ResetInstrumentLinkBUtton"
-                                        Classes="link fade fade-collapse"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        VerticalContentAlignment="Center"
-                                        IsHitTestVisible="{Binding !IsDefaultSelection}"
-                                        Opacity="{Binding !IsDefaultSelection, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
-                                        Command="{Binding ResetInstrumentCommand}">
-                                    <Button.IsVisible>
-                                        <MultiBinding Converter="{x:Static BoolConverters.Or}">
-                                            <Binding Path="IsVisible"
-                                                     ElementName="SearchButton" />
-                                            <Binding Path="IsVisible"
-                                                     ElementName="EmptyTextBlock" />
-                                        </MultiBinding>
-                                    </Button.IsVisible>
-                                    <TextBlock TextAlignment="Center"
-                                               Classes="Body1"
-                                               Text="Reset" />
-                                </Button>
-
-                            </StackPanel>
-
-                            <!-- EDIT POPUP -->
-
-                            <local:PopupEditorView x:Name="InstEditPopupView"
-                                                   common:MpAvOrientedGridExtension.VerticalRowSpan="2"
-                                                   common:MpAvOrientedGridExtension.HorizontalColumnSpan="2"
-                                                   DataContext="{Binding EditModeInstrument}"
-                                                   IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}" />
-
-
+                            <!-- SPLITTER -->
+                            <GridSplitter x:Name="MainSplitter"
+                                          Grid.Row="1"
+                                          IsVisible="False"
+                                          Background="Orange" />
                         </Grid>
                     </DockPanel>
                 </controls:NavigationDrawer>
             </controls:SnackbarHost>
-        </dialogHostAvalonia:DialogHost>
+        </dlg:DialogHost>
 
         <Border x:Name="MainContainerBusyOverlay"
                 Classes="busy-cntr">

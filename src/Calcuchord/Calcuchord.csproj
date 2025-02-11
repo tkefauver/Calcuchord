@@ -54,15 +54,18 @@
             <DependentUpon>WelcomeView2.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Views\Popups\InstrumentEditor\Tabs\InstrumentTabView.axaml.cs">
+            <DependentUpon>InstrumentTabView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Popups\InstrumentEditor\Tabs\TuningTabView.axaml.cs">
+            <DependentUpon>TuningTabView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
         <Folder Include="Views\Instrument\Popups\"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <AdditionalFiles Include="Views\Popups\PopupEditor\Instrument\InstrumentEditorView.axaml"/>
-        <AdditionalFiles Include="Views\Popups\PopupEditor\Tuning\TuningEditorView.axaml"/>
     </ItemGroup>
 
     <ItemGroup>

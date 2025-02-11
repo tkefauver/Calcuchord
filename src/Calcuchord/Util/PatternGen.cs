@@ -187,14 +187,37 @@ namespace Calcuchord {
                     NoteType cur_key = (NoteType)cur_key_val;
                     var pattern = GenPattern(cur_key,suffix);
                     var all_pattern_inst_notes = GenNotes(pattern);
-                    // only return use 1 set of pattern for chords or 1 set + next root for scales/modes
-                    int result_len = PatternType == MusicPatternType.Chords ? pattern.Length : pattern.Length + 1;
+                    // only return 1 set of pattern for chords or 1 set + next root for scales/modes
+                    // int result_len = pattern.Length + 1;
+                    // int pattern_count = 1;
+                    // if(PatternType == MusicPatternType.Chords) {
+                    //     // 
+                    //     int diff = all_pattern_inst_notes.Count() % pattern.Length;
+                    //     
+                    //     result_len = (all_pattern_inst_notes.Count() - diff) * pattern.Length;
+                    //     pattern_count = (int)(result_len / pattern.Length);
+                    // }
                     NoteGroupCollection ngc = new NoteGroupCollection(PatternType,cur_key,suffix);
-                    var pattern_notes =
+                    var all_pattern_notes =
                         all_pattern_inst_notes
-                            .Take(result_len)
                             .Select(x => new PatternNote(0,x));
-                    ngc.Groups.Add(new(ngc,0,pattern_notes));
+                    var cur_pattern = new List<PatternNote>();
+                    foreach((PatternNote pn,int idx) in all_pattern_notes.WithIndex()) {
+                        cur_pattern.Add(pn);
+                        if(PatternType == MusicPatternType.Chords) {
+                            if(cur_pattern.Count == pattern.Length) {
+                                ngc.Groups.Add(new NoteGroup(ngc,ngc.Groups.Count - 1,cur_pattern.ToList()));
+                                cur_pattern.Clear();
+                            }
+                        } else {
+                            if(cur_pattern.Count == pattern.Length + 1 || pn == all_pattern_notes.Last()) {
+                                ngc.Groups.Add(new NoteGroup(ngc,0,cur_pattern));
+                                break;
+                            }
+                        }
+                    }
+
+
                     ngcl.Add(ngc);
                 }
             }

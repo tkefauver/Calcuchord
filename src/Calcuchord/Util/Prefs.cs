@@ -39,7 +39,14 @@ namespace Calcuchord {
                     Instance.Instruments.ForEach(x => x.RefreshModelTree());
                 } catch(Exception e) {
                     e.Dump();
-                    _ = new Prefs();
+                    // json error, about to delete are you sure?
+                    Debugger.Break();
+
+                    // TODO should maybe say there was an error here instead of just reseting data
+                    File.Delete(PrefsFilePath);
+                    Instance = null;
+                    Init();
+                    return;
                 }
             }
 

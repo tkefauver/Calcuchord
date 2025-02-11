@@ -1,9 +1,8 @@
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using HtmlAgilityPack;
 using MonkeyPaste.Common;
-using Process = System.Diagnostics.Process;
 
 namespace Calcuchord {
     public abstract class SvgBuilderBase {
@@ -161,14 +160,16 @@ namespace Calcuchord {
             string fp = $"/home/tkefauver/Desktop/{fn}";
             MpFileIo.WriteTextToFile(fp,result);
 
-            Process.Start(
-                new ProcessStartInfo
-                {
-                    UseShellExecute = true,
-                    //WorkingDirectory = Path.GetDirectoryName(fp),
-                    FileName = "xdg-open",
-                    Arguments = fp
-                });
+            new Uri(fp.ToFileSystemUriFromPath()).OpenInBrowser();
+
+            // Process.Start(
+            //     new ProcessStartInfo
+            //     {
+            //         UseShellExecute = true,
+            //         //WorkingDirectory = Path.GetDirectoryName(fp),
+            //         FileName = "xdg-open",
+            //         Arguments = fp
+            //     });
         }
 
         #endregion
@@ -223,7 +224,7 @@ namespace Calcuchord {
             bool shadow = false,
             double fillOpacity = 1) {
             if(isBox) {
-                AddRect(cntr,fill,stroke,cx - r,cy - r,r * 2d,r * 2d,sw,classes,shadow,fillOpacity);
+                AddDiamond(cntr,fill,stroke,cx - r,cy - r,r * 2d,r * 2d,sw,classes,shadow,fillOpacity);
             } else {
                 AddCircle(cntr,fill,stroke,cx,cy,r,sw,classes,shadow,fillOpacity);
             }
@@ -315,6 +316,65 @@ namespace Calcuchord {
             }
 
             cntr.AppendChild(circle);
+        }
+
+        protected void AddDiamond(
+            HtmlNode cntr,
+            string fill,
+            string stroke,
+            double x,
+            double y,
+            double w,
+            double h,
+            double sw,
+            string classes = null,
+            bool shadow = false,
+            double fillOpacity = 1) {
+            if(shadow) {
+                string shadow_fill = fill == Fg ? Bg : "#000000";
+                double offset = 0.25; //fs / 16d;
+                AddDiamond(cntr,shadow_fill,stroke,x + offset,y + offset,w,h,sw,classes + " shadow-elm");
+            }
+            //<polygon points="0 40,40 80,80 40,40 0" style=" fill: blue; stroke:black;"/>
+
+            HtmlNode poly = CurrentDoc.CreateElement("polygon");
+            double scale = 1.2;
+            double xdiff = (w * scale) - w;
+            double ydiff = (h * scale) - h;
+            x -= xdiff / 2d;
+            y -= ydiff / 2d;
+            // w += xdiff;
+            // h += ydiff;
+            w *= scale;
+            h *= scale;
+
+            double hw = w * 0.5;
+            double hh = h * 0.5;
+            // L
+            double x1 = x;
+            double y1 = y + hh;
+
+            // T
+            double x2 = x + hw;
+            double y2 = y;
+
+            // R
+            double x3 = x + w;
+            double y3 = y + hh;
+
+            // B
+            double x4 = x + hw;
+            double y4 = y + h;
+            poly.Attributes.Add("points",$"{x1} {y1},{x2} {y2},{x3} {y3},{x4} {y4}");
+            poly.Attributes.Add("stroke",stroke);
+            poly.Attributes.Add("fill",fill);
+            poly.Attributes.Add("fill-opacity",fillOpacity);
+            poly.Attributes.Add("stroke-width",sw);
+            if(classes != null) {
+                poly.Attributes.Add("class",classes);
+            }
+
+            cntr.AppendChild(poly);
         }
 
         protected void AddRect(

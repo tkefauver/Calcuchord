@@ -152,7 +152,8 @@ namespace Calcuchord {
                 IsBookmarked = !IsBookmarked;
 
                 if(MainViewModel.Instance.SelectedDisplayMode == DisplayModeType.Bookmarks) {
-                    MainViewModel.Instance.UpdateMatches(MatchUpdateSource.BookmarkToggle);
+                    MainViewModel.Instance.UpdateMatchesAsync(MatchUpdateSource.BookmarkToggle)
+                        .FireAndForgetSafeAsync();
                 }
             });
 

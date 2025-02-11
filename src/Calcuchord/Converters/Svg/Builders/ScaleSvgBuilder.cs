@@ -154,7 +154,7 @@ namespace Calcuchord {
                             classes: "fingers-fill");
                     }
 
-                    AddFingerShape(false,"note-circle");
+                    AddFingerShape(false,is_root ? "root-circle" : "note-circle");
                     if(is_root) {
                         AddFingerShape(true,"root-box");
                     }

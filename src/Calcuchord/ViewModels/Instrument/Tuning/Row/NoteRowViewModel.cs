@@ -288,7 +288,7 @@ namespace Calcuchord {
                 }
 
                 ToggleSelected(nvm,false);
-                MainViewModel.Instance.UpdateMatches(MatchUpdateSource.NoteToggle);
+                MainViewModel.Instance.UpdateMatchesAsync(MatchUpdateSource.NoteToggle).FireAndForgetSafeAsync();
             });
 
         public ICommand ToggleNoteAsDesiredRootCommand => new MpCommand<object>(
@@ -299,7 +299,7 @@ namespace Calcuchord {
                 }
 
                 ToggleSelected(nvm,true);
-                MainViewModel.Instance.UpdateMatches(MatchUpdateSource.RootToggle);
+                MainViewModel.Instance.UpdateMatchesAsync(MatchUpdateSource.RootToggle).FireAndForgetSafeAsync();
             });
 
         #endregion

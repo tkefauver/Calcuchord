@@ -22,12 +22,6 @@ namespace Calcuchord {
 
             HtmlNode bk_bg_g = CurrentDoc.CreateElement("g");
             bg_g.AppendChild(bk_bg_g);
-
-            if(ng.ToString() == "C Major #1") {
-            }
-
-            //SvgFlags flags = MainViewModel.Instance.SelectedSvgFlags;
-
             double lw = FretLineFixedAxisSize * 2;
             double bw = lw * 1;
             double wkw = StringFixedAxisLength;
@@ -110,6 +104,11 @@ namespace Calcuchord {
 
                     if(is_user) {
                         AddShape(cntr,is_root,pattern_bg,Transparent,cx,cy,r,0,"user-fill");
+                        if(is_root) {
+                            double ir = r - DotStrokeWidth;
+                            AddShape(cntr,true,RootBg,Transparent,cx,cy,ir,0,"root-box");
+
+                        }
                     }
 
                     AddCenteredText(

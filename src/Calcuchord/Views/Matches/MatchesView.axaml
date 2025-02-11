@@ -7,71 +7,165 @@
              d:DesignHeight="450"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.MatchesView">
-    <Grid RowDefinitions="Auto,*">
-        <!-- SHARE -->
-        <controls:Card Grid.Row="0"
-                       IsVisible="False"
-                       Classes="button-group"
-                       Margin="10"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Center">
-            <Button x:Name="ShareButton"
-                    Classes="float"
-                    Command="{Binding ConvertMatchesCommand}">
-                <avalonia:MaterialIcon Kind="Share" />
-            </Button>
-        </controls:Card>
-        <!-- ZOOM BTNS -->
-        <controls:Card Grid.Row="0"
-                       Classes="button-group"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Center"
-                       Margin="10">
-            <StackPanel Orientation="Horizontal">
-                <!-- ZOOM OUT (COLS+1) -->
-                <Button x:Name="ZoomMinusButton"
-                        Classes="float"
-                        Command="{Binding IncreaseMatchColumnsCommand}">
-                    <avalonia:MaterialIcon Kind="Minus" />
-                </Button>
-                <!-- ZOOM IN (COLS-1) -->
-                <Button x:Name="ZoomPlusButton"
-                        Classes="float"
-                        Command="{Binding DecreaseMatchColumnsCommand}">
-                    <avalonia:MaterialIcon Kind="Plus" />
-                </Button>
-            </StackPanel>
-        </controls:Card>
+    <Grid>
+        <!-- RESULTS CNTR -->
 
-        <ScrollViewer x:Name="MatchGalleryScrollViewer"
-                      Grid.Row="1"
-                      Padding="5,0">
-            <!-- NOTE no margin/padding on repeater to get accurate bounds -->
-            <ItemsRepeater x:Name="MatchItemsRepeater"
-                           ItemsSource="{Binding Matches}">
-                <ItemsRepeater.RenderTransform>
-                    <TranslateTransform />
-                </ItemsRepeater.RenderTransform>
-                <ItemsRepeater.Layout>
-                    <WrapLayout Orientation="Horizontal" />
-                </ItemsRepeater.Layout>
-                <ItemsRepeater.ItemTemplate>
-                    <DataTemplate x:DataType="local:MatchViewModelBase">
-                        <local:MatchView Background="{DynamicResource HttTransparent}"
-                                         Width="{Binding MatchWidth, Source={x:Static local:MainViewModel.Instance}}" />
-                    </DataTemplate>
-                </ItemsRepeater.ItemTemplate>
-            </ItemsRepeater>
-        </ScrollViewer>
+        <Border x:Name="ResultContainer"
+                Margin="3"
+                Padding="5"
+                CornerRadius="5">
+            <Border.Background>
+                <SolidColorBrush Color="{DynamicResource BgColor}"
+                                 Opacity="0.3" />
+            </Border.Background>
+            <Border.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="!IsSearchButtonVisible" />
+                    <Binding Path="!IsVisible"
+                             ElementName="EmptyTextBlock" />
+                </MultiBinding>
+
+            </Border.IsVisible>
+
+            <Grid RowDefinitions="Auto,*">
+                <!-- SHARE -->
+                <controls:Card Grid.Row="0"
+                               IsVisible="False"
+                               Classes="button-group"
+                               Margin="10"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center">
+                    <Button x:Name="ShareButton"
+                            Classes="float"
+                            Command="{Binding ConvertMatchesCommand}">
+                        <avalonia:MaterialIcon Kind="Share" />
+                    </Button>
+                </controls:Card>
+
+                <!-- ZOOM BTNS -->
+                <controls:Card Grid.Row="0"
+                               Classes="button-group"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Margin="10">
+                    <StackPanel Orientation="Horizontal">
+                        <!-- ZOOM OUT (COLS+1) -->
+                        <Button x:Name="ZoomMinusButton"
+                                Classes="float"
+                                Command="{Binding IncreaseMatchColumnsCommand}">
+                            <avalonia:MaterialIcon Kind="Minus" />
+                        </Button>
+                        <!-- ZOOM IN (COLS-1) -->
+                        <Button x:Name="ZoomPlusButton"
+                                Classes="float"
+                                Command="{Binding DecreaseMatchColumnsCommand}">
+                            <avalonia:MaterialIcon Kind="Plus" />
+                        </Button>
+                    </StackPanel>
+                </controls:Card>
+
+                <ScrollViewer x:Name="MatchGalleryScrollViewer"
+                              Grid.Row="1"
+                              Padding="5,0">
+                    <!-- NOTE no margin/padding on repeater to get accurate bounds -->
+                    <ItemsRepeater x:Name="MatchItemsRepeater"
+                                   ItemsSource="{Binding Matches}">
+                        <ItemsRepeater.RenderTransform>
+                            <TranslateTransform />
+                        </ItemsRepeater.RenderTransform>
+                        <ItemsRepeater.Layout>
+                            <WrapLayout Orientation="Horizontal" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="local:MatchViewModelBase">
+                                <local:MatchView Background="{DynamicResource HttTransparent}"
+                                                 Width="{Binding MatchWidth, Source={x:Static local:MainViewModel.Instance}}" />
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- SEARCH OVERLAY -->
+
+        <StackPanel x:Name="SearchOverlay"
+                    common:MpAvOrientedGridExtension.VerticalRow="1"
+                    common:MpAvOrientedGridExtension.HorizontalColumn="1"
+                    IsVisible="{Binding IsSearchOverlayVisible}"
+                    Spacing="5"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+            <!-- SEARCH BUTTON -->
+
+            <Button x:Name="SearchButton"
+                    Classes="accent fade fade-collapse"
+                    Padding="16"
+                    MinWidth="64"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsHitTestVisible="{Binding IsSearchButtonVisible}"
+                    Opacity="{Binding IsSearchButtonVisible, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
+                    Height="{Binding $self.Bounds.Width}"
+                    Command="{Binding FindMatchesCommand}">
+                <avalonia:MaterialIcon Kind="Search"
+                                       MinWidth="48"
+                                       Height="{Binding $self.Bounds.Width}" />
+            </Button>
+
+            <!-- EMPTY LABEL -->
+
+            <TextBlock x:Name="EmptyTextBlock"
+                       Classes="Headline4"
+                       HorizontalAlignment="Stretch"
+                       TextWrapping="NoWrap"
+                       VerticalAlignment="Center"
+                       MinWidth="150"
+                       TextAlignment="Center"
+                       Text="{Binding EmptyMatchLabel}">
+                <TextBlock.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="!IsSearchButtonVisible" />
+                        <Binding Path="IsMatchesEmpty"
+                                 TargetNullValue="False"
+                                 FallbackValue="False" />
+                        <Binding Path="!IsLoadingMatches" />
+                    </MultiBinding>
+                </TextBlock.IsVisible>
+            </TextBlock>
+
+            <!-- CLEAR INPUT -->
+            <Button x:Name="ResetInstrumentLinkBUtton"
+                    Classes="link fade fade-collapse"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    IsHitTestVisible="{Binding !IsDefaultSelection}"
+                    Opacity="{Binding !IsDefaultSelection, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
+                    Command="{Binding ResetInstrumentCommand}">
+                <Button.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                        <Binding Path="IsVisible"
+                                 ElementName="SearchButton" />
+                        <Binding Path="IsVisible"
+                                 ElementName="EmptyTextBlock" />
+                    </MultiBinding>
+                </Button.IsVisible>
+                <TextBlock TextAlignment="Center"
+                           Classes="Body1"
+                           Text="Reset" />
+            </Button>
+
+        </StackPanel>
+
+        <!-- BUSY OVERLAY -->
 
         <Border x:Name="MatchesBusyOverlay"
-                Grid.Row="0"
-                Grid.RowSpan="2"
                 Classes="busy-cntr">
             <Border.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.Or}">
@@ -80,6 +174,6 @@
                 </MultiBinding>
             </Border.IsVisible>
         </Border>
-    </Grid>
 
+    </Grid>
 </UserControl>

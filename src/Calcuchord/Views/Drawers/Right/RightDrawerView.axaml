@@ -7,7 +7,7 @@
              d:DesignHeight="450"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:MainViewModel"
@@ -19,6 +19,13 @@
         </Style>
 
         <Style Selector="StackPanel.options controls|Card">
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+            <Setter Property="MaxHeight"
+                    Value="150" />
+        </Style>
+
+        <Style Selector="ItemsControl">
             <Setter Property="HorizontalAlignment"
                     Value="Center" />
             <Setter Property="MaxHeight"
@@ -38,6 +45,7 @@
                 <Setter.Value>
                     <DataTemplate x:DataType="local:OptionViewModel">
                         <ToggleButton CornerRadius="0"
+                                      IsVisible="{Binding IsVisible}"
                                       Opacity="{Binding $self.IsEnabled, ConverterParameter=1|0.5, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
                                       Theme="{StaticResource MaterialFlatToggleButton}"
                                       IsChecked="{Binding IsChecked, Mode=OneWay}"
@@ -114,6 +122,7 @@
                         </ScrollViewer>
                     </controls:Card>
 
+
                     <!-- KEY -->
                     <TextBlock Classes="header"
                                Text="Key" />
@@ -122,6 +131,7 @@
                             <ItemsControl ItemsSource="{Binding KeyOptions}" />
                         </ScrollViewer>
                     </controls:Card>
+
 
                     <!-- SUFFIX -->
                     <TextBlock Classes="header"
@@ -133,6 +143,7 @@
                         </ScrollViewer>
                     </controls:Card>
 
+
                     <!-- SVG -->
 
                     <StackPanel Orientation="Horizontal"
@@ -141,7 +152,8 @@
                                    Text="Display" />
                         <local:HintView>
                             <ToolTip.Tip>
-                                <Border Padding="3"
+                                <Border Padding="10"
+                                        CornerRadius="7"
                                         Background="White"
                                         MaxWidth="200"
                                         MaxHeight="200">

@@ -7,11 +7,22 @@
              d:DesignHeight="570"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:NoteViewModel"
              x:Class="Calcuchord.KeyView">
+    <UserControl.Styles>
+        <Style Selector="Border#KeyMarkerInnerContainer.desired-root">
+            <Setter Property="RenderTransform"
+                    Value="rotate(45deg) scale(0.75)" />
+        </Style>
+        <Style Selector="Border#KeyMarkerInnerContainer.desired-root > :is(Control)">
+            <Setter Property="RenderTransform"
+                    Value="rotate(-45deg)" />
+        </Style>
+
+    </UserControl.Styles>
     <Border x:Name="KeyMarker"
             BorderThickness="0"
             BoxShadow="5 5 10 0 DarkGray"
@@ -19,6 +30,7 @@
         <Grid RowDefinitions="*,0.2*">
             <Border x:Name="KeyMarkerInnerContainer"
                     Grid.Row="1"
+                    Classes.desired-root="{Binding IsDesiredRoot}"
                     IsVisible="{Binding !IsPhone, Source={x:Static local:ThemeViewModel.Instance}}"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Bottom"

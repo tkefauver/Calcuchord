@@ -58,6 +58,8 @@ namespace Calcuchord {
 
         #region Properties
 
+        bool IsPretendMobile { get; set; }
+
         public bool IsDesktop =>
             !IsBrowser && !IsMobile;
 
@@ -75,10 +77,21 @@ namespace Calcuchord {
         public bool IsLandscape {
             get {
 
-                if(IsDesktop ||
+                if((IsDesktop && !IsPretendMobile) ||
                    MainView.Instance is not { } mv ||
                    TopLevel.GetTopLevel(mv) is not { } tl) {
                     return false;
+                }
+
+                double w = 0;
+                double h = 0;
+                if(tl.Screens is { } scr &&
+                   scr.Primary is { } pscr) {
+                    w = pscr.Bounds.Width / pscr.Scaling;
+                    h = pscr.Bounds.Height / pscr.Scaling;
+                } else {
+                    w = tl.Bounds.Width / tl.RenderScaling;
+                    h = tl.Bounds.Height / tl.RenderScaling;
                 }
 
                 return tl.Bounds.Width > tl.Bounds.Height;
@@ -276,6 +289,12 @@ namespace Calcuchord {
 
         #endregion
 
+        #region Events
+
+        public event EventHandler OrientationChanged;
+
+        #endregion
+
         #region Public Methods
 
         public void Init() {
@@ -336,17 +355,31 @@ namespace Calcuchord {
 
         public ICommand ToggleLandscapeCommand => new MpCommand(
             () => {
+                IsPretendMobile = true;
                 if(MainView.Instance is not { } mv ||
                    TopLevel.GetTopLevel(mv) is not { } tl) {
                     return;
+                }
+
+                bool was_landscape = IsLandscape;
+
+                tl.EffectiveViewportChanged += TlOnEffectiveViewportChanged;
+
+                void TlOnEffectiveViewportChanged(object sender,EffectiveViewportChangedEventArgs e) {
+                    if(IsLandscape != was_landscape) {
+                        tl.EffectiveViewportChanged -= TlOnEffectiveViewportChanged;
+                        OnPropertyChanged(nameof(IsLandscape));
+                        OnPropertyChanged(nameof(Orientation));
+                        OrientationChanged?.Invoke(this,EventArgs.Empty);
+                    }
                 }
 
                 double w = tl.Bounds.Width;
                 double h = tl.Bounds.Height;
                 tl.Width = h;
                 tl.Height = w;
-                // OnPropertyChanged(nameof(IsLandscape));
-                // OnPropertyChanged(nameof(Orientation));
+
+
             });
 
     }

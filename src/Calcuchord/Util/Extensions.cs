@@ -1,10 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HtmlAgilityPack;
 
 namespace Calcuchord {
     public static class Extensions {
+        public static void OpenInBrowser(this Uri uri) {
+            string url = uri.AbsoluteUri;
+            if(OperatingSystem.IsWindows()) {
+                //Process.Start(new ProcessStartInfo("cmd",$"/c start {url}") {UseShellExecute = true});
+                Process.Start(new ProcessStartInfo { FileName = url,UseShellExecute = true });
+                return;
+            }
+
+            if(OperatingSystem.IsLinux()) {
+                Process.Start("xdg-open",url);
+                return;
+            }
+
+            if(OperatingSystem.IsMacOS()) {
+                Process.Start("open",url);
+            }
+
+        }
+
         public static bool None<TSource>(this IEnumerable<TSource> source) {
             return !source.Any();
         }
@@ -14,7 +34,22 @@ namespace Calcuchord {
         }
 
         public static string ToIconName(this InstrumentType it) {
-            return $"avares://Calcuchord/Assets/Svg/Instruments/{it.ToString().ToLower()}.svg";
+            //return $"avares://Calcuchord/Assets/Svg/Instruments/{it.ToString().ToLower()}.svg";
+            switch(it) {
+                default:
+                    return "MusicClefBass";
+                case InstrumentType.Guitar:
+                    return "GuitarElectric";
+                case InstrumentType.Ukulele:
+                case InstrumentType.Banjo:
+                    return "GuitarAcoustic";
+                case InstrumentType.Piano:
+                    return "Piano";
+                case InstrumentType.Cello:
+                case InstrumentType.Viola:
+                case InstrumentType.Violin:
+                    return "Violin";
+            }
         }
 
         public static bool IsFlagEnabled(this SvgFlags flag,InstrumentType it,MusicPatternType pt,DisplayModeType dmt) {

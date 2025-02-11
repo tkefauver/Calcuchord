@@ -4,9 +4,9 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <!--        <BuildOs>LINUX</BuildOs>-->
+        <BuildOs>LINUX</BuildOs>
         <!--        <BuildOs>BROWSER</BuildOs>-->
-        <BuildOs>ANDROID</BuildOs>
+        <!--        <BuildOs>ANDROID</BuildOs>-->
         <UseSugarWv>true</UseSugarWv>
     </PropertyGroup>
 

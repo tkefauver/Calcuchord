@@ -1,0 +1,117 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:InstrumentViewModel"
+             x:Class="Calcuchord.InstrumentEditorView">
+    <UserControl.Styles>
+        <Style Selector="TextBlock.tab-header">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Fg}" />
+            <Setter Property="FontSize"
+                    Value="24" />
+            <Setter Property="TextAlignment"
+                    Value="Center" />
+        </Style>
+        <Style Selector="TabItem:selected TextBlock.tab-header">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Bg}" />
+        </Style>
+
+        <Style Selector="TabItem:disabled TextBlock.tab-header">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource DisabledAccentFg}" />
+            <Setter Property="FontStyle"
+                    Value="Italic" />
+        </Style>
+        <Style Selector="TabItem > ScrollViewer">
+            <Setter Property="Margin"
+                    Value="0,30,0,0" />
+        </Style>
+    </UserControl.Styles>
+
+
+    <dlg:DialogHost Identifier="InstrumentEditorPopupHost">
+        <Border x:Name="PopupOverlayBorder">
+            <Grid>
+
+                <controls:ColorZone x:Name="PopupZone"
+                                    MinWidth="300"
+                                    Height="500"
+                                    Classes="popup-cntr">
+                    <Grid>
+                        <DockPanel x:Name="InstDockPanel">
+                            <!-- NAV -->
+                            <UniformGrid DockPanel.Dock="Bottom"
+                                         Columns="2"
+                                         x:DataType="local:MainViewModel"
+                                         DataContext="{x:Static local:MainViewModel.Instance}">
+                                <Button HorizontalAlignment="Left"
+                                        VerticalAlignment="Bottom"
+                                        Classes="float-text"
+                                        IsCancel="True"
+                                        IsHitTestVisible="{Binding !IsDoingIntro}"
+                                        Opacity="{Binding IsDoingIntro, ConverterParameter=0|1, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
+                                        Command="{Binding CancelEditInstrumentCommand}">
+                                    <Button.Resources>
+                                        <SolidColorBrush x:Key="MaterialPrimaryMidBrush">Red</SolidColorBrush>
+                                        <SolidColorBrush x:Key="MaterialPrimaryMidForegroundBrush">White</SolidColorBrush>
+                                    </Button.Resources>
+                                    <TextBlock FontSize="18"
+                                               Text="Cancel" />
+                                </Button>
+                                <Button HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        Classes="float-text dark"
+                                        IsDefault="True"
+                                        Command="{Binding FinishEditInstrumentCommand}">
+                                    <TextBlock FontSize="18"
+                                               Text="Done" />
+                                </Button>
+                            </UniformGrid>
+
+                            <!-- TABS -->
+                            <TabControl>
+                                <TabControl.Items>
+                                    <TabItem IsSelected="{Binding IsInstrumentTabSelected, Mode=TwoWay}">
+                                        <TabItem.Header>
+                                            <TextBlock Classes="tab-header"
+                                                       Text="Instrument" />
+                                        </TabItem.Header>
+                                        <ScrollViewer Margin="0,20,0,20">
+                                            <local:InstrumentTabView Margin="0,0,20,0" />
+                                        </ScrollViewer>
+                                    </TabItem>
+                                    <TabItem IsSelected="{Binding IsTuningTabSelected, Mode=TwoWay}"
+                                             IsEnabled="{Binding CanEditTunings}">
+                                        <TabItem.Header>
+                                            <TextBlock Classes="tab-header"
+                                                       Text="Tunings" />
+                                        </TabItem.Header>
+
+                                        <local:TuningTabView />
+                                    </TabItem>
+                                </TabControl.Items>
+                            </TabControl>
+                        </DockPanel>
+                    </Grid>
+
+                </controls:ColorZone>
+
+            </Grid>
+
+        </Border>
+
+    </dlg:DialogHost>
+
+
+</UserControl>

@@ -82,7 +82,7 @@ namespace Calcuchord {
         public string ProgressTitle =>
             $"Calculating {FullName}...";
 
-        public string GenProgressLabel { get; private set; } = "Test label text";
+        public string GenProgressLabel { get; private set; } = "Preparing...";
 
         #endregion
 
@@ -543,8 +543,13 @@ namespace Calcuchord {
                 {
                     DataContext = this
                 };
+                stats_view.OkButton.Command = new MpCommand(
+                    () => {
+                        DialogHost.Close(InstrumentEditorView.DialogHostName);
 
-                DialogHost.Show(stats_view,MainView.DialogHostName);
+                    });
+
+                DialogHost.Show(stats_view,InstrumentEditorView.DialogHostName);
 
             });
 

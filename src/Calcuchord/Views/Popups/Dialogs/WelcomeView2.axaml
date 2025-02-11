@@ -8,64 +8,67 @@
              xmlns:sys="clr-namespace:System;assembly=netstandard"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:Class="Calcuchord.WelcomeView2">
-    <StackPanel Spacing="10"
-                Margin="10"
-                MaxWidth="280">
-        <TextBlock TextAlignment="Center"
-                   FontSize="18"
-                   TextWrapping="WrapWithOverflow">
-            <TextBlock.Inlines>
-                <Run Text="Most instruments have" />
-                <Run FontFamily="{StaticResource GaramondBoldFont}"
-                     Text="a lot of chords"
-                     FontWeight="Bold" />
-                <Run Text="and this may take a minute or two." />
-            </TextBlock.Inlines>
-        </TextBlock>
-        <TextBlock FontSize="14"
-                   Opacity="0.7"
-                   MaxWidth="250"
-                   TextAlignment="Center"
-                   TextWrapping="Wrap">
-            <TextBlock.Inlines>
-                <Run Text="So just" />
-                <Run Text="relax,"
-                     FontStyle="Italic" />
-                <Run Text="pet your cat"
-                     FontFamily="{StaticResource GaramondBoldFont}"
-                     FontWeight="Bold" />
-                <Run Text="or whatever you want. It doesn't take" />
-                <Run Text="that"
-                     FontFamily="{StaticResource GaramondBoldFont}"
-                     FontStyle="Italic" />
-                <Run Text="long..." />
-            </TextBlock.Inlines>
-        </TextBlock>
+    <controls:ColorZone Classes="popup-cntr">
+        <StackPanel Spacing="10"
+                    Margin="10"
+                    MaxWidth="280">
+            <TextBlock TextAlignment="Center"
+                       FontSize="18"
+                       TextWrapping="WrapWithOverflow">
+                <TextBlock.Inlines>
+                    <Run Text="Most instruments have" />
+                    <Run FontFamily="{StaticResource GaramondBoldFont}"
+                         Text="a lot of chords"
+                         FontWeight="Bold" />
+                    <Run Text="and this may take a minute or two." />
+                </TextBlock.Inlines>
+            </TextBlock>
+            <TextBlock FontSize="14"
+                       Opacity="0.7"
+                       MaxWidth="250"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap">
+                <TextBlock.Inlines>
+                    <Run Text="So just" />
+                    <Run Text="relax,"
+                         FontStyle="Italic" />
+                    <Run Text="pet your cat"
+                         FontFamily="{StaticResource GaramondBoldFont}"
+                         FontWeight="Bold" />
+                    <Run Text="or whatever you want. It doesn't take" />
+                    <Run Text="that"
+                         FontFamily="{StaticResource GaramondBoldFont}"
+                         FontStyle="Italic" />
+                    <Run Text="long..." />
+                </TextBlock.Inlines>
+            </TextBlock>
 
-        <controls:FloatingButton Classes="float-text light"
-                                 Margin="5,10,5,20"
-                                 IsExtended="True"
-                                 HorizontalAlignment="Center"
-                                 Command="{Binding ConfirmWelcomeCommand, Source={x:Static local:MainViewModel.Instance}}">
-            <StackPanel Orientation="Horizontal"
-                        Height="24">
-                <Viewbox Stretch="Fill"
-                         HorizontalAlignment="Stretch"
-                         VerticalAlignment="Stretch">
-                    <avalonia:MaterialIcon Kind="LightningBolt"
-                                           Foreground="Yellow"
-                                           Width="24"
-                                           Height="24" />
-                </Viewbox>
-                <TextBlock Margin="8,0"
-                           FontSize="18"
-                           Text="Calculate!"
-                           VerticalAlignment="Center" />
-            </StackPanel>
-        </controls:FloatingButton>
-    </StackPanel>
+            <controls:FloatingButton Classes="float-text light"
+                                     Margin="5,10,5,20"
+                                     IsExtended="True"
+                                     IsDefault="True"
+                                     HorizontalAlignment="Center"
+                                     Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dlg:DialogHost}, Path=CloseDialogCommand}">
+                <StackPanel Orientation="Horizontal"
+                            Height="24">
+                    <Viewbox Stretch="Fill"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch">
+                        <avalonia:MaterialIcon Kind="LightningBolt"
+                                               Foreground="Yellow"
+                                               Width="24"
+                                               Height="24" />
+                    </Viewbox>
+                    <TextBlock Margin="8,0"
+                               FontSize="18"
+                               Text="Calculate!"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </controls:FloatingButton>
+        </StackPanel>
+    </controls:ColorZone>
 </UserControl>

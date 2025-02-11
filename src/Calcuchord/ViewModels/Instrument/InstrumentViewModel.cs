@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -59,8 +58,9 @@ namespace Calcuchord {
         #region Appearance
 
         public string Icon =>
-            InstrumentNameToSvgConverter.Instance.Convert(
-                InstrumentType.ToString(),typeof(string),null,CultureInfo.CurrentCulture) as string;
+            // InstrumentNameToSvgConverter.Instance.Convert(
+            //     InstrumentType.ToString(),typeof(string),null,CultureInfo.CurrentCulture) as string;
+            InstrumentType.ToIconName();
 
 
         public string[] FretCounts =>

@@ -237,14 +237,14 @@ namespace Calcuchord {
                             AddRect(
                                 bg_g,BarShadow,Transparent,curx,bar_y,fw,BarHeight,0,
                                 fillOpacity: ShadowOpacity,
-                                classes: "barre-elm");
+                                classes: "barre-elm shadow-elm");
                         }
 
                         if(fret_note == null &&
                            (str_num == 0 || str_num == str_count - 1)) {
                             // shadow edge
                             HtmlNode shadow_g = CurrentDoc.CreateElement("g");
-                            shadow_g.Attributes.Add("class","barre-elm");
+                            shadow_g.Attributes.Add("class","barre-elm shadow-elm");
                             shadow_g.Attributes.Add("transform",$"translate({cx},{cy})");
                             bg_g.AppendChild(shadow_g);
                             HtmlNode shadow_path = CurrentDoc.CreateElement("path");
@@ -304,7 +304,8 @@ namespace Calcuchord {
                                 classes: "fingers-fill");
                         }
 
-                        AddFingerShape(false,"note-circle");
+
+                        AddFingerShape(false,is_root ? "root-circle" : "note-circle");
                         if(is_root) {
                             AddFingerShape(true,"root-box");
                         }

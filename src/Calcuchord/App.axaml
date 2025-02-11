@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              x:Class="Calcuchord.App"
              RequestedThemeVariant="Default">
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
@@ -20,7 +20,7 @@
             </themes:CustomMaterialTheme.Palettes>
         </themes:CustomMaterialTheme>
         <materialIcons:MaterialIconStyles />
-        <dialogHostAvalonia:DialogHostStyles />
+        <dlg:DialogHostStyles />
         <!-- <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" /> -->
         <!-- <StyleInclude Source="avares://Material.Avalonia.DataGrid/MaterialDataGridStyles.axaml" /> -->
         <StyleInclude Source="avares://Material.Avalonia.DataGrid/DataGrid.xaml" />
