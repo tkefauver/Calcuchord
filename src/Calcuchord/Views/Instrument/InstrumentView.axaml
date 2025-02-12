@@ -93,7 +93,7 @@
                     <local:KeyboardView />
                 </DataTemplate>
                 <DataTemplate x:Key="FretboardViewTemplate">
-                    <local:FretboardView />
+                    <local:FretboardView Margin="10,0" />
                 </DataTemplate>
                 <DataTemplate x:Key="EmptyTemplate">
                     <Border />

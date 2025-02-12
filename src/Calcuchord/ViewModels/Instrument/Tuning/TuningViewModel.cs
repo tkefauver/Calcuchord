@@ -159,12 +159,12 @@ namespace Calcuchord {
         }
 
         public int WorkingFretCount =>
-            Tuning.WorkingFretCount;
+            Tuning.WorkingColCount;
 
         public int TotalFretCount =>
-            Tuning.Parent.FretCount;
+            Tuning.Parent.ColCount;
 
-        int StringCount =>
+        public int RowCount =>
             Parent.RowCount;
 
         // +2 for label and nut

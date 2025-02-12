@@ -9,7 +9,7 @@ namespace Calcuchord {
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
             svg.AppendChild(bg_g);
 
-            //SvgFlags flags = MainViewModel.Instance.SelectedSvgFlags;
+            //SvgOptionType flags = MainViewModel.Instance.SelectedSvgOptionType;
 
             int vfc = 5;
 
@@ -26,7 +26,7 @@ namespace Calcuchord {
 
             var notes = ng.Notes.ToList();
 
-            int str_count = ng.Parent.Parent.Parent.StringCount;
+            int str_count = ng.Parent.Parent.Parent.RowCount;
             int min_fret = 0;
             int max_fret = 0;
             int min_vis_fret = 0;

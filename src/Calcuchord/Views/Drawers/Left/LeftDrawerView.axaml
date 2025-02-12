@@ -5,6 +5,8 @@
              mc:Ignorable="d"
              d:DesignWidth="340"
              d:DesignHeight="720"
+             xmlns:labs="clr-namespace:Avalonia.Labs.Controls;assembly=Avalonia.Labs.Controls"
+             xmlns:base="clr-namespace:Avalonia.Labs.Controls.Base;assembly=Avalonia.Labs.Controls"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
@@ -45,7 +47,7 @@
                 <Setter.Value>
                     <ContextMenu>
                         <MenuItem Header="Delete"
-                                  Command="{Binding DeleteSelectedInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                  Command="{Binding RemoveInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
                                   CommandParameter="{Binding .}" />
                     </ContextMenu>
                 </Setter.Value>
@@ -124,53 +126,70 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="local:InstrumentViewModel">
-                        <Grid Width="{Binding $parent[ListBoxItem].Bounds.Width}"
-                              ColumnDefinitions="Auto,*,Auto"
-                              RowDefinitions="*,Auto">
-                            <!-- <Svg Margin="5,0" -->
-                            <!--      Width="30" -->
-                            <!--      Css="{Binding ConverterParameter=Fg, Converter={x:Static local:CssTintConverter.Instance}}" -->
-                            <!--      Source="{Binding Icon}" /> -->
+                        <labs:Swipe>
+                            <labs:Swipe.Content>
+                                <Grid Width="{Binding $parent[ListBoxItem].Bounds.Width}"
+                                      ColumnDefinitions="Auto,*,Auto"
+                                      RowDefinitions="*,Auto">
 
-                            <avalonia:MaterialIcon Margin="5,0"
-                                                   Kind="{Binding Icon}" />
-                            <TextBlock Grid.Row="0"
-                                       Grid.Column="1"
-                                       Classes="Headline5"
-                                       VerticalAlignment="Center"
-                                       Text="{Binding Name}" />
+                                    <avalonia:MaterialIcon Margin="5,0"
+                                                           Kind="{Binding Icon}" />
+                                    <TextBlock Grid.Row="0"
+                                               Grid.Column="1"
+                                               Classes="Headline5"
+                                               VerticalAlignment="Center"
+                                               Text="{Binding Name}" />
 
-                            <TextBlock Grid.Row="1"
-                                       Grid.Column="1"
-                                       DataContext="{Binding SelectedTuning}"
-                                       Margin="3,0,0,0"
-                                       Classes="Body2"
-                                       Text="{Binding Name}">
-                                <TextBlock.Foreground>
-                                    <SolidColorBrush Color="{DynamicResource FgColor}"
-                                                     Opacity="0.7" />
-                                </TextBlock.Foreground>
-                            </TextBlock>
+                                    <TextBlock Grid.Row="1"
+                                               Grid.Column="1"
+                                               DataContext="{Binding SelectedTuning}"
+                                               Margin="3,0,0,0"
+                                               Classes="Body2"
+                                               Text="{Binding Name}">
+                                        <TextBlock.Foreground>
+                                            <SolidColorBrush Color="{DynamicResource FgColor}"
+                                                             Opacity="0.7" />
+                                        </TextBlock.Foreground>
+                                    </TextBlock>
 
 
-                            <Button Grid.RowSpan="2"
-                                    Grid.Column="2"
-                                    Margin="0,0,5,0"
-                                    Classes="float"
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Center"
-                                    Command="{Binding BeginEditInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                    CommandParameter="{Binding .}">
-                                <Button.IsVisible>
-                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                        <Binding Path="IsSelected" />
-                                        <Binding Path="CanEdit" />
-                                    </MultiBinding>
-                                </Button.IsVisible>
-                                <avalonia:MaterialIcon Kind="Cog" />
-                            </Button>
-                        </Grid>
-
+                                    <Button Grid.RowSpan="2"
+                                            Grid.Column="2"
+                                            Margin="0,0,5,0"
+                                            Classes="float"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Command="{Binding BeginEditInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                            CommandParameter="{Binding .}">
+                                        <Button.IsVisible>
+                                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                                <Binding Path="IsSelected" />
+                                                <Binding Path="CanEdit" />
+                                            </MultiBinding>
+                                        </Button.IsVisible>
+                                        <avalonia:MaterialIcon Kind="Cog" />
+                                    </Button>
+                                </Grid>
+                            </labs:Swipe.Content>
+                            <labs:Swipe.Left>
+                                <DataTemplate x:DataType="local:InstrumentViewModel">
+                                    <Button Background="Red"
+                                            CornerRadius="0"
+                                            HorizontalAlignment="Left"
+                                            Width="100"
+                                            VerticalAlignment="Stretch"
+                                            Command="{Binding RemoveInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                            CommandParameter="{Binding .}">
+                                        <TextBlock Text="Delete"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="18"
+                                                   FontWeight="Bold"
+                                                   Foreground="White" />
+                                    </Button>
+                                </DataTemplate>
+                            </labs:Swipe.Left>
+                        </labs:Swipe>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -206,7 +225,8 @@
                             HorizontalContentAlignment="Left"
                             Padding="0,10">
 
-            <Button Theme="{StaticResource MaterialFlatButton}">
+            <Button Theme="{StaticResource MaterialFlatButton}"
+                    Click="Button_OnClick">
                 <StackPanel Orientation="Horizontal"
                             Spacing="5">
                     <avalonia:MaterialIcon Kind="About"

@@ -32,11 +32,11 @@ namespace Calcuchord {
         }
 
         static int GetId(Note nt) {
-            return nt.IsMute ? -1 : (int)nt.Key + (nt.Register * MAX_NOTE_TYPE);
+            return nt.IsMute ? int.MaxValue : (int)nt.Key + (nt.Register * MAX_NOTE_TYPE);
         }
 
         static Note GetNote(int id) {
-            if(id < 0) {
+            if(id == int.MaxValue) {
                 return new(null,null);
             }
 
@@ -57,6 +57,9 @@ namespace Calcuchord {
 
         [JsonProperty]
         public int Register { get; set; }
+
+        [JsonProperty]
+        public int NoteId { get; set; }
 
         [JsonProperty]
         public bool IsMute { get; set; }
@@ -81,19 +84,19 @@ namespace Calcuchord {
         public virtual string FullName =>
             Key.ToDisplayValue(Register);
 
-        [JsonIgnore]
-        int _id = -1;
-
-        [JsonIgnore]
-        public int NoteId {
-            get {
-                if(_id < 0) {
-                    _id = GetId(this);
-                }
-
-                return _id;
-            }
-        }
+        // [JsonIgnore]
+        // int? _id = null;
+        //
+        // [JsonIgnore]
+        // public int NoteId {
+        //     get {
+        //         if(_id is null) {
+        //             _id = GetId(this);
+        //         }
+        //
+        //         return _id.Value;
+        //     }
+        // }
 
         [JsonIgnore]
         int _midiTone = -1;
@@ -138,6 +141,7 @@ namespace Calcuchord {
         public Note(NoteType nt,int register) {
             Key = nt;
             Register = register;
+            NoteId = GetId(this);
         }
 
         public Note(NoteType? nt,int? register) {
@@ -147,6 +151,8 @@ namespace Calcuchord {
             } else {
                 IsMute = true;
             }
+
+            NoteId = GetId(this);
         }
 
         #endregion
@@ -158,7 +164,7 @@ namespace Calcuchord {
                 return;
             }
 
-            _id = adj_note.NoteId;
+            NoteId = adj_note.NoteId;
             _midiTone = adj_note.MidiTone;
             Key = adj_note.Key;
             Register = adj_note.Register;

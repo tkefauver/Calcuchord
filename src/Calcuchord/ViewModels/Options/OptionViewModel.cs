@@ -51,6 +51,14 @@ namespace Calcuchord {
         [JsonIgnore]
         public bool IsVisible { get; set; } = true;
 
+        [JsonIgnore]
+        public bool IsSecondaryVisible =>
+            IsVisible &&
+            OptionType is
+                OptionType.ChordSort or
+                OptionType.ScaleSort or
+                OptionType.ModeSort;
+
         [JsonProperty]
         public bool IsChecked { get; set; }
 

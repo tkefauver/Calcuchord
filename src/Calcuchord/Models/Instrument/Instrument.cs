@@ -73,22 +73,22 @@ namespace Calcuchord {
 
             var open_notes = tuning_str.Split(" ").Select(
                 (x,idx) => new InstrumentNote(
-                    noteNum: 0,
-                    rowNum: idx,
+                    0,
+                    idx,
                     Note.Parse(x))).ToArray();
 
             Instrument inst = new Instrument(
                 name ?? it.ToString(),
-                it: it,
-                fretCount: fret_count,
-                stringCount: open_notes.Length,
-                neckLengthInInches: neckLen);
+                it,
+                fret_count,
+                open_notes.Length,
+                neckLen);
             inst.IsSelected = isInstrumentSelected;
 
             Tuning tuning = new Tuning(
                 "Standard",
-                isReadOnly: readOnlyTuning,
-                capoNum: capoNum);
+                readOnlyTuning,
+                capoNum);
             tuning.IsChordsFromFile = chordsFromFile;
             tuning.IsSelected = isDefTuningSelected;
             tuning.OpenNotes.AddRange(open_notes);
@@ -118,10 +118,10 @@ namespace Calcuchord {
         public double? NeckLengthInInches { get; set; }
 
         [JsonProperty]
-        public int FretCount { get; set; }
+        public int ColCount { get; set; }
 
         [JsonProperty]
-        public int StringCount { get; set; }
+        public int RowCount { get; set; }
 
         [JsonProperty]
         public List<Tuning> Tunings { get; set; } = [];
@@ -139,12 +139,12 @@ namespace Calcuchord {
         public Instrument() {
         }
 
-        public Instrument(string name,InstrumentType it,int fretCount,int stringCount,
+        public Instrument(string name,InstrumentType it,int colCount,int rowCount,
             double? neckLengthInInches = null) : this() {
             Name = name;
             InstrumentType = it;
-            FretCount = fretCount;
-            StringCount = stringCount;
+            ColCount = colCount;
+            RowCount = rowCount;
             NeckLengthInInches = neckLengthInInches;
         }
 

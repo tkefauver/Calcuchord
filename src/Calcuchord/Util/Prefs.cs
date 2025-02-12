@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using MonkeyPaste.Common;
 using Newtonsoft.Json;
+using DateTime = System.DateTime;
 
 namespace Calcuchord {
     [JsonObject]
@@ -136,32 +138,35 @@ namespace Calcuchord {
         #region Public Methods
 
         public void Save() {
-            if(IsSaveIgnored) {
-                Debug.WriteLine("prefs save ignored");
-                return;
-            }
+            Task.Run(
+                () => {
+                    if(IsSaveIgnored) {
+                        Debug.WriteLine("prefs save ignored");
+                        return;
+                    }
 
 
-            if(MainViewModel.Instance is { } mvm) {
-                Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
-                Options = mvm.OptionLookup.Values.SelectMany(x => x).ToList();
-                IsThemeDark = ThemeViewModel.Instance.IsDark;
-                MatchColCount = mvm.MatchColCount;
-            }
+                    if(MainViewModel.Instance is { } mvm) {
+                        Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
+                        Options = mvm.OptionLookup.Values.SelectMany(x => x).ToList();
+                        IsThemeDark = ThemeViewModel.Instance.IsDark;
+                        MatchColCount = mvm.MatchColCount;
+                    }
 
-            Validate();
-            try {
-                bool is_new = !File.Exists(PrefsFilePath);
-                string pref_json = JsonConvert.SerializeObject(this);
-                File.WriteAllText(PrefsFilePath,pref_json);
-                if(is_new) {
-                    Debug.WriteLine("Prefs CREATED");
-                } else {
-                    Debug.WriteLine("Prefs SAVED");
-                }
-            } catch(Exception e) {
-                e.Dump();
-            }
+                    Validate();
+                    try {
+                        bool is_new = !File.Exists(PrefsFilePath);
+                        string pref_json = JsonConvert.SerializeObject(this);
+                        File.WriteAllText(PrefsFilePath,pref_json);
+                        if(is_new) {
+                            Debug.WriteLine("Prefs CREATED");
+                        } else {
+                            Debug.WriteLine("Prefs SAVED");
+                        }
+                    } catch(Exception e) {
+                        e.Dump();
+                    }
+                });
         }
 
         #endregion

@@ -16,8 +16,6 @@
         <!-- RESULTS CNTR -->
 
         <Border x:Name="ResultContainer"
-                Margin="3"
-                Padding="5"
                 CornerRadius="5">
             <Border.Background>
                 <SolidColorBrush Color="{DynamicResource BgColor}"
@@ -70,8 +68,7 @@
                 </controls:Card>
 
                 <ScrollViewer x:Name="MatchGalleryScrollViewer"
-                              Grid.Row="1"
-                              Padding="5,0">
+                              Grid.Row="1">
                     <!-- NOTE no margin/padding on repeater to get accurate bounds -->
                     <ItemsRepeater x:Name="MatchItemsRepeater"
                                    ItemsSource="{Binding Matches}">
@@ -97,7 +94,6 @@
         <StackPanel x:Name="SearchOverlay"
                     common:MpAvOrientedGridExtension.VerticalRow="1"
                     common:MpAvOrientedGridExtension.HorizontalColumn="1"
-                    IsVisible="{Binding IsSearchOverlayVisible}"
                     Spacing="5"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">

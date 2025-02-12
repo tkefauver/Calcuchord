@@ -26,7 +26,7 @@ namespace Calcuchord {
 
             var notes = ng.Notes.ToList();
 
-            int str_count = ng.Parent.Parent.Parent.StringCount;
+            int str_count = ng.Parent.Parent.Parent.RowCount;
             int min_fret = 0;
             int max_fret = 0;
             int min_vis_fret = 0;
@@ -127,8 +127,12 @@ namespace Calcuchord {
 
             if(show_fret_marker) {
                 double fs = BodyFontSize;
+                if(min_vis_fret > 9) {
+                    fs -= 1; //0.75;
+                }
+
                 double marker_x = 0;
-                double marker_y = cury + (fh / 2d) + (fs / 2d);
+                double marker_y = (cury + (fh / 2d) + (fs / 2d)) - 0.75;
                 string marker_text = $"{min_vis_fret}fr";
 
                 // open label
@@ -201,8 +205,8 @@ namespace Calcuchord {
 
                     PatternNote primary_note = fret_note ?? last_barre_note;
                     if(primary_note != null) {
-                        // fret_bg = flags.HasFlag(SvgFlags.Colors) ? FingerBg[primary_note.FingerNum] : Fg;
-                        // fret_fg = flags.HasFlag(SvgFlags.Colors) ? FingerFg[primary_note.FingerNum] : Bg;
+                        // fret_bg = flags.HasFlag(SvgOptionType.Colors) ? FingerBg[primary_note.FingerNum] : Fg;
+                        // fret_fg = flags.HasFlag(SvgOptionType.Colors) ? FingerFg[primary_note.FingerNum] : Bg;
                         fret_bg = FingerBg[primary_note.FingerNum];
                         fret_fg = FingerFg[primary_note.FingerNum];
                     }

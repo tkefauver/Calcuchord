@@ -172,7 +172,7 @@ namespace Calcuchord {
         }
 
         public int RowCount =>
-            Instrument.StringCount;
+            Instrument.RowCount;
 
         public int VisualRowCount =>
             IsKeyboard ? RowCount : RowCount + 1;
@@ -298,7 +298,7 @@ namespace Calcuchord {
                     if(int.TryParse(
                            StringCounts[SelectedStringCountIndex],
                            out int new_str_count) &&
-                       Instrument.StringCount != new_str_count) {
+                       Instrument.RowCount != new_str_count) {
                         ChangeStringCount(new_str_count);
                     }
 
@@ -312,8 +312,8 @@ namespace Calcuchord {
                     if(int.TryParse(
                            FretCounts[SelectedFretCountIndex],
                            out int new_fret_count) &&
-                       Instrument.FretCount != new_fret_count) {
-                        Instrument.FretCount = new_fret_count;
+                       Instrument.ColCount != new_fret_count) {
+                        Instrument.ColCount = new_fret_count;
                         InitAsync(Instrument).FireAndForgetSafeAsync();
                     }
 
@@ -329,8 +329,8 @@ namespace Calcuchord {
         }
 
         void UpdateEditorSelectionToType() {
-            SelectedFretCountIndex = FretCounts.IndexOf(Instrument.FretCount.ToString());
-            SelectedStringCountIndex = StringCounts.IndexOf(Instrument.StringCount.ToString());
+            SelectedFretCountIndex = FretCounts.IndexOf(Instrument.ColCount.ToString());
+            SelectedStringCountIndex = StringCounts.IndexOf(Instrument.RowCount.ToString());
         }
 
         async Task<TuningViewModel> CreateTuningViewModelAsync(Tuning tuning) {
@@ -387,7 +387,7 @@ namespace Calcuchord {
                 !IsActivated,
                 "No string count changes for existing instruments");
 
-            int diff = newStrCount - Instrument.StringCount;
+            int diff = newStrCount - Instrument.RowCount;
 
             var open_notes = Instrument.Tunings.FirstOrDefault()?.OpenNotes;
             if(diff > 0) {
@@ -406,7 +406,7 @@ namespace Calcuchord {
                 open_notes = open_notes.Take(newStrCount).ToList();
             }
 
-            Instrument.StringCount = newStrCount;
+            Instrument.RowCount = newStrCount;
             Instrument.Tunings.ForEach(x => x.OpenNotes = open_notes.ToList());
             InitAsync(Instrument).FireAndForgetSafeAsync();
         }

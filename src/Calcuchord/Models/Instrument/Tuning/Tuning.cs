@@ -43,8 +43,8 @@ namespace Calcuchord {
         public bool IsChordsFromFile { get; set; }
 
         [JsonIgnore]
-        public int WorkingFretCount =>
-            Parent.FretCount - CapoFretNum;
+        public int WorkingColCount =>
+            Parent.ColCount - CapoFretNum;
 
         [JsonIgnore]
         Dictionary<MusicPatternType,List<NoteGroupCollection>> _collections;

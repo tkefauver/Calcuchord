@@ -1,36 +1,80 @@
-using System;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json.Converters;
 
 namespace Calcuchord {
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum MatchSortType {
+        Key,
+        Position,
+        Suffix
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum PaletteColorType {
+        None = 0,
+        HttTransparent,
+        Bg,
+        Fg,
+        RootFretBg,
+        RootFretFg,
+        UserFretBg,
+        UserFretFg,
+        UnknownFretBg,
+        UnknownFretFg,
+        MutedFretBg,
+        MutedFretFg,
+        Finger1Fg,
+        Finger1Bg,
+        Finger2Fg,
+        Finger2Bg,
+        Finger3Fg,
+        Finger3Bg,
+        Finger4Fg,
+        Finger4Bg,
+        NutBg,
+        NutFg,
+        PianoWhiteKeyBg,
+        PianoWhiteKeyBg2,
+        PianoWhiteKeyBg3,
+        PianoWhiteKeyFg,
+        PianoBlackKeyBg,
+        PianoBlackKeyBg2,
+        PianoBlackKeyBg3,
+        PianoBlackKeyFg,
+        PianoMatch,
+        DisabledAccentFg
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum NoteMarkerState {
         Off,
         On,
         Root
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MatchUpdateSource {
         FindClick,
         NoteToggle,
         RootToggle,
         FilterToggle,
-        SvgToggle,
         InstrumentInit,
-        BookmarkToggle
+        BookmarkToggle,
+        SortToggle
     }
 
 
-    [Flags]
-    public enum SvgFlags {
-        Fingers = 1,
-        Notes = 2,
-        Roots = 4,
-        Matches = 8,
-        Colors = 16,
-        Frets = 32,
-        Tuning = 64,
-        Barres = 128,
-        Shadows = 256
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum SvgOptionType {
+        Fingers,
+        Notes,
+        Roots,
+        Matches,
+        Colors,
+        Frets,
+        Tuning,
+        Barres,
+        Shadows
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -90,7 +134,10 @@ namespace Calcuchord {
         ModeSuffix,
         ChordSvg,
         ScaleSvg,
-        ModeSvg
+        ModeSvg,
+        ChordSort,
+        ScaleSort,
+        ModeSort
     }
 
     // _ = '/'

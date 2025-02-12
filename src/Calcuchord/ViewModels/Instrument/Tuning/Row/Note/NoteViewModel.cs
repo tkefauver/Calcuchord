@@ -85,6 +85,18 @@ namespace Calcuchord {
 
         #region State
 
+        public bool IsFirstFret =>
+            NoteNum == 1;
+
+        public bool IsLastFret =>
+            NoteNum == Parent.Parent.TotalFretCount;
+
+        public bool IsTopFret =>
+            RowNum == 0;
+
+        public bool IsBottomFret =>
+            RowNum == Parent.Parent.RowCount - 1;
+
         public bool IsSelected { get; set; }
         public bool IsHovering { get; set; }
 

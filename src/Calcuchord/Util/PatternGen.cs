@@ -115,7 +115,7 @@ namespace Calcuchord {
             Tuning.OpenNotes.ToArray();
 
         int FretCount =>
-            Tuning.Parent.FretCount;
+            Tuning.Parent.ColCount;
 
         int PatternFretSpan { get; }
 
@@ -425,9 +425,13 @@ namespace Calcuchord {
                             continue;
                         }
 
-                        ngc.Groups.Add(new(ngc,idx,fingerings.OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum)));
+                        ngc.Groups.Add(new NoteGroup(ngc,idx,fingerings.OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum)));
                         TotalChordCount++;
                     }
+
+                    // set group position by lowest note
+                    ngc.Groups = ngc.Groups.OrderBy(x => x.Notes.Min(y => y.NoteId)).ToList();
+                    ngc.Groups.ForEach((x,idx) => x.Position = idx);
 
                     ngcl.Add(ngc);
                     UpdateProgress(++cur_progress,$"{TotalChordCount} chords found...");

@@ -37,7 +37,7 @@ namespace Calcuchord {
 
             var pattern_notes = ng.Notes.OrderBy(x => x.NoteNum);
             InstrumentNote root_note = ng.Parent.Parent.OpenNotes.FirstOrDefault();
-            int key_count = ng.Parent.Parent.WorkingFretCount;
+            int key_count = ng.Parent.Parent.WorkingColCount;
 
             double cur_x = 0;
             double cur_y = 0;
@@ -79,7 +79,7 @@ namespace Calcuchord {
 
 
                 // user
-                // if(is_user && flags.HasFlag(SvgFlags.Matches)) {
+                // if(is_user && flags.HasFlag(SvgOptionType.Matches)) {
                 //     ReduceDims();
                 //     AddRect(cntr,UserBg,UserBg,x,y,w,h,lw);
                 // }

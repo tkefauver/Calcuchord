@@ -167,7 +167,7 @@ namespace Calcuchord {
 #if DEBUG
                 if(TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
                    tl.Clipboard is { } cb &&
-                   MatchToSvgConverter.Instance.Convert(NoteGroup,null,null,null) is string svg) {
+                   MatchToSvgConverter.Instance.Convert(NoteGroup,null,"styled",null) is string svg) {
                     cb.SetTextAsync(svg.ToPrettyPrintXml()).FireAndForgetSafeAsync();
                 }
 #endif

@@ -12,40 +12,7 @@ using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
 
 namespace Calcuchord {
-    public enum PaletteColorType {
-        None = 0,
-        HttTransparent,
-        Bg,
-        Fg,
-        RootFretBg,
-        RootFretFg,
-        UserFretBg,
-        UserFretFg,
-        UnknownFretBg,
-        UnknownFretFg,
-        MutedFretBg,
-        MutedFretFg,
-        Finger1Fg,
-        Finger1Bg,
-        Finger2Fg,
-        Finger2Bg,
-        Finger3Fg,
-        Finger3Bg,
-        Finger4Fg,
-        Finger4Bg,
-        NutBg,
-        NutFg,
-        PianoWhiteKeyBg,
-        PianoWhiteKeyBg2,
-        PianoWhiteKeyBg3,
-        PianoWhiteKeyFg,
-        PianoBlackKeyBg,
-        PianoBlackKeyBg2,
-        PianoBlackKeyBg3,
-        PianoBlackKeyFg,
-        PianoMatch,
-        DisabledAccentFg
-    }
+
 
     public class ThemeViewModel : ViewModelBase {
 

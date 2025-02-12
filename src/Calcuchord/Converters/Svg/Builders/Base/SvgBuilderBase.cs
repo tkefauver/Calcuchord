@@ -17,15 +17,15 @@ namespace Calcuchord {
 
         #region Statics
 
-        public static SvgFlags DefaultSvgFlags =>
-            SvgFlags.Fingers |
-            SvgFlags.Barres |
-            SvgFlags.Colors |
-            SvgFlags.Tuning |
-            SvgFlags.Roots |
-            SvgFlags.Matches |
-            SvgFlags.Frets |
-            SvgFlags.Shadows;
+        public static SvgOptionType DefaultSvgOptionType =>
+            SvgOptionType.Fingers |
+            SvgOptionType.Barres |
+            SvgOptionType.Colors |
+            SvgOptionType.Tuning |
+            SvgOptionType.Roots |
+            SvgOptionType.Matches |
+            SvgOptionType.Frets |
+            SvgOptionType.Shadows;
 
         #endregion
 
@@ -199,6 +199,12 @@ namespace Calcuchord {
                 ForPrint = true;
             } else {
                 ForPrint = false;
+            }
+
+            if(args.ToStringOrEmpty() == "styled") {
+                HtmlNode style_elm = CurrentDoc.CreateElement("style");
+                style_elm.InnerHtml = MainViewModel.Instance.MatchSvgCss;
+                svg.AppendChild(style_elm);
             }
 
             return svg;

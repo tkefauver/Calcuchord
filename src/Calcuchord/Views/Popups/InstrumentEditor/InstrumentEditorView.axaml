@@ -40,7 +40,8 @@
     </UserControl.Styles>
 
 
-    <dlg:DialogHost Identifier="InstrumentEditorPopupHost">
+    <dlg:DialogHost dlg:DialogHostStyle.ClipToBounds="True"
+                    Identifier="InstrumentEditorPopupHost">
         <Border x:Name="PopupOverlayBorder">
             <Grid>
 

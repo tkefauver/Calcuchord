@@ -197,10 +197,15 @@
                  VerticalAlignment="Center" />
 
         <!-- FRET BAR (LEFT) -->
-        <Border IsVisible="{Binding IsRealNote}"
-                HorizontalAlignment="Left"
+        <Border HorizontalAlignment="Left"
                 VerticalAlignment="Stretch"
                 Width="1.5">
+            <Border.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsRealNote" />
+                    <Binding Path="!IsFirstFret" />
+                </MultiBinding>
+            </Border.IsVisible>
             <Border.Background>
                 <LinearGradientBrush StartPoint="0%,0%"
                                      EndPoint="100%,0%"
@@ -220,10 +225,15 @@
 
         <!-- FRET BAR (RIGHT) -->
 
-        <Border IsVisible="{Binding IsRealNote}"
-                HorizontalAlignment="Right"
+        <Border HorizontalAlignment="Right"
                 VerticalAlignment="Stretch"
                 Width="1.5">
+            <Border.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsRealNote" />
+                    <Binding Path="!IsLastFret" />
+                </MultiBinding>
+            </Border.IsVisible>
             <Border.Background>
                 <LinearGradientBrush StartPoint="100%,0%"
                                      EndPoint="0%,0%"
@@ -239,6 +249,32 @@
                     </GradientStops>
                 </LinearGradientBrush>
             </Border.Background>
+        </Border>
+
+        <!-- EDGE (TOP) -->
+        <Border Background="{DynamicResource NutBg}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top"
+                Height="5">
+            <Border.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsRealNote" />
+                    <Binding Path="IsTopFret" />
+                </MultiBinding>
+            </Border.IsVisible>
+        </Border>
+
+        <!-- EDGE (BOTTOM) -->
+        <Border Background="{DynamicResource NutBg}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom"
+                Height="5">
+            <Border.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsRealNote" />
+                    <Binding Path="IsBottomFret" />
+                </MultiBinding>
+            </Border.IsVisible>
         </Border>
 
         <!-- CAPO -->
