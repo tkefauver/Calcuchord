@@ -40,6 +40,15 @@
         <Setter Property="FontFamily"
                 Value="{StaticResource GaramondFont}" />
     </Style>
+    <Style Selector=":is(TextBlock)[FontWeight=Bold]">
+        <Setter Property="FontFamily"
+                Value="{StaticResource GaramondBoldFont}" />
+    </Style>
+
+    <Style Selector="Run[FontWeight=Bold]">
+        <Setter Property="FontFamily"
+                Value="{StaticResource GaramondBoldFont}" />
+    </Style>
     <Style Selector=":is(TextBox)">
         <Setter Property="FontFamily"
                 Value="{StaticResource GaramondFont}" />

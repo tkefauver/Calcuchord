@@ -119,10 +119,6 @@ namespace Calcuchord {
         public bool IsActivated =>
             MainViewModel.Instance.Instruments.Contains(this);
 
-
-        public bool CanEditTunings =>
-            Tunings.Any();
-
         public bool IsKeyboard =>
             InstrumentType == InstrumentType.Piano;
 
@@ -323,7 +319,6 @@ namespace Calcuchord {
 
         void Tunings_OnCollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
             OnPropertyChanged(nameof(Tunings));
-            OnPropertyChanged(nameof(CanEditTunings));
 
             MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.CanFinishEdit));
         }
@@ -425,13 +420,15 @@ namespace Calcuchord {
                 Instrument.Tunings.Remove(tuning_vm_to_remove.Tuning);
                 Tunings.Remove(tuning_vm_to_remove);
 
-                int to_sel_idx = to_remove_idx >= Tunings.Count ? to_remove_idx - 1 : to_remove_idx;
-                SelectedTuning = Tunings[to_sel_idx];
-                Tunings.ForEach(x => x.OnPropertyChanged(nameof(x.CanDelete)));
+                if(Tunings.Any()) {
+                    int to_sel_idx = to_remove_idx >= Tunings.Count ? to_remove_idx - 1 : to_remove_idx;
+                    SelectedTuning = Tunings[to_sel_idx];
+                    Tunings.ForEach(x => x.OnPropertyChanged(nameof(x.CanDelete)));
+                    Debug.WriteLine($"'{tuning_vm_to_remove.Tuning.Name}' removed from {Instrument.Name}");
+                }
 
                 Prefs.Instance.Save();
 
-                Debug.WriteLine($"'{tuning_vm_to_remove.Tuning.Name}' removed from {Instrument.Name}");
             });
 
         public MpIAsyncCommand<object> AddTuningCommand => new MpAsyncCommand<object>(

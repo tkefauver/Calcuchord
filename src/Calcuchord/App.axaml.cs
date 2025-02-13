@@ -1,10 +1,8 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using PropertyChanged;
-#if SUGAR_WV
 using AvaloniaWebView;
-#endif
+using PropertyChanged;
 
 namespace Calcuchord {
     [DoNotNotify]
@@ -15,8 +13,6 @@ namespace Calcuchord {
 
         public override void RegisterServices() {
             base.RegisterServices();
-
-#if SUGAR_WV
             if(PlatformWrapper.Services is { } ps &&
                ps.MidiPlayer is MidiPlayer_sugarwv mp_swv) {
                 AvaloniaWebViewBuilder.Initialize(
@@ -24,7 +20,6 @@ namespace Calcuchord {
                         mp_swv.Init(config);
                     });
             }
-#endif
         }
 
 
@@ -36,16 +31,19 @@ namespace Calcuchord {
 
             _ = new MainViewModel();
 
-            if(ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
-                desktop.MainWindow = new MainWindow
-                {
-                    DataContext = MainViewModel.Instance
-                };
-            } else if(ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform) {
-                singleViewPlatform.MainView = new MainView
-                {
-                    DataContext = MainViewModel.Instance
-                };
+            switch(ApplicationLifetime) {
+                case IClassicDesktopStyleApplicationLifetime desktop:
+                    desktop.MainWindow = new MainWindow
+                    {
+                        DataContext = MainViewModel.Instance
+                    };
+                    break;
+                case ISingleViewApplicationLifetime singleViewPlatform:
+                    singleViewPlatform.MainView = new MainView
+                    {
+                        DataContext = MainViewModel.Instance
+                    };
+                    break;
             }
 
             base.OnFrameworkInitializationCompleted();

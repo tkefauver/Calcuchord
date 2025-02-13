@@ -174,7 +174,11 @@ namespace Calcuchord {
                 }
             }
 
-            th -= sh;
+            // if(show_fret_marker) {
+            //     th -= 5;
+            // } else {
+            //     th -= sh;
+            // }
 
             svg.Attributes.Add("width",tw);
             svg.Attributes.Add("height",th);

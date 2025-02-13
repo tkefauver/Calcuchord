@@ -26,6 +26,13 @@ namespace Calcuchord {
                this.GetVisualDescendants<FretView>() is not { } fvl ||
                fvl.FirstOrDefault(x => x.DataContext == low_note_vm) is not { } low_note_v ||
                fvl.FirstOrDefault(x => x.DataContext == hi_note_vm) is not { } hi_note_v) {
+
+                if(this.GetVisualDescendants<ScrollViewer>().FirstOrDefault(x => x.Classes.Contains("inst-scroll")) is
+                   { } inst_sv) {
+                    // scroll to home when nothing selected
+                    inst_sv.ScrollToHome();
+                }
+
                 return;
             }
 

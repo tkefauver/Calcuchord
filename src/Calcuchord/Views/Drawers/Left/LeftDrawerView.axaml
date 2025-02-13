@@ -142,6 +142,7 @@
 
                                     <TextBlock Grid.Row="1"
                                                Grid.Column="1"
+                                               IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}"
                                                DataContext="{Binding SelectedTuning}"
                                                Margin="3,0,0,0"
                                                Classes="Body2"

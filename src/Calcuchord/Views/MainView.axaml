@@ -25,27 +25,6 @@
             <Setter Property="MinWidth"
                     Value="0" />
         </Style>
-
-        <!-- ORIENTATION -->
-        <!-- <Style Selector="Grid#MainContainerGrid:not(.landscape) local|InstrumentView"> -->
-        <!--     <Setter Property="MaxHeight" -->
-        <!--             Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Height}, exp=a*0.35}" /> -->
-        <!-- </Style> -->
-        <!-- -->
-        <!-- <Style Selector="Grid#MainContainerGrid.landscape local|InstrumentView"> -->
-        <!--     <Setter Property="Width" -->
-        <!--             Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Width}, exp=a*0.35}" /> -->
-        <!-- </Style> -->
-        <!-- -->
-        <!-- <Style Selector="Grid#MainContainerGrid.landscape StackPanel#SearchOverlay"> -->
-        <!--     <Setter Property="Width" -->
-        <!--             Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Width}, exp=a*0.65}" /> -->
-        <!-- </Style> -->
-        <!-- <Style Selector="Grid#MainContainerGrid.landscape local|MatchesView"> -->
-        <!--     <Setter Property="Width" -->
-        <!--             Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Width}, exp=a*0.65}" /> -->
-        <!-- </Style> -->
-
     </UserControl.Styles>
     <Grid x:Name="MainOuterContainer">
         <dlg:DialogHost x:Name="MainDialogHost"

@@ -25,8 +25,8 @@ namespace Calcuchord {
         IEnumerable<NoteGroup> Items =>
             Tuning == null ? [] : Tuning.Collections[PatternType].SelectMany(x => x.Groups);
 
-        MusicPatternType PatternType { get; }
-        Tuning Tuning { get; }
+        public MusicPatternType PatternType { get; }
+        public Tuning Tuning { get; }
 
         #endregion
 

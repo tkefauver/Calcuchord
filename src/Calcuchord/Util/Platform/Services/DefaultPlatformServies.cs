@@ -16,5 +16,6 @@ namespace Calcuchord {
 
 
         public abstract IMidiPlayer MidiPlayer { get; }
+        public virtual IPrefsIo PrefsIo { get; }
     }
 }

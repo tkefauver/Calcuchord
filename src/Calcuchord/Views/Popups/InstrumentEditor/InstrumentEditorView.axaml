@@ -42,6 +42,10 @@
 
     <dlg:DialogHost dlg:DialogHostStyle.ClipToBounds="True"
                     Identifier="InstrumentEditorPopupHost">
+        <dlg:DialogHost.Resources>
+            <SolidColorBrush x:Key="DialogHostOverlayBackgroundMixinBrush">Transparent</SolidColorBrush>
+            <SolidColorBrush x:Key="DialogHostBackgroundMixinBrush">Transparent</SolidColorBrush>
+        </dlg:DialogHost.Resources>
         <Border x:Name="PopupOverlayBorder">
             <Grid>
 
@@ -92,8 +96,7 @@
                                             <local:InstrumentTabView Margin="0,0,20,0" />
                                         </ScrollViewer>
                                     </TabItem>
-                                    <TabItem IsSelected="{Binding IsTuningTabSelected, Mode=TwoWay}"
-                                             IsEnabled="{Binding CanEditTunings}">
+                                    <TabItem IsSelected="{Binding IsTuningTabSelected, Mode=TwoWay}">
                                         <TabItem.Header>
                                             <TextBlock Classes="tab-header"
                                                        Text="Tunings" />

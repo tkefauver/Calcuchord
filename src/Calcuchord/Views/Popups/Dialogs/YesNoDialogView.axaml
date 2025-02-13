@@ -12,30 +12,34 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:DialogViewModel"
              x:Class="Calcuchord.YesNoDialogView">
-    <StackPanel MinWidth="200"
-                Spacing="10">
-        <TextBlock FontSize="16"
-                   MaxWidth="150"
-                   HorizontalAlignment="Center"
-                   TextAlignment="Center"
-                   TextWrapping="Wrap"
-                   Text="{Binding Label}" />
+    <Border Background="{DynamicResource Bg}"
+            Padding="10"
+            CornerRadius="10">
+        <StackPanel MinWidth="200"
+                    Spacing="10">
+            <TextBlock FontSize="16"
+                       MaxWidth="150"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Text="{Binding Label}" />
 
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Spacing="50">
-            <Button Width="70"
-                    IsCancel="True"
-                    HorizontalAlignment="Left"
-                    Command="{Binding CancelCommand}">
-                No
-            </Button>
-            <Button Width="70"
-                    IsDefault="True"
-                    HorizontalAlignment="Right"
-                    Command="{Binding OkCommand}">
-                Yes
-            </Button>
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Spacing="50">
+                <Button Width="70"
+                        IsCancel="True"
+                        HorizontalAlignment="Left"
+                        Command="{Binding CancelCommand}">
+                    No
+                </Button>
+                <Button Width="70"
+                        IsDefault="True"
+                        HorizontalAlignment="Right"
+                        Command="{Binding OkCommand}">
+                    Yes
+                </Button>
+            </StackPanel>
         </StackPanel>
-    </StackPanel>
+    </Border>
 </UserControl>

@@ -30,6 +30,13 @@ namespace Calcuchord {
             }
 
             bool is_initial_startup = !File.Exists(PrefsFilePath);
+            if(OperatingSystem.IsBrowser() &&
+               PlatformWrapper.Services.PrefsIo is { } prefIo &&
+               !string.IsNullOrEmpty(prefIo.ReadPrefs())) {
+                is_initial_startup = false;
+            }
+
+            Debug.WriteLine($"Initial Startup: {is_initial_startup} Prefs Path: {PrefsFilePath}");
 
             if(is_initial_startup) {
                 _ = new Prefs();
@@ -37,6 +44,10 @@ namespace Calcuchord {
             } else {
                 try {
                     string prefs_json = File.ReadAllText(PrefsFilePath);
+                    if(OperatingSystem.IsBrowser()) {
+                        prefs_json = PlatformWrapper.Services.PrefsIo.ReadPrefs();
+                    }
+
                     _ = JsonConvert.DeserializeObject<Prefs>(prefs_json);
                     Instance.Instruments.ForEach(x => x.RefreshModelTree());
                 } catch(Exception e) {
@@ -89,7 +100,7 @@ namespace Calcuchord {
         public bool IsInitialStartup { get; private set; }
 
         [JsonIgnore]
-        public bool IsPrefsPersistent => File.Exists(PrefsFilePath);
+        public bool IsPrefsPersistent => File.Exists(PrefsFilePath) || OperatingSystem.IsBrowser();
 
         [JsonIgnore]
         static bool RESET_PREFS => false;
@@ -98,7 +109,7 @@ namespace Calcuchord {
         static string _prefsFilePath;
 
         [JsonIgnore]
-        static string PrefsFilePath {
+        public static string PrefsFilePath {
             get {
                 if(_prefsFilePath == null &&
                    PlatformWrapper.Services is { } ps &&
@@ -153,11 +164,17 @@ namespace Calcuchord {
                         MatchColCount = mvm.MatchColCount;
                     }
 
-                    Validate();
+                    // Validate();
                     try {
                         bool is_new = !File.Exists(PrefsFilePath);
                         string pref_json = JsonConvert.SerializeObject(this);
-                        File.WriteAllText(PrefsFilePath,pref_json);
+
+                        if(OperatingSystem.IsBrowser()) {
+                            PlatformWrapper.Services.PrefsIo.WritePrefs(pref_json);
+                        } else {
+                            File.WriteAllText(PrefsFilePath,pref_json);
+                        }
+
                         if(is_new) {
                             Debug.WriteLine("Prefs CREATED");
                         } else {
@@ -204,10 +221,10 @@ namespace Calcuchord {
                 return;
             }
 
-            if(mvm.SelectedTuning == null) {
-                // should always have a selected tuning
-                Debugger.Break();
-            }
+            // if(mvm.SelectedTuning == null) {
+            //     // should always have a selected tuning
+            //     Debugger.Break();
+            // }
 
             if(Instruments.SelectMany(x => x.Tunings).SelectMany(x => x.Collections.Values).SelectMany(x => x)
                    .SelectMany(x => x.Groups) is { } all_ngl &&

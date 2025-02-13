@@ -92,6 +92,9 @@ namespace Calcuchord {
 
         #region State
 
+        public bool CanDelete =>
+            !IsReadOnly; // && Parent.Tunings.Count > 1;
+
         public bool IsExpanded { get; set; }
 
         public bool IsCurGenTuning =>
@@ -463,9 +466,6 @@ namespace Calcuchord {
 
         #region Commands
 
-        public bool CanDelete =>
-            !IsReadOnly && Parent.Tunings.Count > 1;
-
         public ICommand DeleteThisTuningCommand => new MpCommand<object>(
             async (args) => {
                 CloseFlyout(args);
@@ -486,13 +486,13 @@ namespace Calcuchord {
                             })
                     }
                 };
-                DialogHost.Show(dlg_v,MainView.DialogHostName).FireAndForgetSafeAsync();
+                DialogHost.Show(dlg_v,InstrumentEditorView.DialogHostName).FireAndForgetSafeAsync();
 
                 while(!confirmed.HasValue) {
                     await Task.Delay(100);
                 }
 
-                DialogHost.Close(MainView.DialogHostName);
+                DialogHost.Close(InstrumentEditorView.DialogHostName);
 
                 if(!confirmed.Value) {
                     return;

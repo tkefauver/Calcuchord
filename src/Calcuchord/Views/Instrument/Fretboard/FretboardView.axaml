@@ -49,6 +49,7 @@
     </UserControl.Styles>
     <Grid>
         <ScrollViewer x:Name="FretboardScrollViewer"
+                      Classes="inst-scroll"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Hidden">
             <Viewbox>

@@ -255,7 +255,7 @@
         <Border Background="{DynamicResource NutBg}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Top"
-                Height="5">
+                Height="2">
             <Border.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="IsRealNote" />
@@ -268,7 +268,7 @@
         <Border Background="{DynamicResource NutBg}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom"
-                Height="5">
+                Height="2">
             <Border.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="IsRealNote" />

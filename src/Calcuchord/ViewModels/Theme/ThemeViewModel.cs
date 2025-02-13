@@ -252,7 +252,7 @@ namespace Calcuchord {
         public string Transparent { get; set; } = "#00000000";
 
         public string ThemeIcon =>
-            IsDark ? "Lightbulb" : "LightbulbOutline";
+            !IsDark ? "Lightbulb" : "LightbulbOutline";
 
         #endregion
 

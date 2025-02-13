@@ -6,9 +6,6 @@
              xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              x:Class="Calcuchord.App"
              RequestedThemeVariant="Default">
-    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
-
-
     <Application.Styles>
         <themes:CustomMaterialTheme>
             <themes:CustomMaterialTheme.Palettes>
@@ -23,8 +20,6 @@
         <materialIcons:MaterialIconStyles />
         <dlg:DialogHostStyles />
         <labs:ControlThemes />
-        <!-- <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" /> -->
-        <!-- <StyleInclude Source="avares://Material.Avalonia.DataGrid/MaterialDataGridStyles.axaml" /> -->
         <StyleInclude Source="avares://Material.Avalonia.DataGrid/DataGrid.xaml" />
         <StyleInclude Source="avares://Calcuchord/Styles/Default.axaml" />
     </Application.Styles>

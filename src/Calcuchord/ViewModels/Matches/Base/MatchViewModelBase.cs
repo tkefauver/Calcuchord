@@ -19,6 +19,9 @@ namespace Calcuchord {
 
         #region Statics
 
+        static MatchViewModelBase PlayingMatch { get; set; }
+        static bool IsAnyMatchPlaying => PlayingMatch != null;
+
         #endregion
 
         #region Interfaces
@@ -165,7 +168,8 @@ namespace Calcuchord {
                 }
 
 #if DEBUG
-                if(TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
+                if(ThemeViewModel.Instance.IsDesktop &&
+                   TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
                    tl.Clipboard is { } cb &&
                    MatchToSvgConverter.Instance.Convert(NoteGroup,null,"styled",null) is string svg) {
                     cb.SetTextAsync(svg.ToPrettyPrintXml()).FireAndForgetSafeAsync();
@@ -178,17 +182,22 @@ namespace Calcuchord {
                     return;
                 }
 
-                if(IsMatchPlaying) {
+                bool was_playing = IsMatchPlaying;
+                if(IsAnyMatchPlaying) {
                     mp.StopPlayback();
-                    return;
+                    if(was_playing) {
+                        return;
+                    }
                 }
 
+                PlayingMatch = this;
                 mp.Stopped += MidiPlayer_OnStopped;
 
                 PlayGroupMidi();
 
                 void MidiPlayer_OnStopped(object sender,EventArgs e) {
                     IsMatchPlaying = false;
+                    PlayingMatch = null;
                     mp.Stopped -= MidiPlayer_OnStopped;
                 }
             });
@@ -203,23 +212,24 @@ namespace Calcuchord {
                 if(!mvm.IsSearchModeSelected) {
                     // auto switch to search mode
                     mvm.SelectOptionCommand.Execute(mvm.SearchOptionViewModel);
+                    //await Task.Delay(300);
                 }
 
-                // select only notes in group, use open note for mutes
-                stvm.SelectedNotes =
-                    stvm.AllNotes.Where(
-                            x => x.IsRealNote &&
-                                 NoteGroup.Notes.Any(
-                                     y =>
-                                         x.NoteNum == (y.NoteNum == -1 ? 0 : y.NoteNum) &&
-                                         x.RowNum == y.RowNum))
-                        .ToList();
+                stvm.ResetSelection();
+                //await Task.Delay(150);
 
-                // set selected open notes to mute when group note is -1
-                NoteGroup.Notes.Where(x => x.NoteNum < 0).ForEach(
-                    x =>
-                        stvm.SelectedNotes.Where(y => y.NoteNum == 0 && y.RowNum == x.RowNum)
-                            .ForEach(z => z.WorkingNoteNum = NoteViewModel.MUTE_FRET_NUM));
+                foreach(NoteViewModel nvm in stvm.AllNotes.Where(x => x.IsRealNote)) {
+                    if(NoteGroup.Notes.FirstOrDefault(
+                           x => x.RowNum == nvm.RowNum && Math.Max(0,x.NoteNum) == nvm.NoteNum) is not { } ng_match) {
+                        continue;
+                    }
+
+                    nvm.Parent.ToggleNoteSelectedCommand.Execute(nvm);
+                    if(ng_match.IsMute) {
+                        // toggle to mute
+                        nvm.Parent.ToggleNoteSelectedCommand.Execute(nvm);
+                    }
+                }
 
                 InstrumentView.Instance.ScrollSelectionIntoView();
             });

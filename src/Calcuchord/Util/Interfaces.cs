@@ -6,6 +6,7 @@ namespace Calcuchord {
     public interface IPlatformServices {
         IStorageHelper StorageHelper { get; }
         IMidiPlayer MidiPlayer { get; }
+        IPrefsIo PrefsIo { get; }
 
     }
 
@@ -16,6 +17,11 @@ namespace Calcuchord {
 
     public interface IStorageHelper {
         string StorageDir { get; }
+    }
+
+    public interface IPrefsIo {
+        string ReadPrefs();
+        void WritePrefs(string prefsJson);
     }
 
 

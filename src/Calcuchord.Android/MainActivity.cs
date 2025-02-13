@@ -1,13 +1,16 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Android;
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
+using Android.Runtime;
 using AndroidX.Core.App;
 using Avalonia;
 using Avalonia.Android;
 using Avalonia.ReactiveUI;
 using Avalonia.WebView.Android;
+using Debug = System.Diagnostics.Debug;
 
 namespace Calcuchord.Android {
     [Activity(
@@ -25,6 +28,17 @@ namespace Calcuchord.Android {
                 .LogToTrace()
                 .AfterPlatformServicesSetup(
                     _ => {
+                        AppDomain.CurrentDomain.UnhandledException += (s,e) => {
+                            Debug.WriteLine(
+                                $"AppDomain.CurrentDomain.UnhandledException: {e.ExceptionObject}. IsTerminating: {e.IsTerminating}");
+                        };
+
+                        AndroidEnvironment.UnhandledExceptionRaiser += (s,e) => {
+                            Debug.WriteLine(
+                                $"AndroidEnvironment.UnhandledExceptionRaiser: {e.Exception}. IsTerminating: {e.Handled}");
+                            e.Handled = true;
+                        };
+
                         PlatformWrapper.Init(new AndroidPlatformServices());
                     });
         }

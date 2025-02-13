@@ -22,19 +22,11 @@
         </PackageReference>
         <PackageReference Include="Avalonia.ReactiveUI"/>
         <PackageReference Include="webview.avalonia.desktop"/>
+        <PackageReference Include="Melanchall.DryWetMidi"/>
     </ItemGroup>
 
 
     <ItemGroup>
         <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Remove="Util\Platform\Midi\LinuxMidiPlayer.cs"/>
-    </ItemGroup>
-
-    <ItemGroup Condition="$(BuildOs) == 'LINUX'">
-        <Compile Include="Util\Platform\Midi\LinuxMidiPlayer.cs"/>
-
     </ItemGroup>
 </Project>

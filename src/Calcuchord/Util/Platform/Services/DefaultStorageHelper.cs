@@ -10,7 +10,7 @@ namespace Calcuchord {
         public string StorageDir {
             get {
                 if(OperatingSystem.IsBrowser()) {
-                    return "/";
+                    return string.Empty;
                 }
 
                 if(_storageDir == null) {

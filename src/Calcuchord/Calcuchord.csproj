@@ -41,36 +41,4 @@
         <PackageReference Include="webview.avalonia"/>
         <PackageReference Include="Melanchall.DryWetMidi" Condition="$(BuildOs) == 'LINUX'"/>
     </ItemGroup>
-
-    <ItemGroup>
-        <Compile Update="Views\Popups\PopupEditor\PopupEditorView.axaml.cs">
-            <DependentUpon>InstPopupContainerView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Popups\Dialogs\TuningGenProgressView.axaml.cs">
-            <DependentUpon>TuningGenProgressView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Popups\Dialogs\WelcomeView2.axaml.cs">
-            <DependentUpon>WelcomeView2.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Popups\InstrumentEditor\Tabs\InstrumentTabView.axaml.cs">
-            <DependentUpon>InstrumentTabView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Popups\InstrumentEditor\Tabs\TuningTabView.axaml.cs">
-            <DependentUpon>TuningTabView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Views\Instrument\Popups\"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <UpToDateCheckInput Remove="Views\Instrument\Popups\Progress\TuningGenProgressView.axaml"/>
-        <UpToDateCheckInput Remove="Views\Instrument\Popups\Tuning\TuningEditorView.axaml"/>
-    </ItemGroup>
 </Project>

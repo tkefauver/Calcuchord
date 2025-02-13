@@ -8,9 +8,7 @@ namespace Calcuchord.Desktop {
             get {
                 if(_midiPlayer == null) {
                     if(OperatingSystem.IsLinux()) {
-#if LINUX
                         _midiPlayer = new LinuxMidiPlayer();
-#endif
                     } else {
                         _midiPlayer = new MidiPlayer_sugarwv();
                     }

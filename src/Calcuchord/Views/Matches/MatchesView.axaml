@@ -12,6 +12,140 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.MatchesView">
+    <UserControl.Styles>
+        <Style Selector="TextBlock.empty-label">
+            <Setter Property="FontSize"
+                    Value="34" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Stretch" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="TextWrapping"
+                    Value="Wrap" />
+            <Setter Property="MaxWidth"
+                    Value="300" />
+            <Setter Property="MinWidth"
+                    Value="150" />
+            <Setter Property="TextAlignment"
+                    Value="Center" />
+        </Style>
+
+        <Style Selector="ContentControl#EmptyTextCntrContentControl">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Template>
+                        <TextBlock Classes="empty-label">
+                            <TextBlock.Inlines>
+                                <Run Text="Nothing." />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.no-inst">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Template>
+                        <TextBlock Classes="empty-label">
+                            <TextBlock.Inlines>
+                                <Run Text="Add an" />
+                                <Run Text="instrument."
+                                     Classes="subject" />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.no-tuning:not(.no-inst)">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Template>
+                        <TextBlock Classes="empty-label">
+                            <TextBlock.Inlines>
+                                <Run Text="Add a" />
+                                <Run Text="tuning."
+                                     Classes="subject" />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.search-mode">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Template>
+                        <TextBlock Classes="empty-label">
+                            <TextBlock.Inlines>
+                                <Run Text="Select" />
+                                <Run Text="frets."
+                                     Classes="subject" />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.search-mode.piano">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Template>
+                        <TextBlock Classes="empty-label">
+                            <TextBlock.Inlines>
+                                <Run Text="Select" />
+                                <Run Text="keys."
+                                     Classes="subject" />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.bookmark-mode">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Template>
+                        <TextBlock Classes="empty-label">
+                            <TextBlock.Inlines>
+                                <Run Text="No" />
+                                <Run Text="{Binding PatternSingularName}"
+                                     Classes="article" />
+                                <Run Text="bookmarks"
+                                     Classes="subject" />
+                                <Run Text="yet." />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.index-mode">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Template>
+                        <TextBlock Classes="empty-label">
+                            <TextBlock.Inlines>
+                                <Run Text="No" />
+                                <Run Text="{Binding PatternSingularName}"
+                                     Classes="article" />
+                                <Run Text="results"
+                                     Classes="subject" />
+                                <Run Text="found." />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Styles>
     <Grid>
         <!-- RESULTS CNTR -->
 
@@ -25,7 +159,7 @@
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="!IsSearchButtonVisible" />
                     <Binding Path="!IsVisible"
-                             ElementName="EmptyTextBlock" />
+                             ElementName="EmptyTextCntrContentControl" />
                 </MultiBinding>
 
             </Border.IsVisible>
@@ -116,46 +250,50 @@
 
             <!-- EMPTY LABEL -->
 
-            <TextBlock x:Name="EmptyTextBlock"
-                       Classes="Headline4"
-                       HorizontalAlignment="Stretch"
-                       TextWrapping="NoWrap"
-                       VerticalAlignment="Center"
-                       MinWidth="150"
-                       TextAlignment="Center"
-                       Text="{Binding EmptyMatchLabel}">
-                <TextBlock.IsVisible>
+            <ContentControl x:Name="EmptyTextCntrContentControl"
+                            Classes.piano="{Binding IsPianoSelected}"
+                            Classes.no-inst="{Binding IsInstrumentsEmpty}"
+                            Classes.no-tuning="{Binding IsTuningsEmpty}"
+                            Classes.search-mode="{Binding IsSearchModeSelected}"
+                            Classes.bookmark-mode="{Binding IsBookmarkModeSelected}"
+                            Classes.index-mode="{Binding IsIndexModeSelected}">
+                <ContentControl.IsVisible>
                     <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="IsSearchOverlayVisible" />
                         <Binding Path="!IsSearchButtonVisible" />
                         <Binding Path="IsMatchesEmpty"
                                  TargetNullValue="False"
                                  FallbackValue="False" />
                         <Binding Path="!IsLoadingMatches" />
                     </MultiBinding>
-                </TextBlock.IsVisible>
-            </TextBlock>
+                </ContentControl.IsVisible>
 
-            <!-- CLEAR INPUT -->
-            <Button x:Name="ResetInstrumentLinkBUtton"
-                    Classes="link fade fade-collapse"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    IsHitTestVisible="{Binding !IsDefaultSelection}"
-                    Opacity="{Binding !IsDefaultSelection, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
-                    Command="{Binding ResetInstrumentCommand}">
-                <Button.IsVisible>
+            </ContentControl>
+
+            <!-- RESET -->
+            <HyperlinkButton x:Name="ResetInstrumentLinkBUtton"
+                             Classes="fade fade-collapse"
+                             Cursor="Hand"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             Opacity="{Binding !IsDefaultSelection, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
+                             Command="{Binding ResetInstrumentCommand}">
+                <HyperlinkButton.IsVisible>
                     <MultiBinding Converter="{x:Static BoolConverters.Or}">
                         <Binding Path="IsVisible"
                                  ElementName="SearchButton" />
                         <Binding Path="IsVisible"
-                                 ElementName="EmptyTextBlock" />
+                                 ElementName="EmptyTextCntrContentControl" />
                     </MultiBinding>
-                </Button.IsVisible>
-                <TextBlock TextAlignment="Center"
+                </HyperlinkButton.IsVisible>
+                <TextBlock Background="Transparent"
+                           Width="{Binding Bounds.Width, ElementName=SearchButton}"
+                           MinHeight="20"
+                           TextAlignment="Center"
                            Classes="Body1"
                            Text="Reset" />
-            </Button>
+            </HyperlinkButton>
 
         </StackPanel>
 

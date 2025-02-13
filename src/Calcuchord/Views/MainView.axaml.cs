@@ -55,8 +55,8 @@ namespace Calcuchord {
 
 
         public void RefreshMainGrid() {
-            //return;
-            if(ThemeViewModel.Instance is not { } tvm) {
+            if(ThemeViewModel.Instance is not { } tvm ||
+               MainViewModel.Instance is not { } mvm) {
                 return;
             }
 
@@ -64,9 +64,10 @@ namespace Calcuchord {
             MainContainerGrid.ColumnDefinitions.Clear();
             MainContainerGrid.RowDefinitions.Clear();
 
+            double tw = MainContainerGrid.Bounds.Width;
+            double th = MainContainerGrid.Bounds.Height;
             if(tvm.IsLandscape) {
-                double tw = MainContainerGrid.Bounds.Width;
-                double inst_len = InstrumentView.IsVisible ? tw * 0.5d : 0;
+                double inst_len = mvm.IsInstrumentVisible ? tw * 0.5d : 0;
                 double matches_len = tw - inst_len;
                 MainContainerGrid.ColumnDefinitions.Add(
                     new ColumnDefinition(new GridLength(inst_len,GridUnitType.Auto)));
@@ -95,8 +96,7 @@ namespace Calcuchord {
                 MainSplitter.Width = splitter_len;
                 MainSplitter.Cursor = new Cursor(StandardCursorType.SizeWestEast);
             } else {
-                double th = MainContainerGrid.Bounds.Height;
-                double inst_len = InstrumentView.IsVisible ? Math.Max(210,MainContainerGrid.Bounds.Height * 0.35d) : 0;
+                double inst_len = mvm.IsInstrumentVisible ? Math.Max(210,MainContainerGrid.Bounds.Height * 0.35d) : 0;
                 double matches_len = th - inst_len;
                 MainContainerGrid.RowDefinitions.Add(new RowDefinition(new GridLength(inst_len,GridUnitType.Auto)));
                 MainContainerGrid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));

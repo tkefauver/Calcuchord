@@ -11,5 +11,7 @@ namespace Calcuchord.Browser {
                 return _midiPlayer;
             }
         }
+
+        public override IPrefsIo PrefsIo { get; } = new PrefsIo_browser();
     }
 }

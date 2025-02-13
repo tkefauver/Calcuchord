@@ -1,12 +1,12 @@
 <Project>
     <PropertyGroup>
-        <DotNetVersion>8.0</DotNetVersion>
+        <DotNetVersion>9.0</DotNetVersion>
     </PropertyGroup>
 
     <PropertyGroup>
         <!--        <BuildOs>LINUX</BuildOs>-->
-        <!--        <BuildOs>BROWSER</BuildOs>-->
-        <BuildOs>ANDROID</BuildOs>
+        <BuildOs>BROWSER</BuildOs>
+        <!--        <BuildOs>ANDROID</BuildOs>-->
         <UseSugarWv>true</UseSugarWv>
     </PropertyGroup>
 

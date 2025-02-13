@@ -1,10 +1,7 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.ReactiveUI;
-#if SUGAR_WV
 using Avalonia.WebView.Desktop;
-#endif
-
 
 namespace Calcuchord.Desktop {
     internal sealed class Program {
@@ -23,9 +20,7 @@ namespace Calcuchord.Desktop {
             return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .UseReactiveUI()
-#if SUGAR_WV
                 .UseDesktopWebView()
-#endif
                 .With(
                     new X11PlatformOptions
                     {
