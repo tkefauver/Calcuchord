@@ -352,7 +352,7 @@ namespace Calcuchord {
                         }
 
 
-                        Debug.WriteLine($"Total Progress: {GenProgress} Label: '{pg.ProgressLabel}'");
+                        //Debug.WriteLine($"Total Progress: {GenProgress} Label: '{pg.ProgressLabel}'");
                     });
             }
 

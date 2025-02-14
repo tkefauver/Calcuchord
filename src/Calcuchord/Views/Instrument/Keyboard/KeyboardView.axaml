@@ -118,6 +118,7 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <!-- KEYBOARD SHADOW -->
             <Border IsHitTestVisible="False">
                 <Border.Background>
                     <LinearGradientBrush TransformOrigin="50%,50%"

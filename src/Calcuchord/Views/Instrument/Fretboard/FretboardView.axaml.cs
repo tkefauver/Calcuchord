@@ -14,8 +14,6 @@ namespace Calcuchord {
     [DoNotNotify]
     public partial class FretboardView : UserControl {
 
-        public double MinHeight { get; private set; }
-
         public FretboardView() {
             InitializeComponent();
 
@@ -47,9 +45,15 @@ namespace Calcuchord {
             }
 
             ItemsControl cntr = StringsItemsControl;
+// guitar
+// tw 1600
+// th 188
+            double def_fret_w = 69d;
+            double def_fret_h = 31d;
 
-            double tw = Math.Max(1000,tvm.TotalFretCount * (1600 / 23d));
-            double th = tw * (0.117521368 * (tvm.Parent.RowCount / 6d));
+
+            double tw = tvm.TotalFretCount * def_fret_w; //Math.Max(1000,tvm.TotalFretCount * (1600 / 23d));
+            double th = tvm.Parent.RowCount * def_fret_h; //tw * (0.117521368 * 1);//(tvm.Parent.RowCount / 6d));
 
             var fvl = StringsItemsControl.GetVisualDescendants<FretView>();
             if(!fvl.Any()) {

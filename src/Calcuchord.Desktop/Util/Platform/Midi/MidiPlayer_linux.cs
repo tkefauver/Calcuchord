@@ -7,7 +7,7 @@ using Melanchall.DryWetMidi.Core;
 
 namespace Calcuchord.Desktop {
 
-    public class LinuxMidiPlayer : MidiPlayerBase {
+    public class MidiPlayer_linux : MidiPlayerBase {
 
         public override void PlayChord(IEnumerable<Note> notes) {
             SetStopDt(notes.Count(),false);

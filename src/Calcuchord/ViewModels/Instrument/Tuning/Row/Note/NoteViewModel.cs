@@ -37,7 +37,14 @@ namespace Calcuchord {
 
         #region Appearance
 
-        public double StringChunkHeight => (RowCount - Parent.Parent.PitchSortedRows.IndexOf(Parent)) + 1;
+        public double StringChunkHeight =>
+            (RowCount - Parent.Parent.PitchSortedRows.IndexOf(Parent)) + 1;
+        // Max = 96
+        // E2 = 28 ~ 96 - 28 = 68 
+        // E4 = 52 ~ 96 - 52 = 44
+        // string height is proportial to its octave, between 1-9 (pixels)
+        //Parent.BaseNote == null ? 0 : (Note.MAX_REGISTER - Parent.BaseNote.Register) + 1;
+
 
         public string MarkerLabel {
             get {

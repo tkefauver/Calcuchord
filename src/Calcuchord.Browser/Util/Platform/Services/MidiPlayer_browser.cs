@@ -14,15 +14,15 @@ namespace Calcuchord.Browser {
         }
 
         public override void PlayChord(IEnumerable<Note> notes) {
-            GlobalJsInterop.PlayChord(GetMidiNotes(notes));
+            JsInterop.PlayChord(GetMidiNotes(notes));
         }
 
         public override void PlayScale(IEnumerable<Note> notes) {
-            GlobalJsInterop.PlayScale(GetMidiNotes(notes));
+            JsInterop.PlayScale(GetMidiNotes(notes));
         }
 
         public override void StopPlayback() {
-            GlobalJsInterop.StopPlayback();
+            JsInterop.StopPlayback();
             TriggerStopped();
         }
     }

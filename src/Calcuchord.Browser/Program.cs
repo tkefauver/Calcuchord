@@ -15,13 +15,13 @@ internal sealed partial class Program {
             .AfterPlatformServicesSetup(
                 _ => {
                     string root_dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                    GlobalJsInterop.ConsoleLog($"RootDir: '{root_dir}'");
+                    JsInterop.ConsoleLog($"RootDir: '{root_dir}'");
                     string test_dir = Path.Combine(root_dir,"test");
                     if(Directory.Exists(test_dir)) {
-                        GlobalJsInterop.ConsoleLog($"TestDir EXISTS '{test_dir}'");
+                        JsInterop.ConsoleLog($"TestDir EXISTS '{test_dir}'");
                     } else {
                         Directory.CreateDirectory(test_dir);
-                        GlobalJsInterop.ConsoleLog($"TestDir CREATED '{test_dir}'");
+                        JsInterop.ConsoleLog($"TestDir CREATED '{test_dir}'");
                     }
 
 

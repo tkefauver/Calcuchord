@@ -97,6 +97,10 @@ namespace Calcuchord {
 
         #region Public Methods
 
+        public override string ToString() {
+            return Label;
+        }
+
         #endregion
 
         #region Protected Methods

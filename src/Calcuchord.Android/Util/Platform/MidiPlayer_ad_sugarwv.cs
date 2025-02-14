@@ -27,10 +27,12 @@ namespace Calcuchord.Android {
             wkwv.Settings.JavaScriptCanOpenWindowsAutomatically = true;
 
             wkwv.Settings.DomStorageEnabled = true;
-            // wkwv.Settings.MixedContentMode = MixedContentHandling.AlwaysAllow;
-            // wkwv.SetWebChromeClient(new WebChromeClient());
+            wkwv.Settings.MixedContentMode = MixedContentHandling.AlwaysAllow;
+            wkwv.SetWebChromeClient(new WebChromeClient());
 
             _wkwv = wkwv;
+
+            //ClearCache();
         }
 
         void ClearCache() {

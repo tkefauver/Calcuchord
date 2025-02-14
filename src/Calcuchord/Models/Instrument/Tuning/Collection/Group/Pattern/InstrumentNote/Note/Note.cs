@@ -13,7 +13,7 @@ namespace Calcuchord {
         #region Constants
 
         const int MAX_NOTE_TYPE = 12;
-        const int MAX_REGISTER = 8;
+        public const int MAX_REGISTER = 8;
 
         public const int MIN_NOTE_ID = 0;
         public const int MAX_NOTE_ID = MAX_NOTE_TYPE * MAX_REGISTER;

@@ -31,7 +31,6 @@
             <Border x:Name="KeyMarkerInnerContainer"
                     Grid.Row="1"
                     Classes.desired-root="{Binding IsDesiredRoot}"
-                    IsVisible="{Binding !IsPhone, Source={x:Static local:ThemeViewModel.Instance}}"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Bottom"
                     CornerRadius="5">

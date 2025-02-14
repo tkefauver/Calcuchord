@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using MonkeyPaste.Common.Avalonia;
 using PropertyChanged;
 
@@ -29,10 +31,22 @@ namespace Calcuchord {
         }
 
         protected override void OnLoaded(RoutedEventArgs e) {
-            if(PlatformWrapper.Services is { } ps &&
+            if(MainViewModel.Instance is { } mvm &&
+               PlatformWrapper.Services is { } ps &&
                ps.MidiPlayer is { } mp) {
-                // only handled by sugarwv
-                mp.Init(MainContainerGrid);
+                Dispatcher.UIThread.Post(
+                    async () => {
+                        // wait for load
+                        while(!mvm.IsLoaded) {
+                            await Task.Delay(100);
+                        }
+
+                        // wait for asset move
+                        await Task.Delay(500);
+
+                        // only handled by sugarwv
+                        mp.Init(MainContainerGrid);
+                    });
             }
 
             RefreshMainGrid();

@@ -32,7 +32,7 @@ namespace Calcuchord.Desktop {
                 .LogToTrace()
                 .AfterPlatformServicesSetup(
                     _ => {
-                        PlatformWrapper.Init(new DesktopPlatformServices());
+                        PlatformWrapper.Init(new PlatformServices_desktop());
                     });
         }
     }

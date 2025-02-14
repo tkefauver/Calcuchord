@@ -56,7 +56,8 @@
             <Setter Property="ItemsPanel">
                 <Setter.Value>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" />
+                        <!-- <WrapPanel Orientation="Horizontal" /> -->
+                        <UniformGrid />
                     </ItemsPanelTemplate>
                 </Setter.Value>
             </Setter>
@@ -110,28 +111,29 @@
             <Setter Property="Text"
                     Value="{Binding Label}" />
         </Style>
-        <Style Selector="controls|Card.suffix.chords WrapPanel">
-            <Setter Property="ItemWidth"
-                    Value="64" />
+
+        <Style Selector="controls|Card.button-group UniformGrid">
+            <Setter Property="Columns"
+                    Value="3" />
         </Style>
-        <Style Selector="controls|Card.suffix.scales WrapPanel">
-            <Setter Property="ItemWidth"
-                    Value="128" />
+        <Style Selector="controls|Card.suffix:not(.chords) UniformGrid">
+            <Setter Property="Columns"
+                    Value="2" />
         </Style>
-        <Style Selector="controls|Card.suffix.modes WrapPanel">
-            <Setter Property="ItemWidth"
-                    Value="100" />
+        <Style Selector="controls|Card.key UniformGrid">
+            <Setter Property="Columns"
+                    Value="6" />
         </Style>
         <Style Selector="controls|Card.suffix TextBlock"
                x:DataType="local:OptionViewModel">
             <Setter Property="Text"
                     Value="{Binding Label, Converter={x:Static local:SuffixDisplayValueConverter.Instance}}" />
         </Style>
-        <Style Selector="controls|Card.svg WrapPanel"
-               x:DataType="local:OptionViewModel">
-            <Setter Property="ItemWidth"
-                    Value="85" />
-        </Style>
+        <!-- <Style Selector="controls|Card.svg UniformGrid" -->
+        <!--        x:DataType="local:OptionViewModel"> -->
+        <!--     <Setter Property="Columns" -->
+        <!--             Value="85" /> -->
+        <!-- </Style> -->
         <Style Selector="controls|Card.svg TextBlock"
                x:DataType="local:OptionViewModel">
             <Setter Property="ClipToBounds"
@@ -149,7 +151,20 @@
                     Classes="float">
                 <avalonia:MaterialIcon Kind="Close" />
             </Button>
-            <ScrollViewer Margin="0,20,0,0">
+            <!-- <Border DockPanel.Dock="Top" -->
+            <!--         MaxHeight="{Binding Bounds.Height, ElementName=CloseRightDrawerButton}" -->
+            <!--         HorizontalAlignment="Center" -->
+            <!--         Classes="busy-cntr" -->
+            <!--         Background="Transparent"> -->
+            <!--     <Border.IsVisible> -->
+            <!--         <MultiBinding Converter="{x:Static BoolConverters.Or}"> -->
+            <!--             <Binding Path="IsSearchInitiating" /> -->
+            <!--             ~1~ <Binding Path="IsMatchZoomChanging" /> @1@ -->
+            <!--         </MultiBinding> -->
+            <!--     </Border.IsVisible> -->
+            <!-- </Border> -->
+
+            <ScrollViewer>
                 <StackPanel Classes="options"
                             Margin="10"
                             Spacing="10">

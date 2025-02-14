@@ -2,11 +2,11 @@ namespace Calcuchord.Browser {
     public class PrefsIo_browser : IPrefsIo {
 
         public string ReadPrefs() {
-            return GlobalJsInterop.ReadPrefs();
+            return JsInterop.ReadPrefs();
         }
 
         public void WritePrefs(string prefsJson) {
-            GlobalJsInterop.WritePrefs(prefsJson);
+            JsInterop.WritePrefs(prefsJson);
         }
     }
 }

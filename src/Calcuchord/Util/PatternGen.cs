@@ -265,13 +265,11 @@ namespace Calcuchord {
 
         #region Chords
 
-        bool RejectNotAllNotes(InstrumentNote[] notes,NoteType[] pattern,
-            IEnumerable<IEnumerable<InstrumentNote>> existing) {
+        bool RejectNotAllNotes(InstrumentNote[] notes,NoteType[] pattern) {
             return pattern.Any(x => notes.All(y => y.Key != x));
         }
 
-        bool RejectNotStartOnRoot(InstrumentNote[] notes,NoteType[] pattern,
-            IEnumerable<IEnumerable<InstrumentNote>> existing) {
+        bool RejectNotStartOnRoot(InstrumentNote[] notes,NoteType[] pattern) {
             if(notes.OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum).FirstOrDefault() is { } root_note) {
                 return root_note.Key != pattern[0];
             }
@@ -279,25 +277,19 @@ namespace Calcuchord {
             return true;
         }
 
-        bool RejectNotesOnSameString(InstrumentNote[] notes,NoteType[] pattern,
-            IEnumerable<IEnumerable<InstrumentNote>> existing) {
+        bool RejectNotesOnSameString(InstrumentNote[] notes,NoteType[] pattern) {
             return notes.GroupBy(x => x.RowNum).Any(x => x.Count() > 1);
         }
 
-        bool RejectExists(InstrumentNote[] notes,NoteType[] pattern,IEnumerable<IEnumerable<InstrumentNote>> existing) {
-            return existing.Any(x => x.Difference(notes).None());
-        }
-
-        bool IsValidCombo(InstrumentNote[] notes,NoteType[] pattern,IEnumerable<IEnumerable<InstrumentNote>> existing) {
-            Func<InstrumentNote[],NoteType[],IEnumerable<IEnumerable<InstrumentNote>>,bool>[] reject_funcs =
+        bool IsValidCombo(InstrumentNote[] notes,NoteType[] pattern) {
+            Func<InstrumentNote[],NoteType[],bool>[] reject_funcs =
             [
                 RejectNotAllNotes,
                 RejectNotStartOnRoot,
-                RejectNotesOnSameString,
-                RejectExists
+                RejectNotesOnSameString
             ];
             foreach(var reject_func in reject_funcs) {
-                if(reject_func.Invoke(notes,pattern,existing)) {
+                if(reject_func.Invoke(notes,pattern)) {
                     return false;
                 }
             }
@@ -399,6 +391,7 @@ namespace Calcuchord {
                     var pattern = GenPattern(cur_key,suffix);
                     var pattern_inst_notes = GenNotes(pattern);
                     var valid_patterns = new List<IEnumerable<InstrumentNote>>();
+                    var valid_signatures = new List<string>();
 
                     for(int min_fret_num = 0; min_fret_num <= max_min_fret_num; min_fret_num++) {
                         int max_fret_num = min_fret_num + PatternFretSpan;
@@ -410,11 +403,16 @@ namespace Calcuchord {
                             x => x.NoteNum >= min_fret_num && x.NoteNum <= max_fret_num);
                         var combos = block_notes.PowerSet().Where(x => x.Length >= pattern.Length);
                         foreach(var combo in combos) {
-                            if(!IsValidCombo(combo,pattern,valid_patterns)) {
+                            if(!IsValidCombo(combo,pattern) ||
+                               // create sig
+                               GetSignature(combo) is not { } combo_sig ||
+                               // reject duplicates
+                               valid_signatures.Contains(combo_sig)) {
                                 continue;
                             }
 
                             valid_patterns.Add(combo);
+                            valid_signatures.Add(combo_sig);
                         }
                     }
 

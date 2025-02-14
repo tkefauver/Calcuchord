@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using MonkeyPaste.Common;
@@ -25,29 +24,25 @@ namespace Calcuchord {
         public static Prefs Instance { get; private set; }
 
         public static void Init() {
+            if(PlatformWrapper.Services is not { } ps ||
+               ps.PrefsIo is not { } prefsIo) {
+                return;
+            }
+
             if(RESET_PREFS) {
-                File.Delete(PrefsFilePath);
+                prefsIo.WritePrefs(string.Empty);
             }
 
-            bool is_initial_startup = !File.Exists(PrefsFilePath);
-            if(OperatingSystem.IsBrowser() &&
-               PlatformWrapper.Services.PrefsIo is { } prefIo &&
-               !string.IsNullOrEmpty(prefIo.ReadPrefs())) {
-                is_initial_startup = false;
-            }
+            string prefs_json = prefsIo.ReadPrefs();
 
-            Debug.WriteLine($"Initial Startup: {is_initial_startup} Prefs Path: {PrefsFilePath}");
+            bool is_initial_startup = string.IsNullOrEmpty(prefs_json);
+
+            Debug.WriteLine($"Initial Startup: {is_initial_startup}");
 
             if(is_initial_startup) {
                 _ = new Prefs();
-                //Instance.Save();
             } else {
                 try {
-                    string prefs_json = File.ReadAllText(PrefsFilePath);
-                    if(OperatingSystem.IsBrowser()) {
-                        prefs_json = PlatformWrapper.Services.PrefsIo.ReadPrefs();
-                    }
-
                     _ = JsonConvert.DeserializeObject<Prefs>(prefs_json);
                     Instance.Instruments.ForEach(x => x.RefreshModelTree());
                 } catch(Exception e) {
@@ -56,7 +51,7 @@ namespace Calcuchord {
                     Debugger.Break();
 
                     // TODO should maybe say there was an error here instead of just reseting data
-                    File.Delete(PrefsFilePath);
+                    prefsIo.WritePrefs(string.Empty);
                     Instance = null;
                     Init();
                     return;
@@ -80,7 +75,7 @@ namespace Calcuchord {
         public bool IsThemeDark { get; set; }
 
         [JsonProperty]
-        public int MatchColCount { get; set; } = 1;
+        public int MatchColCount { get; set; } = 3;
 
 
         [JsonProperty]
@@ -100,28 +95,7 @@ namespace Calcuchord {
         public bool IsInitialStartup { get; private set; }
 
         [JsonIgnore]
-        public bool IsPrefsPersistent => File.Exists(PrefsFilePath) || OperatingSystem.IsBrowser();
-
-        [JsonIgnore]
         static bool RESET_PREFS => false;
-
-        [JsonIgnore]
-        static string _prefsFilePath;
-
-        [JsonIgnore]
-        public static string PrefsFilePath {
-            get {
-                if(_prefsFilePath == null &&
-                   PlatformWrapper.Services is { } ps &&
-                   ps.StorageHelper is { } sh &&
-                   sh.StorageDir is { } sd) {
-                    string fn = "appstate.json";
-                    _prefsFilePath = Path.Combine(sd,fn);
-                }
-
-                return _prefsFilePath;
-            }
-        }
 
         #endregion
 
@@ -151,31 +125,26 @@ namespace Calcuchord {
         public void Save() {
             Task.Run(
                 () => {
+                    if(PlatformWrapper.Services is not { } ps ||
+                       ps.PrefsIo is not { } prefsIo) {
+                        Debug.WriteLine("prefs io service unavailable");
+                        return;
+                    }
+
                     if(IsSaveIgnored) {
                         Debug.WriteLine("prefs save ignored");
                         return;
                     }
 
+                    SyncModels();
 
-                    if(MainViewModel.Instance is { } mvm) {
-                        Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
-                        Options = mvm.OptionLookup.Values.SelectMany(x => x).ToList();
-                        IsThemeDark = ThemeViewModel.Instance.IsDark;
-                        MatchColCount = mvm.MatchColCount;
-                    }
 
                     // Validate();
                     try {
-                        bool is_new = !File.Exists(PrefsFilePath);
                         string pref_json = JsonConvert.SerializeObject(this);
+                        prefsIo.WritePrefs(pref_json);
 
-                        if(OperatingSystem.IsBrowser()) {
-                            PlatformWrapper.Services.PrefsIo.WritePrefs(pref_json);
-                        } else {
-                            File.WriteAllText(PrefsFilePath,pref_json);
-                        }
-
-                        if(is_new) {
+                        if(IsInitialStartup) {
                             Debug.WriteLine("Prefs CREATED");
                         } else {
                             Debug.WriteLine("Prefs SAVED");
@@ -193,6 +162,18 @@ namespace Calcuchord {
         #endregion
 
         #region Private Methods
+
+        void SyncModels() {
+            if(MainViewModel.Instance is { } mvm) {
+                Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
+                Options = mvm.OptionLookup.Values.SelectMany(x => x).ToList();
+                MatchColCount = mvm.MatchColCount;
+            }
+
+            if(ThemeViewModel.Instance is { } tvm) {
+                IsThemeDark = tvm.IsDark;
+            }
+        }
 
         void LogPrefs() {
             Debug.WriteLine("");

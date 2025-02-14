@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices.JavaScript;
 
 namespace Calcuchord.Browser {
-    public static partial class GlobalJsInterop {
+    public static partial class JsInterop {
         [JSImport("globalThis.window.playChord")]
         public static partial void PlayChord(int[] notes);
 

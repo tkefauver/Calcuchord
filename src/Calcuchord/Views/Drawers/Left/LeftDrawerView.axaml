@@ -60,33 +60,30 @@
                             Grid.Row="0"
                             Classes.landscape="{Binding IsLandscape, Source={x:Static local:ThemeViewModel.Instance}}"
                             Mode="Accent">
-            <Viewbox>
-                <StackPanel>
-                    <!-- LOGO -->
-                    <Image x:Name="LogoImage"
-                           Width="96"
-                           Height="120"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Source="avares://Calcuchord/Assets/Images/logo.png" />
+            <StackPanel>
+                <!-- LOGO -->
+                <Image x:Name="LogoImage"
+                       Width="96"
+                       Height="96"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Source="avares://Calcuchord/Assets/Images/logo.png" />
 
-                    <!-- APP NAME -->
-                    <TextBlock Classes="Headline5"
-                               Text="Calcuchord"
-                               HorizontalAlignment="Center" />
+                <!-- APP NAME -->
+                <TextBlock Classes="Headline5"
+                           Text="Calcuchord"
+                           HorizontalAlignment="Center" />
 
-                    <!-- APP SUBTITLE -->
+                <!-- APP SUBTITLE -->
 
-                    <TextBlock Classes="Subtitle2"
-                               HorizontalAlignment="Center">
-                        <TextBlock.Inlines>
-                            <Run Text="Reverse search for" />
-                            <Run Text="musicians" />
-                        </TextBlock.Inlines>
-                    </TextBlock>
-                </StackPanel>
-
-            </Viewbox>
+                <TextBlock Classes="Subtitle2"
+                           HorizontalAlignment="Center">
+                    <TextBlock.Inlines>
+                        <Run Text="Reverse search for" />
+                        <Run Text="musicians" />
+                    </TextBlock.Inlines>
+                </TextBlock>
+            </StackPanel>
         </controls:ColorZone>
         <!-- THEME TOGGLE BTN -->
         <ToggleButton x:Name="ThemeToggleButton"

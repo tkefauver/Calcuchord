@@ -22,9 +22,10 @@ namespace Calcuchord {
 
         #region Properties
 
-        IEnumerable<NoteGroup> Items =>
-            Tuning == null ? [] : Tuning.Collections[PatternType].SelectMany(x => x.Groups);
+        // IEnumerable<NoteGroup> Items =>
+        //     Tuning == null ? [] : Tuning.Collections[PatternType].SelectMany(x => x.Groups);
 
+        MatchViewModelBase[] Items { get; }
         public MusicPatternType PatternType { get; }
         public Tuning Tuning { get; }
 
@@ -35,6 +36,8 @@ namespace Calcuchord {
         public MatchProvider(MusicPatternType patternType,Tuning tuning) {
             PatternType = patternType;
             Tuning = tuning;
+            Items = Tuning.Collections[PatternType].SelectMany(x => x.Groups).Select(x => CreateMatchViewModel(x,0))
+                .ToArray();
         }
 
         #endregion
@@ -42,21 +45,22 @@ namespace Calcuchord {
         #region Public Methods
 
         public IEnumerable<MatchViewModelBase> GetAll() {
-            return Items.Select(x => CreateMatchViewModel(x,1));
+            return Items; //.Select(x => CreateMatchViewModel(x,1));
         }
 
         public IEnumerable<MatchViewModelBase> GetBookmarks() {
             return
                 Items
-                    .Where(x => x.IsBookmarked)
-                    .Select(x => CreateMatchViewModel(x,1));
+                    .Where(x => x.IsBookmarked);
+            //.Select(x => CreateMatchViewModel(x,1));
         }
 
         public IEnumerable<MatchViewModelBase> GetMatches(IEnumerable<NoteViewModel> matchNotes) {
             var results =
-                Items.Select(x => (x,GetScore(x,matchNotes)))
+                Items.Select(x => (x,GetScore(x.NoteGroup,matchNotes)))
                     .Where(x => x.Item2 > 0)
-                    .Select(x => CreateMatchViewModel(x.Item1,x.Item2));
+                    .Select(x => x.Item1);
+            //.Select(x => CreateMatchViewModel(x.Item1,x.Item2));
             return results;
         }
 
