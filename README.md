@@ -3,6 +3,7 @@
 <p style="text-align: center;"><img style="width: 77%" src="ss.png" /></p>
 
 [Try it out here!](https://tkefauver.github.io/Calcuchord/)
+(Reload if it freezes :/)
 
 ## Features
 

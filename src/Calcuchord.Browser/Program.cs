@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -14,15 +12,15 @@ internal sealed partial class Program {
             .WithInterFont()
             .AfterPlatformServicesSetup(
                 _ => {
-                    string root_dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                    JsInterop.ConsoleLog($"RootDir: '{root_dir}'");
-                    string test_dir = Path.Combine(root_dir,"test");
-                    if(Directory.Exists(test_dir)) {
-                        JsInterop.ConsoleLog($"TestDir EXISTS '{test_dir}'");
-                    } else {
-                        Directory.CreateDirectory(test_dir);
-                        JsInterop.ConsoleLog($"TestDir CREATED '{test_dir}'");
-                    }
+                    // string root_dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                    // JsInterop.ConsoleLog($"RootDir: '{root_dir}'");
+                    // string test_dir = Path.Combine(root_dir,"test");
+                    // if(Directory.Exists(test_dir)) {
+                    //     JsInterop.ConsoleLog($"TestDir EXISTS '{test_dir}'");
+                    // } else {
+                    //     Directory.CreateDirectory(test_dir);
+                    //     JsInterop.ConsoleLog($"TestDir CREATED '{test_dir}'");
+                    // }
 
 
                     PlatformWrapper.Init(new BrowserPlatformServices());

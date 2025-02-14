@@ -44,7 +44,7 @@ namespace Calcuchord {
         public bool IsLandscape {
             get {
 
-                if((IsDesktop && !IsPretendMobile) ||
+                if(((IsDesktop || IsBrowser) && !IsPretendMobile) ||
                    MainView.Instance is not { } mv ||
                    TopLevel.GetTopLevel(mv) is not { } tl) {
                     return false;
