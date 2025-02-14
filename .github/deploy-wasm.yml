@@ -1,0 +1,29 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy-to-github-pages:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout 🛎️
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 9
+      uses: actions/setup-dotnet@v3
+      with:
+          dotnet-version: 9.0.102
+
+    - name: Install wasm-tools
+      run: dotnet workload install wasm-tools
+
+    - name: Publish .NET Project
+      run: dotnet publish src/Calcuchord.Browser/Calcuchord.Browser.csproj -c Release
+
+    - name: Commit wwwroot to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: src/Calcuchord.Browser/bin/Release/net9.0-browser/publish/wwwroot
