@@ -1,0 +1,17 @@
+﻿span {
+    text-align: center;
+
+    font-family: "EB Garamond", serif;
+    font-optical-sizing: auto;
+    font-weight: 1;
+    font-style: normal;
+}
+
+span.title {
+    font-size: 6rem;
+}
+
+span.sub-title {
+    font-size: 2rem;
+}
+
