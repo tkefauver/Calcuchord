@@ -9,6 +9,7 @@
     <ItemGroup>
         <PackageVersion Include="Avalonia.Labs.Controls" Version="11.2.0"/>
         <PackageVersion Include="MonkeyPaste.Common.Avalonia" Version="1.0.3.25"/>
+        <PackageVersion Include="PublishSPAforGitHubPages.Build" Version="3.0.0"/>
         <PackageVersion Include="System.Formats.Nrbf" Version="9.0.1"/>
     </ItemGroup>
     <ItemGroup>

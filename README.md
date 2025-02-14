@@ -2,6 +2,8 @@
 
 <p style="text-align: center;"><img style="width: 77%" src="ss.png" /></p>
 
+[Try it out here!](https://tkefauver.github.io/Calcuchord/)
+
 ## Features
 
 - 11 built-in tuning templates (guitar,ukulele,piano,bass,violin, etc.)

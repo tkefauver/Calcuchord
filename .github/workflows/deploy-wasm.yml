@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup .NET 9
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.102
 
@@ -21,9 +21,10 @@ jobs:
         run: dotnet workload install wasm-tools
 
       - name: Publish .NET Project
-        run: dotnet publish src/Calcuchord.Browser/Calcuchord.Browser.csproj -c Release
+        run: dotnet publish src/Calcuchord.Browser/Calcuchord.Browser.csproj -c:Release -p:GHPages=true -o dist/Web --nologo
 
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: src/Calcuchord.Browser/bin/Release/net9.0-browser/publish/wwwroot
+          branch: gh-pages
+          folder: dist/Web/wwwroot
