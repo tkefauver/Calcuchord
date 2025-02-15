@@ -258,7 +258,9 @@ namespace Calcuchord {
                         }
 
                         ResetSelection();
-                        if(!Parent.IsSelected) {
+                        if(!Parent.IsSelected ||
+                           Parent.IsEditModeEnabled ||
+                           Parent.Parent.LastSelectedTuning == this) {
                             break;
                         }
 
@@ -270,7 +272,13 @@ namespace Calcuchord {
 
                         Dispatcher.UIThread.Post(
                             async () => {
-                                while(!MainView.Instance.IsLoaded) {
+                                while(true) {
+                                    if(MainView.Instance is { } mv &&
+                                       mv.MainDialogHost is { } mdh &&
+                                       mdh.IsLoaded) {
+                                        break;
+                                    }
+
                                     // wait until load to prevent showing snackbar on startup
                                     await Task.Delay(100);
                                 }
@@ -278,7 +286,7 @@ namespace Calcuchord {
                                 string sel_msg = $"{FullName} selected";
                                 SnackbarHost.Post(
                                     sel_msg,
-                                    null,
+                                    MainView.SnackbarHostName,
                                     DispatcherPriority.Background);
 
                             });
@@ -289,16 +297,6 @@ namespace Calcuchord {
         }
 
         async Task<bool> LoadPatternsAsync() {
-            // if(Prefs.Instance.Instruments.SelectMany(x => x.Tunings).FirstOrDefault(x => x.Id == Id) is not
-            //    { } tuning_model) {
-            //     if(!Parent.IsEditModeEnabled && Parent.IsActivated) {
-            //         // error
-            //         Debugger.Break();
-            //     }
-            //
-            //     return false;
-            // }
-
             PatternGenCts = new CancellationTokenSource();
 
             var progress_lookup = new Dictionary<MusicPatternType,double>
@@ -313,6 +311,7 @@ namespace Calcuchord {
                 CreateChordsAsync
             };
 
+
             bool is_done = false;
 
             _ = Task.Run(
@@ -320,6 +319,7 @@ namespace Calcuchord {
                     await Task.WhenAll(tasks.Select(task => task()));
                     is_done = true;
                 },PatternGenCts.Token);
+
             while(true) {
                 if(is_done) {
                     break;

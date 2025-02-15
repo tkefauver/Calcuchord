@@ -167,7 +167,7 @@
             <ScrollViewer>
                 <StackPanel Classes="options"
                             Margin="10"
-                            Spacing="10">
+                            Spacing="15">
 
                     <!-- PATTERN -->
                     <TextBlock Classes="header"

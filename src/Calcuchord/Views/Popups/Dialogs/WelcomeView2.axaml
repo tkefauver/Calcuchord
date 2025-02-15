@@ -21,9 +21,8 @@
                        TextWrapping="WrapWithOverflow">
                 <TextBlock.Inlines>
                     <Run Text="Most instruments have" />
-                    <Run FontFamily="{StaticResource GaramondBoldFont}"
-                         Text="a lot of chords"
-                         FontWeight="Bold" />
+                    <Run Text="a lot of chords"
+                         Classes="bold" />
                     <Run Text="and this may take a minute or two." />
                 </TextBlock.Inlines>
             </TextBlock>
@@ -37,11 +36,10 @@
                     <Run Text="relax,"
                          FontStyle="Italic" />
                     <Run Text="pet your cat"
-                         FontFamily="{StaticResource GaramondBoldFont}"
-                         FontWeight="Bold" />
+                         Classes="bold" />
                     <Run Text="or whatever you want. It doesn't take" />
                     <Run Text="that"
-                         FontFamily="{StaticResource GaramondBoldFont}"
+                         Classes="bold"
                          FontStyle="Italic" />
                     <Run Text="long..." />
                 </TextBlock.Inlines>

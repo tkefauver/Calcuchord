@@ -145,6 +145,7 @@ namespace Calcuchord {
         #region Public Methods
 
         public async Task<IEnumerable<NoteGroupCollection>> GenerateAsync(CancellationToken ct) {
+            Stopwatch sw = Stopwatch.StartNew();
             Ct = ct;
 
             try {
@@ -159,6 +160,12 @@ namespace Calcuchord {
                     ngc.Groups.ForEach(x => x.CreateId(null));
                     ngc.SetParent(Tuning);
                 }
+
+                if(PatternType == MusicPatternType.Chords) {
+                    Debug.WriteLine(
+                        $"Chord Gen complete. Total time: {sw.ElapsedMilliseconds} ms. {result.SelectMany(x => x.Groups).Count()} groups.");
+                }
+
 
                 return result;
             } catch(Exception ex) {
@@ -264,6 +271,10 @@ namespace Calcuchord {
         #endregion
 
         #region Chords
+
+        bool RejectExists(InstrumentNote[] notes,IEnumerable<IEnumerable<InstrumentNote>> existing) {
+            return existing.Any(x => x.Difference(notes).None());
+        }
 
         bool RejectNotAllNotes(InstrumentNote[] notes,NoteType[] pattern) {
             return pattern.Any(x => notes.All(y => y.Key != x));
@@ -375,66 +386,68 @@ namespace Calcuchord {
         }
 
         async Task<IEnumerable<NoteGroupCollection>> GetFretboardChordsAsync() {
-            await Task.Delay(1,Ct);
             var patterns = PatternsLookup[MusicPatternType.Chords];
-            var ngcl = new List<NoteGroupCollection>();
             int max_min_fret_num = FretCount - PatternFretSpan - 1;
             InitProgress(patterns.Count * 12);
             int cur_progress = 0;
             TotalChordCount = 0;
             Stopwatch tsw = Stopwatch.StartNew();
+            var ngcl = await Task.WhenAll(
+                patterns.SelectMany(
+                    x =>
+                        Enumerable.Range(0,12)
+                            .Select(
+                                y =>
+                                    GetChordGroupAsync(x.Key,(NoteType)y))));
 
-            foreach(string suffix in patterns.Select(x => x.Key)) {
-                for(int cur_key_val = 0; cur_key_val < 12; cur_key_val++) {
-                    Stopwatch sw = Stopwatch.StartNew();
-                    NoteType cur_key = (NoteType)cur_key_val;
-                    var pattern = GenPattern(cur_key,suffix);
-                    var pattern_inst_notes = GenNotes(pattern);
-                    var valid_patterns = new List<IEnumerable<InstrumentNote>>();
-                    var valid_signatures = new List<string>();
+            async Task<NoteGroupCollection> GetChordGroupAsync(string suffix,NoteType cur_key) {
+                var pattern = GenPattern(cur_key,suffix);
+                var pattern_inst_notes = GenNotes(pattern);
+                var valid_patterns = new List<IEnumerable<InstrumentNote>>();
 
-                    for(int min_fret_num = 0; min_fret_num <= max_min_fret_num; min_fret_num++) {
-                        int max_fret_num = min_fret_num + PatternFretSpan;
-                        if(min_fret_num > 0) {
-                            max_fret_num--;
-                        }
-
-                        var block_notes = pattern_inst_notes.Where(
-                            x => x.NoteNum >= min_fret_num && x.NoteNum <= max_fret_num);
-                        var combos = block_notes.PowerSet().Where(x => x.Length >= pattern.Length);
-                        foreach(var combo in combos) {
-                            if(!IsValidCombo(combo,pattern) ||
-                               // create sig
-                               GetSignature(combo) is not { } combo_sig ||
-                               // reject duplicates
-                               valid_signatures.Contains(combo_sig)) {
-                                continue;
-                            }
-
-                            valid_patterns.Add(combo);
-                            valid_signatures.Add(combo_sig);
-                        }
+                for(int min_fret_num = 0; min_fret_num <= max_min_fret_num; min_fret_num++) {
+                    int max_fret_num = min_fret_num + PatternFretSpan;
+                    if(min_fret_num > 0) {
+                        max_fret_num--;
                     }
 
-                    NoteGroupCollection ngc = new NoteGroupCollection(PatternType,cur_key,suffix);
-                    foreach((var vp,int idx) in valid_patterns.OrderBy(x => x.Min(y => y.NoteNum))
-                                .ThenBy(x => x.Min(y => y.RowNum)).WithIndex()) {
-                        if(AddChordFingerings(vp) is not { } fingerings) {
+                    var block_notes = pattern_inst_notes.Where(
+                        x => x.NoteNum >= min_fret_num && x.NoteNum <= max_fret_num);
+                    var combos = block_notes.PowerSet().Where(x => x.Length >= pattern.Length);
+                    foreach(var combo in combos) {
+                        if(!IsValidCombo(combo,pattern) ||
+                           RejectExists(combo,valid_patterns)) {
                             continue;
                         }
 
-                        ngc.Groups.Add(new NoteGroup(ngc,idx,fingerings.OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum)));
-                        TotalChordCount++;
+                        valid_patterns.Add(combo);
                     }
 
-                    // set group position by lowest note
-                    ngc.Groups = ngc.Groups.OrderBy(x => x.Notes.Min(y => y.NoteId)).ToList();
-                    ngc.Groups.ForEach((x,idx) => x.Position = idx);
-
-                    ngcl.Add(ngc);
-                    UpdateProgress(++cur_progress,$"{TotalChordCount} chords found...");
+                    await Task.Delay(3,Ct);
                 }
+
+                NoteGroupCollection ngc = new NoteGroupCollection(PatternType,cur_key,suffix);
+                foreach((var vp,int idx) in valid_patterns
+                            //.OrderBy(x => x.Min(y => y.NoteNum))
+                            //.ThenBy(x => x.Min(y => y.RowNum))
+                            .WithIndex()) {
+                    if(AddChordFingerings(vp) is not { } fingerings) {
+                        continue;
+                    }
+
+                    ngc.Groups.Add(new NoteGroup(ngc,idx,fingerings.OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum)));
+                    TotalChordCount++;
+                }
+
+                // set group position by lowest note
+                ngc.Groups = ngc.Groups.OrderBy(x => x.Notes.Min(y => y.NoteId)).ToList();
+                ngc.Groups.ForEach((x,idx) => x.Position = idx);
+
+                //ngcl.Add(ngc);
+                UpdateProgress(++cur_progress,$"{TotalChordCount} chords found...");
+                return ngc;
             }
+
 
             Debug.WriteLine($"{TotalChordCount} total chords for '{Tuning}' in {tsw.ElapsedMilliseconds}ms");
 
@@ -540,8 +553,6 @@ namespace Calcuchord {
 
             return ntl.ToArray();
         }
-
-//[0,2,2,1,2,2,2,1] 
 
         #endregion
 

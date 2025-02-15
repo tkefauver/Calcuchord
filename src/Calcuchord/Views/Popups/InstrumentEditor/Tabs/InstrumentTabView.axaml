@@ -137,6 +137,11 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style Selector=":is(Control).fretted-only"
+               x:DataType="local:InstrumentViewModel">
+            <Setter Property="IsVisible"
+                    Value="{Binding !IsKeyboard}" />
+        </Style>
     </UserControl.Styles>
     <StackPanel Spacing="0">
         <!-- TYPE -->
@@ -164,28 +169,23 @@
             <TextBlock Text="Name" />
             <TextBox FontSize="22"
                      Watermark="Enter name..."
-                     Text="{Binding Name, Mode=TwoWay}">
-                <!-- <TextBox.Background> -->
-                <!--     <SolidColorBrush Color="{DynamicResource BgColor}" -->
-                <!--                      Opacity="0.3" /> -->
-                <!-- </TextBox.Background> -->
-            </TextBox>
+                     Text="{Binding Name, Mode=TwoWay}" />
         </UniformGrid>
-        <Border Classes="sep" />
+        <Border Classes="sep fretted-only" />
 
         <!-- STRINGS -->
-        <UniformGrid Classes="form-element">
+        <UniformGrid Classes="form-element fretted-only">
             <TextBlock Text="Strings" />
-            <ComboBox IsHitTestVisible="{Binding CanChangeStringCount}"
+            <ComboBox IsHitTestVisible="{Binding CanChangeIntrinsics}"
                       SelectedIndex="{Binding SelectedStringCountIndex, Mode=TwoWay}"
                       ItemsSource="{Binding StringCounts}" />
         </UniformGrid>
-        <Border Classes="sep" />
+        <Border Classes="sep fretted-only" />
 
         <!-- FRETS -->
-        <UniformGrid Classes="form-element">
+        <UniformGrid Classes="form-element fretted-only">
             <TextBlock Text="Frets" />
-            <ComboBox IsHitTestVisible="{Binding !IsActivated}"
+            <ComboBox IsHitTestVisible="{Binding CanChangeIntrinsics}"
                       SelectedIndex="{Binding SelectedFretCountIndex, Mode=TwoWay}"
                       ItemsSource="{Binding FretCounts}" />
         </UniformGrid>

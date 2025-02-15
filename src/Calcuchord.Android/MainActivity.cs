@@ -35,7 +35,7 @@ namespace Calcuchord.Android {
                             e.Handled = true;
                         };
 
-                        PlatformWrapper.Init(new AndroidPlatformServices(this));
+                        PlatformWrapper.Init(new PlatformServices_ad(this));
                     });
         }
     }

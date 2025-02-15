@@ -4,9 +4,11 @@ namespace Calcuchord {
         readonly PrefsIo_default _prefs = new PrefsIo_default();
 
         public virtual IStorageHelper StorageHelper => _prefs;
+        public virtual IPlatformInfo PlatformInfo { get; } = new PlatformInfo_default();
 
         public virtual IPrefsIo PrefsIo => _prefs;
 
         public abstract IMidiPlayer MidiPlayer { get; }
     }
+
 }

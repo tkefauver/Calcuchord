@@ -5,6 +5,53 @@
              mc:Ignorable="d"
              d:DesignWidth="800"
              d:DesignHeight="450"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             x:DataType="local:AboutViewModel"
+             Width="350"
+             Height="350"
              x:Class="Calcuchord.AboutView">
-    Welcome to Avalonia!
+    <UserControl.Styles>
+        <Style Selector="TextBlock.header">
+            <Setter Property="FontSize"
+                    Value="32" />
+        </Style>
+        <Style Selector="TextBlock.body">
+            <Setter Property="FontSize"
+                    Value="18" />
+        </Style>
+
+        <Style Selector="HyperlinkButton TextBlock.body">
+            <Setter Property="Foreground"
+                    Value="Blue" />
+        </Style>
+        <Style Selector="HyperlinkButton:pointerover TextBlock.body">
+            <Setter Property="Foreground"
+                    Value="Red" />
+        </Style>
+    </UserControl.Styles>
+    <controls:ColorZone x:Name="PopupZone"
+                        MinWidth="325"
+                        Padding="10,20"
+                        Mode="PrimaryMid"
+                        Foreground="{DynamicResource Bg}"
+                        Classes="popup-cntr">
+        <StackPanel Spacing="3">
+            <TextBlock Classes="header bold"
+                       Text="Calcuchord" />
+            <TextBlock Classes="body"
+                       Text="{Binding AppVersion}" />
+            <TextBlock Classes="body"
+                       Text="© 2025 Thomas Kefauver" />
+            <HyperlinkButton Cursor="Hand"
+                             Command="{Binding OpenLinkCommand}"
+                             CommandParameter="https://github.com/tkefauver/Calcuchord">
+                <TextBlock Classes="body"
+                           Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
+            </HyperlinkButton>
+        </StackPanel>
+    </controls:ColorZone>
 </UserControl>

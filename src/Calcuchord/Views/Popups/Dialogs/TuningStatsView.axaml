@@ -11,39 +11,46 @@
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:TuningViewModel"
-             Background="{DynamicResource Bg}"
              x:Class="Calcuchord.TuningStatsView">
-    <StackPanel MinWidth="200"
-                Margin="15">
-        <StackPanel.Styles>
-            <Style Selector="TextBlock">
-                <Setter Property="TextAlignment"
-                        Value="Center" />
-            </Style>
-            <Style Selector="TextBlock:not(.Body1)">
-                <Setter Property="Opacity"
-                        Value="0.7" />
-                <Setter Property="FontWeight"
-                        Value="Bold" />
-            </Style>
-        </StackPanel.Styles>
-        <TextBlock>Chords</TextBlock>
-        <TextBlock Classes="Body1"
-                   Text="{Binding ChordsCount, StringFormat='{}{0:n0}'}" />
-        <TextBlock>Scales</TextBlock>
-        <TextBlock Classes="Body1"
-                   Text="{Binding ScalesCount}" />
-        <TextBlock>Modes</TextBlock>
-        <TextBlock Classes="Body1"
-                   Text="{Binding ModesCount}" />
-        <TextBlock>Bookmarks</TextBlock>
-        <TextBlock Classes="Body1"
-                   Text="{Binding BookmarkCount}" />
+    <Border MinWidth="200"
+            Padding="15"
+            Background="{DynamicResource Bg}"
+            Effect="drop-shadow(3 3 3 black)"
+            CornerRadius="10">
+        <StackPanel MinWidth="200"
+                    Margin="15">
+            <StackPanel.Styles>
+                <Style Selector="TextBlock">
+                    <Setter Property="TextAlignment"
+                            Value="Center" />
+                </Style>
+                <Style Selector="TextBlock:not(.Body1)">
+                    <Setter Property="Opacity"
+                            Value="0.7" />
+                    <Setter Property="FontFamily"
+                            Value="{StaticResource GaramondBoldFont}" />
+                </Style>
+            </StackPanel.Styles>
+            <TextBlock>Chords</TextBlock>
+            <TextBlock Classes="Body1"
+                       Text="{Binding ChordsCount, StringFormat='{}{0:n0}'}" />
+            <TextBlock>Scales</TextBlock>
+            <TextBlock Classes="Body1"
+                       Text="{Binding ScalesCount}" />
+            <TextBlock>Modes</TextBlock>
+            <TextBlock Classes="Body1"
+                       Text="{Binding ModesCount}" />
+            <TextBlock>Bookmarks</TextBlock>
+            <TextBlock Classes="Body1"
+                       Text="{Binding BookmarkCount}" />
 
-        <Button x:Name="OkButton"
-                HorizontalAlignment="Center"
-                Margin="0 8">
-            Ok
-        </Button>
-    </StackPanel>
+            <Button x:Name="OkButton"
+                    HorizontalAlignment="Center"
+                    Margin="0 8">
+                Ok
+            </Button>
+        </StackPanel>
+
+    </Border>
+
 </UserControl>

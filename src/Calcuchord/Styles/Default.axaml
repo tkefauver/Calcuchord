@@ -40,12 +40,16 @@
         <Setter Property="FontFamily"
                 Value="{StaticResource GaramondFont}" />
     </Style>
-    <Style Selector=":is(TextBlock)[FontWeight=Bold]">
+    <Style Selector="TextBlock.bold">
         <Setter Property="FontFamily"
                 Value="{StaticResource GaramondBoldFont}" />
     </Style>
 
     <Style Selector="Run[FontWeight=Bold]">
+        <Setter Property="FontFamily"
+                Value="{StaticResource GaramondBoldFont}" />
+    </Style>
+    <Style Selector="Run.bold">
         <Setter Property="FontFamily"
                 Value="{StaticResource GaramondBoldFont}" />
     </Style>
@@ -60,6 +64,28 @@
                 Value="{x:Static sys:Double.NaN}" />
         <Setter Property="Height"
                 Value="{x:Static sys:Double.NaN}" />
+    </Style>
+
+    <!-- TEXT -->
+
+    <Style Selector="TextBlock.subject">
+        <Setter Property="Foreground"
+                Value="{DynamicResource MaterialPrimaryMidBrush}" />
+    </Style>
+
+    <Style Selector="Run.subject">
+        <Setter Property="Foreground"
+                Value="{DynamicResource MaterialPrimaryMidBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.article">
+        <Setter Property="Foreground"
+                Value="{DynamicResource MaterialSecondaryMidBrush}" />
+    </Style>
+
+    <Style Selector="Run.article">
+        <Setter Property="Foreground"
+                Value="{DynamicResource MaterialSecondaryMidBrush}" />
     </Style>
 
     <!-- BUTTONS -->

@@ -1,10 +1,11 @@
 using Android.Content;
 
 namespace Calcuchord.Android {
-    public class AndroidPlatformServices : PlatformServies_default {
+    public class PlatformServices_ad : PlatformServies_default {
 
-        public AndroidPlatformServices(Context context) {
+        public PlatformServices_ad(Context context) {
             PrefsIo = new PrefsIo_ad(context);
+            PlatformInfo = new PlatformInfo_ad(context);
         }
 
         public override IPrefsIo PrefsIo { get; }
@@ -20,5 +21,7 @@ namespace Calcuchord.Android {
                 return _midiPlayer;
             }
         }
+
+        public override IPlatformInfo PlatformInfo { get; }
     }
 }

@@ -15,8 +15,8 @@ namespace Calcuchord {
                 return;
             }
 
-            void TopLevel_OnPointerPressed(object sender2,PointerPressedEventArgs e) {
-                e.Handled = true;
+            void TopLevel_OnPointerPressed(object sender2,PointerPressedEventArgs e2) {
+                e2.Handled = true;
 
                 tl.RemoveHandler(PointerPressedEvent,TopLevel_OnPointerPressed);
                 tl.RemoveHandler(PointerPressedEvent,TopLevel_OnPointerPressed);

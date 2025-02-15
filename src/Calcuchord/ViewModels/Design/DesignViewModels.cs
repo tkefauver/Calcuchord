@@ -8,7 +8,8 @@ namespace Calcuchord {
 
     public class DesignChordMatchViewModel : ChordMatchViewModel {
         public DesignChordMatchViewModel() {
-            var instl = MainViewModel.CreateDefaultInstruments();
+            var instl = new[]
+                { Instrument.CreateByType(InstrumentType.Guitar) }; //MainViewModel.CreateDefaultInstruments();
 
             NoteGroupCollection ngc = new NoteGroupCollection(MusicPatternType.Chords,NoteType.C,"Major");
             ngc.SetParent(

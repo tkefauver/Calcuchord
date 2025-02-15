@@ -86,7 +86,7 @@
                            VerticalAlignment="Center">
                     <TextBlock.Inlines>
                         <Run Text="{Binding PrimaryLabel}"
-                             FontWeight="Bold"
+                             Classes="bold"
                              FontSize="48" />
                         <Run Text="{Binding SecondaryLabel}"
                              FontSize="36" />

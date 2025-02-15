@@ -7,7 +7,12 @@ namespace Calcuchord {
         IStorageHelper StorageHelper { get; }
         IMidiPlayer MidiPlayer { get; }
         IPrefsIo PrefsIo { get; }
+        IPlatformInfo PlatformInfo { get; }
+    }
 
+    public interface IPlatformInfo {
+        bool IsMobile { get; }
+        bool IsTablet { get; }
     }
 
     public interface IPrimaryModel {

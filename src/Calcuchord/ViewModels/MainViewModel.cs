@@ -9,7 +9,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using DialogHostAvalonia;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
@@ -91,7 +94,7 @@ namespace Calcuchord {
         public TuningViewModel SelectedTuning =>
             SelectedInstrument == null ? null : SelectedInstrument.SelectedTuning;
 
-        TuningViewModel LastSelectedTuning { get; set; }
+        public TuningViewModel LastSelectedTuning { get; private set; }
 
         #endregion
 
@@ -625,6 +628,7 @@ namespace Calcuchord {
                     DispatcherPriority.ApplicationIdle,
                     MatchCts.Token);
 
+            } catch(TaskCanceledException) {
             } catch(Exception e) {
                 e.Dump();
             }
@@ -958,14 +962,14 @@ namespace Calcuchord {
                             })));
 
             // set all svg sets to default
-            foreach((string key,int idx) in Enum.GetNames(typeof(SvgOptionType)).WithIndex()) {
-                SvgOptionType optionType = (SvgOptionType)(int)Math.Pow(
-                    2,
-                    idx);
-                if(SvgBuilderBase.DefaultSvgOptionType.HasFlag(optionType)) {
-                    all_opts.Where(x => x.OptionValue == optionType.ToString()).ForEach(x => x.IsChecked = true);
-                }
-            }
+            all_opts
+                .Where(x => x.OptionType.ToString().Contains("Svg"))
+                .ForEach(
+                    x =>
+                        x.IsChecked = SvgBuilderBase
+                            .DefaultSvgOptionType
+                            .Any(y => y.ToString() == x.OptionValue.ToString()));
+
 
             return all_opts;
         }
@@ -1052,6 +1056,10 @@ namespace Calcuchord {
             LastDisplayMode = SelectedDisplayMode;
             LastPatternType = SelectedPatternType;
 
+            if(SelectedTuning is { } st) {
+                st.OnPropertyChanged(nameof(st.IsSelected));
+            }
+
             Dispatcher.UIThread.Post(
                 async () => {
                     await Task.Delay(500);
@@ -1080,21 +1088,6 @@ namespace Calcuchord {
                 });
         }
 
-        public static IEnumerable<Instrument> CreateDefaultInstruments(InstrumentType[] def_itl = default) {
-            def_itl = def_itl ?? [InstrumentType.Guitar,InstrumentType.Ukulele,InstrumentType.Piano];
-            var instl = new List<Instrument>();
-            foreach(InstrumentType def_it in def_itl) {
-                Instrument def_inst = Instrument.CreateByType(
-                    def_it,
-                    true,
-                    chordsFromFile: def_it != InstrumentType.Piano,
-                    isInstrumentSelected: def_it == InstrumentType.Guitar);
-                instl.Add(def_inst);
-            }
-
-            return instl;
-        }
-
         #endregion
 
         #endregion
@@ -1105,22 +1098,22 @@ namespace Calcuchord {
             async (args) => {
                 await Task.Delay(1);
                 if(MatchCount <= 0 ||
-                   MatchColCount <= 0 ||
-                   MatchesView.Instance is not { } mv ||
-                   mv.MatchItemsRepeater.GetVisualDescendants<MatchView>().FirstOrDefault() is not { } sample_cp) {
+                   MatchColCount <= 0) {
                     return;
                 }
 
-                int cc = MatchColCount;
-                int rc = (int)Math.Ceiling(MatchCount / (double)MatchColCount);
-                double ar = sample_cp.Bounds.Height / sample_cp.Bounds.Width;
-                double mw = 250;
-                double mh = mw * ar;
-                double tw = MatchColCount * mw;
-                double th = rc * mh;
+                // int cc = MatchColCount;
+                // int rc = (int)Math.Ceiling(MatchCount / (double)MatchColCount);
+                // double ar = sample_cp.Bounds.Height / sample_cp.Bounds.Width;
+                // double mw = 250;
+                // double mh = mw * ar;
+                // double tw = MatchColCount * mw;
+                // double th = rc * mh;
 
-                ChordSvgBuilder cb = new ChordSvgBuilder();
-                cb.Test(SelectedTuning.Tuning,Matches.Select(x => x.NoteGroup));
+                if(args.ToStringOrEmpty() == "html") {
+                    ChordSvgBuilder cb = new ChordSvgBuilder();
+                    cb.Test(SelectedTuning.Tuning,Matches.Select(x => x.NoteGroup));
+                }
             });
 
         public MpIAsyncCommand CancelEditInstrumentCommand => new MpAsyncCommand(
@@ -1204,16 +1197,12 @@ namespace Calcuchord {
 
                 EditModeInstrument = null;
 
-                if(SelectedInstrument == emi_vm) {
-                    InitInstrument();
-                    return;
-                }
-
                 SelectedInstrument = emi_vm;
+                InitInstrument();
 
-                if(is_new && SelectedDisplayMode != DisplayModeType.Index) {
-                    SelectOptionCommand.Execute(IndexOptionViewModel);
-                }
+                // if(is_new && SelectedDisplayMode != DisplayModeType.Index) {
+                //     SelectOptionCommand.Execute(IndexOptionViewModel);
+                // }
             });
 
         public MpIAsyncCommand<object> BeginEditInstrumentCommand => new MpAsyncCommand<object>(
@@ -1242,7 +1231,8 @@ namespace Calcuchord {
                     EditModeInstrument.IsTuningTabSelected = false;
                 }
 
-                await DialogHost.Show(new InstrumentEditorView { DataContext = edit_inst_vm },MainView.DialogHostName);
+                await DialogHost.Show(
+                    new InstrumentEditorView { DataContext = edit_inst_vm },MainView.DialogHostName);
             });
 
         public MpIAsyncCommand AddInstrumentCommand => new MpAsyncCommand(
@@ -1295,8 +1285,36 @@ namespace Calcuchord {
             });
 
         public ICommand RemoveInstrumentCommand => new MpCommand<object>(
-            (args) => {
+            async (args) => {
                 if(args is not InstrumentViewModel to_remove_ivm) {
+                    return;
+                }
+
+                bool? confirmed = null;
+                YesNoDialogView dlg_v = new YesNoDialogView
+                {
+                    DataContext = new DialogViewModel
+                    {
+                        Label = $"Are you sure you want to delete '{to_remove_ivm.Name}'?",
+                        OkCommand = new MpCommand(
+                            () => {
+                                confirmed = true;
+                            }),
+                        CancelCommand = new MpCommand(
+                            () => {
+                                confirmed = false;
+                            })
+                    }
+                };
+                DialogHost.Show(dlg_v,MainView.DialogHostName).FireAndForgetSafeAsync();
+
+                while(!confirmed.HasValue) {
+                    await Task.Delay(100);
+                }
+
+                DialogHost.Close(MainView.DialogHostName);
+
+                if(!confirmed.Value) {
                     return;
                 }
 
@@ -1309,6 +1327,39 @@ namespace Calcuchord {
         public ICommand CloseRightDrawerCommand => new MpCommand(
             () => {
                 IsRightDrawerOpen = false;
+            });
+
+        public ICommand ShowAboutCommand => new MpCommand(
+            () => {
+                if(TopLevel.GetTopLevel(MainView.Instance) is not { } tl) {
+                    return;
+                }
+
+                void TopLevel_OnPointerPressed(object sender2,PointerPressedEventArgs e2) {
+                    if(e2.Source is Control c && c.GetSelfAndVisualAncestors().OfType<AboutView>().Any()) {
+                        // allow  about view click
+                        return;
+                    }
+
+                    e2.Handled = true;
+
+                    tl.RemoveHandler(InputElement.PointerPressedEvent,TopLevel_OnPointerPressed);
+                    //tl.RemoveHandler(InputElement.PointerPressedEvent,TopLevel_OnPointerPressed);
+                    try {
+                        DialogHost.Close(MainView.DialogHostName);
+                    } catch(Exception ex) {
+                        ex.Dump();
+                    }
+                }
+
+                tl.AddHandler(InputElement.PointerPressedEvent,TopLevel_OnPointerPressed,RoutingStrategies.Tunnel,true);
+                //tl.AddHandler(InputElement.PointerPressedEvent,TopLevel_OnPointerPressed,RoutingStrategies.Bubble,true);
+                DialogHost.Show(
+                    new AboutView
+                    {
+                        DataContext = new AboutViewModel()
+                    },MainView.DialogHostName).FireAndForgetSafeAsync();
+
             });
 
         DateTime? LastOptSelectDt { get; set; }
@@ -1420,7 +1471,7 @@ namespace Calcuchord {
 
                 }
 
-                //Prefs.Instance.Save();
+                Prefs.Instance.Save();
             });
 
         public ICommand FindMatchesCommand => new MpCommand(

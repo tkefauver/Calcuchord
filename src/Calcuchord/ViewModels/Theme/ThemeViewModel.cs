@@ -13,7 +13,6 @@ using MonkeyPaste.Common.Avalonia;
 
 namespace Calcuchord {
 
-
     public class ThemeViewModel : ViewModelBase {
 
         #region Statics
@@ -25,26 +24,22 @@ namespace Calcuchord {
 
         #region Properties
 
-        bool IsPretendMobile { get; set; }
+        public bool IsDesktop { get; }
 
-        public bool IsDesktop =>
-            !IsBrowser && !IsMobile;
+        public bool IsBrowser { get; }
 
-        public bool IsBrowser =>
-            OperatingSystem.IsBrowser();
+        public bool IsMobile { get; }
 
-        public bool IsMobile =>
-            OperatingSystem.IsAndroid() || OperatingSystem.IsIOS();
+        public bool IsPhone { get; }
 
-        public bool IsPhone =>
-            IsMobile && !IsTablet;
+        public bool IsTablet { get; }
 
-        public bool IsTablet => false;
+        bool IsForcedOrientation { get; set; }
 
         public bool IsLandscape {
             get {
 
-                if(((IsDesktop || IsBrowser) && !IsPretendMobile) ||
+                if((!IsPhone && !IsForcedOrientation) ||
                    MainView.Instance is not { } mv ||
                    TopLevel.GetTopLevel(mv) is not { } tl) {
                     return false;
@@ -262,6 +257,23 @@ namespace Calcuchord {
 
         #endregion
 
+        #region Constructors
+
+        public ThemeViewModel() {
+            if(PlatformWrapper.Services is not { } ps ||
+               ps.PlatformInfo is not { } pi) {
+                return;
+            }
+
+            IsBrowser = OperatingSystem.IsBrowser();
+            IsMobile = pi.IsMobile;
+            IsDesktop = !IsMobile;
+            IsTablet = pi.IsTablet;
+            IsPhone = IsMobile && !IsTablet;
+        }
+
+        #endregion
+
         #region Public Methods
 
         public void Init() {
@@ -322,11 +334,12 @@ namespace Calcuchord {
 
         public ICommand ToggleLandscapeCommand => new MpCommand(
             () => {
-                IsPretendMobile = true;
                 if(MainView.Instance is not { } mv ||
                    TopLevel.GetTopLevel(mv) is not { } tl) {
                     return;
                 }
+
+                IsForcedOrientation = true;
 
                 bool was_landscape = IsLandscape;
 

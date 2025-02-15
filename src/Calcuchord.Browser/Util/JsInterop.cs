@@ -20,5 +20,12 @@ namespace Calcuchord.Browser {
 
         [JSImport("globalThis.window.writePrefs")]
         public static partial void WritePrefs(string prefsJson);
+
+        [JSImport("globalThis.window.isMobile")]
+        public static partial bool IsMobile();
+
+        [JSImport("globalThis.window.isTablet")]
+        public static partial bool IsTablet();
+
     }
 }

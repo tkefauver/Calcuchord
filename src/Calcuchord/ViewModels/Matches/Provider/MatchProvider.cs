@@ -36,8 +36,16 @@ namespace Calcuchord {
         public MatchProvider(MusicPatternType patternType,Tuning tuning) {
             PatternType = patternType;
             Tuning = tuning;
-            Items = Tuning.Collections[PatternType].SelectMany(x => x.Groups).Select(x => CreateMatchViewModel(x,0))
-                .ToArray();
+            if(Tuning == null) {
+                Items = [];
+            } else {
+                Items =
+                    Tuning.Collections[PatternType]
+                        .SelectMany(x => x.Groups)
+                        .Select(x => CreateMatchViewModel(x,0))
+                        .ToArray();
+            }
+
         }
 
         #endregion

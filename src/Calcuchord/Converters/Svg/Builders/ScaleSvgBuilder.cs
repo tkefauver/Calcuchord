@@ -134,13 +134,13 @@ namespace Calcuchord {
                         HtmlNode shape_cntr = CreateG(bg_g,classes);
                         if(is_box) {
                             // root outer box
-                            AddShape(shape_cntr,true,RootBg,Transparent,cx,cy,shape_r,0,shadow: true);
+                            AddMarkerShape(shape_cntr,true,RootBg,Transparent,cx,cy,shape_r,0,shadow: true);
                             shape_r -= DotStrokeWidth;
                         }
 
                         if(is_user) {
                             // user outer circle
-                            AddShape(
+                            AddMarkerShape(
                                 shape_cntr,is_box,UserBg,Transparent,cx,cy,shape_r,0,
                                 shadow: !is_root,
                                 classes: "user-fill");
@@ -148,7 +148,7 @@ namespace Calcuchord {
                         }
 
                         // finger circle
-                        AddShape(
+                        AddMarkerShape(
                             shape_cntr,is_box,fret_bg,Transparent,cx,cy,shape_r,0,
                             shadow: !is_root && !is_user,
                             classes: "fingers-fill");

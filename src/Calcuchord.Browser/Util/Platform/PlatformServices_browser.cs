@@ -1,5 +1,5 @@
 namespace Calcuchord.Browser {
-    public class BrowserPlatformServices : PlatformServies_default {
+    public class PlatformServices_browser : PlatformServies_default {
         IMidiPlayer _midiPlayer;
 
         public override IMidiPlayer MidiPlayer {
@@ -13,5 +13,6 @@ namespace Calcuchord.Browser {
         }
 
         public override IPrefsIo PrefsIo { get; } = new PrefsIo_browser();
+        public override IPlatformInfo PlatformInfo { get; } = new PlatformInfo_browser();
     }
 }

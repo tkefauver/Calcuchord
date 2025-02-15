@@ -85,18 +85,18 @@ namespace Calcuchord {
         }
 
         public static IEnumerable<T[]> PowerSet<T>(this IEnumerable<T> source) {
-            if(null == source) {
-                throw new ArgumentNullException(nameof(source));
-            }
-
+            // from https://stackoverflow.com/a/57058345/105028
             var data = source.ToArray();
 
-            return Enumerable
-                .Range(0,1 << data.Length)
-                .Select(
-                    index => data
-                        .Where((v,i) => (index & (1 << i)) != 0)
-                        .ToArray());
+            return
+                // from 0 to 2^N...
+                Enumerable.Range(0,1 << data.Length)
+                    .Select(
+                        x => data
+                            .Where((v,i) => (x & (1 << i)) != 0)
+                            .ToArray()
+                    );
         }
+
     }
 }

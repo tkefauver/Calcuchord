@@ -17,15 +17,16 @@ namespace Calcuchord {
 
         #region Statics
 
-        public static SvgOptionType DefaultSvgOptionType =>
-            SvgOptionType.Fingers |
-            SvgOptionType.Barres |
-            SvgOptionType.Colors |
-            SvgOptionType.Tuning |
-            SvgOptionType.Roots |
-            SvgOptionType.Matches |
-            SvgOptionType.Frets |
-            SvgOptionType.Shadows;
+        public static SvgOptionType[] DefaultSvgOptionType { get; } =
+        [
+            SvgOptionType.Fingers,
+            SvgOptionType.Barres,
+            SvgOptionType.Tuning,
+            SvgOptionType.Roots,
+            SvgOptionType.Matches,
+            SvgOptionType.Frets,
+            SvgOptionType.Shadows
+        ];
 
         #endregion
 
@@ -81,7 +82,7 @@ namespace Calcuchord {
         protected double StringFixedAxisLength => 12;
 
         protected double DotRadius => 4;
-        protected double DotStrokeWidth => 0.775;
+        protected double DotStrokeWidth => 0.33;
 
         protected double BarHeight => DotRadius * 2;
 
@@ -217,7 +218,7 @@ namespace Calcuchord {
             return g;
         }
 
-        protected void AddShape(
+        protected void AddMarkerShape(
             HtmlNode cntr,
             bool isBox,
             string fill,

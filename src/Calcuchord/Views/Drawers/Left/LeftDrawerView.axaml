@@ -24,11 +24,33 @@
         <Style Selector="controls|ColorZone#TopColorZone">
             <Setter Property="Height"
                     Value="180" />
+            <Setter Property="Padding"
+                    Value="0,15,0,0" />
         </Style>
 
         <Style Selector="controls|ColorZone#TopColorZone.landscape">
             <Setter Property="Height"
                     Value="70" />
+            <Setter Property="Padding"
+                    Value="0,5,0,0" />
+        </Style>
+
+        <Style Selector="controls|ColorZone#TopColorZone Image">
+            <Setter Property="Width"
+                    Value="96" />
+            <Setter Property="Height"
+                    Value="96" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+        </Style>
+
+        <Style Selector="controls|ColorZone#TopColorZone.landscape Image">
+            <Setter Property="Width"
+                    Value="30" />
+            <Setter Property="Height"
+                    Value="30" />
+            <Setter Property="VerticalAlignment"
+                    Value="Top" />
         </Style>
 
         <!-- INST ITEM -->
@@ -63,10 +85,7 @@
             <StackPanel>
                 <!-- LOGO -->
                 <Image x:Name="LogoImage"
-                       Width="96"
-                       Height="96"
                        HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
                        Source="avares://Calcuchord/Assets/Images/logo.png" />
 
                 <!-- APP NAME -->
@@ -77,6 +96,7 @@
                 <!-- APP SUBTITLE -->
 
                 <TextBlock Classes="Subtitle2"
+                           IsVisible="{Binding !IsLandscape, Source={x:Static local:ThemeViewModel.Instance}}"
                            HorizontalAlignment="Center">
                     <TextBlock.Inlines>
                         <Run Text="Reverse search for" />
@@ -101,7 +121,6 @@
         <!-- LANDSCAPE TOGGLE BTN -->
         <ToggleButton x:Name="LandscapeToggleButton"
                       Grid.Row="0"
-                      IsVisible="{Binding IsDebug, Source={x:Static local:ThemeViewModel.Instance}}"
                       Margin="3"
                       Classes="float"
                       HorizontalAlignment="Left"
@@ -123,71 +142,49 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="local:InstrumentViewModel">
-                        <labs:Swipe>
-                            <labs:Swipe.Content>
-                                <Grid Width="{Binding $parent[ListBoxItem].Bounds.Width}"
-                                      ColumnDefinitions="Auto,*,Auto"
-                                      RowDefinitions="*,Auto">
+                        <Grid Width="{Binding $parent[ListBoxItem].Bounds.Width}"
+                              ColumnDefinitions="Auto,*,Auto"
+                              RowDefinitions="*,Auto">
 
-                                    <avalonia:MaterialIcon Margin="5,0"
-                                                           Kind="{Binding Icon}" />
-                                    <TextBlock Grid.Row="0"
-                                               Grid.Column="1"
-                                               Classes="Headline5"
-                                               VerticalAlignment="Center"
-                                               Text="{Binding Name}" />
+                            <avalonia:MaterialIcon Margin="5,0"
+                                                   Kind="{Binding Icon}" />
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="1"
+                                       Classes="Headline5"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding Name}" />
 
-                                    <TextBlock Grid.Row="1"
-                                               Grid.Column="1"
-                                               IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}"
-                                               DataContext="{Binding SelectedTuning}"
-                                               Margin="3,0,0,0"
-                                               Classes="Body2"
-                                               Text="{Binding Name}">
-                                        <TextBlock.Foreground>
-                                            <SolidColorBrush Color="{DynamicResource FgColor}"
-                                                             Opacity="0.7" />
-                                        </TextBlock.Foreground>
-                                    </TextBlock>
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="1"
+                                       IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}"
+                                       DataContext="{Binding SelectedTuning}"
+                                       Margin="3,0,0,0"
+                                       Classes="Body2"
+                                       Text="{Binding Name}">
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="{DynamicResource FgColor}"
+                                                     Opacity="0.7" />
+                                </TextBlock.Foreground>
+                            </TextBlock>
 
 
-                                    <Button Grid.RowSpan="2"
-                                            Grid.Column="2"
-                                            Margin="0,0,5,0"
-                                            Classes="float"
-                                            HorizontalAlignment="Right"
-                                            VerticalAlignment="Center"
-                                            Command="{Binding BeginEditInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                            CommandParameter="{Binding .}">
-                                        <Button.IsVisible>
-                                            <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                                <Binding Path="IsSelected" />
-                                                <Binding Path="CanEdit" />
-                                            </MultiBinding>
-                                        </Button.IsVisible>
-                                        <avalonia:MaterialIcon Kind="Cog" />
-                                    </Button>
-                                </Grid>
-                            </labs:Swipe.Content>
-                            <labs:Swipe.Left>
-                                <DataTemplate x:DataType="local:InstrumentViewModel">
-                                    <Button Background="Red"
-                                            CornerRadius="0"
-                                            HorizontalAlignment="Left"
-                                            Width="100"
-                                            VerticalAlignment="Stretch"
-                                            Command="{Binding RemoveInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                            CommandParameter="{Binding .}">
-                                        <TextBlock Text="Delete"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   FontSize="18"
-                                                   FontWeight="Bold"
-                                                   Foreground="White" />
-                                    </Button>
-                                </DataTemplate>
-                            </labs:Swipe.Left>
-                        </labs:Swipe>
+                            <Button Grid.RowSpan="2"
+                                    Grid.Column="2"
+                                    Margin="0,0,5,0"
+                                    Classes="float"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding BeginEditInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                    CommandParameter="{Binding .}">
+                                <Button.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="IsSelected" />
+                                        <Binding Path="CanEdit" />
+                                    </MultiBinding>
+                                </Button.IsVisible>
+                                <avalonia:MaterialIcon Kind="Cog" />
+                            </Button>
+                        </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -224,7 +221,7 @@
                             Padding="0,10">
 
             <Button Theme="{StaticResource MaterialFlatButton}"
-                    Click="Button_OnClick">
+                    Command="{Binding ShowAboutCommand}">
                 <StackPanel Orientation="Horizontal"
                             Spacing="5">
                     <avalonia:MaterialIcon Kind="About"

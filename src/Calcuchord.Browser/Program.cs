@@ -23,7 +23,7 @@ internal sealed partial class Program {
                     // }
 
 
-                    PlatformWrapper.Init(new BrowserPlatformServices());
+                    PlatformWrapper.Init(new PlatformServices_browser());
 
                 })
             .StartBrowserAppAsync("out");

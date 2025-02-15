@@ -6,4 +6,5 @@ namespace Calcuchord {
         public ICommand OkCommand { get; set; }
         public ICommand CancelCommand { get; set; }
     }
+
 }

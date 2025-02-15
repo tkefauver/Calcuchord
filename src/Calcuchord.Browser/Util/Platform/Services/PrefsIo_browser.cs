@@ -9,4 +9,5 @@ namespace Calcuchord.Browser {
             JsInterop.WritePrefs(prefsJson);
         }
     }
+
 }

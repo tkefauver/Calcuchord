@@ -119,7 +119,8 @@
                                      Classes="article" />
                                 <Run Text="bookmarks"
                                      Classes="subject" />
-                                <Run Text="yet." />
+                                <Run FontStyle="Italic"
+                                     Text="yet." />
                             </TextBlock.Inlines>
                         </TextBlock>
                     </Template>

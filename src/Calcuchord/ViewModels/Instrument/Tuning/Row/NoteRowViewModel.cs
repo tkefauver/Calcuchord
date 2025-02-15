@@ -196,7 +196,7 @@ namespace Calcuchord {
                         NoteMarkerState.Off;
         }
 
-        void SetNoteMarkerState(NoteViewModel nvm,NoteMarkerState newState) {
+        void SetNoteMarkerState(NoteViewModel nvm,NoteMarkerState newState,bool root) {
             // cases:
             // off->on
             // off->root
@@ -209,7 +209,8 @@ namespace Calcuchord {
                 return;
             }
 
-            if(nvm.IsDesiredRoot) {
+            if(nvm.IsDesiredRoot &&
+               (root || Parent.AllNotes.Where(x => x.IsSelected).None(x => x != nvm && x.IsDesiredRoot))) {
                 mvm.DesiredRoot = null;
             } else if(newState == NoteMarkerState.Root) {
                 mvm.DesiredRoot = nvm.InstrumentNote.Key;
@@ -243,7 +244,7 @@ namespace Calcuchord {
                 nvm.WorkingNoteNum--;
                 OnPropertyChanged(nameof(IsMuted));
                 if(nvm.WorkingNoteNum == 0) {
-                    SetNoteMarkerState(nvm,NoteMarkerState.Off);
+                    SetNoteMarkerState(nvm,NoteMarkerState.Off,root);
                 }
             } else {
                 switch(cur_state) {
@@ -258,7 +259,7 @@ namespace Calcuchord {
                         break;
                 }
 
-                SetNoteMarkerState(nvm,next_state);
+                SetNoteMarkerState(nvm,next_state,root);
             }
 
             if(SelectedNotes.Difference(last_sel).Any()) {
@@ -266,7 +267,9 @@ namespace Calcuchord {
             }
 
             bool was_root = false;
-            if(mvm.DesiredRoot != last_root && last_root != null && Parent.AllNotes.All(x => !x.IsDesiredRoot)) {
+            if(mvm.DesiredRoot != last_root &&
+               last_root != null &&
+               Parent.AllNotes.Where(x => x.IsSelected).All(x => !x.IsDesiredRoot)) {
                 // remove desired root when nothing selected of key
                 was_root = true;
             }

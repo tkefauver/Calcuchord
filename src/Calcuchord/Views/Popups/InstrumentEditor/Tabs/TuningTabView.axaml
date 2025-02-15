@@ -210,7 +210,7 @@
                                         <TextBlock VerticalAlignment="Center"
                                                    HorizontalAlignment="Center"
                                                    TextAlignment="Center"
-                                                   FontWeight="Bold"
+                                                   Classes="bold"
                                                    FontSize="16"
                                                    Text="{Binding CapoNum}" />
                                     </Button>
@@ -280,7 +280,6 @@
                                                     <TextBlock VerticalAlignment="Center"
                                                                HorizontalAlignment="Center"
                                                                TextAlignment="Center"
-                                                               FontWeight="Bold"
                                                                ClipToBounds="False"
                                                                FontSize="14"
                                                                Text="{Binding MarkerDetail}" />

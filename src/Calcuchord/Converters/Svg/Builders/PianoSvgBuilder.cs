@@ -98,15 +98,15 @@ namespace Calcuchord {
                     double cy = (y + h) - pad - (mh / 2d);
                     double r = mw / 2d;
                     if(is_root) {
-                        AddShape(cntr,true,RootBg,Transparent,cx,cy,r,0,"root-box");
+                        AddMarkerShape(cntr,true,RootBg,Transparent,cx,cy,r,0,"root-box");
                         r -= DotStrokeWidth;
                     }
 
                     if(is_user) {
-                        AddShape(cntr,is_root,pattern_bg,Transparent,cx,cy,r,0,"user-fill");
+                        AddMarkerShape(cntr,is_root,pattern_bg,Transparent,cx,cy,r,0,"user-fill");
                         if(is_root) {
                             double ir = r - DotStrokeWidth;
-                            AddShape(cntr,true,RootBg,Transparent,cx,cy,ir,0,"root-box");
+                            AddMarkerShape(cntr,true,RootBg,Transparent,cx,cy,ir,0,"root-box");
 
                         }
                     }

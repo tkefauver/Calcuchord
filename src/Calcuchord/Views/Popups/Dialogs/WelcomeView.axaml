@@ -23,11 +23,11 @@
                     <Run Text="To get started you'll need to" />
                     <Run FontFamily="{StaticResource GaramondBoldFont}"
                          Text="pick an instrument"
-                         FontWeight="Bold" />
+                         Classes="bold" />
                     <Run Text="or you can even" />
                     <Run FontFamily="{StaticResource GaramondBoldFont}"
                          Text="create your own!"
-                         FontWeight="Bold" />
+                         Classes="bold" />
                 </TextBlock.Inlines>
             </TextBlock>
             <controls:FloatingButton Classes="float-text light"

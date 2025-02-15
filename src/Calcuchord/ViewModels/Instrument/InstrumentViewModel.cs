@@ -57,6 +57,9 @@ namespace Calcuchord {
 
         #region Appearance
 
+        public string InstrumentNoteName =>
+            IsKeyboard ? "key" : "fret";
+
         public string Icon =>
             // InstrumentNameToSvgConverter.Instance.Convert(
             //     InstrumentType.ToString(),typeof(string),null,CultureInfo.CurrentCulture) as string;
@@ -109,9 +112,9 @@ namespace Calcuchord {
             }
         }
 
-        public bool CanChangeStringCount =>
+        public bool CanChangeIntrinsics =>
             !IsActivated &&
-            Tunings.Count <= 1;
+            Tunings.None();
 
         public bool IsEditModeEnabled =>
             Parent.EditModeInstrument == this;

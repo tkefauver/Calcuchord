@@ -30,12 +30,12 @@
         <dlg:DialogHost x:Name="MainDialogHost"
                         BlurBackground="True"
                         dlg:DialogHostStyle.ClipToBounds="True"
-                        Identifier="MainDialogHost">
+                        Identifier="{x:Static local:MainView.DialogHostName}">
             <dlg:DialogHost.Resources>
                 <SolidColorBrush x:Key="DialogHostOverlayBackgroundMixinBrush">Transparent</SolidColorBrush>
                 <SolidColorBrush x:Key="DialogHostBackgroundMixinBrush">Transparent</SolidColorBrush>
             </dlg:DialogHost.Resources>
-            <controls:SnackbarHost HostName="Root"
+            <controls:SnackbarHost HostName="{x:Static local:MainView.SnackbarHostName}"
                                    Theme="{StaticResource TinySnackbarHost}"
                                    SnackbarHorizontalAlignment="Center"
                                    SnackbarVerticalAlignment="Top">

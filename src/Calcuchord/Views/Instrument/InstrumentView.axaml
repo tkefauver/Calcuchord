@@ -81,24 +81,95 @@
             <Setter Property="Opacity"
                     Value="0.75" />
         </Style>
+
     </UserControl.Styles>
-    <TransitioningContentControl x:Name="InstrumentContentControl"
-                                 Content="{Binding SelectedTuning}">
-        <TransitioningContentControl.PageTransition>
-            <CrossFade Duration="0:0:1.0" />
-        </TransitioningContentControl.PageTransition>
-        <TransitioningContentControl.DataTemplates>
-            <local:InstrumentTemplateSelector>
-                <DataTemplate x:Key="KeyboardViewTemplate">
-                    <local:KeyboardView />
-                </DataTemplate>
-                <DataTemplate x:Key="FretboardViewTemplate">
-                    <local:FretboardView Margin="10,0" />
-                </DataTemplate>
-                <DataTemplate x:Key="EmptyTemplate">
-                    <Border />
-                </DataTemplate>
-            </local:InstrumentTemplateSelector>
-        </TransitioningContentControl.DataTemplates>
-    </TransitioningContentControl>
+    <Grid>
+        <TransitioningContentControl x:Name="InstrumentContentControl"
+                                     Content="{Binding SelectedTuning}">
+            <TransitioningContentControl.PageTransition>
+                <CrossFade Duration="0:0:1.0" />
+            </TransitioningContentControl.PageTransition>
+            <TransitioningContentControl.DataTemplates>
+                <local:InstrumentTemplateSelector>
+                    <DataTemplate x:Key="KeyboardViewTemplate">
+                        <local:KeyboardView />
+                    </DataTemplate>
+                    <DataTemplate x:Key="FretboardViewTemplate">
+                        <local:FretboardView Margin="10,0" />
+                    </DataTemplate>
+                    <DataTemplate x:Key="EmptyTemplate">
+                        <Border />
+                    </DataTemplate>
+                </local:InstrumentTemplateSelector>
+            </TransitioningContentControl.DataTemplates>
+        </TransitioningContentControl>
+
+        <local:HintView Margin="12,10"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top">
+            <ToolTip.Tip>
+                <controls:ColorZone>
+                    <StackPanel Spacing="10">
+                        <TextBlock>
+                            <TextBlock.Inlines>
+                                <Run Text="◦ " />
+                                <Run Classes="subject2"
+                                     Text="Long-press" />
+                                <Run Text="or" />
+                                <Run Classes="subject2"
+                                     Text="right-click" />
+                                <Run Text="{Binding InstrumentNoteName}" />
+                                <Run Text="to toggle" />
+                                <Run Text="desired root"
+                                     FontStyle="Italic"
+                                     Classes="subject2" />
+                                <Run Foreground="Black"
+                                     Text="♦" />
+
+                            </TextBlock.Inlines>
+                        </TextBlock>
+
+                        <TextBlock IsVisible="{Binding !IsKeyboard}">
+                            <TextBlock.Inlines>
+                                <Run Text="◦ " />
+                                <Run Classes="subject2"
+                                     Text="Click" />
+                                <Run Text="or" />
+                                <Run Classes="subject2"
+                                     Text="tap" />
+                                <Run Text="nut" />
+                                <Run Text="to select " />
+                                <Run Text="open fret"
+                                     FontStyle="Italic"
+                                     Classes="subject2" />
+
+                            </TextBlock.Inlines>
+                        </TextBlock>
+
+                        <TextBlock IsVisible="{Binding !IsKeyboard}">
+                            <TextBlock.Inlines>
+                                <Run Text="◦ " />
+                                <Run Classes="subject2"
+                                     Text="Click" />
+                                <Run Text="or" />
+                                <Run Classes="subject2"
+                                     Text="tap" />
+                                <Run Text="nut" />
+                                <Run Text="twice"
+                                     Classes="bold" />
+                                <Run Text="to" />
+                                <Run Text="mute"
+                                     FontStyle="Italic"
+                                     Classes="subject2" />
+                                <Run Text="that string" />
+
+                            </TextBlock.Inlines>
+                        </TextBlock>
+
+                    </StackPanel>
+
+                </controls:ColorZone>
+            </ToolTip.Tip>
+        </local:HintView>
+    </Grid>
 </UserControl>
