@@ -18,17 +18,12 @@
 
     <script>
         function readPrefs() {
-            if (!localStorage.prefs) {
-                return '';
-            }
-            return localStorage.prefs;
+            
+            return localStorage.getItem('prefs');
         }
 
         function writePrefs(prefsJson) {
-            if (localStorage.prefs === undefined) {
-                console.log('prefs created');
-            }
-            localStorage.prefs = prefsJson;
+            localStorage.setItem('prefs', prefsJson);
             console.log('prefs saved');
         }
 
