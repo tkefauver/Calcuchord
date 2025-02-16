@@ -9,7 +9,7 @@
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <!--        <PublishReadyToRun>true</PublishReadyToRun>-->
-        <!--        <RunAOTCompilation>true</RunAOTCompilation>-->
+               <RunAOTCompilation>true</RunAOTCompilation>
     </PropertyGroup>
 
     <ItemGroup>
