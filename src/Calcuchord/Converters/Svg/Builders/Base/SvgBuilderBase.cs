@@ -129,9 +129,9 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public abstract HtmlNode Build(NoteGroup ng,object args);
+        public abstract HtmlNode Build(NotePattern ng,object args);
 
-        public void Test(Tuning tuning,IEnumerable<NoteGroup> ngl) {
+        public void Test(Tuning tuning,IEnumerable<NotePattern> ngl) {
             HtmlDocument doc = new HtmlDocument();
 
             HtmlNode body = doc.CreateElement("body");
@@ -141,7 +141,7 @@ namespace Calcuchord {
             style.InnerHtml = MainViewModel.Instance.MatchSvgCss;
             body.AppendChild(style);
 
-            void AddSvg(HtmlNode svg,NoteGroup ng) {
+            void AddSvg(HtmlNode svg,NotePattern ng) {
                 HtmlNode title = doc.CreateElement("span");
                 title.InnerHtml = ng.ToString();
 
@@ -151,7 +151,7 @@ namespace Calcuchord {
                 body.AppendChild(doc.CreateElement("br"));
             }
 
-            foreach(NoteGroup ng in ngl) {
+            foreach(NotePattern ng in ngl) {
                 AddSvg(Build(ng,null),ng);
             }
 

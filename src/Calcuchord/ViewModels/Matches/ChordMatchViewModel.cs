@@ -57,7 +57,7 @@ namespace Calcuchord {
         public ChordMatchViewModel() {
         }
 
-        public ChordMatchViewModel(NoteGroup noteGroup,double score) : base(noteGroup,score) {
+        public ChordMatchViewModel(NotePattern notePattern,double score) : base(notePattern,score) {
         }
 
         #endregion
@@ -74,7 +74,7 @@ namespace Calcuchord {
                 return;
             }
 
-            mp.PlayChord(NoteGroup.Notes.ToArray());
+            mp.PlayChord(NotePattern.Notes.ToArray());
         }
 
         #endregion

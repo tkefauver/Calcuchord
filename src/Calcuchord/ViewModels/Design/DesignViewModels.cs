@@ -11,11 +11,11 @@ namespace Calcuchord {
             var instl = new[]
                 { Instrument.CreateByType(InstrumentType.Guitar) }; //MainViewModel.CreateDefaultInstruments();
 
-            NoteGroupCollection ngc = new NoteGroupCollection(MusicPatternType.Chords,NoteType.C,"Major");
+            PatternKeyCollection ngc = new PatternKeyCollection(MusicPatternType.Chords,NoteType.C,"Major");
             ngc.SetParent(
                 instl.FirstOrDefault(x => x.InstrumentType == InstrumentType.Guitar)?.Tunings.FirstOrDefault());
 
-            NoteGroup = new(
+            NotePattern = new(
                 ngc,0,new List<PatternNote>
                 {
                     new PatternNote(0,InstrumentNote.Mute(0)),
@@ -25,7 +25,7 @@ namespace Calcuchord {
                     new PatternNote(1,new(1,4,NoteType.C,4)),
                     new PatternNote(0,new(0,5,NoteType.E,4))
                 });
-            NoteGroup.SetParent(ngc);
+            NotePattern.SetParent(ngc);
             instl.ForEach(x => x.RefreshModelTree());
         }
     }

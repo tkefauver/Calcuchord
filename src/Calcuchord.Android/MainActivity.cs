@@ -6,7 +6,6 @@ using Avalonia;
 using Avalonia.Android;
 using Avalonia.ReactiveUI;
 using Avalonia.WebView.Android;
-using Debug = System.Diagnostics.Debug;
 
 namespace Calcuchord.Android {
     [Activity(
@@ -25,12 +24,12 @@ namespace Calcuchord.Android {
                 .AfterPlatformServicesSetup(
                     _ => {
                         AppDomain.CurrentDomain.UnhandledException += (s,e) => {
-                            Debug.WriteLine(
+                            PlatformWrapper.Services.Logger.WriteLine(
                                 $"AppDomain.CurrentDomain.UnhandledException: {e.ExceptionObject}. IsTerminating: {e.IsTerminating}");
                         };
 
                         AndroidEnvironment.UnhandledExceptionRaiser += (s,e) => {
-                            Debug.WriteLine(
+                            PlatformWrapper.Services.Logger.WriteLine(
                                 $"AndroidEnvironment.UnhandledExceptionRaiser: {e.Exception}. IsTerminating: {e.Handled}");
                             e.Handled = true;
                         };

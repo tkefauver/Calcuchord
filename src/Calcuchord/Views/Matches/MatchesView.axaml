@@ -52,7 +52,7 @@
                             <TextBlock.Inlines>
                                 <Run Text="Add an" />
                                 <Run Text="instrument."
-                                     Classes="subject" />
+                                     Classes="subject2" />
                             </TextBlock.Inlines>
                         </TextBlock>
                     </Template>
@@ -68,7 +68,7 @@
                             <TextBlock.Inlines>
                                 <Run Text="Add a" />
                                 <Run Text="tuning."
-                                     Classes="subject" />
+                                     Classes="subject2" />
                             </TextBlock.Inlines>
                         </TextBlock>
                     </Template>
@@ -84,7 +84,7 @@
                             <TextBlock.Inlines>
                                 <Run Text="Select" />
                                 <Run Text="frets."
-                                     Classes="subject" />
+                                     Classes="subject2" />
                             </TextBlock.Inlines>
                         </TextBlock>
                     </Template>
@@ -100,7 +100,7 @@
                             <TextBlock.Inlines>
                                 <Run Text="Select" />
                                 <Run Text="keys."
-                                     Classes="subject" />
+                                     Classes="subject2" />
                             </TextBlock.Inlines>
                         </TextBlock>
                     </Template>
@@ -116,9 +116,9 @@
                             <TextBlock.Inlines>
                                 <Run Text="No" />
                                 <Run Text="{Binding PatternSingularName}"
-                                     Classes="article" />
+                                     Classes="article2" />
                                 <Run Text="bookmarks"
-                                     Classes="subject" />
+                                     Classes="subject2" />
                                 <Run FontStyle="Italic"
                                      Text="yet." />
                             </TextBlock.Inlines>
@@ -136,9 +136,9 @@
                             <TextBlock.Inlines>
                                 <Run Text="No" />
                                 <Run Text="{Binding PatternSingularName}"
-                                     Classes="article" />
+                                     Classes="article2" />
                                 <Run Text="results"
-                                     Classes="subject" />
+                                     Classes="subject2" />
                                 <Run Text="found." />
                             </TextBlock.Inlines>
                         </TextBlock>
@@ -260,7 +260,6 @@
                             Classes.index-mode="{Binding IsIndexModeSelected}">
                 <ContentControl.IsVisible>
                     <MultiBinding Converter="{x:Static BoolConverters.And}">
-                        <Binding Path="IsSearchOverlayVisible" />
                         <Binding Path="!IsSearchButtonVisible" />
                         <Binding Path="IsMatchesEmpty"
                                  TargetNullValue="False"

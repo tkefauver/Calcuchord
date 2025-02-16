@@ -4,7 +4,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Calcuchord {
     [JsonObject]
-    public class NoteGroupCollection {
+    public class PatternKeyCollection {
 
         #region Properties
 
@@ -21,8 +21,9 @@ namespace Calcuchord {
         [JsonConverter(typeof(StringEnumConverter))]
         public MusicPatternType PatternType { get; set; }
 
+
         [JsonProperty]
-        public List<NoteGroup> Groups { get; set; } = [];
+        public List<NotePattern> Patterns { get; set; } = [];
 
         #endregion
 
@@ -52,10 +53,10 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public NoteGroupCollection() {
+        public PatternKeyCollection() {
         }
 
-        public NoteGroupCollection(MusicPatternType pt,NoteType key,string suffixKey) {
+        public PatternKeyCollection(MusicPatternType pt,NoteType key,string suffixKey) {
             PatternType = pt;
             Key = key;
             SuffixKey = suffixKey;
@@ -67,7 +68,7 @@ namespace Calcuchord {
 
         public void SetParent(Tuning parent) {
             Parent = parent;
-            foreach(NoteGroup g in Groups) {
+            foreach(NotePattern g in Patterns) {
                 g.SetParent(this);
             }
         }

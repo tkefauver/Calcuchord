@@ -14,7 +14,6 @@ namespace Calcuchord {
     [DoNotNotify]
     public partial class MainView : UserControl {
         public static MainView Instance { get; private set; }
-        public static string DialogHostName => "MainDialogHost";
         public static string SnackbarHostName => "Root";
 
         public MainView() {
@@ -25,6 +24,7 @@ namespace Calcuchord {
 
             Instance = this;
             InitializeComponent();
+
 
             MainContainerGrid.GetObservable(BoundsProperty).Subscribe(value => OnMainContainerSizeChanged());
             EffectiveViewportChanged += (sender,args) => OnMainContainerSizeChanged();

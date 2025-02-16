@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using MonkeyPaste.Common;
 using PropertyChanged;
 
 namespace Calcuchord {
@@ -19,16 +20,12 @@ namespace Calcuchord {
 
             Instance = this;
             InitializeComponent();
-        }
+            
+            MatchItemsRepeater.Loaded += (sender,args) => {
+                MainViewModel.Instance.SetMatchColumnCountAsync(MainViewModel.Instance.MatchColCount)
+                    .FireAndForgetSafeAsync();
 
-        protected override void OnLoaded(RoutedEventArgs e) {
-            if(MainViewModel.Instance is not { } mvm ||
-               mvm.Matches is not { } matches) {
-            }
-
-            //matches.CollectionChanged += MatchesOnCollectionChanged;
-            //MatchItemsRepeater.ElementClearing += (s,e1) => DoBusyCheck();
-            //MatchItemsRepeater.ElementPrepared += (s,e2) => DoBusyCheck();
+            };
         }
 
         void MatchesOnCollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {

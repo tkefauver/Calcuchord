@@ -1,15 +1,6 @@
 using System;
 
 namespace Calcuchord.Desktop {
-    public class PrefsIo_desktop : IPrefsIo {
-
-        public string ReadPrefs() {
-            return null;
-        }
-
-        public void WritePrefs(string prefsJson) {
-        }
-    }
 
     public class PlatformServices_desktop : PlatformServies_default {
         IMidiPlayer _midiPlayer;

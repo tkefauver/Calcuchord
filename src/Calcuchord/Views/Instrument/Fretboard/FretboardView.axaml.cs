@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
@@ -50,8 +52,6 @@ namespace Calcuchord {
 // th 188
             double def_fret_w = 69d;
             double def_fret_h = 31d;
-
-
             double tw = tvm.TotalFretCount * def_fret_w; //Math.Max(1000,tvm.TotalFretCount * (1600 / 23d));
             double th = tvm.Parent.RowCount * def_fret_h; //tw * (0.117521368 * 1);//(tvm.Parent.RowCount / 6d));
 
@@ -73,17 +73,18 @@ namespace Calcuchord {
                 ll = l;
             }
 
-            double label_width = fret_widths.Max() * 0.25;
+            double label_width = 30; //Math.Max(30,fret_widths.Max() * 0.25);
             double str_h = th / tvm.Parent.VisualRowCount;
-            double nut_width = Math.Min(str_h,fret_widths.Min());
+            double dot_d = Math.Min((tvm.Parent.RowCount * 3) + 2,fret_widths.Min());
+            double nut_width = Math.Min(str_h,dot_d);
 
             fvl.ForEach(
-                x => {
-                    if(x.GetVisualAncestor<ContentPresenter>() is not { } cp) {
+                fv => {
+                    if(fv.GetVisualAncestor<ContentPresenter>() is not { } cp) {
                         return;
                     }
 
-                    int fn = x.BindingContext.NoteNum;
+                    int fn = fv.BindingContext.NoteNum;
                     cp.Width =
                         fn < 0 ?
                             label_width :
@@ -93,6 +94,15 @@ namespace Calcuchord {
                                     fret_widths[fn - 1] :
                                     0;
                     cp.Height = str_h;
+                    if(fv.GetVisualDescendants<Ellipse>().Where(x => x.IsVisible && x.Classes.Contains("dot")) is
+                       { } dots) {
+                        dots.ForEach(x => x.Width = dot_d);
+                        if(!fv.BindingContext.IsFullDot) {
+                            dots.Select(x => x.RenderTransform).OfType<TranslateTransform>().ForEach(
+                                x => x.Y = (dot_d / 2d) * (fv.BindingContext.IsTopDotFret ? 1 : -1));
+                        }
+
+                    }
                 });
             double frets_width = fret_widths.Sum();
 

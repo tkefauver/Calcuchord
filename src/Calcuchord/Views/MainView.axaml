@@ -27,10 +27,10 @@
         </Style>
     </UserControl.Styles>
     <Grid x:Name="MainOuterContainer">
-        <dlg:DialogHost x:Name="MainDialogHost"
-                        BlurBackground="True"
+        <dlg:DialogHost x:Name="DlgHost"
+                        BlurBackground="False"
                         dlg:DialogHostStyle.ClipToBounds="True"
-                        Identifier="{x:Static local:MainView.DialogHostName}">
+                        Identifier="{Binding MainDialogHostName}">
             <dlg:DialogHost.Resources>
                 <SolidColorBrush x:Key="DialogHostOverlayBackgroundMixinBrush">Transparent</SolidColorBrush>
                 <SolidColorBrush x:Key="DialogHostBackgroundMixinBrush">Transparent</SolidColorBrush>
@@ -53,7 +53,7 @@
                     <DockPanel LastChildFill="true">
                         <!-- HEADER MENU -->
                         <local:MainHeaderView x:Name="HeaderView"
-                                              IsEnabled="{Binding !IsOpen, ElementName=MainDialogHost}"
+                                              IsEnabled="{Binding !IsOpen, ElementName=DlgHost}"
                                               DockPanel.Dock="Top" />
                         <local:MainFooterView x:Name="FooterView"
                                               DockPanel.Dock="Bottom" />

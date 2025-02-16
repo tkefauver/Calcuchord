@@ -21,7 +21,7 @@ namespace Calcuchord {
 
         #region Properties
 
-        protected IEnumerable<NoteGroupCollection> Items =>
+        protected IEnumerable<PatternKeyCollection> Items =>
             Tuning.Collections[PatternType];
 
         protected abstract MusicPatternType PatternType { get; }

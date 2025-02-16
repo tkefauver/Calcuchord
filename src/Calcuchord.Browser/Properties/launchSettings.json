@@ -2,13 +2,11 @@
   "profiles": {
     "Calcuchord.Browser": {
       "commandName": "Project",
-      "launchUrl": "http://localhost:5235",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "http://localhost:5235;https://localhost:7169"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:5235;https://localhost:7169",
+      "applicationUrl": "https://localhost:7169;http://localhost:5235",
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}"
     }
   }

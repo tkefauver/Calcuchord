@@ -1,12 +1,13 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Controls;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
 
 namespace Calcuchord {
-    public abstract class MatchViewModelBase : ViewModelBase {
+    public class PatternViewModel : ViewModelBase<TuningViewModel> {
 
         #region Private Variables
 
@@ -18,7 +19,7 @@ namespace Calcuchord {
 
         #region Statics
 
-        static MatchViewModelBase PlayingMatch { get; set; }
+        static PatternViewModel PlayingMatch { get; set; }
         static bool IsAnyMatchPlaying => PlayingMatch != null;
 
         #endregion
@@ -35,9 +36,25 @@ namespace Calcuchord {
 
         #region View Models
 
+        public new TuningViewModel Parent { get; set; }
+
         #endregion
 
         #region Appearance
+
+        // string _svgSource;
+        //
+        // public string SvgSource {
+        //     get {
+        //         if(_svgSource == null) {
+        //             _svgSource =
+        //                 PatternToSvgConverter.Instance.Convert(
+        //                     NotePattern,null,typeof(string),CultureInfo.CurrentCulture) as string;
+        //         }
+        //
+        //         return _svgSource;
+        //     }
+        // }
 
         public string BookmarkIcon =>
             IsBookmarked ? "Bookmark" : "BookmarkOutline";
@@ -64,7 +81,6 @@ namespace Calcuchord {
 
         public bool IsMatchPlaying { get; set; }
 
-        public abstract MusicPatternType MatchPatternType { get; }
 
         public bool IsSelected { get; set; }
 
@@ -85,7 +101,10 @@ namespace Calcuchord {
             }
         }
 
-        public double Score { get; set; }
+        public MusicPatternType PatternType =>
+            NotePattern.PatternType;
+
+        double Score { get; set; }
 
         public NotePattern NotePattern { get; set; }
 
@@ -99,27 +118,38 @@ namespace Calcuchord {
 
         #region Constructors
 
-        protected MatchViewModelBase() {
+        protected PatternViewModel() {
         }
 
-        protected MatchViewModelBase(NotePattern notePattern,double score) {
-            NotePattern = notePattern;
-            Score = score;
+        protected PatternViewModel(TuningViewModel parent) : base(parent) {
+
         }
 
         #endregion
 
         #region Public Methods
 
-        public void RefreshSvg() {
-            OnPropertyChanged(nameof(NotePattern));
+        public async Task InitAsync(NotePattern notePattern) {
+            await Task.Delay(1);
+            NotePattern = notePattern;
         }
 
         #endregion
 
         #region Protected Methods
 
-        protected abstract void PlayGroupMidi();
+        protected void PlayGroupMidi() {
+            if(PlatformWrapper.Services is not { } ps ||
+               ps.MidiPlayer is not { } mp) {
+                return;
+            }
+
+            if(PatternType == MusicPatternType.Chords) {
+                mp.PlayChord(NotePattern.Notes.ToArray());
+            } else {
+                mp.PlayScale(NotePattern.Notes.ToArray());
+            }
+        }
 
         #endregion
 
@@ -219,7 +249,7 @@ namespace Calcuchord {
                     return;
                 }
 
-                mvm.SelectedMatch = this;
+                //mvm.SelectedMatch = this;
 
                 if(MatchesView.Instance is not { } msv ||
                    msv.GetVisualDescendants<MatchView>().FirstOrDefault(x => x.DataContext == this) is not { } mv) {

@@ -12,17 +12,6 @@ internal sealed partial class Program {
             .WithInterFont()
             .AfterPlatformServicesSetup(
                 _ => {
-                    // string root_dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                    // JsInterop.ConsoleLog($"RootDir: '{root_dir}'");
-                    // string test_dir = Path.Combine(root_dir,"test");
-                    // if(Directory.Exists(test_dir)) {
-                    //     JsInterop.ConsoleLog($"TestDir EXISTS '{test_dir}'");
-                    // } else {
-                    //     Directory.CreateDirectory(test_dir);
-                    //     JsInterop.ConsoleLog($"TestDir CREATED '{test_dir}'");
-                    // }
-
-
                     PlatformWrapper.Init(new PlatformServices_browser());
 
                 })
@@ -32,12 +21,12 @@ internal sealed partial class Program {
     public static AppBuilder BuildAvaloniaApp() {
 
 #if DEBUG
-        Debug.WriteLine("Waiting for debugger");
+        PlatformWrapper.Services.Logger.WriteLine("Waiting for debugger");
         while(!Debugger.IsAttached) {
             Thread.Sleep(100);
         }
 
-        Debug.WriteLine("Debugger attached");
+        PlatformWrapper.Services.Logger.WriteLine("Debugger attached");
 #endif
 
         return AppBuilder

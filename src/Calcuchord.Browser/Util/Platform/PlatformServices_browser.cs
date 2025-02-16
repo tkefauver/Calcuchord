@@ -14,5 +14,6 @@ namespace Calcuchord.Browser {
 
         public override IPrefsIo PrefsIo { get; } = new PrefsIo_browser();
         public override IPlatformInfo PlatformInfo { get; } = new PlatformInfo_browser();
+        public override ILog Logger { get; } = new Logger_browser();
     }
 }

@@ -51,8 +51,8 @@
         <Style Selector="StackPanel.options ItemsControl">
             <Setter Property="HorizontalAlignment"
                     Value="Center" />
-            <Setter Property="MaxHeight"
-                    Value="150" />
+            <!-- <Setter Property="MaxHeight" -->
+            <!--         Value="150" /> -->
             <Setter Property="ItemsPanel">
                 <Setter.Value>
                     <ItemsPanelTemplate>
@@ -61,6 +61,12 @@
                     </ItemsPanelTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+
+        <Style Selector="controls|Card:not(.suffix) ItemsControl">
+            <Setter Property="MaxHeight"
+                    Value="150" />
         </Style>
 
         <Style Selector="controls|Card:not(.sort) ItemsControl">
@@ -129,11 +135,6 @@
             <Setter Property="Text"
                     Value="{Binding Label, Converter={x:Static local:SuffixDisplayValueConverter.Instance}}" />
         </Style>
-        <!-- <Style Selector="controls|Card.svg UniformGrid" -->
-        <!--        x:DataType="local:OptionViewModel"> -->
-        <!--     <Setter Property="Columns" -->
-        <!--             Value="85" /> -->
-        <!-- </Style> -->
         <Style Selector="controls|Card.svg TextBlock"
                x:DataType="local:OptionViewModel">
             <Setter Property="ClipToBounds"
@@ -151,18 +152,6 @@
                     Classes="float">
                 <avalonia:MaterialIcon Kind="Close" />
             </Button>
-            <!-- <Border DockPanel.Dock="Top" -->
-            <!--         MaxHeight="{Binding Bounds.Height, ElementName=CloseRightDrawerButton}" -->
-            <!--         HorizontalAlignment="Center" -->
-            <!--         Classes="busy-cntr" -->
-            <!--         Background="Transparent"> -->
-            <!--     <Border.IsVisible> -->
-            <!--         <MultiBinding Converter="{x:Static BoolConverters.Or}"> -->
-            <!--             <Binding Path="IsSearchInitiating" /> -->
-            <!--             ~1~ <Binding Path="IsMatchZoomChanging" /> @1@ -->
-            <!--         </MultiBinding> -->
-            <!--     </Border.IsVisible> -->
-            <!-- </Border> -->
 
             <ScrollViewer>
                 <StackPanel Classes="options"
@@ -197,7 +186,7 @@
                                    Classes.scales="{Binding IsScalesSelected}"
                                    Classes.modes="{Binding IsModesSelected}">
                         <ScrollViewer>
-                            <ItemsControl ItemsSource="{Binding VisibleSuffixOptions}" />
+                            <ItemsControl ItemsSource="{Binding SuffixOptions}" />
                         </ScrollViewer>
                     </controls:Card>
 

@@ -98,5 +98,28 @@ namespace Calcuchord {
                     );
         }
 
+        public static List<T[]> PowerSet3<T>(this IEnumerable<T> s) {
+            var data = s.ToArray();
+            int n = data.Length;
+            var result = new List<T[]>();
+
+            // Iterate through all subsets (represented by 0 to
+            // 2^n - 1)
+            for(int i = 0; i < 1 << n; i++) {
+                var subset = new List<T>();
+                for(int j = 0; j < n; j++) {
+                    // Check if the j-th bit is set in i
+                    if((i & (1 << j)) != 0) {
+                        //subset += s[j];
+                        subset.Add(data[j]);
+                    }
+                }
+
+                result.Add(subset.ToArray());
+            }
+
+            return result;
+        }
+
     }
 }

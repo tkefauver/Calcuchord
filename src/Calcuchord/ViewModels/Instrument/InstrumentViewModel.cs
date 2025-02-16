@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -82,6 +83,8 @@ namespace Calcuchord {
 
         #region Layout
 
+        public double DotDiameter { get; set; } = 20d;
+
         #endregion
 
         #region State
@@ -113,8 +116,7 @@ namespace Calcuchord {
         }
 
         public bool CanChangeIntrinsics =>
-            !IsActivated &&
-            Tunings.None();
+            !IsActivated;
 
         public bool IsEditModeEnabled =>
             Parent.EditModeInstrument == this;
@@ -379,15 +381,20 @@ namespace Calcuchord {
 
         void ChangeStringCount(int newStrCount) {
             Debug.Assert(
-                Instrument.Tunings.Count == 1,
-                "Should have only ONE tuning");
-            Debug.Assert(
                 !IsActivated,
                 "No string count changes for existing instruments");
 
             int diff = newStrCount - Instrument.RowCount;
 
-            var open_notes = Instrument.Tunings.FirstOrDefault()?.OpenNotes;
+            IEnumerable<InstrumentNote> open_notes = null;
+            if(Instrument.Tunings.FirstOrDefault() is { } tuning) {
+                open_notes = tuning.OpenNotes;
+            } else if(Instrument.CreateByType(InstrumentType).Tunings.FirstOrDefault() is { } def_tun) {
+                open_notes = def_tun.OpenNotes;
+            } else {
+                throw new Exception($"Unknown tuning type: {InstrumentType}");
+            }
+
             if(diff > 0) {
                 // completely reset strings
                 open_notes =
@@ -427,7 +434,7 @@ namespace Calcuchord {
                     int to_sel_idx = to_remove_idx >= Tunings.Count ? to_remove_idx - 1 : to_remove_idx;
                     SelectedTuning = Tunings[to_sel_idx];
                     Tunings.ForEach(x => x.OnPropertyChanged(nameof(x.CanDelete)));
-                    Debug.WriteLine($"'{tuning_vm_to_remove.Tuning.Name}' removed from {Instrument.Name}");
+                    PlatformWrapper.Services.Logger.WriteLine($"'{tuning_vm_to_remove.Tuning.Name}' removed from {Instrument.Name}");
                 }
 
                 Prefs.Instance.Save();

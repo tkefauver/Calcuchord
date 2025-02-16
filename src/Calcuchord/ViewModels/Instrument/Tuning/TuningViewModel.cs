@@ -1,22 +1,16 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using Calcuchord.JsonChords;
 using DialogHostAvalonia;
 using Material.Styles.Controls;
 using MonkeyPaste.Common;
-using MonkeyPaste.Common.Avalonia;
-using Newtonsoft.Json;
 
 namespace Calcuchord {
 
@@ -274,7 +268,7 @@ namespace Calcuchord {
                             async () => {
                                 while(true) {
                                     if(MainView.Instance is { } mv &&
-                                       mv.MainDialogHost is { } mdh &&
+                                       mv.DlgHost is { } mdh &&
                                        mdh.IsLoaded) {
                                         break;
                                     }
@@ -297,146 +291,64 @@ namespace Calcuchord {
         }
 
         async Task<bool> LoadPatternsAsync() {
-            PatternGenCts = new CancellationTokenSource();
+            bool success = true;
 
-            var progress_lookup = new Dictionary<MusicPatternType,double>
-            {
-                { MusicPatternType.Chords,0 },
-                { MusicPatternType.Scales,0 },
-                { MusicPatternType.Modes,0 }
-            };
-            var tasks = new List<Func<Task>>
-            {
-                CreateScalesAndModesAsync,
-                CreateChordsAsync
-            };
+            DialogHost.Show(
+                    new TuningGenProgressView { DataContext = this },MainViewModel.Instance.MainDialogHostName)
+                .FireAndForgetSafeAsync();
 
+            await Task.Delay(2_000);
 
-            bool is_done = false;
-
-            _ = Task.Run(
+            await Task.Run(
                 async () => {
-                    await Task.WhenAll(tasks.Select(task => task()));
-                    is_done = true;
-                },PatternGenCts.Token);
+                    PatternGenCts = new CancellationTokenSource();
+                    for(int i = 0; i < Enum.GetNames<MusicPatternType>().Length; i++) {
+                        PatternGen pg = new PatternGen((MusicPatternType)2 - i,Tuning);
+                        pg.ProgressChanged += OnProgressChanged;
 
-            while(true) {
-                if(is_done) {
-                    break;
-                }
+                        try {
+                            var patterns = await pg.GenerateAsync(PatternGenCts.Token);
+                            Dispatcher.UIThread.Post(
+                                () => {
+                                    Tuning.Collections[pg.PatternType].Clear();
+                                    Tuning.Collections[pg.PatternType].AddRange(patterns);
+                                });
+                        } catch(TaskCanceledException tcex) {
+                            PlatformWrapper.Services.Logger.WriteLine($"Gen for '{Tuning}' canceled");
+                            success = false;
+                            break;
+                        }
+                    }
 
-                if(PatternGenCts.Token.IsCancellationRequested) {
-                    break;
-                }
+                    PatternGenCts.Dispose();
+                    PatternGenCts = null;
 
-                await Task.Delay(100);
-            }
-
-            return is_done;
+                });
+            DialogHost.Close(MainViewModel.Instance.MainDialogHostName);
+            return success;
 
 
-            void OnProgressChanged(object sender,EventArgs e) {
+            void OnProgressChanged(object sender,double progress) {
                 if(sender is not PatternGen pg) {
                     return;
                 }
 
-                progress_lookup[pg.PatternType] = pg.PercentDone;
+                double total_progress = progress / 3d;
+                if(pg.PatternType == MusicPatternType.Scales) {
+                    total_progress += 1 / 3d;
+                } else if(pg.PatternType == MusicPatternType.Chords) {
+                    total_progress += 2 / 3d;
+                }
 
                 Dispatcher.UIThread.Post(
                     () => {
-                        GenProgress =
-                            progress_lookup
-                                [MusicPatternType.Chords]; //progress_lookup.Values.Sum() / progress_lookup.Count;
-                        if(pg.PatternType == MusicPatternType.Chords) {
-                            GenProgressLabel = $"{pg.TotalChordCount:n0} chords found"; //pg.ProgressLabel;    
-                        }
-
-
-                        //Debug.WriteLine($"Total Progress: {GenProgress} Label: '{pg.ProgressLabel}'");
+                        GenProgress = total_progress;
+                        GenProgressLabel =
+                            $"Generating {pg.PatternType.ToString().ToLower()}...{pg.CurItemCount:n0} found";
                     });
-            }
-
-            async Task CreateChordsAsync() {
-                bool from_file = Tuning.IsChordsFromFile;
-                //from_file = false;
-                IEnumerable<NoteGroupCollection> chords = null;
-                if(from_file) {
-                    chords = GenFromFile(Tuning);
-                } else {
-                    chords = await GenFromPatternsAsync(Tuning);
+                if(progress >= 1) {
+                    pg.ProgressChanged -= OnProgressChanged;
                 }
-
-                Tuning.Chords.AddRange(chords);
-                return;
-
-                async Task<IEnumerable<NoteGroupCollection>> GenFromPatternsAsync(Tuning tuning) {
-                    PatternGen pg = new PatternGen(MusicPatternType.Chords,tuning);
-                    pg.ProgressChanged += OnProgressChanged;
-                    var result = await pg.GenerateAsync(PatternGenCts.Token);
-                    return result;
-                }
-
-                IEnumerable<NoteGroupCollection> GenFromFile(Tuning tuning) {
-                    string json = MpAvFileIo.ReadTextFromResource(
-                        $"avares://Calcuchord/Assets/Text/{tuning.Parent.InstrumentType.ToString().ToLower()}.json");
-                    ChordsJsonRoot chordsJsonRoot = JsonConvert.DeserializeObject<ChordsJsonRoot>(json);
-                    var ngcl = new List<NoteGroupCollection>();
-
-                    foreach(PropertyInfo pi in typeof(Chords).GetProperties()) {
-                        object obj = chordsJsonRoot.chords.GetPropertyValue(pi.Name);
-                        if(obj is not IList keys_obj ||
-                           keys_obj.OfType<MusicKey>().FirstOrDefault() is not { } key_obj ||
-                           MusicHelpers.ParseNote(key_obj.key) is not { } key_note_tup) {
-                            continue;
-                        }
-
-                        NoteType cur_key = key_note_tup.nt;
-
-                        foreach(MusicKey chord_group in keys_obj) {
-                            string cur_suffix = chord_group.suffix;
-                            NoteGroupCollection ngc = new NoteGroupCollection(
-                                MusicPatternType.Chords,cur_key,chord_group.suffix);
-                            foreach((Position pos,int pos_num) in chord_group.positions.WithIndex()) {
-                                NoteGroup ng = new NoteGroup(ngc,pos_num);
-                                ng.CreateId(null);
-                                foreach((int f,int str_num) in pos.real_frets.WithIndex()) {
-                                    InstrumentNote inn = null;
-                                    if(f < 0) {
-                                        inn = InstrumentNote.Mute(str_num);
-                                    } else if(tuning.OpenNotes[str_num].Offset(f) is { } fret_note) {
-                                        inn = new InstrumentNote(f,str_num,fret_note);
-                                    }
-
-                                    Debug.Assert(inn != null,"Parse error");
-                                    PatternNote pattern_note = new PatternNote(pos.fingers[str_num],inn);
-                                    ng.Notes.Add(pattern_note);
-                                }
-
-                                ngc.Groups.Add(ng);
-                            }
-
-                            ngcl.Add(ngc);
-                        }
-                    }
-
-                    return ngcl;
-                }
-            }
-
-            async Task CreateScalesAndModesAsync() {
-                PatternGen pg1 = new PatternGen(MusicPatternType.Scales,Tuning);
-                pg1.ProgressChanged += OnProgressChanged;
-                var scales = await pg1.GenerateAsync(PatternGenCts.Token);
-                Tuning.Scales.AddRange(scales);
-                Debug.WriteLine(
-                    $"{scales.SelectMany(x => x.Groups).Count()} scales generated for {Tuning}");
-
-                PatternGen pg2 = new PatternGen(MusicPatternType.Modes,Tuning);
-                pg2.ProgressChanged += OnProgressChanged;
-                var modes = await pg2.GenerateAsync(PatternGenCts.Token);
-                Tuning.Modes.AddRange(modes);
-                Debug.WriteLine(
-                    $"{modes.SelectMany(x => x.Groups).Count()} modes generated for {Tuning}");
             }
         }
 
@@ -530,13 +442,13 @@ namespace Calcuchord {
         public ICommand ShowStatsCommand => new MpCommand<object>(
             (args) => {
                 CloseFlyout(args);
-                ChordsCount = Tuning.Chords.SelectMany(x => x.Groups).Count();
-                ScalesCount = Tuning.Scales.SelectMany(x => x.Groups).Count();
-                ModesCount = Tuning.Modes.SelectMany(x => x.Groups).Count();
+                ChordsCount = Tuning.Chords.SelectMany(x => x.Patterns).Count();
+                ScalesCount = Tuning.Scales.SelectMany(x => x.Patterns).Count();
+                ModesCount = Tuning.Modes.SelectMany(x => x.Patterns).Count();
 
                 BookmarkCount =
                     Tuning.Collections.Values.SelectMany(x => x)
-                        .SelectMany(x => x.Groups)
+                        .SelectMany(x => x.Patterns)
                         .Count(x => x.IsBookmarked);
 
                 TuningStatsView stats_view = new TuningStatsView
@@ -566,4 +478,5 @@ namespace Calcuchord {
         #endregion
 
     }
+
 }

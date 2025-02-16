@@ -4,10 +4,20 @@ using System.Collections.Generic;
 namespace Calcuchord {
 
     public interface IPlatformServices {
+        IUriNavigator UriNavigator { get; }
         IStorageHelper StorageHelper { get; }
         IMidiPlayer MidiPlayer { get; }
         IPrefsIo PrefsIo { get; }
         IPlatformInfo PlatformInfo { get; }
+        ILog Logger { get; }
+    }
+
+    public interface ILog {
+        void WriteLine(string message);
+    }
+
+    public interface IUriNavigator {
+        void NavigateTo(string uri);
     }
 
     public interface IPlatformInfo {
@@ -38,9 +48,7 @@ namespace Calcuchord {
     }
 
     public interface IProgressIndicator {
-        double PercentDone { get; }
-        string ProgressLabel { get; }
-        event EventHandler ProgressChanged;
+        event EventHandler<double> ProgressChanged;
     }
 
     public interface IMidiPlayer {

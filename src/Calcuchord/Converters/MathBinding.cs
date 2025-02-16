@@ -58,7 +58,7 @@ namespace Calcuchord {
                 // get variables
                 var variables = Exp.getVariables();
                 foreach(string variable in variables) {
-                    Debug.WriteLine(variable); // will print x, a
+                    PlatformWrapper.Services.Logger.WriteLine(variable); // will print x, a
                 }
 
                 return null;

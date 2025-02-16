@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Calcuchord {
     [JsonObject]
-    public class NoteGroup : PrimaryModelBase {
+    public class NotePattern : PrimaryModelBase {
 
         #region Properties
 
@@ -23,15 +23,29 @@ namespace Calcuchord {
         #region Ignored
 
         [JsonIgnore]
+        public MusicPatternType PatternType =>
+            Parent.PatternType;
+
+        [JsonIgnore]
         public string SuffixKey =>
             Parent.SuffixKey;
 
         [JsonIgnore]
-        public string SuffixDisplayValue =>
-            Parent.SuffixDisplayValue;
+        string _suffixDisplayValue;
 
         [JsonIgnore]
-        public NoteGroupCollection Parent { get; private set; }
+        public string SuffixDisplayValue {
+            get {
+                if(string.IsNullOrEmpty(_suffixDisplayValue)) {
+                    _suffixDisplayValue = PatternType.ToDisplayValue(SuffixKey);
+                }
+
+                return _suffixDisplayValue;
+            }
+        }
+
+        [JsonIgnore]
+        public PatternKeyCollection Parent { get; private set; }
 
         [JsonIgnore]
         public NoteType Key =>
@@ -51,13 +65,13 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public NoteGroup() {
+        public NotePattern() {
         }
 
-        public NoteGroup(NoteGroupCollection ngc,int position) : this(ngc,position,[]) {
+        public NotePattern(PatternKeyCollection ngc,int position) : this(ngc,position,[]) {
         }
 
-        public NoteGroup(NoteGroupCollection ngc,int position,IEnumerable<PatternNote> notes) : this() {
+        public NotePattern(PatternKeyCollection ngc,int position,IEnumerable<PatternNote> notes) : this() {
             Position = position;
             Notes.AddRange(notes);
             SetParent(ngc);
@@ -67,7 +81,7 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public void SetParent(NoteGroupCollection parent) {
+        public void SetParent(PatternKeyCollection parent) {
             Parent = parent;
             foreach(PatternNote pn in Notes) {
                 pn.SetParent(this);

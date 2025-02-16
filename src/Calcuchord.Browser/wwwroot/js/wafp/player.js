@@ -3,6 +3,7 @@ var audioContext;
 var player;
 var instrument;
 
+const defInstrumentName = '0240_Aspirin_sf2_file';
 var instrumentName = '0240_Aspirin_sf2_file';
 var volumeDb = 0.5;
 var sustain = 1;
@@ -60,6 +61,9 @@ function testScale() {
 function setInstrumentAsync(instName) {
     //https://surikov.github.io/webaudiofontdata/sound/0240_SBLive_sf2.html
     instrumentName = instName;
+    if (instrumentName === defInstrumentName) {
+        return;
+    }
     let inst_url = `wafp/${instName}.js`;
     let inst_var_name = `_tone_${instName}`;
 

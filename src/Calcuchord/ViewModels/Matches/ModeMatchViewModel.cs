@@ -54,7 +54,7 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public ModeMatchViewModel(NoteGroup noteGroup,double score) : base(noteGroup,score) {
+        public ModeMatchViewModel(NotePattern notePattern,double score) : base(notePattern,score) {
         }
 
         #endregion

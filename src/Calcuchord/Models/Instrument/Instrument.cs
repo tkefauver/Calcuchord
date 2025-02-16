@@ -61,6 +61,10 @@ namespace Calcuchord {
                     tuning_str = "G3 D4 A4 E5";
                     fret_count = 29;
                     break;
+                case InstrumentType.Viola:
+                    tuning_str = "C3 G3 D4 A4";
+                    fret_count = 29;
+                    break;
                 case InstrumentType.Cello:
                     tuning_str = "C2 G2 D3 A3";
                     fret_count = 29;

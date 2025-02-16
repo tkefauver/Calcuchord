@@ -41,4 +41,8 @@
         <PackageReference Include="webview.avalonia"/>
         <PackageReference Include="Melanchall.DryWetMidi" Condition="$(BuildOs) == 'LINUX'"/>
     </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Util\PatternGen\"/>
+    </ItemGroup>
 </Project>

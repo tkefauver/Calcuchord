@@ -25,7 +25,7 @@ namespace Calcuchord {
             Key == Parent.Key;
 
         [JsonIgnore]
-        public NoteGroup Parent { get; private set; }
+        public NotePattern Parent { get; private set; }
 
         #endregion
 
@@ -52,7 +52,7 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public void SetParent(NoteGroup parent) {
+        public void SetParent(NotePattern parent) {
             Parent = parent;
         }
 

@@ -17,10 +17,10 @@
         <Style Selector="Ellipse.dot">
             <Setter Property="ClipToBounds"
                     Value="True" />
-            <Setter Property="Width"
-                    Value="20" />
+            <!-- <Setter Property="Width" -->
+            <!--         Value="20" /> -->
             <Setter Property="Height"
-                    Value="20" />
+                    Value="{Binding $self.Bounds.Width}" />
             <Setter Property="HorizontalAlignment"
                     Value="Center" />
             <Setter Property="Fill">
@@ -171,7 +171,7 @@
                 </MultiBinding>
             </Ellipse.IsVisible>
             <Ellipse.RenderTransform>
-                <TranslateTransform Y="10" />
+                <TranslateTransform />
             </Ellipse.RenderTransform>
         </Ellipse>
 
@@ -186,7 +186,7 @@
                 </MultiBinding>
             </Ellipse.IsVisible>
             <Ellipse.RenderTransform>
-                <TranslateTransform Y="-10" />
+                <TranslateTransform />
             </Ellipse.RenderTransform>
         </Ellipse>
 

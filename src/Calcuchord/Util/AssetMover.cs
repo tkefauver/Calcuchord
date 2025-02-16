@@ -40,7 +40,7 @@ namespace Calcuchord {
                     string tone_text = MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/tone.html");
                     //MpFileIo.WriteTextToFile(tone_target_path,tone_text);
                     File.WriteAllText(tone_target_path,tone_text);
-                    Debug.WriteLine($"tone.html was written to: {tone_target_path}");
+                    PlatformWrapper.Services.Logger.WriteLine($"tone.html was written to: {tone_target_path}");
                 }
             } catch(Exception e) {
                 e.Dump();

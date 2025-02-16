@@ -49,11 +49,7 @@ namespace Calcuchord {
         #region State
 
         [JsonIgnore]
-        public bool IsVisible { get; set; } = true;
-
-        [JsonIgnore]
         public bool IsSecondaryVisible =>
-            IsVisible &&
             OptionType is
                 OptionType.ChordSort or
                 OptionType.ScaleSort or

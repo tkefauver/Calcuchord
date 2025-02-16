@@ -75,22 +75,22 @@ namespace Calcuchord {
             _wv = wv;
 
             _wv.NavigationStarting += (sender,arg) => {
-                Debug.WriteLine($"Navigating to {arg.Url}");
+                PlatformWrapper.Services.Logger.WriteLine($"Navigating to {arg.Url}");
             };
 
             _wv.NavigationCompleted += (_,webViewUrlLoadedEventArg) => {
                 if(webViewUrlLoadedEventArg.IsSuccess) {
                     CanPlay = true;
-                    Debug.WriteLine("Tone.html successfully loaded");
+                    PlatformWrapper.Services.Logger.WriteLine("Tone.html successfully loaded");
                 } else {
-                    Debug.WriteLine("Error loading Tone.html page");
+                    PlatformWrapper.Services.Logger.WriteLine("Error loading Tone.html page");
                 }
             };
             _wv.Loaded += (_,_) => {
                 ConfigurePlatformWebView(_wv);
 
                 if(PlayerUrl is null) {
-                    Debug.WriteLine("Error loading Tone.html assets");
+                    PlatformWrapper.Services.Logger.WriteLine("Error loading Tone.html assets");
                     return;
                 }
 
@@ -116,7 +116,7 @@ namespace Calcuchord {
                PlayerUrl.ToPathFromUri() is { } tone_path &&
                tone_path.IsFile()) {
                 config.BrowserExecutableFolder = Path.GetDirectoryName(tone_path);
-                Debug.WriteLine($"Browser executable folder: {config.BrowserExecutableFolder}");
+                PlatformWrapper.Services.Logger.WriteLine($"Browser executable folder: {config.BrowserExecutableFolder}");
             }
         }
 

@@ -99,7 +99,7 @@
                 <Svg x:Name="MatchSvg"
                      Grid.Row="1"
                      Css="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}"
-                     Source="{Binding SvgSource}"
+                     Source="{Binding NotePattern, Converter={x:Static local:PatternToSvgConverter.Instance}}"
                      Stretch="Uniform" />
                 <StackPanel x:Name="MatchButtonStripPanel"
                             Grid.Row="2"

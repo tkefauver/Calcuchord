@@ -54,7 +54,7 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public ScaleMatchViewModel(NoteGroup noteGroup,double score) : base(noteGroup,score) {
+        public ScaleMatchViewModel(NotePattern notePattern,double score) : base(notePattern,score) {
         }
 
         #endregion
@@ -71,7 +71,7 @@ namespace Calcuchord {
                 return;
             }
 
-            mp.PlayScale(NoteGroup.Notes);
+            mp.PlayScale(NotePattern.Notes);
         }
 
         #endregion

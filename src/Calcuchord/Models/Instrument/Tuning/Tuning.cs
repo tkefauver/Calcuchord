@@ -27,13 +27,13 @@ namespace Calcuchord {
         public List<InstrumentNote> OpenNotes { get; set; } = [];
 
         [JsonProperty]
-        public List<NoteGroupCollection> Chords { get; set; } = [];
+        public List<PatternKeyCollection> Chords { get; set; } = [];
 
         [JsonProperty]
-        public List<NoteGroupCollection> Scales { get; set; } = [];
+        public List<PatternKeyCollection> Scales { get; set; } = [];
 
         [JsonProperty]
-        public List<NoteGroupCollection> Modes { get; set; } = [];
+        public List<PatternKeyCollection> Modes { get; set; } = [];
 
         #endregion
 
@@ -47,10 +47,10 @@ namespace Calcuchord {
             Parent.ColCount - CapoFretNum;
 
         [JsonIgnore]
-        Dictionary<MusicPatternType,List<NoteGroupCollection>> _collections;
+        Dictionary<MusicPatternType,List<PatternKeyCollection>> _collections;
 
         [JsonIgnore]
-        public Dictionary<MusicPatternType,List<NoteGroupCollection>> Collections {
+        public Dictionary<MusicPatternType,List<PatternKeyCollection>> Collections {
             get {
                 if(_collections == null) {
                     _collections = new()
@@ -92,7 +92,7 @@ namespace Calcuchord {
             Parent = parent;
 
             foreach(var col_kvp in Collections) {
-                foreach(NoteGroupCollection col in col_kvp.Value) {
+                foreach(PatternKeyCollection col in col_kvp.Value) {
                     col.SetParent(this);
                 }
             }

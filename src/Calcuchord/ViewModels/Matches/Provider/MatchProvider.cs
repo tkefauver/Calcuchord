@@ -22,10 +22,12 @@ namespace Calcuchord {
 
         #region Properties
 
-        // IEnumerable<NoteGroup> Items =>
-        //     Tuning == null ? [] : Tuning.Collections[PatternType].SelectMany(x => x.Groups);
+        IEnumerable<MatchViewModelBase> Items { get; }
 
-        MatchViewModelBase[] Items { get; }
+
+        //MatchViewModelBase[] Items { get; }
+        public Dictionary<NoteType,Dictionary<string,IEnumerable<MatchViewModelBase>>> PatternLookup { get; } = [];
+
         public MusicPatternType PatternType { get; }
         public Tuning Tuning { get; }
 
@@ -41,9 +43,27 @@ namespace Calcuchord {
             } else {
                 Items =
                     Tuning.Collections[PatternType]
-                        .SelectMany(x => x.Groups)
+                        .SelectMany(x => x.Patterns)
                         .Select(x => CreateMatchViewModel(x,0))
                         .ToArray();
+
+                var coll = Tuning.Collections[PatternType];
+                for(int i = 0; i < 12; i++) {
+                    NoteType nt = (NoteType)i;
+                    if(coll.Where(x => x.Key == nt) is { } all_key_groups) {
+                        var key_suffix_lookup =
+                            all_key_groups
+                                .GroupBy(x => x.SuffixKey)
+                                .ToDictionary(
+                                    x => x.Key,
+                                    x =>
+                                        x.SelectMany(y => y.Patterns)
+                                            .OrderBy(y => y.Position)
+                                            .Select(y => CreateMatchViewModel(y,0))
+                                );
+                        PatternLookup.Add(nt,key_suffix_lookup);
+                    }
+                }
             }
 
         }
@@ -65,7 +85,7 @@ namespace Calcuchord {
 
         public IEnumerable<MatchViewModelBase> GetMatches(IEnumerable<NoteViewModel> matchNotes) {
             var results =
-                Items.Select(x => (x,GetScore(x.NoteGroup,matchNotes)))
+                Items.Select(x => (x,GetScore(x.NotePattern,matchNotes)))
                     .Where(x => x.Item2 > 0)
                     .Select(x => x.Item1);
             //.Select(x => CreateMatchViewModel(x.Item1,x.Item2));
@@ -80,22 +100,22 @@ namespace Calcuchord {
 
         #region Private Methods
 
-        MatchViewModelBase CreateMatchViewModel(NoteGroup noteGroup,double score) {
+        MatchViewModelBase CreateMatchViewModel(NotePattern notePattern,double score) {
             switch(PatternType) {
                 default:
                 case MusicPatternType.Chords:
-                    return new ChordMatchViewModel(noteGroup,score);
+                    return new ChordMatchViewModel(notePattern,score);
                 case MusicPatternType.Scales:
-                    return new ScaleMatchViewModel(noteGroup,score);
+                    return new ScaleMatchViewModel(notePattern,score);
                 case MusicPatternType.Modes:
-                    return new ModeMatchViewModel(noteGroup,score);
+                    return new ModeMatchViewModel(notePattern,score);
             }
         }
 
-        double GetScore(NoteGroup group,IEnumerable<NoteViewModel> matchNotes) {
+        public double GetScore(NotePattern pattern,IEnumerable<NoteViewModel> matchNotes) {
             double score = 0;
             foreach(NoteViewModel mn in matchNotes) {
-                if(group.Notes.Any(x => x.NoteNum == mn.WorkingNoteNum && x.RowNum == mn.RowNum)) {
+                if(pattern.Notes.Any(x => x.NoteNum == mn.WorkingNoteNum && x.RowNum == mn.RowNum)) {
                     score += 1;
                     continue;
                 }

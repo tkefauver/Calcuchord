@@ -37,7 +37,7 @@ namespace Calcuchord {
 
             bool is_initial_startup = string.IsNullOrEmpty(prefs_json);
 
-            Debug.WriteLine($"Initial Startup: {is_initial_startup}");
+            PlatformWrapper.Services.Logger.WriteLine($"Initial Startup: {is_initial_startup}");
 
             if(is_initial_startup) {
                 _ = new Prefs();
@@ -108,7 +108,7 @@ namespace Calcuchord {
         #region Constructors
 
         public Prefs() {
-            Debug.WriteLine("prefs ctor called");
+            PlatformWrapper.Services.Logger.WriteLine("prefs ctor called");
             if(Instance != null) {
                 // singleton erro
                 Debugger.Break();
@@ -127,12 +127,12 @@ namespace Calcuchord {
                 () => {
                     if(PlatformWrapper.Services is not { } ps ||
                        ps.PrefsIo is not { } prefsIo) {
-                        Debug.WriteLine("prefs io service unavailable");
+                        PlatformWrapper.Services.Logger.WriteLine("prefs io service unavailable");
                         return;
                     }
 
                     if(IsSaveIgnored) {
-                        Debug.WriteLine("prefs save ignored");
+                        PlatformWrapper.Services.Logger.WriteLine("prefs save ignored");
                         return;
                     }
 
@@ -145,9 +145,9 @@ namespace Calcuchord {
                         prefsIo.WritePrefs(pref_json);
 
                         if(IsInitialStartup) {
-                            Debug.WriteLine("Prefs CREATED");
+                            PlatformWrapper.Services.Logger.WriteLine("Prefs CREATED");
                         } else {
-                            Debug.WriteLine("Prefs SAVED");
+                            PlatformWrapper.Services.Logger.WriteLine("Prefs SAVED");
                         }
                     } catch(Exception e) {
                         e.Dump();
@@ -176,7 +176,7 @@ namespace Calcuchord {
         }
 
         void LogPrefs() {
-            Debug.WriteLine("");
+            PlatformWrapper.Services.Logger.WriteLine("");
             string tuning_str = MainViewModel.Instance == null || MainViewModel.Instance.SelectedTuning == null
                 ? string.Empty
                 : MainViewModel.Instance.SelectedTuning.ToString();
@@ -186,15 +186,15 @@ namespace Calcuchord {
                 sel_tuning_full_name = sel_tvm.ToString();
             }
 
-            Debug.WriteLine($"{DateTime.Now} prefs saved. SelectedTuningId: {sel_tuning_full_name} {tuning_str}");
+            PlatformWrapper.Services.Logger.WriteLine($"{DateTime.Now} prefs saved. SelectedTuningId: {sel_tuning_full_name} {tuning_str}");
             foreach(Instrument inst in Instruments) {
                 foreach(Tuning tuning in inst.Tunings) {
-                    Debug.WriteLine(
-                        $"{inst} Chords: {tuning.Chords.SelectMany(x => x.Groups).Count()} Scales: {tuning.Scales.SelectMany(x => x.Groups).Count()} Modes: {tuning.Modes.SelectMany(x => x.Groups).Count()}");
+                    PlatformWrapper.Services.Logger.WriteLine(
+                        $"{inst} Chords: {tuning.Chords.SelectMany(x => x.Patterns).Count()} Scales: {tuning.Scales.SelectMany(x => x.Patterns).Count()} Modes: {tuning.Modes.SelectMany(x => x.Patterns).Count()}");
                 }
             }
 
-            Debug.WriteLine("");
+            PlatformWrapper.Services.Logger.WriteLine("");
         }
 
         void Validate() {
@@ -208,21 +208,21 @@ namespace Calcuchord {
             // }
 
             if(Instruments.SelectMany(x => x.Tunings).SelectMany(x => x.Collections.Values).SelectMany(x => x)
-                   .SelectMany(x => x.Groups) is { } all_ngl &&
+                   .SelectMany(x => x.Patterns) is { } all_ngl &&
                all_ngl.GroupBy(x => x.Id).Where(x => x.Count() > 1) is { } dup_nggl &&
                dup_nggl.Any()) {
 
-                // BUG randomly bookmarking duplicates the noteGroup
+                // BUG randomly bookmarking duplicates the notePattern
                 // i think its a virtualization thing maybe w/ the items repeater maybe 
                 // foreach(Tuning tuning in all_tunings) {
                 //     bool needs_update = false;
                 //     foreach(var coll in tuning.Collections.Values) {
-                //         if(coll.SelectMany(x => x.Groups).GroupBy(x => x.FullName).Where(x => x.Count() > 1) is
+                //         if(coll.SelectMany(x => x.Patterns).GroupBy(x => x.FullName).Where(x => x.Count() > 1) is
                 //                { } dup_ngl &&
                 //            dup_ngl.Any()) {
                 //             foreach(var dup_group_to_remove in dup_ngl) {
-                //                 foreach(NoteGroup dup_to_remove in dup_group_to_remove.Skip(1)) {
-                //                     dup_to_remove.Parent.Groups.Remove(dup_to_remove);
+                //                 foreach(NotePattern dup_to_remove in dup_group_to_remove.Skip(1)) {
+                //                     dup_to_remove.Parent.Patterns.Remove(dup_to_remove);
                 //                     needs_update = true;
                 //                 }
                 //             }

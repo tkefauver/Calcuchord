@@ -43,7 +43,7 @@ namespace Calcuchord.Android {
                 return;
             }
 
-            Debug.WriteLine($"Prefs Error, cannot write to '{PrefsFilePath}'");
+            PlatformWrapper.Services.Logger.WriteLine($"Prefs Error, cannot write to '{PrefsFilePath}'");
 
         }
     }
