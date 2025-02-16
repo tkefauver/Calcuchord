@@ -423,7 +423,8 @@ namespace Calcuchord {
                         valid_patterns.Add(combo);
                     }
 
-                    await Task.Delay(OperatingSystem.IsBrowser() ? 200:3,Ct);
+                    await Task.Yield();
+                    //await Task.Delay(OperatingSystem.IsBrowser() ? 200:3,Ct);
                 }
 
                 NoteGroupCollection ngc = new NoteGroupCollection(PatternType,cur_key,suffix);
