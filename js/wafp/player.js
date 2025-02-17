@@ -61,11 +61,14 @@ function testScale() {
 function setInstrumentAsync(instName) {
     //https://surikov.github.io/webaudiofontdata/sound/0240_SBLive_sf2.html
     instrumentName = instName;
-    if (instrumentName === defInstrumentName) {
+
+    let inst_url = `js/wafp/${instName}.js`;
+    let inst_var_name = `_tone_${instName}`;
+    if (window[inst_var_name]) {
+        instrument = window[inst_var_name];
+        player.adjustPreset(audioContext, instrument);
         return;
     }
-    let inst_url = `wafp/${instName}.js`;
-    let inst_var_name = `_tone_${instName}`;
 
     fetch(inst_url)
         .then(response => response.text())
