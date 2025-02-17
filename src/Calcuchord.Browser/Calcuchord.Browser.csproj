@@ -13,7 +13,6 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser" />
-        <PackageReference Include="Blazored.LocalStorage" />
         <PackageReference Include="PublishSPAforGitHubPages.Build" />
     </ItemGroup>
 

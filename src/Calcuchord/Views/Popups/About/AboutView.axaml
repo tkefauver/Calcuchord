@@ -49,8 +49,8 @@
             <HyperlinkButton Cursor="Hand"
                              Command="{Binding OpenLinkCommand}"
                              CommandParameter="https://github.com/tkefauver/Calcuchord">
-                <SelectableTextBlock Classes="body"
-                                     Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
+                <TextBlock Classes="body"
+                           Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
             </HyperlinkButton>
         </StackPanel>
     </controls:ColorZone>

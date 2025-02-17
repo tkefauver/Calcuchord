@@ -1,53 +1,52 @@
 <Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AvaloniaVersion>11.2.3</AvaloniaVersion>
-    <MaterialAvaloniaVersion>3.9.2</MaterialAvaloniaVersion>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageVersion Include="Avalonia.Labs.Controls" Version="11.2.0" />
-    <PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />
-    <PackageVersion Include="MonkeyPaste.Common.Avalonia" Version="1.0.3.25" />
-    <PackageVersion Include="PublishSPAforGitHubPages.Build" Version="3.0.0" />
-    <PackageVersion Include="System.Formats.Nrbf" Version="9.0.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageVersion Include="Avalonia.Svg.Skia" Version="11.2.0.2" />
-    <PackageVersion Include="org.matheval" Version="1.0.0.3" />
-    <PackageVersion Include="Svg.Skia" Version="2.0.0.4" />
-    <PackageVersion Include="WebView.Avalonia.Linux" Version="11.0.0.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageVersion Include="Material.Avalonia.DataGrid" Version="$(MaterialAvaloniaVersion)" />
-    <PackageVersion Include="Material.Avalonia" Version="$(MaterialAvaloniaVersion)" />
-    <PackageVersion Include="Material.Avalonia.Dialogs" Version="$(MaterialAvaloniaVersion)" />
-    <PackageVersion Include="Material.Icons.Avalonia" Version="2.1.11" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.iOS" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Browser" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageVersion Include="DialogHost.Avalonia" Version="0.9.2" />
-    <PackageVersion Include="fody" Version="6.9.1">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageVersion>
-    <PackageVersion Include="PropertyChanged.Fody" Version="4.1.0" />
-    <PackageVersion Include="ReactiveUI" Version="20.1.63" />
-    <PackageVersion Include="webview.avalonia" Version="11.0.0.1" />
-    <PackageVersion Include="webview.avalonia.android" Version="11.0.0.1" />
-    <PackageVersion Include="webview.avalonia.desktop" Version="11.0.0.1" />
-    <PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.1" />
-    <PackageVersion Include="Melanchall.DryWetMidi" Version="7.2.0" />
-  </ItemGroup>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <PropertyGroup>
+        <AvaloniaVersion>11.2.4</AvaloniaVersion>
+        <MaterialAvaloniaVersion>3.9.2</MaterialAvaloniaVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageVersion Include="Avalonia.Labs.Controls" Version="11.2.0"/>
+        <PackageVersion Include="MonkeyPaste.Common.Avalonia" Version="1.0.3.25"/>
+        <PackageVersion Include="PublishSPAforGitHubPages.Build" Version="3.0.0"/>
+        <PackageVersion Include="System.Formats.Nrbf" Version="9.0.1"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageVersion Include="Avalonia.Svg.Skia" Version="11.2.0.2"/>
+        <PackageVersion Include="org.matheval" Version="1.0.0.3"/>
+        <PackageVersion Include="Svg.Skia" Version="2.0.0.4"/>
+        <PackageVersion Include="WebView.Avalonia.Linux" Version="11.0.0.1"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageVersion Include="Material.Avalonia.DataGrid" Version="$(MaterialAvaloniaVersion)"/>
+        <PackageVersion Include="Material.Avalonia" Version="$(MaterialAvaloniaVersion)"/>
+        <PackageVersion Include="Material.Avalonia.Dialogs" Version="$(MaterialAvaloniaVersion)"/>
+        <PackageVersion Include="Material.Icons.Avalonia" Version="2.1.11"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia.iOS" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia.Browser" Version="$(AvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaVersion)"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageVersion Include="DialogHost.Avalonia" Version="0.9.2"/>
+        <PackageVersion Include="fody" Version="6.9.1">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageVersion>
+        <PackageVersion Include="PropertyChanged.Fody" Version="4.1.0"/>
+        <PackageVersion Include="ReactiveUI" Version="20.1.63"/>
+        <PackageVersion Include="webview.avalonia" Version="11.0.0.1"/>
+        <PackageVersion Include="webview.avalonia.android" Version="11.0.0.1"/>
+        <PackageVersion Include="webview.avalonia.desktop" Version="11.0.0.1"/>
+        <PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.1"/>
+        <PackageVersion Include="Melanchall.DryWetMidi" Version="7.2.0"/>
+    </ItemGroup>
 </Project>
