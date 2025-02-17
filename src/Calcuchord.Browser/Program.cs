@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Browser;
 using Calcuchord;
@@ -21,12 +19,12 @@ internal sealed partial class Program {
     public static AppBuilder BuildAvaloniaApp() {
 
 #if DEBUG
-        PlatformWrapper.Services.Logger.WriteLine("Waiting for debugger");
-        while(!Debugger.IsAttached) {
-            Thread.Sleep(100);
-        }
-
-        PlatformWrapper.Services.Logger.WriteLine("Debugger attached");
+        // PlatformWrapper.Services.Logger.WriteLine("Waiting for debugger");
+        // while(!Debugger.IsAttached) {
+        //     Thread.Sleep(100);
+        // }
+        //
+        // PlatformWrapper.Services.Logger.WriteLine("Debugger attached");
 #endif
 
         return AppBuilder

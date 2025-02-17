@@ -12,19 +12,52 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:Class="Calcuchord.TuningGenProgressView"
              x:DataType="local:TuningViewModel">
+    <UserControl.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+            <Setter Property="TextWrapping"
+                    Value="WrapWithOverflow" />
+        </Style>
+    </UserControl.Styles>
     <controls:ColorZone Classes="popup-cntr"
                         Width="300">
         <StackPanel Spacing="16">
             <TextBlock Classes="Body2"
-                       TextWrapping="Wrap"
-                       TextAlignment="Center"
                        Text="{Binding ProgressTitle}" />
+            <Border Background="Orange"
+                    IsVisible="{Binding IsBrowser, Source={x:Static local:ThemeViewModel.Instance}}"
+                    CornerRadius="10"
+                    Padding="5">
+                <StackPanel Spacing="5">
+
+                    <TextBlock Foreground="Black"
+                               Classes="Body2">
+                        <TextBlock.Inlines>
+                            <Run Text="UI will freeze!!!"
+                                 Classes="bold"
+                                 Foreground="OrangeRed" />
+                        </TextBlock.Inlines>
+                    </TextBlock>
+                    <TextBlock Foreground="Black"
+                               Classes="Body2"
+                               Text="Click 'wait' if your browser shows you a message"
+                               TextAlignment="Center" />
+                    <TextBlock FontSize="12"
+                               Foreground="Black"
+                               Text="It will go back to normal once complete. It shouldn't take more than a few minutes..." />
+
+                    <TextBlock FontSize="10"
+                               TextAlignment="Center"
+                               Foreground="Black"
+                               Text="(Browser mode only)" />
+                </StackPanel>
+            </Border>
             <ProgressBar Maximum="1"
                          Minimum="0"
                          Value="{Binding GenProgress}" />
             <TextBlock FontSize="10"
-                       Text="{Binding GenProgressLabel}"
-                       TextAlignment="Center" />
+                       Text="{Binding GenProgressLabel}" />
             <Button Classes="float-text"
                     IsDefault="True"
                     IsVisible="{Binding !Parent.IsKeyboard}"

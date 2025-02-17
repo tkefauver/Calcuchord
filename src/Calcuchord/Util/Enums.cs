@@ -198,7 +198,8 @@ namespace Calcuchord {
         //sus,
         sus2,
         sus4,
-        sus2sus4,
+
+        //sus2sus4,
         aug,
 
         // aug7,

@@ -1,9 +1,14 @@
 ﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace Calcuchord {
     public abstract class ViewModelBase : INotifyPropertyChanged {
+        [JsonIgnore]
         public bool IsBusy { get; set; }
+
+        [JsonIgnore]
         public bool HasModelChanged { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected ViewModelBase() {
@@ -29,6 +34,7 @@ namespace Calcuchord {
     }
 
     public abstract class ViewModelBase<T> : ViewModelBase where T : ViewModelBase {
+        [JsonIgnore]
         public T Parent { get; set; }
 
         protected ViewModelBase(T parent) {

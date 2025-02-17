@@ -15,20 +15,20 @@
              Height="350"
              x:Class="Calcuchord.AboutView">
     <UserControl.Styles>
-        <Style Selector="TextBlock.header">
+        <Style Selector=":is(TextBlock).header">
             <Setter Property="FontSize"
                     Value="32" />
         </Style>
-        <Style Selector="TextBlock.body">
+        <Style Selector=":is(TextBlock).body">
             <Setter Property="FontSize"
                     Value="18" />
         </Style>
 
-        <Style Selector="HyperlinkButton TextBlock.body">
+        <Style Selector="HyperlinkButton :is(TextBlock).body">
             <Setter Property="Foreground"
                     Value="Blue" />
         </Style>
-        <Style Selector="HyperlinkButton:pointerover TextBlock.body">
+        <Style Selector="HyperlinkButton:pointerover :is(TextBlock).body">
             <Setter Property="Foreground"
                     Value="Red" />
         </Style>
@@ -40,17 +40,17 @@
                         Foreground="{DynamicResource Bg}"
                         Classes="popup-cntr">
         <StackPanel Spacing="3">
-            <TextBlock Classes="header bold"
-                       Text="Calcuchord" />
-            <TextBlock Classes="body"
-                       Text="{Binding AppVersion}" />
-            <TextBlock Classes="body"
-                       Text="© 2025 Thomas Kefauver" />
+            <SelectableTextBlock Classes="header bold"
+                                 Text="Calcuchord" />
+            <SelectableTextBlock Classes="body"
+                                 Text="{Binding AppVersion}" />
+            <SelectableTextBlock Classes="body"
+                                 Text="© 2025 Thomas Kefauver" />
             <HyperlinkButton Cursor="Hand"
                              Command="{Binding OpenLinkCommand}"
                              CommandParameter="https://github.com/tkefauver/Calcuchord">
-                <TextBlock Classes="body"
-                           Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
+                <SelectableTextBlock Classes="body"
+                                     Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
             </HyperlinkButton>
         </StackPanel>
     </controls:ColorZone>

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using MonkeyPaste.Common;
 using Newtonsoft.Json;
-using DateTime = System.DateTime;
 
 namespace Calcuchord {
     [JsonObject]
@@ -165,7 +164,13 @@ namespace Calcuchord {
 
         void SyncModels() {
             if(MainViewModel.Instance is { } mvm) {
-                Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
+                if(OperatingSystem.IsBrowser()) {
+                    Instruments = mvm.Instruments.Select(x => x.Instrument.Clone()).ToList();
+                    Instruments.SelectMany(x => x.Tunings).ForEach(x => x.ClearPatterns());
+                } else {
+                    Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
+                }
+
                 Options = mvm.OptionLookup.Values.SelectMany(x => x).ToList();
                 MatchColCount = mvm.MatchColCount;
             }
@@ -186,7 +191,8 @@ namespace Calcuchord {
                 sel_tuning_full_name = sel_tvm.ToString();
             }
 
-            PlatformWrapper.Services.Logger.WriteLine($"{DateTime.Now} prefs saved. SelectedTuningId: {sel_tuning_full_name} {tuning_str}");
+            PlatformWrapper.Services.Logger.WriteLine(
+                $"{DateTime.Now} prefs saved. SelectedTuningId: {sel_tuning_full_name} {tuning_str}");
             foreach(Instrument inst in Instruments) {
                 foreach(Tuning tuning in inst.Tunings) {
                     PlatformWrapper.Services.Logger.WriteLine(

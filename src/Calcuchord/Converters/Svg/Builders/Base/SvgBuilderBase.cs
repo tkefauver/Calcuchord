@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using HtmlAgilityPack;
@@ -25,6 +24,7 @@ namespace Calcuchord {
             SvgOptionType.Roots,
             SvgOptionType.Matches,
             SvgOptionType.Frets,
+            SvgOptionType.Colors,
             SvgOptionType.Shadows
         ];
 
@@ -161,16 +161,8 @@ namespace Calcuchord {
             string fp = $"/home/tkefauver/Desktop/{fn}";
             MpFileIo.WriteTextToFile(fp,result);
 
-            new Uri(fp.ToFileSystemUriFromPath()).OpenInBrowser();
-
-            // Process.Start(
-            //     new ProcessStartInfo
-            //     {
-            //         UseShellExecute = true,
-            //         //WorkingDirectory = Path.GetDirectoryName(fp),
-            //         FileName = "xdg-open",
-            //         Arguments = fp
-            //     });
+            PlatformWrapper.Services.UriNavigator.NavigateTo(
+                fp.ToFileSystemUriFromPath());
         }
 
         #endregion

@@ -27,5 +27,8 @@ namespace Calcuchord.Browser {
         [JSImport("globalThis.window.isTablet")]
         public static partial bool IsTablet();
 
+        [JSImport("globalThis.window.openLink")]
+        public static partial void OpenLink(string url);
+
     }
 }

@@ -156,6 +156,13 @@ namespace Calcuchord {
 
         #region Public Methods
 
+        public Instrument Clone() {
+            Instrument clone = new Instrument(Name,InstrumentType,ColCount,RowCount,NeckLengthInInches);
+            clone.Tunings.AddRange(Tunings.Select(tuning => tuning.Clone()));
+            clone.RefreshModelTree();
+            return clone;
+        }
+
         public void RefreshModelTree() {
             Tunings.ForEach(x => x.SetParent(this));
         }

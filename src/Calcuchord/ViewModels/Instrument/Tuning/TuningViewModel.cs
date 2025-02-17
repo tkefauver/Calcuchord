@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -293,37 +292,40 @@ namespace Calcuchord {
         async Task<bool> LoadPatternsAsync() {
             bool success = true;
 
+            while(true) {
+                if(MainView.Instance is not { } mv ||
+                   !mv.DlgHost.IsLoaded) {
+                    await Task.Delay(100);
+                }
+
+                break;
+            }
+
             DialogHost.Show(
                     new TuningGenProgressView { DataContext = this },MainViewModel.Instance.MainDialogHostName)
                 .FireAndForgetSafeAsync();
 
             await Task.Delay(2_000);
 
-            await Task.Run(
+            await Dispatcher.UIThread.InvokeAsync(
                 async () => {
                     PatternGenCts = new CancellationTokenSource();
-                    for(int i = 0; i < Enum.GetNames<MusicPatternType>().Length; i++) {
-                        PatternGen pg = new PatternGen((MusicPatternType)2 - i,Tuning);
-                        pg.ProgressChanged += OnProgressChanged;
+                    PatternGen pg = new PatternGen(Tuning);
+                    pg.ProgressChanged += OnProgressChanged;
+                    try {
+                        var patterns = await pg.GenerateAsync(PatternGenCts.Token);
+                        Tuning.Collections.Keys.ForEach(x => Tuning.Collections[x].AddRange(patterns[x]));
 
-                        try {
-                            var patterns = await pg.GenerateAsync(PatternGenCts.Token);
-                            Dispatcher.UIThread.Post(
-                                () => {
-                                    Tuning.Collections[pg.PatternType].Clear();
-                                    Tuning.Collections[pg.PatternType].AddRange(patterns);
-                                });
-                        } catch(TaskCanceledException tcex) {
-                            PlatformWrapper.Services.Logger.WriteLine($"Gen for '{Tuning}' canceled");
-                            success = false;
-                            break;
-                        }
+                    } catch(TaskCanceledException) {
+                        PlatformWrapper.Services.Logger.WriteLine($"Gen for '{Tuning}' canceled");
+                        success = false;
+
                     }
 
                     PatternGenCts.Dispose();
                     PatternGenCts = null;
+                },DispatcherPriority.Background);
 
-                });
             DialogHost.Close(MainViewModel.Instance.MainDialogHostName);
             return success;
 
@@ -333,16 +335,16 @@ namespace Calcuchord {
                     return;
                 }
 
-                double total_progress = progress / 3d;
-                if(pg.PatternType == MusicPatternType.Scales) {
-                    total_progress += 1 / 3d;
-                } else if(pg.PatternType == MusicPatternType.Chords) {
-                    total_progress += 2 / 3d;
-                }
+                // double total_progress = progress / 3d;
+                // if(pg.PatternType == MusicPatternType.Scales) {
+                //     total_progress += 1 / 3d;
+                // } else if(pg.PatternType == MusicPatternType.Chords) {
+                //     total_progress += 2 / 3d;
+                // }
 
                 Dispatcher.UIThread.Post(
                     () => {
-                        GenProgress = total_progress;
+                        GenProgress = progress; //total_progress;
                         GenProgressLabel =
                             $"Generating {pg.PatternType.ToString().ToLower()}...{pg.CurItemCount:n0} found";
                     });

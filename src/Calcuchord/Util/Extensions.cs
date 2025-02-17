@@ -97,14 +97,46 @@ namespace Calcuchord {
                             .ToArray()
                     );
         }
+        
+        public static IEnumerable<IEnumerable<T>> PowerSet4<T>(this IEnumerable<T> source) {
+            // from https://stackoverflow.com/a/57058345/105028
+            var data = source.ToArray();
+            return
+                // from 0 to 2^N...
+                Enumerable.Range(0,1 << data.Length)
+                    .Select(
+                        x => source
+                            .Where((v,i) => (x & (1 << i)) != 0)
+                            //.ToArray()
+                    );
+        }
 
-        public static List<T[]> PowerSet3<T>(this IEnumerable<T> s) {
+        public static List<List<T>> PowerSet3<T>(this List<T> list) {
+            var result = new List<List<T>>();
+            // head
+            result.Add(new List<T>());
+            result.Last().Add(list[0]);
+            if(list.Count == 1) {
+                return result;
+            }
+
+            // tail
+            var tailCombos = PowerSet3(list.Skip(1).ToList());
+            tailCombos.ForEach(
+                combo => {
+                    result.Add(new List<T>(combo));
+                    combo.Add(list[0]);
+                    result.Add(new List<T>(combo));
+                });
+            return result;
+        }
+
+        public static List<T[]> PowerSet2<T>(this IEnumerable<T> s) {
             var data = s.ToArray();
             int n = data.Length;
             var result = new List<T[]>();
 
-            // Iterate through all subsets (represented by 0 to
-            // 2^n - 1)
+            // Iterate through all subsets (represented by 0 to 2^n - 1)
             for(int i = 0; i < 1 << n; i++) {
                 var subset = new List<T>();
                 for(int j = 0; j < n; j++) {

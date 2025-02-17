@@ -227,8 +227,6 @@
         <!-- SEARCH OVERLAY -->
 
         <StackPanel x:Name="SearchOverlay"
-                    common:MpAvOrientedGridExtension.VerticalRow="1"
-                    common:MpAvOrientedGridExtension.HorizontalColumn="1"
                     Spacing="5"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">
@@ -240,8 +238,7 @@
                     MinWidth="64"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    IsHitTestVisible="{Binding IsSearchButtonVisible}"
-                    Opacity="{Binding IsSearchButtonVisible, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
+                    IsVisible="{Binding IsSearchButtonVisible}"
                     Height="{Binding $self.Bounds.Width}"
                     Command="{Binding FindMatchesCommand}">
                 <avalonia:MaterialIcon Kind="Search"
@@ -264,7 +261,7 @@
                         <Binding Path="IsMatchesEmpty"
                                  TargetNullValue="False"
                                  FallbackValue="False" />
-                        <Binding Path="!IsLoadingMatches" />
+                        <Binding Path="!IsSearchInitiating" />
                     </MultiBinding>
                 </ContentControl.IsVisible>
 

@@ -88,6 +88,13 @@ namespace Calcuchord {
 
         #region Public Methods
 
+        public void ClearPatterns() {
+            Chords.Clear();
+            Scales.Clear();
+            Modes.Clear();
+            Collections.Clear();
+        }
+
         public void SetParent(Instrument parent) {
             Parent = parent;
 

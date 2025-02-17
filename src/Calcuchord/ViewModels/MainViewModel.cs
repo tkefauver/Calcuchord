@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -56,8 +57,6 @@ namespace Calcuchord {
         #region Matches
 
         public ObservableCollection<MatchViewModelBase> Matches { get; } = [];
-        List<MatchViewModelBase> WorkingMatches { get; } = [];
-        IEnumerable<MatchViewModelBase> FilteredMatches { get; set; } = [];
         List<NoteViewModel> LastNotes { get; set; } = [];
         IEnumerable<MatchViewModelBase> LastMatches { get; } = [];
         List<OptionViewModel> LastOptions { get; } = [];
@@ -335,7 +334,7 @@ namespace Calcuchord {
 
         IEnumerable<NoteType> AvailableKeys { get; set; } = [];
 
-        IEnumerable<NoteType> LastSelectedKeys { get; set; } = [];
+        IEnumerable<NoteType> LastSelectedKeys { get; } = [];
 
         IEnumerable<NoteType> SelectedKeys { get; set; } = [];
         // IEnumerable<NoteType> SelectedKeys =>
@@ -349,7 +348,7 @@ namespace Calcuchord {
         IEnumerable<string> AvailableSuffixes { get; set; } = [];
 
 
-        IEnumerable<string> LastSelectedSuffixes { get; set; } = [];
+        IEnumerable<string> LastSelectedSuffixes { get; } = [];
 
         IEnumerable<string> SelectedSuffixes { get; set; } = [];
         // IEnumerable<string> SelectedSuffixes =>
@@ -373,7 +372,7 @@ namespace Calcuchord {
         CancellationTokenSource MatchCts { get; set; }
 
         public bool IsMatchesEmpty =>
-            !FilteredMatches.Any();
+            !Matches.Any() && !IsSearchInitiating;
 
         public bool IsSearchButtonVisible {
             get {
@@ -411,6 +410,7 @@ namespace Calcuchord {
 
         public MainViewModel() {
             PropertyChanged += MainViewModel_OnPropertyChanged;
+            Matches.CollectionChanged += MatchesOnCollectionChanged;
             Instance = this;
             InitAsync().FireAndForgetSafeAsync();
         }
@@ -483,6 +483,7 @@ namespace Calcuchord {
                     OptionLookup.Values.SelectMany(x => x).ForEach(x => x.OnPropertyChanged(nameof(x.IsEnabled)));
                     break;
                 case nameof(IsSearchInitiating):
+                    OnPropertyChanged(nameof(IsMatchesEmpty));
                     if(!IsSearchInitiating &&
                        MatchesView.Instance is { } matchesView &&
                        matchesView.MatchItemsRepeater is { } mir) {
@@ -504,6 +505,10 @@ namespace Calcuchord {
 
                     break;
             }
+        }
+
+        void MatchesOnCollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
+            OnPropertyChanged(nameof(IsMatchesEmpty));
         }
 
         async Task InitAsync() {
@@ -584,6 +589,7 @@ namespace Calcuchord {
                     MatchUpdateSource.NoteToggle or
                     MatchUpdateSource.RootToggle) {
                 UpdateMatchOverlays();
+                IsSearchInitiating = false;
                 return;
             }
 
@@ -600,8 +606,8 @@ namespace Calcuchord {
                     DispatcherPriority.ApplicationIdle,
                     MatchCts.Token);
 
-            } catch(TaskCanceledException) {
-            } catch(Exception e) {
+            } catch(Exception) {
+                // ignored
             }
         }
 
@@ -618,8 +624,13 @@ namespace Calcuchord {
         }
 
         void UpdateFilters(IEnumerable<MatchViewModelBase> matches) {
-            AvailableKeys = matches.Select(x => x.NotePattern.Key).Distinct();
-            AvailableSuffixes = matches.Select(x => x.NotePattern.SuffixKey).Distinct();
+            AvailableKeys = IsIndexModeSelected
+                ? KeyOptions.Select(x => x.OptionValue.ToEnum<NoteType>())
+                : matches.Select(x => x.NotePattern.Key).Distinct();
+
+            AvailableSuffixes = IsIndexModeSelected
+                ? SuffixOptions.Select(x => x.OptionValue)
+                : matches.Select(x => x.NotePattern.SuffixKey).Distinct();
 
             KeyOptions.ForEach(x => x.IsEnabled = AvailableKeys.Any(y => y.ToString() == x.OptionValue));
             SuffixOptions.ForEach(x => x.IsEnabled = AvailableSuffixes.Contains(x.OptionValue));
@@ -680,7 +691,7 @@ namespace Calcuchord {
             if(source is MatchUpdateSource.FindClick
                or MatchUpdateSource.FilterToggle) {
                 AvSnackbarHost.Post(
-                    $"{FilteredMatches.Count():n0} found",
+                    $"{results.Count():n0} found",
                     null,
                     DispatcherPriority.Background);
             }
@@ -726,41 +737,6 @@ namespace Calcuchord {
             }
 
             IsSearchInitiating = false;
-        }
-
-        void CreateWorkingMatches(IEnumerable<NoteViewModel> notes) {
-            WorkingMatches.Clear();
-            switch(SelectedDisplayMode) {
-                case DisplayModeType.Search:
-                    WorkingMatches.AddRange(MatchProvider.GetMatches(notes));
-                    break;
-                case DisplayModeType.Bookmarks:
-                    WorkingMatches.AddRange(MatchProvider.GetBookmarks());
-                    break;
-                case DisplayModeType.Index:
-                    WorkingMatches.AddRange(MatchProvider.GetAll());
-                    break;
-            }
-
-        }
-
-        IEnumerable<MatchViewModelBase> GetFilteredWorkingMatches() {
-            IEnumerable<MatchViewModelBase> result = WorkingMatches;
-            if(DesiredRoot is { } dr) {
-                result = result.Where(x => x.NotePattern.Key == dr);
-            } else if(SelectedKeys.Any() && !IsAllKeysSelected) {
-                result = result.Where(x => SelectedKeys.Contains(x.NotePattern.Key));
-            }
-
-            if(SelectedSuffixes.Any() && !IsAllSuffixesSelected) {
-                result = result.Where(x => SelectedSuffixes.Contains(x.NotePattern.SuffixKey));
-            }
-
-            LastSelectedKeys = SelectedKeys.ToList();
-            LastSelectedSuffixes = SelectedSuffixes.ToList();
-
-            //return SortMatches(result);
-            return result;
         }
 
         IEnumerable<MatchViewModelBase> SortMatches(IEnumerable<MatchViewModelBase> matches) {
@@ -1052,7 +1028,7 @@ namespace Calcuchord {
         }
 
         void InitInstrument() {
-
+            IsSearchInitiating = true;
             if(IsIndexModeSelected) {
                 DesiredRoot = null;
             }
@@ -1297,7 +1273,6 @@ namespace Calcuchord {
                 LastNotes.Clear();
 
                 Matches.Clear();
-                FilteredMatches = [];
 
                 UpdateMatchOverlays();
                 InstrumentView.Instance.ScrollSelectionIntoView();
