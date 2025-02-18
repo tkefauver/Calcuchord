@@ -1571,14 +1571,20 @@ namespace Calcuchord {
                     DialogHost.Show(new LoadingView(),MainDialogHostName).FireAndForgetSafeAsync();
 
                     await Task.Delay(1_000);
-                    //await DefaultDataBuilder.BuildAsync();
-                    PlatformWrapper.Services.Logger.WriteLine("Clearing instruments");
-                    Instruments.Clear();
-                    string def_json = MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/def.json");
-                    var instl = JsonConvert.DeserializeObject<List<Instrument>>(def_json);
-                    //var instl = def_json.DeserializeBase64Object<List<Instrument>>();//JsonConvert.DeserializeObject<List<Instrument>>(def_json);
-                    PlatformWrapper.Services.Logger.WriteLine($"Adding {instl.Count} instruments");
-                    await InitAsync(instl);
+
+                    await Dispatcher.UIThread.InvokeAsync(
+                        async () => {
+//await DefaultDataBuilder.BuildAsync();
+                            PlatformWrapper.Services.Logger.WriteLine("Clearing instruments");
+                            Instruments.Clear();
+                            string def_json =
+                                MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/def.json");
+                            var instl = JsonConvert.DeserializeObject<List<Instrument>>(def_json);
+                            //var instl = def_json.DeserializeBase64Object<List<Instrument>>();//JsonConvert.DeserializeObject<List<Instrument>>(def_json);
+                            PlatformWrapper.Services.Logger.WriteLine($"Adding {instl.Count} instruments");
+                            await InitAsync(instl);
+                        },DispatcherPriority.Background);
+
                     DialogHost.Close(MainDialogHostName);
                 } catch(Exception ex) {
                     PlatformWrapper.Services.Logger.WriteLine(ex.ToString());
