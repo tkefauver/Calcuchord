@@ -6,6 +6,7 @@ function initStorage() {
     }
     try {
         localforage.config({
+            driver: localforage.INDEXEDDB,
             //driver: localforage.WEBSQL, // Force WebSQL; same as using setDriver()
             name: 'myApp',
             version: 1.0,
