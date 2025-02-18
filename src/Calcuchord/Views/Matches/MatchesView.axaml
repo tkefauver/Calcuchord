@@ -66,7 +66,9 @@
                     <Template>
                         <TextBlock Classes="empty-label">
                             <TextBlock.Inlines>
-                                <Run Text="Add a" />
+                                <Run Text="{Binding SelectedInstrument.Name}"
+                                     Classes="article" />
+                                <Run Text="needs a" />
                                 <Run Text="tuning."
                                      Classes="subject2" />
                             </TextBlock.Inlines>
@@ -76,7 +78,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.search-mode">
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.search-mode:not(.no-tuning):not(.no-inst)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -92,7 +94,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.search-mode.piano">
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.search-mode.piano:not(.no-tuning):not(.no-inst)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>

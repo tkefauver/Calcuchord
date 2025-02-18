@@ -66,6 +66,10 @@ namespace Calcuchord {
         }
 
         [JsonIgnore]
+        public string FullName =>
+            $"{Parent.Name} - {Name}";
+
+        [JsonIgnore]
         public Instrument Parent { get; private set; }
 
         #endregion

@@ -177,7 +177,7 @@ namespace Calcuchord {
                 return false;
             }
 
-            bool is_user_note = stvm.SelectedNotes.Any(x => x.RowNum == note.RowNum && x.NoteNum == note.NoteNum);
+            bool is_user_note = stvm.SelectedNotes.Any(x => x.RowNum == note.RowNum && x.NoteNum == note.ColNum);
 
             return is_user_note;
         }

@@ -1,11 +1,13 @@
 ﻿using System;
 using Android.App;
 using Android.Content.PM;
+using Android.OS;
 using Android.Runtime;
 using Avalonia;
 using Avalonia.Android;
 using Avalonia.ReactiveUI;
 using Avalonia.WebView.Android;
+using Xamarin.Essentials;
 
 namespace Calcuchord.Android {
     [Activity(
@@ -15,6 +17,11 @@ namespace Calcuchord.Android {
         MainLauncher = true,
         ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
     public class MainActivity : AvaloniaMainActivity<App> {
+        public override void OnCreate(Bundle savedInstanceState,PersistableBundle persistentState) {
+            base.OnCreate(savedInstanceState,persistentState);
+            Platform.Init(this,savedInstanceState);
+        }
+
         protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) {
             return base.CustomizeAppBuilder(builder)
                 .UseReactiveUI()

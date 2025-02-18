@@ -70,12 +70,7 @@ namespace Calcuchord {
         #region Appearance
 
         public string FullName =>
-            $"{Parent.Name} - {Name}";
-
-        public string ProgressTitle =>
-            $"Calculating {FullName}...";
-
-        public string GenProgressLabel { get; private set; } = "Preparing...";
+            Tuning.FullName;
 
         #endregion
 
@@ -93,7 +88,6 @@ namespace Calcuchord {
         public bool IsCurGenTuning =>
             Parent.CurGenTuning == this;
 
-        public double GenProgress { get; private set; }
 
         public int BookmarkCount { get; private set; }
         public int ChordsCount { get; private set; }
@@ -290,7 +284,7 @@ namespace Calcuchord {
         }
 
         async Task<bool> LoadPatternsAsync() {
-            bool success = true;
+            bool success = false;
 
             while(true) {
                 if(MainView.Instance is not { } mv ||
@@ -301,57 +295,26 @@ namespace Calcuchord {
                 break;
             }
 
+            PatternGen pg = new PatternGen(this);
             DialogHost.Show(
-                    new TuningGenProgressView { DataContext = this },MainViewModel.Instance.MainDialogHostName)
+                    new TuningGenProgressView { DataContext = pg },MainViewModel.Instance.MainDialogHostName)
                 .FireAndForgetSafeAsync();
 
-            await Task.Delay(2_000);
-
-            await Dispatcher.UIThread.InvokeAsync(
-                async () => {
-                    PatternGenCts = new CancellationTokenSource();
-                    PatternGen pg = new PatternGen(Tuning);
-                    pg.ProgressChanged += OnProgressChanged;
-                    try {
+            PatternGenCts = new CancellationTokenSource();
+            try {
+                await Task.Run(
+                    async () => {
                         var patterns = await pg.GenerateAsync(PatternGenCts.Token);
                         Tuning.Collections.Keys.ForEach(x => Tuning.Collections[x].AddRange(patterns[x]));
-
-                    } catch(TaskCanceledException) {
-                        PlatformWrapper.Services.Logger.WriteLine($"Gen for '{Tuning}' canceled");
-                        success = false;
-
-                    }
-
-                    PatternGenCts.Dispose();
-                    PatternGenCts = null;
-                },DispatcherPriority.Background);
+                        success = true;
+                    },PatternGenCts.Token);
+            } catch {
+                // canceled
+            }
 
             DialogHost.Close(MainViewModel.Instance.MainDialogHostName);
+
             return success;
-
-
-            void OnProgressChanged(object sender,double progress) {
-                if(sender is not PatternGen pg) {
-                    return;
-                }
-
-                // double total_progress = progress / 3d;
-                // if(pg.PatternType == MusicPatternType.Scales) {
-                //     total_progress += 1 / 3d;
-                // } else if(pg.PatternType == MusicPatternType.Chords) {
-                //     total_progress += 2 / 3d;
-                // }
-
-                Dispatcher.UIThread.Post(
-                    () => {
-                        GenProgress = progress; //total_progress;
-                        GenProgressLabel =
-                            $"Generating {pg.PatternType.ToString().ToLower()}...{pg.CurItemCount:n0} found";
-                    });
-                if(progress >= 1) {
-                    pg.ProgressChanged -= OnProgressChanged;
-                }
-            }
         }
 
 

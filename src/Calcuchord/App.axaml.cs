@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using AvaloniaWebView;
 using PropertyChanged;
+using WebViewCore.Extensions;
 
 namespace Calcuchord {
     [DoNotNotify]
@@ -24,11 +25,8 @@ namespace Calcuchord {
 
 
         public override void OnFrameworkInitializationCompleted() {
-            //AssetMover.MoveAllAssets();
-
-            Prefs.Init();
+            Prefs.InitAsync().FireAndForget();
             ThemeViewModel.Instance.Init();
-
             _ = new MainViewModel();
 
             switch(ApplicationLifetime) {

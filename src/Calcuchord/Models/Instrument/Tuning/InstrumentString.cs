@@ -34,7 +34,7 @@ namespace Calcuchord {
 
         [JsonIgnore]
         public int BaseNoteNum =>
-            BaseNote.NoteNum;
+            BaseNote.ColNum;
 
         [JsonIgnore]
         public Tuning Parent { get; private set; }

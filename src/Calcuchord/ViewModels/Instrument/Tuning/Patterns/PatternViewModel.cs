@@ -229,7 +229,7 @@ namespace Calcuchord {
 
                 foreach(NoteViewModel nvm in stvm.AllNotes.Where(x => x.IsRealNote)) {
                     if(NotePattern.Notes.FirstOrDefault(
-                           x => x.RowNum == nvm.RowNum && Math.Max(0,x.NoteNum) == nvm.NoteNum) is not { } ng_match) {
+                           x => x.RowNum == nvm.RowNum && Math.Max(0,x.ColNum) == nvm.NoteNum) is not { } ng_match) {
                         continue;
                     }
 

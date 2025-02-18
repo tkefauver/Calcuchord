@@ -20,19 +20,21 @@ namespace Calcuchord {
 
         #region Statics
 
+        public static bool IsLoaded { get; private set; }
+
         public static Prefs Instance { get; private set; }
 
-        public static void Init() {
+        public static async Task InitAsync() {
             if(PlatformWrapper.Services is not { } ps ||
                ps.PrefsIo is not { } prefsIo) {
                 return;
             }
 
             if(RESET_PREFS) {
-                prefsIo.WritePrefs(string.Empty);
+                await prefsIo.WritePrefsAsync(string.Empty);
             }
 
-            string prefs_json = prefsIo.ReadPrefs();
+            string prefs_json = await prefsIo.ReadPrefsAsync();
 
             bool is_initial_startup = string.IsNullOrEmpty(prefs_json);
 
@@ -50,14 +52,15 @@ namespace Calcuchord {
                     Debugger.Break();
 
                     // TODO should maybe say there was an error here instead of just reseting data
-                    prefsIo.WritePrefs(string.Empty);
+                    await prefsIo.WritePrefsAsync(string.Empty);
                     Instance = null;
-                    Init();
+                    InitAsync().FireAndForgetSafeAsync();
                     return;
                 }
             }
 
             Instance.IsInitialStartup = is_initial_startup;
+            IsLoaded = true;
         }
 
         #endregion
@@ -136,18 +139,11 @@ namespace Calcuchord {
                     }
 
                     SyncModels();
-
-
                     // Validate();
                     try {
                         string pref_json = JsonConvert.SerializeObject(this);
-                        prefsIo.WritePrefs(pref_json);
-
-                        if(IsInitialStartup) {
-                            PlatformWrapper.Services.Logger.WriteLine("Prefs CREATED");
-                        } else {
-                            PlatformWrapper.Services.Logger.WriteLine("Prefs SAVED");
-                        }
+                        prefsIo.WritePrefsAsync(pref_json).FireAndForgetSafeAsync();
+                        PlatformWrapper.Services.Logger.WriteLine("Prefs SAVED");
                     } catch(Exception e) {
                         e.Dump();
                     }
@@ -164,12 +160,13 @@ namespace Calcuchord {
 
         void SyncModels() {
             if(MainViewModel.Instance is { } mvm) {
-                if(OperatingSystem.IsBrowser()) {
-                    Instruments = mvm.Instruments.Select(x => x.Instrument.Clone()).ToList();
-                    Instruments.SelectMany(x => x.Tunings).ForEach(x => x.ClearPatterns());
-                } else {
-                    Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
-                }
+                // if(OperatingSystem.IsBrowser()) {
+                //     Instruments = mvm.Instruments.Select(x => x.Instrument.Clone()).ToList();
+                //     Instruments.SelectMany(x => x.Tunings).ForEach(x => x.ClearPatterns());
+                // } else {
+                //     Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
+                // }
+                Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
 
                 Options = mvm.OptionLookup.Values.SelectMany(x => x).ToList();
                 MatchColCount = mvm.MatchColCount;

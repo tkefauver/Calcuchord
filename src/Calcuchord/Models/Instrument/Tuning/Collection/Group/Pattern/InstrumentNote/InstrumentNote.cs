@@ -16,7 +16,7 @@ namespace Calcuchord {
         #region Statics
 
         public static InstrumentNote Mute(int stringNum) {
-            return new InstrumentNote(-1,stringNum,null);
+            return Create(-1,stringNum,null);
         }
 
         #endregion
@@ -30,7 +30,7 @@ namespace Calcuchord {
         #region Members
 
         [JsonProperty]
-        public int NoteNum { get; set; }
+        public int ColNum { get; set; }
 
         [JsonProperty]
         public int RowNum { get; set; }
@@ -40,7 +40,7 @@ namespace Calcuchord {
         #region Ignored
 
         [JsonIgnore]
-        public new InstrumentNote Next => new InstrumentNote(NoteNum + 1,RowNum,base.Next);
+        public new InstrumentNote Next => Create(ColNum + 1,RowNum,base.Next);
 
         #endregion
 
@@ -48,31 +48,36 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public InstrumentNote() {
-        }
-
-        public InstrumentNote(
-            int noteNum,
+        public static InstrumentNote Create(
+            int colNum,
             int rowNum,
-            Note? n) :
-            this(
-                noteNum,
+            Note? n) {
+            return Create(
+                colNum,
                 rowNum,
                 n?.Key,
-                n?.Register) {
+                n?.Register);
         }
 
-        public InstrumentNote(
-            int noteNum,
+        public static InstrumentNote Create(
+            int colNum,
             int rowNum,
             NoteType? nt,
-            int? register) :
-            base(
-                nt,
-                register) {
-            NoteNum = noteNum;
-            RowNum = rowNum;
-            IsMute = NoteNum < 0;
+            int? register) {
+            InstrumentNote inn = new InstrumentNote
+            {
+                ColNum = colNum,
+                RowNum = rowNum
+            };
+            if(nt is null || register is null) {
+                inn.IsMute = true;
+            } else {
+                inn.Key = nt.Value;
+                inn.Register = register.Value;
+            }
+
+            inn.NoteId = GetId(inn);
+            return inn;
         }
 
         #endregion
@@ -81,20 +86,20 @@ namespace Calcuchord {
 
         public override void Adjust(int offset) {
             base.Adjust(offset);
-            //NoteNum -= offset;
+            //ColNum -= offset;
         }
 
         // public new InstrumentNote Offset(int offset) {
         //     Note? offset_note = base.Offset(offset);
-        //     return new InstrumentNote(NoteNum + offset,RowNum,offset_note);
+        //     return new InstrumentNote(ColNum + offset,RowNum,offset_note);
         // }
 
         public new InstrumentNote Clone() {
-            return new(NoteNum,RowNum,Key,Register);
+            return Create(ColNum,RowNum,Key,Register);
         }
 
         public override string ToString() {
-            return $"[{RowNum}|{NoteNum}] " + base.FullName;
+            return $"[{RowNum}|{ColNum}] " + base.FullName;
         }
 
         #endregion

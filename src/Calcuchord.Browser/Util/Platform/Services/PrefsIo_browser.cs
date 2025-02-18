@@ -1,12 +1,15 @@
+using System.Threading.Tasks;
+
 namespace Calcuchord.Browser {
     public class PrefsIo_browser : IPrefsIo {
 
-        public string ReadPrefs() {
-            return JsInterop.ReadPrefs();
+        public async Task<string> ReadPrefsAsync() {
+            string result = await JsInterop.ReadPrefsAsync();
+            return result;
         }
 
-        public void WritePrefs(string prefsJson) {
-            JsInterop.WritePrefs(prefsJson);
+        public async Task WritePrefsAsync(string prefsJson) {
+            await JsInterop.WritePrefsAsync(prefsJson);
         }
     }
 

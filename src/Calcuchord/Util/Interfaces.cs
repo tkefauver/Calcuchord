@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Calcuchord {
 
@@ -35,8 +36,8 @@ namespace Calcuchord {
     }
 
     public interface IPrefsIo {
-        string ReadPrefs();
-        void WritePrefs(string prefsJson);
+        Task<string> ReadPrefsAsync();
+        Task WritePrefsAsync(string prefsJson);
     }
 
 
@@ -45,10 +46,6 @@ namespace Calcuchord {
         void InitEnv(object config);
         bool ConfigureWebView(object wv);
         bool IsSupported { get; }
-    }
-
-    public interface IProgressIndicator {
-        event EventHandler<double> ProgressChanged;
     }
 
     public interface IMidiPlayer {

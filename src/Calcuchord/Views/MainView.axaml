@@ -28,7 +28,7 @@
     </UserControl.Styles>
     <Grid x:Name="MainOuterContainer">
         <dlg:DialogHost x:Name="DlgHost"
-                        BlurBackground="False"
+                        BlurBackground="True"
                         dlg:DialogHostStyle.ClipToBounds="True"
                         Identifier="{Binding MainDialogHostName}">
             <dlg:DialogHost.Resources>
@@ -60,7 +60,7 @@
 
                         <Grid x:Name="MainContainerGrid"
                               RowDefinitions="Auto,Auto,*"
-                              Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
+                              Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"
                               Classes.landscape="{Binding IsLandscape, Source={x:Static local:ThemeViewModel.Instance}}">
                             <!-- BG IMAGE -->
                             <Image x:Name="MainBgImage"

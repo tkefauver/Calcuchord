@@ -9,19 +9,9 @@ namespace Calcuchord.Android {
         }
 
         public override IPrefsIo PrefsIo { get; }
-
-        IMidiPlayer _midiPlayer;
-
-        public override IMidiPlayer MidiPlayer {
-            get {
-                if(_midiPlayer == null) {
-                    _midiPlayer = new MidiPlayer_ad_sugarwv();
-                }
-
-                return _midiPlayer;
-            }
-        }
-
         public override IPlatformInfo PlatformInfo { get; }
+
+        public override IMidiPlayer MidiPlayer { get; } = new MidiPlayer_ad_sugarwv();
+        public override IUriNavigator UriNavigator { get; } = new UriNav_ad();
     }
 }

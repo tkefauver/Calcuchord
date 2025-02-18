@@ -18,12 +18,12 @@ namespace Calcuchord {
             NotePattern = new(
                 ngc,0,new List<PatternNote>
                 {
-                    new PatternNote(0,InstrumentNote.Mute(0)),
-                    new PatternNote(3,new(3,1,NoteType.C,2)),
-                    new PatternNote(2,new(2,2,NoteType.E,3)),
-                    new PatternNote(0,new(0,3,NoteType.G,3)),
-                    new PatternNote(1,new(1,4,NoteType.C,4)),
-                    new PatternNote(0,new(0,5,NoteType.E,4))
+                    PatternNote.Create(0,InstrumentNote.Mute(0)),
+                    PatternNote.Create(3,InstrumentNote.Create(3,1,NoteType.C,2)),
+                    PatternNote.Create(2,InstrumentNote.Create(2,2,NoteType.E,3)),
+                    PatternNote.Create(0,InstrumentNote.Create(0,3,NoteType.G,3)),
+                    PatternNote.Create(1,InstrumentNote.Create(1,4,NoteType.C,4)),
+                    PatternNote.Create(0,InstrumentNote.Create(0,5,NoteType.E,4))
                 });
             NotePattern.SetParent(ngc);
             instl.ForEach(x => x.RefreshModelTree());

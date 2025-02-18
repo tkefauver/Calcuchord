@@ -2,7 +2,6 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
 using PropertyChanged;
@@ -20,9 +19,14 @@ namespace Calcuchord {
 
             Instance = this;
             InitializeComponent();
-            
-            MatchItemsRepeater.Loaded += (sender,args) => {
-                MainViewModel.Instance.SetMatchColumnCountAsync(MainViewModel.Instance.MatchColCount)
+
+            MatchItemsRepeater.Loaded += async (sender,args) => {
+                if(MainViewModel.Instance is not { } mvm) {
+                    return;
+                }
+
+                await mvm.CancelMatchZoomAsync();
+                mvm.SetMatchColumnCountAsync(mvm.MatchColCount,mvm.ZoomCts.Token)
                     .FireAndForgetSafeAsync();
 
             };

@@ -11,7 +11,7 @@
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:Class="Calcuchord.TuningGenProgressView"
-             x:DataType="local:TuningViewModel">
+             x:DataType="local:PatternGen">
     <UserControl.Styles>
         <Style Selector="TextBlock">
             <Setter Property="HorizontalAlignment"
@@ -50,6 +50,7 @@
                     <TextBlock FontSize="10"
                                TextAlignment="Center"
                                Foreground="Black"
+                               Classes="bold"
                                Text="(Browser mode only)" />
                 </StackPanel>
             </Border>
@@ -60,9 +61,8 @@
                        Text="{Binding GenProgressLabel}" />
             <Button Classes="float-text"
                     IsDefault="True"
-                    IsVisible="{Binding !Parent.IsKeyboard}"
                     HorizontalAlignment="Center"
-                    Command="{Binding CancelPatternGenCommand}">
+                    Command="{Binding TuningVm.CancelPatternGenCommand}">
                 <TextBlock Text="Cancel" />
             </Button>
         </StackPanel>

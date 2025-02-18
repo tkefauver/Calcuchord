@@ -25,6 +25,7 @@
         <PackageReference Include="Avalonia.ReactiveUI"/>
         <PackageReference Include="webview.avalonia.android"/>
         <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"/>
+        <PackageReference Include="Xamarin.Essentials"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -112,7 +112,7 @@
                       Classes="float"
                       HorizontalAlignment="Right"
                       VerticalAlignment="Top"
-                      IsChecked="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, Mode=OneWay}"
+                      IsChecked="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, Mode=OneWay, FallbackValue=False, TargetNullValue=False}"
                       Command="{Binding ToggleThemeCommand, Source={x:Static local:ThemeViewModel.Instance}}">
             <avalonia:MaterialIcon
                 Kind="{Binding ThemeIcon, Source={x:Static local:ThemeViewModel.Instance}, Mode=OneWay}" />
@@ -125,6 +125,7 @@
                       Classes="float"
                       HorizontalAlignment="Left"
                       VerticalAlignment="Top"
+                      IsVisible="{Binding IsDebug, Source={x:Static local:ThemeViewModel.Instance}}"
                       IsChecked="{Binding IsLandscape, Source={x:Static local:ThemeViewModel.Instance}, Mode=OneWay}"
                       Command="{Binding ToggleLandscapeCommand, Source={x:Static local:ThemeViewModel.Instance}}">
             <avalonia:MaterialIcon Kind="PhoneRotateLandscape" />

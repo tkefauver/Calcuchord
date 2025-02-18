@@ -8,19 +8,20 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <RunAOTCompilation>true</RunAOTCompilation>
+        <!--        <RunAOTCompilation>true</RunAOTCompilation>-->
+        <!--        <_ExtraTrimmerArgs>&#45;&#45;keep-metadata parametername</_ExtraTrimmerArgs>-->
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Browser" />
-        <PackageReference Include="PublishSPAforGitHubPages.Build" />
+        <PackageReference Include="Avalonia.Browser"/>
+        <PackageReference Include="PublishSPAforGitHubPages.Build"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj" />
+        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="wwwroot\favicon.ico" />
+        <AvaloniaResource Include="wwwroot\favicon.ico"/>
     </ItemGroup>
 </Project>

@@ -31,7 +31,7 @@ namespace Calcuchord {
             return new(note_tup.nt,reg);
         }
 
-        static int GetId(Note nt) {
+        public static int GetId(Note nt) {
             return nt.IsMute ? int.MaxValue : (int)nt.Key + (nt.Register * MAX_NOTE_TYPE);
         }
 

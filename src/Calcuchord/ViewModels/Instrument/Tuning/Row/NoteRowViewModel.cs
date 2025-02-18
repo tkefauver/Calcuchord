@@ -57,7 +57,7 @@ namespace Calcuchord {
 
 
         NoteViewModel DefaultNote =>
-            null; //!IsEnabled || IsKeyboard ? null : Notes.FirstOrDefault(x => x.NoteNum == 0);
+            null; //!IsEnabled || IsKeyboard ? null : Notes.FirstOrDefault(x => x.ColNum == 0);
 
         #endregion
 
@@ -181,7 +181,7 @@ namespace Calcuchord {
             if(fretNum == 0 && BaseNote != null) {
                 inn = BaseNote;
             } else {
-                inn = new InstrumentNote(fretNum,RowNum,BaseNote?.Offset(fretNum));
+                inn = InstrumentNote.Create(fretNum,RowNum,BaseNote?.Offset(fretNum));
             }
 
             return new NoteViewModel(this,inn);

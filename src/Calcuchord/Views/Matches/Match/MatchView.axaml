@@ -71,7 +71,7 @@
                 Background="{DynamicResource HttTransparent}"
                 BorderThickness="1"
                 Margin="10"
-                Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
+                Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"
                 Classes.selected="{Binding IsSelected}"
                 Classes.bookmarked="{Binding IsBookmarked}"
                 Classes.bookmark-mode="{Binding IsBookmarkModeSelected, Source={x:Static local:MainViewModel.Instance}}"

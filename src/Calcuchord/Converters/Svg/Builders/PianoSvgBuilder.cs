@@ -35,7 +35,7 @@ namespace Calcuchord {
             string pattern_bg = ThemeViewModel.Instance.P[PaletteColorType.UserFretBg];
             string pattern_fg = ThemeViewModel.Instance.P[PaletteColorType.UserFretFg];
 
-            var pattern_notes = ng.Notes.OrderBy(x => x.NoteNum);
+            var pattern_notes = ng.Notes.OrderBy(x => x.ColNum);
             InstrumentNote root_note = ng.Parent.Parent.OpenNotes.FirstOrDefault();
             int key_count = ng.Parent.Parent.WorkingColCount;
 
@@ -45,7 +45,7 @@ namespace Calcuchord {
             for(int i = 0; i < key_count; i++) {
                 Note cur_note = root_note.Offset(i);
                 bool is_black = cur_note.IsAltered;
-                PatternNote pattern_note = pattern_notes.FirstOrDefault(x => x.NoteNum == i);
+                PatternNote pattern_note = pattern_notes.FirstOrDefault(x => x.ColNum == i);
                 bool is_root = pattern_note != null && pattern_note.IsRoot;
                 bool is_user = IsUserNote(pattern_note);
 

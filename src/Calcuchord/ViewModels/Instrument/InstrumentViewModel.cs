@@ -402,7 +402,7 @@ namespace Calcuchord {
                         .Split(" ")
                         .Take(newStrCount)
                         .Select(
-                            (x,idx) => new InstrumentNote(
+                            (x,idx) => InstrumentNote.Create(
                                 0,
                                 idx,
                                 Note.Parse(x))).ToList();
@@ -434,7 +434,8 @@ namespace Calcuchord {
                     int to_sel_idx = to_remove_idx >= Tunings.Count ? to_remove_idx - 1 : to_remove_idx;
                     SelectedTuning = Tunings[to_sel_idx];
                     Tunings.ForEach(x => x.OnPropertyChanged(nameof(x.CanDelete)));
-                    PlatformWrapper.Services.Logger.WriteLine($"'{tuning_vm_to_remove.Tuning.Name}' removed from {Instrument.Name}");
+                    PlatformWrapper.Services.Logger.WriteLine(
+                        $"'{tuning_vm_to_remove.Tuning.Name}' removed from {Instrument.Name}");
                 }
 
                 Prefs.Instance.Save();

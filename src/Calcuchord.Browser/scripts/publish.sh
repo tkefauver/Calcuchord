@@ -9,5 +9,5 @@ rm -fr obj
 rm -fr bin
 dotnet publish -f $FRAMEWORK -c $CONFIG
 
-dotnet serve -o -d:bin/$CONFIG/$FRAMEWORK/publish/wwwroot
+dotnet serve -o --port 7169 -d:bin/$CONFIG/$FRAMEWORK/publish/wwwroot
 

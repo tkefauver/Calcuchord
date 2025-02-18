@@ -1,11 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using Android;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using AndroidX.Core.App;
-using Debug = System.Diagnostics.Debug;
 
 namespace Calcuchord.Android {
     public class PrefsIo_ad : PrefsIo_default {
@@ -37,9 +37,9 @@ namespace Calcuchord.Android {
             return true;
         }
 
-        public override void WritePrefs(string prefsJson) {
+        public override async Task WritePrefsAsync(string prefsJson) {
             if(DoPermissionCheck()) {
-                base.WritePrefs(prefsJson);
+                await base.WritePrefsAsync(prefsJson);
                 return;
             }
 

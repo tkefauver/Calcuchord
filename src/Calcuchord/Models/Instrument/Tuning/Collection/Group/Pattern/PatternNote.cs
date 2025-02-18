@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Newtonsoft.Json;
 
 namespace Calcuchord {
@@ -33,19 +32,21 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public PatternNote() {
-        }
-
-        public PatternNote(
+        public static PatternNote Create(
             int fingerNum,
-            InstrumentNote inn) :
-            base(
-                inn.NoteNum,
-                inn.RowNum,
-                inn.Key,
-                inn.Register) {
-            Debug.Assert(NoteNum >= 0 == !IsMute,"Mute mismatch");
-            FingerNum = fingerNum;
+            InstrumentNote inn) {
+            PatternNote pn = new PatternNote
+            {
+                RowNum = inn.RowNum,
+                ColNum = inn.ColNum,
+                Key = inn.Key,
+                Register = inn.Register,
+                NoteId = inn.NoteId,
+                IsMute = inn.IsMute,
+                FingerNum = fingerNum
+            };
+
+            return pn;
         }
 
         #endregion

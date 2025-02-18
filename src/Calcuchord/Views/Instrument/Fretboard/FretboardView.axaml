@@ -55,7 +55,7 @@
             <Viewbox>
                 <Grid x:Name="FretboardContainerGrid">
                     <Image x:Name="FretboardBgImage"
-                           Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
+                           Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"
                            HorizontalAlignment="Left"
                            VerticalAlignment="Top"
                            Stretch="UniformToFill" />

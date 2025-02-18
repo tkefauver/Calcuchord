@@ -48,7 +48,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="StackPanel.options ItemsControl">
+        <Style Selector="StackPanel.options :is(ItemsControl)">
             <Setter Property="HorizontalAlignment"
                     Value="Center" />
             <!-- <Setter Property="MaxHeight" -->
@@ -63,13 +63,17 @@
             </Setter>
         </Style>
 
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding"
+                    Value="0" />
+        </Style>
 
-        <Style Selector="controls|Card:not(.suffix) ItemsControl">
+        <Style Selector="controls|Card:not(.suffix) :is(ItemsControl)">
             <Setter Property="MaxHeight"
                     Value="150" />
         </Style>
 
-        <Style Selector="controls|Card:not(.sort) ItemsControl">
+        <Style Selector="controls|Card:not(.sort) :is(ItemsControl)">
             <Setter Property="ItemTemplate">
                 <Setter.Value>
                     <DataTemplate x:DataType="local:OptionViewModel">
@@ -112,7 +116,7 @@
             <Setter Property="Kind"
                     Value="MenuDown" />
         </Style>
-        <Style Selector="ItemsControl TextBlock"
+        <Style Selector=":is(ItemsControl) TextBlock"
                x:DataType="local:OptionViewModel">
             <Setter Property="Text"
                     Value="{Binding Label}" />
@@ -194,51 +198,20 @@
                     <TextBlock Classes="header"
                                Text="Sort" />
                     <controls:Card Classes="button-group sort">
-                        <ItemsControl ItemsSource="{Binding SortOptions}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="local:OptionViewModel">
-                                    <TransitioningContentControl Content="{Binding OptionValue}">
-                                        <TransitioningContentControl.PageTransition>
-                                            <PageSlide Orientation="Horizontal"
-                                                       Duration="0:0:3.25" />
-                                        </TransitioningContentControl.PageTransition>
-                                        <TransitioningContentControl.ContentTemplate>
-                                            <DataTemplate>
-                                                <Grid Classes="opt-item"
-                                                      DataContext="{Binding $parent[TransitioningContentControl].DataContext}"
-                                                      x:DataType="local:OptionViewModel"
-                                                      ColumnDefinitions="Auto,*">
-                                                    <ToggleButton Classes="opt-btn"
-                                                                  Width="20"
-                                                                  Padding="0"
-                                                                  IsChecked="{Binding IsChecked, Mode=OneWay}"
-                                                                  IsVisible="{Binding IsSecondaryVisible}"
-                                                                  Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}">
-                                                        <ToggleButton.CommandParameter>
-                                                            <MultiBinding
-                                                                Converter="{x:Static local:MultiObjectConverter.Instance}">
-                                                                <Binding />
-                                                                <Binding Path="IsChecked" />
-                                                            </MultiBinding>
-                                                        </ToggleButton.CommandParameter>
-                                                        <avalonia:MaterialIcon HorizontalAlignment="Center"
-                                                                               VerticalAlignment="Center" />
-                                                    </ToggleButton>
-                                                    <Button Grid.Column="1"
-                                                            Classes="opt-btn"
-                                                            Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                                            CommandParameter="{Binding .}">
-                                                        <TextBlock />
-                                                    </Button>
-
-                                                </Grid>
-
-                                            </DataTemplate>
-                                        </TransitioningContentControl.ContentTemplate>
-                                    </TransitioningContentControl>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <ListBox>
+                            <ListBoxItem
+                                DataContext="{Binding SortOption1, Source={x:Static local:MainViewModel.Instance}}">
+                                <local:SortItemView />
+                            </ListBoxItem>
+                            <ListBoxItem
+                                DataContext="{Binding SortOption2, Source={x:Static local:MainViewModel.Instance}}">
+                                <local:SortItemView />
+                            </ListBoxItem>
+                            <ListBoxItem
+                                DataContext="{Binding SortOption3, Source={x:Static local:MainViewModel.Instance}}">
+                                <local:SortItemView />
+                            </ListBoxItem>
+                        </ListBox>
                     </controls:Card>
 
 

@@ -14,10 +14,34 @@
              Width="350"
              Height="350"
              x:Class="Calcuchord.AboutView">
+    <UserControl.Resources>
+        <LinearGradientBrush x:Key="OuterGradientBrush"
+                             SpreadMethod="Reflect"
+                             TransformOrigin="50%,50%"
+                             StartPoint="0%,0%"
+                             EndPoint="50%,0%">
+            <LinearGradientBrush.GradientStops>
+                <GradientStop Offset="0"
+                              Color="#1AC4FF" />
+                <GradientStop Offset="0.16"
+                              Color="#2F5068" />
+                <GradientStop Offset="0.32"
+                              Color="#EA789B" />
+                <GradientStop Offset="0.48"
+                              Color="#1DFAFF" />
+                <GradientStop Offset="0.64"
+                              Color="#1AC4FF" />
+                <GradientStop Offset="0.8"
+                              Color="#FFE600" />
+                <GradientStop Offset="1.0"
+                              Color="#FFA9C8" />
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+    </UserControl.Resources>
     <UserControl.Styles>
-        <Style Selector=":is(TextBlock).header">
+        <Style Selector=":is(TextBlock)">
             <Setter Property="FontSize"
-                    Value="32" />
+                    Value="12" />
         </Style>
         <Style Selector=":is(TextBlock).body">
             <Setter Property="FontSize"
@@ -34,23 +58,50 @@
         </Style>
     </UserControl.Styles>
     <controls:ColorZone x:Name="PopupZone"
+                        Loaded="PopupZone_OnLoaded"
                         MinWidth="325"
-                        Padding="10,20"
+                        Padding="20"
                         Mode="PrimaryMid"
+                        BorderBrush="{DynamicResource OuterGradientBrush}"
                         Foreground="{DynamicResource Bg}"
                         Classes="popup-cntr">
+        <controls:ColorZone.Transitions>
+            <Transitions>
+                <BrushTransition Property="BorderBrush"
+                                 Duration="0:0:10" />
+            </Transitions>
+        </controls:ColorZone.Transitions>
         <StackPanel Spacing="3">
-            <SelectableTextBlock Classes="header bold"
-                                 Text="Calcuchord" />
-            <SelectableTextBlock Classes="body"
-                                 Text="{Binding AppVersion}" />
-            <SelectableTextBlock Classes="body"
-                                 Text="© 2025 Thomas Kefauver" />
+            <StackPanel Orientation="Horizontal"
+                        Spacing="5">
+                <Border Padding="10"
+                        Width="42"
+                        Height="42"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource Bg}"
+                        CornerRadius="7">
+                    <Image Width="36"
+                           Height="36"
+                           Stretch="UniformToFill"
+                           Source="avares://Calcuchord/Assets/Images/logo.png" />
+                </Border>
+                <StackPanel>
+                    <SelectableTextBlock FontSize="32"
+                                         Effect="drop-shadow(1 1 3 black)"
+                                         Text="Calcuchord" />
+                    <SelectableTextBlock FontSize="10"
+                                         VerticalAlignment="Top"
+                                         TextAlignment="Right"
+                                         Text="{Binding AppVersion}" />
+                </StackPanel>
+
+            </StackPanel>
+
+            <SelectableTextBlock Text="© 2025 Thomas Kefauver" />
             <HyperlinkButton Cursor="Hand"
                              Command="{Binding OpenLinkCommand}"
                              CommandParameter="https://github.com/tkefauver/Calcuchord">
-                <TextBlock Classes="body"
-                           Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
+                <TextBlock Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
             </HyperlinkButton>
         </StackPanel>
     </controls:ColorZone>

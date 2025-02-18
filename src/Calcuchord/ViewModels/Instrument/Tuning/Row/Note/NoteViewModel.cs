@@ -286,7 +286,7 @@ namespace Calcuchord {
             InstrumentNote.IsAltered;
 
         public int NoteNum =>
-            InstrumentNote.NoteNum;
+            InstrumentNote.ColNum;
 
         public int RowNum =>
             InstrumentNote.RowNum;

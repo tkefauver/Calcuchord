@@ -59,6 +59,7 @@ namespace Calcuchord {
         RootToggle,
         FilterToggle,
         InstrumentInit,
+        ModeChange,
         BookmarkToggle,
         SortToggle
     }

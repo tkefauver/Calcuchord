@@ -76,7 +76,7 @@ namespace Calcuchord {
             }
 
             var open_notes = tuning_str.Split(" ").Select(
-                (x,idx) => new InstrumentNote(
+                (x,idx) => InstrumentNote.Create(
                     0,
                     idx,
                     Note.Parse(x))).ToArray();

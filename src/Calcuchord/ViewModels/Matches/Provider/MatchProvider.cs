@@ -115,7 +115,7 @@ namespace Calcuchord {
         public double GetScore(NotePattern pattern,IEnumerable<NoteViewModel> matchNotes) {
             double score = 0;
             foreach(NoteViewModel mn in matchNotes) {
-                if(pattern.Notes.Any(x => x.NoteNum == mn.WorkingNoteNum && x.RowNum == mn.RowNum)) {
+                if(pattern.Notes.Any(x => x.ColNum == mn.WorkingNoteNum && x.RowNum == mn.RowNum)) {
                     score += 1;
                     continue;
                 }

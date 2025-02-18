@@ -31,46 +31,46 @@ namespace Calcuchord {
             int max_fret = 0;
             int min_vis_fret = 0;
             // get min/max visual frets
-            if(notes.Where(x => x.NoteNum >= 0) is { } real_frets &&
+            if(notes.Where(x => x.ColNum >= 0) is { } real_frets &&
                real_frets.Any()) {
-                min_fret = real_frets.Min(x => x.NoteNum);
-                max_fret = real_frets.Max(x => x.NoteNum);
-                if(real_frets.Where(x => x.NoteNum > 0) is { } vis_frets &&
+                min_fret = real_frets.Min(x => x.ColNum);
+                max_fret = real_frets.Max(x => x.ColNum);
+                if(real_frets.Where(x => x.ColNum > 0) is { } vis_frets &&
                    vis_frets.Any()) {
-                    min_vis_fret = vis_frets.Min(x => x.NoteNum);
+                    min_vis_fret = vis_frets.Min(x => x.ColNum);
                 }
             }
 
             // find barres
             int? shadow_barre_fret_num = null;
             Dictionary<int,(int min_str,int max_str)> barred_fret_lookup = [];
-            if(notes.Where(x => x.NoteNum > 0 && x.FingerNum > 0)
+            if(notes.Where(x => x.ColNum > 0 && x.FingerNum > 0)
                    .GroupBy(x => x.FingerNum)
                    .Where(x => x.Count() > 1) is { } barre_groups &&
                barre_groups.Any()) {
                 var barre_frets = barre_groups.SelectMany(x => x);
-                if(notes.All(x => x.NoteNum != 0)) {
+                if(notes.All(x => x.ColNum != 0)) {
                     // only show shadow when no open notes
                     // and min barre fret doesn't have other fingers
-                    int min_barre_fret_num = barre_frets.Min(x => x.NoteNum);
+                    int min_barre_fret_num = barre_frets.Min(x => x.ColNum);
                     if(min_barre_fret_num == min_vis_fret &&
                        notes
-                           .Where(x => x.FingerNum > 0 && x.NoteNum == min_barre_fret_num)
+                           .Where(x => x.FingerNum > 0 && x.ColNum == min_barre_fret_num)
                            .Select(x => x.FingerNum).Distinct().Count() ==
                        1) {
                         shadow_barre_fret_num = min_barre_fret_num;
                     }
                 }
 
-                var barre_fret_nums = barre_frets.Select(x => x.NoteNum).Distinct();
+                var barre_fret_nums = barre_frets.Select(x => x.ColNum).Distinct();
                 foreach(int barre_fret_num in barre_fret_nums) {
-                    int min_str = barre_frets.Where(x => x.NoteNum == barre_fret_num).Min(x => x.RowNum);
-                    int max_str = barre_frets.Where(x => x.NoteNum == barre_fret_num).Max(x => x.RowNum);
+                    int min_str = barre_frets.Where(x => x.ColNum == barre_fret_num).Min(x => x.RowNum);
+                    int max_str = barre_frets.Where(x => x.ColNum == barre_fret_num).Max(x => x.RowNum);
                     barred_fret_lookup.Add(barre_fret_num,(min_str,max_str));
                 }
             }
 
-            bool show_header_labels = notes.Any(x => x.NoteNum <= 0);
+            bool show_header_labels = notes.Any(x => x.ColNum <= 0);
             bool show_nut = max_fret < vfc;
             bool show_fret_marker = !show_nut;
             if(show_nut) {
@@ -145,8 +145,8 @@ namespace Calcuchord {
                 double header_y = fh + (ForPrint ? fh * 2 : 0); //-1;
                 for(int i = 0; i < str_count; i++) {
                     if(notes.FirstOrDefault(x => x.RowNum == i) is { } str_fret &&
-                       str_fret.NoteNum <= 0) {
-                        bool is_mute = str_fret.NoteNum < 0;
+                       str_fret.ColNum <= 0) {
+                        bool is_mute = str_fret.ColNum < 0;
                         if(is_mute) {
                             double mute_size = 3;
                             double margin_y = 1;
@@ -198,8 +198,8 @@ namespace Calcuchord {
                     double cy = cury + (fh / 2d); //(fh + cury) - (fh / 2d);
                     double bar_y = cy - (BarHeight / 2d);
                     double dot_r = DotRadius;
-                    PatternNote fret_note = notes.Where(x => x.NoteNum > 0)
-                        .FirstOrDefault(x => x.RowNum == str_num && x.NoteNum == fret_num);
+                    PatternNote fret_note = notes.Where(x => x.ColNum > 0)
+                        .FirstOrDefault(x => x.RowNum == str_num && x.ColNum == fret_num);
                     string fret_bg = null;
                     string fret_fg = null;
 

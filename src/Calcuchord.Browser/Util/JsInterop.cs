@@ -1,7 +1,11 @@
 using System.Runtime.InteropServices.JavaScript;
+using System.Threading.Tasks;
 
 namespace Calcuchord.Browser {
     public static partial class JsInterop {
+
+        #region Midi
+
         [JSImport("globalThis.window.playChord")]
         public static partial void PlayChord(int[] notes);
 
@@ -11,15 +15,27 @@ namespace Calcuchord.Browser {
         [JSImport("globalThis.window.stopPlayback")]
         public static partial void StopPlayback();
 
+        #endregion
+
+        #region log
+
         [JSImport("globalThis.console.log")]
         public static partial void ConsoleLog(string text);
 
-        [JSImport("globalThis.window.readPrefs")]
-        public static partial string ReadPrefs();
+        #endregion
+
+        #region Prefs
+
+        [JSImport("globalThis.window.readPrefsAsync")]
+        public static partial Task<string> ReadPrefsAsync();
 
 
-        [JSImport("globalThis.window.writePrefs")]
-        public static partial void WritePrefs(string prefsJson);
+        [JSImport("globalThis.window.writePrefsAsync")]
+        public static partial Task WritePrefsAsync(string prefsJson);
+
+        #endregion
+
+        #region Device
 
         [JSImport("globalThis.window.isMobile")]
         public static partial bool IsMobile();
@@ -27,8 +43,14 @@ namespace Calcuchord.Browser {
         [JSImport("globalThis.window.isTablet")]
         public static partial bool IsTablet();
 
+        #endregion
+
+        #region Uri Nav
+
         [JSImport("globalThis.window.openLink")]
         public static partial void OpenLink(string url);
+
+        #endregion
 
     }
 }

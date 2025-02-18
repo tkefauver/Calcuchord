@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Combinatorics.Collections;
 using HtmlAgilityPack;
 
 namespace Calcuchord {
@@ -97,7 +98,21 @@ namespace Calcuchord {
                             .ToArray()
                     );
         }
-        
+
+        public static List<List<T>> PowerSet5<T>(this IEnumerable<T> sourceList,int minLength,int maxLength) {
+            List<List<T>> finalUnion = new List<List<T>>();
+            foreach(int length in Enumerable.Range(minLength,maxLength)) {
+                var variations = new Variations<T>(sourceList,length,GenerateOption.WithoutRepetition);
+                foreach(var variation in variations) {
+                    var list = variation.ToList();
+                    finalUnion.Add(list);
+                }
+            }
+
+            //Debug.WriteLine(sourceList.Count() + " source " + typeof(T).Name + " yielded " + finalUnion.Count());
+            return finalUnion;
+        }
+
         public static IEnumerable<IEnumerable<T>> PowerSet4<T>(this IEnumerable<T> source) {
             // from https://stackoverflow.com/a/57058345/105028
             var data = source.ToArray();
@@ -107,7 +122,7 @@ namespace Calcuchord {
                     .Select(
                         x => source
                             .Where((v,i) => (x & (1 << i)) != 0)
-                            //.ToArray()
+                        //.ToArray()
                     );
         }
 

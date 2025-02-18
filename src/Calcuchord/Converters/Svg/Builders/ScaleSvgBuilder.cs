@@ -31,13 +31,13 @@ namespace Calcuchord {
             int max_fret = 0;
             int min_vis_fret = 0;
             // get min/max visual frets
-            if(notes.Where(x => x.NoteNum >= 0) is { } real_frets &&
+            if(notes.Where(x => x.ColNum >= 0) is { } real_frets &&
                real_frets.Any()) {
-                min_fret = real_frets.Min(x => x.NoteNum);
-                max_fret = real_frets.Max(x => x.NoteNum);
-                if(real_frets.Where(x => x.NoteNum > 0) is { } vis_frets &&
+                min_fret = real_frets.Min(x => x.ColNum);
+                max_fret = real_frets.Max(x => x.ColNum);
+                if(real_frets.Where(x => x.ColNum > 0) is { } vis_frets &&
                    vis_frets.Any()) {
-                    min_vis_fret = vis_frets.Min(x => x.NoteNum);
+                    min_vis_fret = vis_frets.Min(x => x.ColNum);
                 }
             }
 
@@ -114,7 +114,7 @@ namespace Calcuchord {
                         }
                     }
 
-                    if(notes.FirstOrDefault(x => x.RowNum == str_num && x.NoteNum == fret_num) is not
+                    if(notes.FirstOrDefault(x => x.RowNum == str_num && x.ColNum == fret_num) is not
                        { } fret_note) {
                         continue;
                     }

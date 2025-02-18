@@ -64,9 +64,9 @@ namespace Calcuchord {
             IsLandscape ? Orientation.Horizontal : Orientation.Vertical;
 
         public bool IsDark {
-            get => Prefs.Instance.IsThemeDark;
+            get => Prefs.Instance == null ? false : Prefs.Instance.IsThemeDark;
             private set {
-                if(IsDark != value) {
+                if(IsDark != value && Prefs.Instance != null) {
                     Prefs.Instance.IsThemeDark = value;
                     HasModelChanged = true;
                     OnPropertyChanged(nameof(IsDark));
@@ -278,7 +278,9 @@ namespace Calcuchord {
 
         public void Init() {
             bool is_sys_theme_dark = Theme.BaseTheme == BaseThemeMode.Dark;
-            bool is_dark = Prefs.Instance.IsInitialStartup ? is_sys_theme_dark : Prefs.Instance.IsThemeDark;
+            bool is_dark = Prefs.Instance == null || Prefs.Instance.IsInitialStartup
+                ? is_sys_theme_dark
+                : Prefs.Instance.IsThemeDark;
             SetTheme(is_dark);
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
@@ -47,13 +48,13 @@ namespace Calcuchord {
             }
         }
 
-        public virtual string ReadPrefs() {
+        public virtual async Task<string> ReadPrefsAsync() {
             if(!File.Exists(PrefsFilePath)) {
                 return string.Empty;
             }
 
             try {
-                return File.ReadAllText(PrefsFilePath);
+                return await File.ReadAllTextAsync(PrefsFilePath);
             } catch(Exception e) {
                 e.Dump();
 
@@ -62,7 +63,7 @@ namespace Calcuchord {
             return string.Empty;
         }
 
-        public virtual void WritePrefs(string prefsJson) {
+        public virtual async Task WritePrefsAsync(string prefsJson) {
             try {
                 if(PlatformWrapper.Services is not { } ps ||
                    ps.StorageHelper is not { } sh ||
@@ -75,7 +76,7 @@ namespace Calcuchord {
 
                 }
 
-                File.WriteAllText(PrefsFilePath,prefsJson);
+                await File.WriteAllTextAsync(PrefsFilePath,prefsJson);
             } catch(Exception e) {
                 e.Dump();
             }
