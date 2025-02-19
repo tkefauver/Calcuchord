@@ -74,7 +74,7 @@ namespace Calcuchord {
                             InstrumentNote inn = null;
                             if(f < 0) {
                                 inn = InstrumentNote.Mute(str_num);
-                            } else if(tuning.OpenNotes[str_num].Offset(f) is { } fret_note) {
+                            } else if(tuning != null && tuning.OpenNotes[str_num].Offset(f) is { } fret_note) {
                                 inn = InstrumentNote.Create(f,str_num,fret_note);
                             }
 
@@ -86,6 +86,7 @@ namespace Calcuchord {
                         ngc.Patterns.Add(ng);
                     }
 
+                    ngc.SetPositions();
                     ngcl.Add(ngc);
                 }
             }

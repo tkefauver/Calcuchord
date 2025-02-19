@@ -44,7 +44,21 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.no-inst">
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.init">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Template>
+                        <TextBlock Classes="empty-label">
+                            <TextBlock.Inlines>
+                                <Run Text="Loading..." />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.no-inst:not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -60,7 +74,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.no-tuning:not(.no-inst)">
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.no-tuning:not(.no-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -78,7 +92,8 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.search-mode:not(.no-tuning):not(.no-inst)">
+        <Style
+            Selector="ContentControl#EmptyTextCntrContentControl.search-mode:not(.no-tuning):not(.no-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -94,7 +109,8 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.search-mode.piano:not(.no-tuning):not(.no-inst)">
+        <Style
+            Selector="ContentControl#EmptyTextCntrContentControl.search-mode.piano:not(.no-tuning):not(.no-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -110,7 +126,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.bookmark-mode">
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.bookmark-mode:not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -130,7 +146,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.index-mode">
+        <Style Selector="ContentControl#EmptyTextCntrContentControl.index-mode:not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -168,14 +184,18 @@
             </Border.IsVisible>
 
             <Grid RowDefinitions="Auto,*">
-                <!-- SHARE -->
+                <!-- SHARE 
+IsVisible="{Binding !IsBrowser, Source={x:Static local:ThemeViewModel.Instance}}"
+                               
+-->
                 <controls:Card Grid.Row="0"
-                               IsVisible="False"
                                Classes="button-group"
                                Margin="10"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center">
                     <Button x:Name="ShareButton"
+                            ToolTip.Tip="Export"
+                            Padding="8"
                             Classes="float"
                             Command="{Binding ConvertMatchesCommand}">
                         <avalonia:MaterialIcon Kind="Share" />
@@ -191,12 +211,14 @@
                     <StackPanel Orientation="Horizontal">
                         <!-- ZOOM OUT (COLS+1) -->
                         <Button x:Name="ZoomMinusButton"
+                                ToolTip.Tip="Zoom out"
                                 Classes="float"
                                 Command="{Binding IncreaseMatchColumnsCommand}">
                             <avalonia:MaterialIcon Kind="Minus" />
                         </Button>
                         <!-- ZOOM IN (COLS-1) -->
                         <Button x:Name="ZoomPlusButton"
+                                ToolTip.Tip="Zoom in"
                                 Classes="float"
                                 Command="{Binding DecreaseMatchColumnsCommand}">
                             <avalonia:MaterialIcon Kind="Plus" />
@@ -216,7 +238,7 @@
                             <WrapLayout Orientation="Horizontal" />
                         </ItemsRepeater.Layout>
                         <ItemsRepeater.ItemTemplate>
-                            <DataTemplate x:DataType="local:MatchViewModelBase">
+                            <DataTemplate x:DataType="local:MatchViewModel">
                                 <local:MatchView Background="{DynamicResource HttTransparent}"
                                                  Width="{Binding MatchWidth, Source={x:Static local:MainViewModel.Instance}}" />
                             </DataTemplate>
@@ -252,6 +274,7 @@
 
             <ContentControl x:Name="EmptyTextCntrContentControl"
                             Classes.piano="{Binding IsPianoSelected}"
+                            Classes.init="{Binding !IsLoaded}"
                             Classes.no-inst="{Binding IsInstrumentsEmpty}"
                             Classes.no-tuning="{Binding IsTuningsEmpty}"
                             Classes.search-mode="{Binding IsSearchModeSelected}"

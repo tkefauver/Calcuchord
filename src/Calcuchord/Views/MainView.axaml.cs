@@ -55,17 +55,18 @@ namespace Calcuchord {
         }
 
         void OnMainContainerSizeChanged() {
+            PlatformWrapper.Services.Logger.WriteLine("size changed");
             if(MainViewModel.Instance is not { } mvm ||
                ThemeViewModel.Instance is not { } tvm) {
                 return;
             }
 
             if(IsLoaded) {
-                RefreshMainGrid();
+                //RefreshMainGrid();
             }
 
+            mvm.SetMatchColumnCount(mvm.MatchColCount);
 
-            mvm.DiscoverMatchColumnCount();
             InstrumentView.MeasureInstrument();
         }
 

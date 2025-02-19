@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using HtmlAgilityPack;
 using MonkeyPaste.Common;
@@ -131,7 +133,7 @@ namespace Calcuchord {
 
         public abstract HtmlNode Build(NotePattern ng,object args);
 
-        public void Test(Tuning tuning,IEnumerable<NotePattern> ngl) {
+        public void BatchToBrowser(Tuning tuning,IEnumerable<NotePattern> ngl) {
             HtmlDocument doc = new HtmlDocument();
 
             HtmlNode body = doc.CreateElement("body");
@@ -156,13 +158,19 @@ namespace Calcuchord {
             }
 
             string result = doc.DocumentNode.OuterHtml;
-            string fn =
-                $"{tuning.ToString().Replace("|","-").Replace(" ","-")}_{GetType().Name.Replace("SvgBuilder",string.Empty).ToLower()}_{ngl.FirstOrDefault().Parent.PatternType}.html";
-            string fp = $"/home/tkefauver/Desktop/{fn}";
-            MpFileIo.WriteTextToFile(fp,result);
-
-            PlatformWrapper.Services.UriNavigator.NavigateTo(
-                fp.ToFileSystemUriFromPath());
+            // string fn =
+            //     $"{tuning.ToString().Replace("|","-").Replace(" ","-")}_{GetType().Name.Replace("SvgBuilder",string.Empty).ToLower()}_{ngl.FirstOrDefault().Parent.PatternType}.html";
+            // string fp = $"/home/tkefauver/Desktop/{fn}";
+            try {
+                string fp = Path.Combine(
+                    Path.GetTempPath(),
+                    Path.GetRandomFileName().SplitNoEmpty(".")[0] + ".html");
+                File.WriteAllText(fp,result);
+                PlatformWrapper.Services.UriNavigator.NavigateTo(
+                    fp.ToFileSystemUriFromPath());
+            } catch(Exception ex) {
+                ex.Dump();
+            }
         }
 
         #endregion

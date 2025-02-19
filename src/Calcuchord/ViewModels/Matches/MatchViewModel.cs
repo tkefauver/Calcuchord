@@ -1,12 +1,14 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
 
 namespace Calcuchord {
-    public abstract class MatchViewModelBase : ViewModelBase {
+    public class MatchViewModel : ViewModelBase {
 
         #region Private Variables
 
@@ -17,9 +19,6 @@ namespace Calcuchord {
         #endregion
 
         #region Statics
-
-        static MatchViewModelBase PlayingMatch { get; set; }
-        static bool IsAnyMatchPlaying => PlayingMatch != null;
 
         #endregion
 
@@ -45,14 +44,17 @@ namespace Calcuchord {
         public string PlaybackIcon =>
             IsMatchPlaying ? "Pause" : "Play";
 
-        public string PrimaryLabel =>
+        public string Label1 =>
             NotePattern.Key.ToDisplayValue();
 
-        public string SecondaryLabel =>
+        public string Label2 =>
             NotePattern.SuffixDisplayValue;
 
-        public string TertiaryLabel =>
-            (NotePattern.Position + 1).ToString();
+        public string Label3 =>
+            NotePattern.Position == 0 ? string.Empty : NotePattern.Position.ToString();
+
+        public string Label4 =>
+            NotePattern.SubPosition == 0 ? string.Empty : NotePattern.SubPosition.ToString();
 
         #endregion
 
@@ -64,7 +66,7 @@ namespace Calcuchord {
 
         public bool IsMatchPlaying { get; set; }
 
-        public abstract MusicPatternType MatchPatternType { get; }
+        public MusicPatternType PatternType { get; protected set; }
 
         public bool IsSelected { get; set; }
 
@@ -77,7 +79,6 @@ namespace Calcuchord {
             set {
                 if(IsBookmarked != value) {
                     NotePattern.IsBookmarked = value;
-                    HasModelChanged = true;
                     OnPropertyChanged(nameof(IsBookmarked));
                     OnPropertyChanged(nameof(BookmarkIcon));
                 }
@@ -99,10 +100,11 @@ namespace Calcuchord {
 
         #region Constructors
 
-        protected MatchViewModelBase() {
+        public MatchViewModel() {
         }
 
-        protected MatchViewModelBase(NotePattern notePattern,double score) {
+        public MatchViewModel(MusicPatternType patternType,NotePattern notePattern,double score) {
+            PatternType = patternType;
             NotePattern = notePattern;
             Score = score;
         }
@@ -119,7 +121,23 @@ namespace Calcuchord {
 
         #region Protected Methods
 
-        protected abstract void PlayGroupMidi();
+        void PlayGroupMidi() {
+            if(PlatformWrapper.Services is not { } ps ||
+               ps.MidiPlayer is not { } mp) {
+                return;
+            }
+
+
+            Dispatcher.UIThread.Post(
+                () => {
+
+                    if(PatternType == MusicPatternType.Chords) {
+                        mp.PlayChord(NotePattern.Notes.ToArray());
+                    } else {
+                        mp.PlayScale(NotePattern.Notes.ToArray());
+                    }
+                },DispatcherPriority.Background);
+        }
 
         #endregion
 
@@ -130,13 +148,17 @@ namespace Calcuchord {
         #region Commands
 
         public ICommand ToggleBookmarkCommand => new MpCommand(
-            () => {
+            async () => {
                 IsBookmarked = !IsBookmarked;
 
+                await Task.Delay(1_000);
                 if(MainViewModel.Instance.SelectedDisplayMode == DisplayModeType.Bookmarks) {
                     MainViewModel.Instance.UpdateMatchesAsync(MatchUpdateSource.BookmarkToggle)
                         .FireAndForgetSafeAsync();
                 }
+
+                Prefs.Instance.Save();
+
             });
 
         public ICommand ToggleMatchPlaybackCommand => new MpCommand(
@@ -161,28 +183,11 @@ namespace Calcuchord {
                     return;
                 }
 
-                bool was_playing = IsMatchPlaying;
-                if(IsAnyMatchPlaying) {
-                    mp.StopPlayback();
-                    if(was_playing) {
-                        return;
-                    }
-                }
-
-                PlayingMatch = this;
-                mp.Stopped += MidiPlayer_OnStopped;
-
                 PlayGroupMidi();
-
-                void MidiPlayer_OnStopped(object sender,EventArgs e) {
-                    IsMatchPlaying = false;
-                    PlayingMatch = null;
-                    mp.Stopped -= MidiPlayer_OnStopped;
-                }
             });
 
         public ICommand SetMatchToInstrumentCommand => new MpCommand(
-            () => {
+            async () => {
                 if(MainViewModel.Instance is not { } mvm ||
                    mvm.SelectedTuning is not { } stvm) {
                     return;
@@ -191,11 +196,11 @@ namespace Calcuchord {
                 if(!mvm.IsSearchModeSelected) {
                     // auto switch to search mode
                     mvm.SelectOptionCommand.Execute(mvm.SearchOptionViewModel);
-                    //await Task.Delay(300);
+                    await Task.Delay(500);
                 }
 
                 stvm.ResetSelection();
-                //await Task.Delay(150);
+                await Task.Delay(300);
 
                 foreach(NoteViewModel nvm in stvm.AllNotes.Where(x => x.IsRealNote)) {
                     if(NotePattern.Notes.FirstOrDefault(
@@ -209,6 +214,8 @@ namespace Calcuchord {
                         nvm.Parent.ToggleNoteSelectedCommand.Execute(nvm);
                     }
                 }
+
+                await Task.Delay(250);
 
                 InstrumentView.Instance.ScrollSelectionIntoView();
             });

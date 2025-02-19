@@ -10,6 +10,7 @@
              xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.MainView">
     <Design.DataContext>
@@ -23,6 +24,16 @@
             <Setter Property="CornerRadius"
                     Value="7" />
             <Setter Property="MinWidth"
+                    Value="0" />
+        </Style>
+
+        <!-- RIGHT-DRAWER MODALITY -->
+        <Style Selector="controls|NavigationDrawer">
+            <Setter Property="RightDrawerExpandThresholdWidth"
+                    Value="{x:Null}" />
+        </Style>
+        <Style Selector="controls|NavigationDrawer.is-right-modal">
+            <Setter Property="RightDrawerExpandThresholdWidth"
                     Value="0" />
         </Style>
     </UserControl.Styles>
@@ -40,10 +51,19 @@
                                    SnackbarHorizontalAlignment="Center"
                                    SnackbarVerticalAlignment="Top">
                 <controls:NavigationDrawer x:Name="MainNavDrawer"
-                                           RightDrawerExpandThresholdWidth="{Binding RightDrawerExpandWidth}"
                                            LeftDrawerOpened="{Binding IsLeftDrawerOpen, Mode=TwoWay}"
                                            RightDrawerOpened="{Binding IsRightDrawerOpen, Mode=TwoWay}"
                                            Classes="permanent">
+                    <Classes.is-right-modal>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <!-- when window is significantly wider than right drawer, right drawer is NOT modal -->
+                            <local:MathBinding IsBoolResult="True"
+                                               a="{Binding $parent[local:MainView].Bounds.Width}"
+                                               exp="IF(380-a>0,0,1)" />
+                            <Binding ElementName="MainNavDrawer"
+                                     Path="RightDrawerOpened" />
+                        </MultiBinding>
+                    </Classes.is-right-modal>
                     <controls:NavigationDrawer.LeftDrawerContent>
                         <local:LeftDrawerView x:Name="LeftDrawerView" />
                     </controls:NavigationDrawer.LeftDrawerContent>

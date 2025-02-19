@@ -38,7 +38,7 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public override IEnumerable<MatchViewModelBase> GetResults(IEnumerable<NoteViewModel> frets) {
+        public override IEnumerable<MatchViewModel> GetResults(IEnumerable<NoteViewModel> frets) {
             return null;
         }
 

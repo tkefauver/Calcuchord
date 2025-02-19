@@ -236,16 +236,6 @@ namespace Calcuchord {
                     NoteType cur_key = (NoteType)cur_key_val;
                     var pattern = GenPattern(cur_key,suffix);
                     var all_pattern_inst_notes = GenNotes(pattern);
-                    // only return 1 set of pattern for chords or 1 set + next root for scales/modes
-                    // int result_len = pattern.Length + 1;
-                    // int pattern_count = 1;
-                    // if(PatternType == MusicPatternType.Chords) {
-                    //     // 
-                    //     int diff = all_pattern_inst_notes.Count() % pattern.Length;
-                    //     
-                    //     result_len = (all_pattern_inst_notes.Count() - diff) * pattern.Length;
-                    //     pattern_count = (int)(result_len / pattern.Length);
-                    // }
                     PatternKeyCollection ngc = new PatternKeyCollection(PatternType,cur_key,suffix);
                     var all_pattern_notes =
                         all_pattern_inst_notes
@@ -386,52 +376,9 @@ namespace Calcuchord {
 
             PlatformWrapper.Services.Logger.WriteLine(
                 $"{CurItemCount} total chords for '{Tuning}' in {tsw.ElapsedMilliseconds}ms");
-
-            PlatformWrapper.Services.Logger.WriteLine(
-                $"Max combo {max_combo}");
-
-
             return ngcl;
         }
 
-        void CreateBlockCombo_helper(InstrumentNote[][] lookup,int str_num,List<InstrumentNote> notes) {
-
-        }
-
-        List<List<InstrumentNote>> CreateBlockCombinations(IEnumerable<InstrumentNote> blockNotes) {
-            var lookup = Enumerable.Range(0,StringCount).Select(x => blockNotes.Where(y => y.RowNum == x).ToArray())
-                .ToArray();
-            var combos = new List<List<InstrumentNote>>();
-
-            void AddCombos(InstrumentNote note,List<List<InstrumentNote>> cur,int str_num) {
-                if(note != null) {
-                    cur.ForEach(x => x.Add(note));
-                    cur.Add([note]);
-                }
-
-                for(int i = str_num + 1; i < StringCount; i++) {
-                    for(int j = 0; j < lookup[i].Length + 1; j++) {
-                        if(j >= lookup[i].Length) {
-                            AddCombos(null,cur,i);
-                        } else {
-                            AddCombos(lookup[i][j],cur,i);
-                        }
-                    }
-                }
-
-            }
-
-            for(int i = 0; i < StringCount; i++) {
-                var str_notes = lookup[i];
-                for(int j = 0; j < str_notes.Length; j++) {
-                    AddCombos(str_notes[j],combos,j);
-                }
-            }
-
-            return combos;
-        }
-
-        int max_combo;
 
         async Task<PatternKeyCollection> GetChordGroupAsync(
             string suffix,
@@ -454,16 +401,7 @@ namespace Calcuchord {
                 var block_notes = pattern_inst_notes.Where(
                     x => x.ColNum >= min_fret_num && x.ColNum <= max_fret_num);
 
-                //var combos = CreateBlockCombinations(block_notes).Select(x=>x.Distinct()).Where(x=>x.Count() >= pattern.Length).Distinct().ToList();
                 var combos = block_notes.PowerSet().Where(x => x.Length >= pattern.Length);
-                // if(suffix == "major") {
-                //     var test = combos.Count();
-                //     var test2 = combos.DistinctBy(x=>GetSignature(x)).Count();    
-                // }
-                max_combo = Math.Max(max_combo,combos.Count());
-
-                //var combos = block_notes.PowerSet4();
-                //var combos = block_notes.PowerSet5(pattern.Length,StringCount);
                 foreach(var combo in combos) {
                     if(!IsValidCombo(combo,pattern) ||
                        RejectExists(combo,valid_patterns) ||
@@ -484,10 +422,8 @@ namespace Calcuchord {
             }
 
             // set pattern position by lowest note
-            ngc.Patterns = ngc.Patterns.OrderBy(x => x.Notes.Min(y => y.NoteId)).ToList();
-            ngc.Patterns.ForEach((x,idx) => x.Position = idx);
+            ngc.SetPositions();
             CurChordProgressCount++;
-            //UpdateProgress();
             return ngc;
         }
 
@@ -582,10 +518,6 @@ namespace Calcuchord {
         }
 
         void UpdateProgress() {
-            if(!Dispatcher.UIThread.CheckAccess()) {
-
-            }
-
             if(Ct.IsCancellationRequested) {
                 throw new OperationCanceledException();
             }

@@ -10,7 +10,6 @@ namespace Calcuchord.Desktop {
     public class MidiPlayer_linux : MidiPlayerBase {
 
         public override void PlayChord(IEnumerable<Note> notes) {
-            SetStopDt(notes.Count(),false);
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
@@ -40,8 +39,6 @@ namespace Calcuchord.Desktop {
         }
 
         public override void PlayScale(IEnumerable<Note> notes) {
-            SetStopDt(notes.Count(),true);
-
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
@@ -67,13 +64,6 @@ namespace Calcuchord.Desktop {
 
             PlayFile(midiFile,GetInstrumentSoundFontPath(notes.FirstOrDefault()));
 
-        }
-
-        public override void StopPlayback() {
-            if(NextStopDt != null) {
-                NextStopDt = null;
-                TriggerStopped();
-            }
         }
 
         void PlayFile(MidiFile midiFile,string soundFontPath) {

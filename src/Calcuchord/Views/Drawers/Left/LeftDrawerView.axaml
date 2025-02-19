@@ -86,10 +86,11 @@
                 <!-- LOGO -->
                 <Image x:Name="LogoImage"
                        HorizontalAlignment="Center"
+                       Classes="theme-drop-shadow"
                        Source="avares://Calcuchord/Assets/Images/logo.png" />
 
                 <!-- APP NAME -->
-                <TextBlock Classes="Headline5"
+                <TextBlock Classes="Headline5 theme-drop-shadow"
                            Text="Calcuchord"
                            HorizontalAlignment="Center" />
 
@@ -220,19 +221,14 @@
                             VerticalContentAlignment="Center"
                             HorizontalContentAlignment="Left"
                             Padding="0,10">
+            <DockPanel LastChildFill="False">
+                <Button DockPanel.Dock="Left"
+                        Classes="float"
+                        Command="{Binding ShowAboutCommand}">
 
-            <Button Theme="{StaticResource MaterialFlatButton}"
-                    Command="{Binding ShowAboutCommand}">
-                <StackPanel Orientation="Horizontal"
-                            Spacing="5">
-                    <avalonia:MaterialIcon Kind="About"
-                                           VerticalAlignment="Center" />
-                    <TextBlock VerticalAlignment="Center"
-                               IsVisible="False"
-                               Text="About" />
-
-                </StackPanel>
-            </Button>
+                    <avalonia:MaterialIcon Kind="About" />
+                </Button>
+            </DockPanel>
         </controls:ColorZone>
     </Grid>
 </UserControl>

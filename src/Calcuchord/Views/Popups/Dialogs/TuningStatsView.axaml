@@ -15,7 +15,7 @@
     <Border MinWidth="200"
             Padding="15"
             Background="{DynamicResource Bg}"
-            Effect="drop-shadow(3 3 3 black)"
+            Classes="theme-drop-shadow"
             CornerRadius="10">
         <StackPanel MinWidth="200"
                     Margin="15">

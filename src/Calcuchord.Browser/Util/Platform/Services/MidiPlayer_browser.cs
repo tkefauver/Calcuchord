@@ -20,11 +20,6 @@ namespace Calcuchord.Browser {
         public override void PlayScale(IEnumerable<Note> notes) {
             JsInterop.PlayScale(GetMidiNotes(notes));
         }
-
-        public override void StopPlayback() {
-            JsInterop.StopPlayback();
-            TriggerStopped();
-        }
     }
 
 }

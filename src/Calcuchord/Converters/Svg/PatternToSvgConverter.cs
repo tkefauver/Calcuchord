@@ -21,7 +21,7 @@ namespace Calcuchord {
             return htmlNode.OuterHtml;
         }
 
-        SvgBuilderBase GetBuilder(NotePattern ng) {
+        public SvgBuilderBase GetBuilder(NotePattern ng) {
             if(ng.Parent.Parent.Parent.InstrumentType == InstrumentType.Piano) {
                 return PianoBuilder;
             }

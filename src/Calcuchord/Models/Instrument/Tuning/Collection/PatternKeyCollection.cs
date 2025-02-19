@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using MonkeyPaste.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -70,6 +72,23 @@ namespace Calcuchord {
             Parent = parent;
             foreach(NotePattern g in Patterns) {
                 g.SetParent(this);
+            }
+        }
+
+        public void SetPositions() {
+            // set position to minimum root col
+            if(Patterns.Where(x => x.Notes.None()) is { } empty_patterns &&
+               empty_patterns.Any()) {
+
+            }
+
+            Patterns.ForEach(
+                x => x.Position = x.Notes.Where(y => !y.IsMute && y.Key == Key).MinOrDefault(y => y.ColNum));
+            // set subposition by minimum root row
+            var pos_groups = Patterns.GroupBy(x => x.Position);
+            foreach(var pos_group in pos_groups) {
+                pos_group.OrderBy(x => x.Notes.Where(y => !y.IsMute && y.Key == Key).MinOrDefault(y => y.RowNum))
+                    .ForEach((x,idx) => x.SubPosition = idx);
             }
         }
 

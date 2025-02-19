@@ -6,8 +6,10 @@ namespace Calcuchord {
     public class DesignMainViewModel : MainViewModel {
     }
 
-    public class DesignChordMatchViewModel : ChordMatchViewModel {
+    public class DesignChordMatchViewModel : MatchViewModel {
         public DesignChordMatchViewModel() {
+            PatternType = MusicPatternType.Chords;
+
             var instl = new[]
                 { Instrument.CreateByType(InstrumentType.Guitar) }; //MainViewModel.CreateDefaultInstruments();
 
@@ -15,7 +17,7 @@ namespace Calcuchord {
             ngc.SetParent(
                 instl.FirstOrDefault(x => x.InstrumentType == InstrumentType.Guitar)?.Tunings.FirstOrDefault());
 
-            NotePattern = new(
+            NotePattern = new NotePattern(
                 ngc,0,new List<PatternNote>
                 {
                     PatternNote.Create(0,InstrumentNote.Mute(0)),

@@ -14,7 +14,14 @@
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.RightDrawerView">
     <UserControl.Styles>
-
+        <Style Selector="ScrollViewer">
+            <Setter Property="IsScrollChainingEnabled"
+                    Value="False" />
+        </Style>
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding"
+                    Value="0" />
+        </Style>
         <Style Selector="TextBlock.header">
             <Setter Property="FontSize"
                     Value="24" />
@@ -63,10 +70,6 @@
             </Setter>
         </Style>
 
-        <Style Selector="ListBoxItem">
-            <Setter Property="Padding"
-                    Value="0" />
-        </Style>
 
         <Style Selector="controls|Card:not(.suffix) :is(ItemsControl)">
             <Setter Property="MaxHeight"
@@ -198,7 +201,7 @@
                     <TextBlock Classes="header"
                                Text="Sort" />
                     <controls:Card Classes="button-group sort">
-                        <ListBox>
+                        <ListBox SelectedItem="{x:Null}">
                             <ListBoxItem
                                 DataContext="{Binding SortOption1, Source={x:Static local:MainViewModel.Instance}}">
                                 <local:SortItemView />

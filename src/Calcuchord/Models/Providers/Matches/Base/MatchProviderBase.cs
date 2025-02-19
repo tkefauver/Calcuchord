@@ -43,7 +43,7 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public abstract IEnumerable<MatchViewModelBase> GetResults(IEnumerable<NoteViewModel> frets);
+        public abstract IEnumerable<MatchViewModel> GetResults(IEnumerable<NoteViewModel> frets);
 
         #endregion
 

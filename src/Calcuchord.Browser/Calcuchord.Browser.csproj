@@ -8,7 +8,8 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-                <RunAOTCompilation>true</RunAOTCompilation>
+        <WasmBuildNative>true</WasmBuildNative>
+        <RunAOTCompilation>true</RunAOTCompilation>
         <!--        <_ExtraTrimmerArgs>&#45;&#45;keep-metadata parametername</_ExtraTrimmerArgs>-->
     </PropertyGroup>
 
@@ -24,4 +25,12 @@
     <ItemGroup>
         <AvaloniaResource Include="wwwroot\favicon.ico"/>
     </ItemGroup>
+
+    <Target Name="MoveMidi" BeforeTargets="BeforeBuild">
+        <!-- Keep midi stuff in 1 place (xplat\Assets) -->
+        <ItemGroup>
+            <_CopyItems Include="..\Calcuchord\Assets\Text\js\midi\**\*"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(_CopyItems)" DestinationFiles="@(_CopyItems->'wwwroot/js/midi/%(RecursiveDir)%(Filename)%(Extension)')"/>
+    </Target>
 </Project>

@@ -17,8 +17,6 @@ namespace Calcuchord.Android {
 
         [SuppressMessage("Interoperability","CA1416:Validate platform compatibility",Justification = "<Pending>")]
         bool DoPermissionCheck() {
-            return true;
-
             if(_context is not Activity mac) {
                 return false;
             }

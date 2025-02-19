@@ -53,8 +53,6 @@ namespace Calcuchord {
         protected override void OnLoaded(RoutedEventArgs e) {
             base.OnLoaded(e);
             MeasureKeyboard();
-
-
         }
 
         void KeyView_Loaded(object sender,RoutedEventArgs e) {

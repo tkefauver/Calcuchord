@@ -244,8 +244,6 @@ namespace Calcuchord {
         false;
 #endif
 
-        public string Transparent { get; set; } = "#00000000";
-
         public string ThemeIcon =>
             !IsDark ? "Lightbulb" : "LightbulbOutline";
 
@@ -291,6 +289,7 @@ namespace Calcuchord {
             _ = P;
             OnPropertyChanged(nameof(P));
             InitResoures();
+            OnPropertyChanged(nameof(IsDark));
         }
 
         #endregion

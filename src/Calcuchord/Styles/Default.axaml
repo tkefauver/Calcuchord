@@ -272,5 +272,15 @@
                 Value="10" />
     </Style>
 
+    <!-- EFFECTS -->
+    <Style Selector=":is(local|MainView) :is(Control).theme-drop-shadow">
+        <Setter Property="Effect"
+                Value="drop-shadow(1 1 3 black)" />
+    </Style>
+    <Style Selector=":is(local|MainView).dark :is(Control).theme-drop-shadow">
+        <Setter Property="Effect"
+                Value="drop-shadow(1 1 3 white)" />
+    </Style>
+
 
 </Styles>

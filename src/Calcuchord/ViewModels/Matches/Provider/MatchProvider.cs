@@ -22,11 +22,11 @@ namespace Calcuchord {
 
         #region Properties
 
-        IEnumerable<MatchViewModelBase> Items { get; }
+        IEnumerable<MatchViewModel> Items { get; }
 
 
-        //MatchViewModelBase[] Items { get; }
-        public Dictionary<NoteType,Dictionary<string,IEnumerable<MatchViewModelBase>>> PatternLookup { get; } = [];
+        //MatchViewModel[] Items { get; }
+        public Dictionary<NoteType,Dictionary<string,IEnumerable<MatchViewModel>>> PatternLookup { get; } = [];
 
         public MusicPatternType PatternType { get; }
         public Tuning Tuning { get; }
@@ -72,18 +72,18 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public IEnumerable<MatchViewModelBase> GetAll() {
+        public IEnumerable<MatchViewModel> GetAll() {
             return Items; //.Select(x => CreateMatchViewModel(x,1));
         }
 
-        public IEnumerable<MatchViewModelBase> GetBookmarks() {
+        public IEnumerable<MatchViewModel> GetBookmarks() {
             return
                 Items
                     .Where(x => x.IsBookmarked);
             //.Select(x => CreateMatchViewModel(x,1));
         }
 
-        public IEnumerable<MatchViewModelBase> GetMatches(IEnumerable<NoteViewModel> matchNotes) {
+        public IEnumerable<MatchViewModel> GetMatches(IEnumerable<NoteViewModel> matchNotes) {
             var results =
                 Items.Select(x => (x,GetScore(x.NotePattern,matchNotes)))
                     .Where(x => x.Item2 > 0)
@@ -100,16 +100,8 @@ namespace Calcuchord {
 
         #region Private Methods
 
-        MatchViewModelBase CreateMatchViewModel(NotePattern notePattern,double score) {
-            switch(PatternType) {
-                default:
-                case MusicPatternType.Chords:
-                    return new ChordMatchViewModel(notePattern,score);
-                case MusicPatternType.Scales:
-                    return new ScaleMatchViewModel(notePattern,score);
-                case MusicPatternType.Modes:
-                    return new ModeMatchViewModel(notePattern,score);
-            }
+        MatchViewModel CreateMatchViewModel(NotePattern notePattern,double score) {
+            return new MatchViewModel(PatternType,notePattern,score);
         }
 
         public double GetScore(NotePattern pattern,IEnumerable<NoteViewModel> matchNotes) {

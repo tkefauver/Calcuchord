@@ -11,7 +11,7 @@
              xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
-             x:DataType="local:MatchViewModelBase"
+             x:DataType="local:MatchViewModel"
              x:Class="Calcuchord.MatchView">
     <Design.DataContext>
         <local:DesignChordMatchViewModel />
@@ -85,12 +85,15 @@
                            TextAlignment="Center"
                            VerticalAlignment="Center">
                     <TextBlock.Inlines>
-                        <Run Text="{Binding PrimaryLabel}"
+                        <Run Text="{Binding Label1}"
                              Classes="bold"
                              FontSize="48" />
-                        <Run Text="{Binding SecondaryLabel}"
+                        <Run Text="{Binding Label2}"
                              FontSize="36" />
-                        <Run Text="{Binding TertiaryLabel}"
+                        <Run Text="{Binding Label3}"
+                             FontSize="24"
+                             BaselineAlignment="TextBottom" />
+                        <Run Text="{Binding Label4}"
                              FontSize="24"
                              BaselineAlignment="TextTop" />
                     </TextBlock.Inlines>

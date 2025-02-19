@@ -19,7 +19,7 @@ namespace Calcuchord {
         }
 
         void MatchContainerBorder_OnPointerReleased(object sender,PointerReleasedEventArgs e) {
-            if(DataContext is not MatchViewModelBase mtvm) {
+            if(DataContext is not MatchViewModel mtvm) {
                 return;
             }
 
@@ -27,7 +27,7 @@ namespace Calcuchord {
         }
 
         protected override void OnPointerReleased(PointerReleasedEventArgs e) {
-            if(DataContext is not MatchViewModelBase mtvm) {
+            if(DataContext is not MatchViewModel mtvm) {
                 return;
             }
 

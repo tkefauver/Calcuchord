@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Avalonia.Data;
@@ -14,13 +13,14 @@ namespace Calcuchord {
         public BindingBase b { get; set; }
         public BindingBase c { get; set; }
         public BindingBase d { get; set; }
+        public bool IsBoolResult { get; set; }
         public string exp { get; set; }
 
         public object ProvideValue() {
             MultiBinding mb = new MultiBinding
             {
                 Bindings = new[] { a,b,c,d }.Where(x => x != null).Cast<IBinding>().ToList(),
-                Converter = new MathMultiValueConverter(exp)
+                Converter = new MathMultiValueConverter(exp,IsBoolResult)
             };
 
             return mb;
@@ -29,9 +29,14 @@ namespace Calcuchord {
         internal class MathMultiValueConverter : IMultiValueConverter {
             static readonly string[] VariableNames = ["a","b","c","d"];
             Expression Exp { get; }
+            bool IsBoolResult { get; }
 
-            internal MathMultiValueConverter(string exp) {
+            internal MathMultiValueConverter(string exp,bool isBoolResult) {
                 Exp = new(exp);
+                IsBoolResult = isBoolResult;
+                if(IsBoolResult) {
+
+                }
             }
 
             public object Convert(IList<object> values,Type targetType,object parameter,CultureInfo culture) {
@@ -47,6 +52,16 @@ namespace Calcuchord {
 
                 var errors = Exp.GetError();
                 if(errors.Count == 0) {
+                    if(IsBoolResult) {
+                        int bool_result = Exp.Eval<int>();
+                        if(bool_result == 1) {
+
+                        }
+
+                        // test
+                        return bool_result == 1;
+                    }
+
                     double result = Exp.Eval<double>();
                     if(!result.IsNumber() || result == 0) {
 

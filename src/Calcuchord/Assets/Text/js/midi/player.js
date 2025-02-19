@@ -62,13 +62,13 @@ function setInstrumentAsync(instName) {
     //https://surikov.github.io/webaudiofontdata/sound/0240_SBLive_sf2.html
     instrumentName = instName;
 
-    let inst_url = `js/wafp/${instName}.js`;
     let inst_var_name = `_tone_${instName}`;
     if (window[inst_var_name]) {
         instrument = window[inst_var_name];
         player.adjustPreset(audioContext, instrument);
         return;
     }
+    let inst_url = `js/midi/fonts/${instName}.js`;
 
     fetch(inst_url)
         .then(response => response.text())

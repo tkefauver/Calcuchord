@@ -16,6 +16,7 @@
 
     <ItemGroup>
         <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Remove="Assets\Text\midi\fonts\**"/>
     </ItemGroup>
 
 
@@ -56,5 +57,31 @@
             <DependentUpon>LoadingView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
+        <Compile Remove="Assets\Text\midi\fonts\**"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <AvaloniaXaml Remove="Assets\Text\midi\fonts\**"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <EmbeddedResource Remove="Assets\Text\midi\fonts\**"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <AdditionalFiles Remove="Assets\Text\midi\fonts\**"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <None Remove="Assets\Text\midi\fonts\**"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <Folder Include="Assets\Text\js\"/>
     </ItemGroup>
 </Project>

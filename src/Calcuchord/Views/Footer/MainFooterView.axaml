@@ -39,7 +39,7 @@
             <Setter Property="Foreground"
                     Value="{DynamicResource Bg}" />
             <Setter Property="Opacity"
-                    Value="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}, ConverterParameter=0.6|0.3, FallbackValue=False, TargetNullValue=False}" />
+                    Value="{Binding IsDark, ConverterParameter=1.0|0.3, Source={x:Static local:ThemeViewModel.Instance}, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}, FallbackValue=False, TargetNullValue=False}" />
             <Setter Property="Grid.Row"
                     Value="2" />
             <Setter Property="FontSize"
@@ -50,8 +50,7 @@
                     Value="Top" />
             <Setter Property="Margin"
                     Value="0,8,0,0" />
-            <!-- <Setter Property="FontFamily" -->
-            <!--         Value="{StaticResource NunitoFont}" /> -->
+
         </Style>
     </UserControl.Styles>
     <controls:ColorZone Mode="Inverted"

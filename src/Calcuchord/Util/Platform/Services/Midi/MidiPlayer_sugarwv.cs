@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using AvaloniaWebView;
@@ -116,32 +114,19 @@ namespace Calcuchord {
                PlayerUrl.ToPathFromUri() is { } tone_path &&
                tone_path.IsFile()) {
                 config.BrowserExecutableFolder = Path.GetDirectoryName(tone_path);
-                PlatformWrapper.Services.Logger.WriteLine($"Browser executable folder: {config.BrowserExecutableFolder}");
+                PlatformWrapper.Services.Logger.WriteLine(
+                    $"Browser executable folder: {config.BrowserExecutableFolder}");
             }
         }
 
         public override void PlayChord(IEnumerable<Note> notes) {
-            SetStopDt(notes.Count(),false);
             ExecuteScriptAsync($"playChord([{string.Join(",",GetMidiNotes(notes))}])")
                 .FireAndForgetSafeAsync();
         }
 
         public override void PlayScale(IEnumerable<Note> notes) {
-            SetStopDt(notes.Count(),true);
             ExecuteScriptAsync($"playScale([{string.Join(",",GetMidiNotes(notes))}])")
                 .FireAndForgetSafeAsync();
         }
-
-        public override void StopPlayback() {
-            if(IsPlaying) {
-                ExecuteScriptAsync("stopPlayback()").FireAndForgetSafeAsync();
-            }
-
-            if(NextStopDt != null) {
-                NextStopDt = null;
-                TriggerStopped();
-            }
-        }
-
     }
 }

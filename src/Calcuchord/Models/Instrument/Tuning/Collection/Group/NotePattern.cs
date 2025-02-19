@@ -10,6 +10,9 @@ namespace Calcuchord {
         #region Members
 
         [JsonProperty]
+        public int SubPosition { get; set; }
+
+        [JsonProperty]
         public int Position { get; set; }
 
         [JsonProperty]
@@ -66,6 +69,9 @@ namespace Calcuchord {
         #region Constructors
 
         public NotePattern() {
+        }
+
+        public NotePattern(PatternKeyCollection ngc) : this(ngc,0,[]) {
         }
 
         public NotePattern(PatternKeyCollection ngc,int position) : this(ngc,position,[]) {

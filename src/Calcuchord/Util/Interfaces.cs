@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -50,11 +49,9 @@ namespace Calcuchord {
 
     public interface IMidiPlayer {
         bool CanPlay { get; }
-        event EventHandler Stopped;
         void Init(object obj);
         void PlayChord(IEnumerable<Note> notes);
         void PlayScale(IEnumerable<Note> notes);
-        void StopPlayback();
 
     }
 }

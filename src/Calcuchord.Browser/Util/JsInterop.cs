@@ -12,9 +12,6 @@ namespace Calcuchord.Browser {
         [JSImport("globalThis.window.playScale")]
         public static partial void PlayScale(int[] notes);
 
-        [JSImport("globalThis.window.stopPlayback")]
-        public static partial void StopPlayback();
-
         #endregion
 
         #region log
