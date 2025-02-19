@@ -38,7 +38,6 @@ namespace Calcuchord {
                    tone_target_url.ToPathFromUri() is { } tone_target_path &&
                    !tone_target_path.IsFile()) {
                     string tone_text = MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/tone.html");
-                    //MpFileIo.WriteTextToFile(tone_target_path,tone_text);
                     File.WriteAllText(tone_target_path,tone_text);
                     PlatformWrapper.Services.Logger.WriteLine($"tone.html was written to: {tone_target_path}");
                 }

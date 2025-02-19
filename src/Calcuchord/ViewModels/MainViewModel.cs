@@ -513,12 +513,15 @@ namespace Calcuchord {
                     if(IsLoaded /* && Prefs.Instance.IsInitialStartup*/) {
                         if(OperatingSystem.IsAndroid()) {
                             Prefs.Instance.Saved += InstanceOnSaved;
+                            Prefs.Instance.Save();
 
                             void InstanceOnSaved(object o,EventArgs eventArgs) {
                                 // only move assets if/when user allows writing
                                 Prefs.Instance.Saved -= InstanceOnSaved;
                                 AssetMover.MoveAllAssets();
                             }
+
+                            break;
                         }
 
                         AssetMover.MoveAllAssets();
