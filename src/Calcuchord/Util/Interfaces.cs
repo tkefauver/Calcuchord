@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -32,19 +33,14 @@ namespace Calcuchord {
 
     public interface IStorageHelper {
         string StorageDir { get; }
+        bool IsExternalWriteEnabled();
+        event EventHandler ExternalWriteEnabled;
+        void RequestExternalWritePermission();
     }
 
     public interface IPrefsIo {
         Task<string> ReadPrefsAsync();
         Task WritePrefsAsync(string prefsJson);
-    }
-
-
-    public interface IWebViewHelper {
-        string ToneUrl { get; }
-        void InitEnv(object config);
-        bool ConfigureWebView(object wv);
-        bool IsSupported { get; }
     }
 
     public interface IMidiPlayer {

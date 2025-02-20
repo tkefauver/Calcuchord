@@ -136,32 +136,123 @@ namespace Calcuchord {
         public void BatchToBrowser(Tuning tuning,IEnumerable<NotePattern> ngl) {
             HtmlDocument doc = new HtmlDocument();
 
-            HtmlNode body = doc.CreateElement("body");
-            doc.DocumentNode.AppendChild(body);
-            body.Attributes.Add("style","zoom=\"400%\"");
-            HtmlNode style = doc.CreateElement("style");
-            style.InnerHtml = MainViewModel.Instance.MatchSvgCss;
-            body.AppendChild(style);
+            HtmlNode head = doc.CreateElement("head");
+            doc.DocumentNode.AppendChild(head);
+            head.InnerHtml =
+                """
+                <link href="https://fonts.googleapis.com" rel="preconnect">
+                <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+                <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+                """;
+            HtmlNode main_style = doc.CreateElement("style");
+            main_style.InnerHtml =
+                """
+                body {
+                   margin: 0;
+                   padding: 0;
+                   width: 100%;                                        
+                   height: 100%;                   
+                }
+                .container {
+                    min-width:100%;
+                    min-height:100%;
+                    padding: 0;
+                    margin: 0;
+                    display: grid;
+                    grid-template-columns: auto auto auto;
+                    gap: 10px;
+                }
+
+                p, span {
+                    font-family: "EB Garamond", serif;
+                    font-optical-sizing: auto;
+                    font-weight: 1;
+                    font-style: normal;
+                }
+
+                p.title {
+                    margin: 0;
+                    text-align: center;
+                    font-size: 24px;
+                }
+
+                div.item {
+                    display: block;
+                    width: 90%;
+                    text-align: center;
+                    padding: 10px;
+                    margin-bottom: 100px;
+                }
+                svg {
+                    transform: scale(2) translate(0px,20px);
+                }
+                body {
+                    background-color: white;
+                    color: black;
+                }
+
+                body.dark {
+                    background-color: black;
+                    color: white;
+                }
+
+                .footer {
+                    width: 100%;
+                    font-size: 16px;
+                    display: inline-block;
+                    text-align: center;
+                    margin-top: 30px;
+                }
+                """;
+            head.AppendChild(main_style);
+
+            HtmlNode body_elm = doc.CreateElement("body");
+            doc.DocumentNode.AppendChild(body_elm);
+            if(ThemeViewModel.Instance.IsDark) {
+                body_elm.SetAttributeValue("class","dark");
+            }
+
+            HtmlNode svg_style = doc.CreateElement("style");
+            svg_style.InnerHtml = MainViewModel.Instance.MatchSvgCss;
+            body_elm.AppendChild(svg_style);
+
+            HtmlNode cont_elm = doc.CreateElement("div");
+            cont_elm.SetAttributeValue("class","container");
+            body_elm.AppendChild(cont_elm);
 
             void AddSvg(HtmlNode svg,NotePattern ng) {
-                HtmlNode title = doc.CreateElement("span");
-                title.InnerHtml = ng.ToString();
+                HtmlNode item_elm = doc.CreateElement("div");
+                item_elm.SetAttributeValue("class","item");
+                cont_elm.AppendChild(item_elm);
 
-                body.AppendChild(title);
-                body.AppendChild(doc.CreateElement("br"));
-                body.AppendChild(svg);
-                body.AppendChild(doc.CreateElement("br"));
+                HtmlNode title_elm = doc.CreateElement("p");
+                title_elm.SetAttributeValue("class","title");
+                title_elm.InnerHtml = ng.ToString();
+                item_elm.AppendChild(title_elm);
+
+                item_elm.AppendChild(svg);
             }
 
             foreach(NotePattern ng in ngl) {
                 AddSvg(Build(ng,null),ng);
             }
 
+            HtmlNode footer_elm = doc.CreateElement("p");
+            footer_elm.SetAttributeValue("class","footer");
+            body_elm.AppendChild(footer_elm);
+            HtmlNode footer_label_elm = doc.CreateElement("span");
+            footer_label_elm.InnerHtml = "Created With: ";
+            footer_elm.AppendChild(footer_label_elm);
+            HtmlNode footer_link_elm = doc.CreateElement("a");
+            footer_link_elm.SetAttributeValue("href","https://github.com/tkefauver/Calcuchord");
+            footer_elm.AppendChild(footer_link_elm);
+            HtmlNode footer_link_label_elm = doc.CreateElement("span");
+            footer_link_label_elm.InnerHtml = "Calcuchord";
+            footer_link_elm.AppendChild(footer_link_label_elm);
+
             string result = doc.DocumentNode.OuterHtml;
-            // string fn =
-            //     $"{tuning.ToString().Replace("|","-").Replace(" ","-")}_{GetType().Name.Replace("SvgBuilder",string.Empty).ToLower()}_{ngl.FirstOrDefault().Parent.PatternType}.html";
-            // string fp = $"/home/tkefauver/Desktop/{fn}";
             try {
+
                 string fp = Path.Combine(
                     Path.GetTempPath(),
                     Path.GetRandomFileName().SplitNoEmpty(".")[0] + ".html");

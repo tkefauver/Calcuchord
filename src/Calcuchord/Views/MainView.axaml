@@ -5,6 +5,7 @@
              mc:Ignorable="d"
              d:DesignWidth="360"
              d:DesignHeight="720"
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
@@ -35,6 +36,67 @@
         <Style Selector="controls|NavigationDrawer.is-right-modal">
             <Setter Property="RightDrawerExpandThresholdWidth"
                     Value="0" />
+        </Style>
+
+        <!-- ORIENTATION (PORTRAIT) -->
+        <Style Selector="Grid#MainContainerGrid local|InstrumentView">
+            <Setter Property="Grid.RowSpan"
+                    Value="1" />
+            <Setter Property="Grid.ColumnSpan"
+                    Value="2" />
+
+            <Setter Property="Grid.Row"
+                    Value="0" />
+            <Setter Property="Grid.Column"
+                    Value="0" />
+
+            <Setter Property="MaxWidth"
+                    Value="{x:Static sys:Double.PositiveInfinity}" />
+            <Setter Property="MaxHeight"
+                    Value="{local:MathBinding a={Binding $parent[local:MainView].Bounds.Height}, exp=a*0.35}" />
+        </Style>
+
+        <Style Selector="Grid#MainContainerGrid local|MatchesView">
+            <Setter Property="Grid.RowSpan"
+                    Value="1" />
+            <Setter Property="Grid.ColumnSpan"
+                    Value="2" />
+
+            <Setter Property="Grid.Row"
+                    Value="1" />
+            <Setter Property="Grid.Column"
+                    Value="0" />
+
+        </Style>
+
+        <!-- ORIENTATION (LANDSCAPE) -->
+        <Style Selector="Grid#MainContainerGrid.landscape local|InstrumentView">
+            <Setter Property="Grid.RowSpan"
+                    Value="2" />
+            <Setter Property="Grid.ColumnSpan"
+                    Value="1" />
+
+            <Setter Property="Grid.Row"
+                    Value="0" />
+            <Setter Property="Grid.Column"
+                    Value="0" />
+
+            <Setter Property="MaxWidth"
+                    Value="{local:MathBinding a={Binding $parent[local:MainView].Bounds.Width}, exp=a*0.5}" />
+            <Setter Property="MaxHeight"
+                    Value="{x:Static sys:Double.PositiveInfinity}" />
+        </Style>
+
+        <Style Selector="Grid#MainContainerGrid.landscape local|MatchesView">
+            <Setter Property="Grid.RowSpan"
+                    Value="2" />
+            <Setter Property="Grid.ColumnSpan"
+                    Value="1" />
+
+            <Setter Property="Grid.Row"
+                    Value="0" />
+            <Setter Property="Grid.Column"
+                    Value="1" />
         </Style>
     </UserControl.Styles>
     <Grid x:Name="MainOuterContainer">
@@ -79,12 +141,14 @@
                                               DockPanel.Dock="Bottom" />
 
                         <Grid x:Name="MainContainerGrid"
-                              RowDefinitions="Auto,Auto,*"
+                              RowDefinitions="Auto,*"
+                              ColumnDefinitions="Auto,*"
                               Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"
                               Classes.landscape="{Binding IsLandscape, Source={x:Static local:ThemeViewModel.Instance}}">
                             <!-- BG IMAGE -->
                             <Image x:Name="MainBgImage"
-                                   Grid.RowSpan="3"
+                                   Grid.RowSpan="2"
+                                   Grid.ColumnSpan="2"
                                    Source="/Assets/Images/parchment.jpg"
                                    HorizontalAlignment="Stretch"
                                    VerticalAlignment="Stretch"
@@ -98,14 +162,7 @@
 
                             <!-- MATCHES VIEW -->
 
-                            <local:MatchesView x:Name="MatchesView"
-                                               Grid.Row="2" />
-
-                            <!-- SPLITTER -->
-                            <GridSplitter x:Name="MainSplitter"
-                                          Grid.Row="1"
-                                          IsVisible="False"
-                                          Background="Orange" />
+                            <local:MatchesView x:Name="MatchesView" />
                         </Grid>
                     </DockPanel>
                 </controls:NavigationDrawer>

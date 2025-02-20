@@ -5,32 +5,8 @@ using MonkeyPaste.Common;
 
 namespace Calcuchord {
 
-    public class PrefsIo_default : IPrefsIo,IStorageHelper {
-        string _storageDir;
+    public class PrefsIo_default : IPrefsIo {
 
-        public string StorageDir {
-            get {
-                if(OperatingSystem.IsBrowser()) {
-                    return string.Empty;
-                }
-
-                if(_storageDir == null) {
-                    string dir_name = "Calcuchord";
-#if DEBUG
-                    dir_name += "_DEBUG";
-#endif
-                    _storageDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-#if DEBUG && LINUX
-                    //_storageDir = "/home/tkefauver/Desktop";
-#endif
-                    if(!_storageDir.ToLower().Contains(dir_name)) {
-                        _storageDir = Path.Combine(_storageDir,dir_name);
-                    }
-                }
-
-                return _storageDir;
-            }
-        }
 
         string _prefsFilePath;
 
@@ -65,17 +41,6 @@ namespace Calcuchord {
 
         public virtual async Task WritePrefsAsync(string prefsJson) {
             try {
-                if(PlatformWrapper.Services is not { } ps ||
-                   ps.StorageHelper is not { } sh ||
-                   sh.StorageDir is not { } storage_dir) {
-                    return;
-                }
-
-                if(!Directory.Exists(storage_dir)) {
-                    Directory.CreateDirectory(storage_dir);
-
-                }
-
                 await File.WriteAllTextAsync(PrefsFilePath,prefsJson);
             } catch(Exception e) {
                 e.Dump();

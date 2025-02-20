@@ -510,21 +510,10 @@ namespace Calcuchord {
 
                     break;
                 case nameof(IsLoaded):
-                    if(IsLoaded /* && Prefs.Instance.IsInitialStartup*/) {
-                        if(OperatingSystem.IsAndroid()) {
-                            Prefs.Instance.Saved += InstanceOnSaved;
+                    if(IsLoaded) {
+                        if(Prefs.Instance.IsInitialStartup) {
                             Prefs.Instance.Save();
-
-                            void InstanceOnSaved(object o,EventArgs eventArgs) {
-                                // only move assets if/when user allows writing
-                                Prefs.Instance.Saved -= InstanceOnSaved;
-                                AssetMover.MoveAllAssets();
-                            }
-
-                            break;
                         }
-
-                        AssetMover.MoveAllAssets();
                     }
 
                     break;
@@ -632,12 +621,16 @@ namespace Calcuchord {
                 return;
             }
 
+            Dispatcher.UIThread.Post(
+                () => {
+                    IsLoadingMatches = true;
+                });
+
             try {
                 await CancelMatchLoadAsync();
                 await Dispatcher.UIThread.InvokeAsync(
                     async () => {
                         try {
-                            IsLoadingMatches = true;
 
                             await LoadMatchesAsync2(source,MatchCts.Token);
 
@@ -769,31 +762,6 @@ namespace Calcuchord {
             IsSearchInitiating = false;
         }
 
-        async Task LoadMatchesAsync(IEnumerable<MatchViewModel> matches,CancellationToken ct) {
-            Matches.Clear();
-            MatchCount = 0;
-            //int init_count = Math.Max(1,MatchColCount * (MatchColCount - 1));
-            int init_count = Math.Max(1,MatchColCount);
-            int delay = ThemeViewModel.Instance.IsDesktop ? 5 : 50;
-
-            foreach(MatchViewModel match in matches) {
-                if(ct.IsCancellationRequested) {
-                    return;
-                }
-
-                Matches.Add(match);
-                MatchCount++;
-                await Task.Delay(
-                    delay,
-                    ct);
-                if(MatchCount >= init_count) {
-                    IsSearchInitiating = false;
-                    delay = 150;
-                }
-            }
-
-            IsSearchInitiating = false;
-        }
 
         IEnumerable<MatchViewModel> SortMatches(IEnumerable<MatchViewModel> matches) {
             var sorts = SelectedMatchSort.ToList();
@@ -1052,7 +1020,6 @@ namespace Calcuchord {
                             .DefaultSvgOptionType
                             .Any(y => y.ToString() == x.OptionValue.ToString()));
 
-
             return all_opts;
         }
 
@@ -1071,7 +1038,7 @@ namespace Calcuchord {
             } else {
                 // reset filters
 
-                OptionLookup.Where(x => x.Key.ToString().EndsWith("Suffix"))
+                OptionLookup.Where(x => x.Key.ToString().EndsWith("Suffix") || x.Key.ToString() == "Key")
                     .SelectMany(x => x.Value)
                     .ForEach(x => x.IsChecked = false);
             }
@@ -1116,13 +1083,9 @@ namespace Calcuchord {
         }
 
         void InitInstrument() {
-            IsSearchInitiating = true;
             if(IsIndexModeSelected) {
                 DesiredRoot = null;
             }
-
-            //PlatformWrapper.Services.Logger.WriteLine("init instrument");
-
 
             if(SelectedTuning is { } sel_tvm) {
                 sel_tvm.ResetSelection();
@@ -1150,12 +1113,13 @@ namespace Calcuchord {
 
             Dispatcher.UIThread.Post(
                 async () => {
-                    await Task.Delay(500);
-                    await UpdateMatchesAsync(MatchUpdateSource.InstrumentInit);
-
                     if(MainView.Instance is { } mv) {
                         mv.RefreshMainGrid();
                     }
+
+                    await Task.Delay(500);
+                    await UpdateMatchesAsync(MatchUpdateSource.InstrumentInit);
+
 
                     if(InstrumentView.Instance is { } iv) {
                         iv.MeasureInstrument();
@@ -1192,7 +1156,28 @@ namespace Calcuchord {
                     return;
                 }
 
-                builder.BatchToBrowser(SelectedTuning.Tuning,Matches.Select(x => x.NotePattern));
+                // if(PlatformWrapper.Services is { } ps &&
+                //    ps.StorageHelper is { } sh &&
+                //    !sh.CanWrite) {
+                //     sh.ExternalWriteEnabled += ShOnSaveEnabled;
+                //
+                //     void ShOnSaveEnabled(object o,EventArgs eventArgs) {
+                //         sh.ExternalWriteEnabled -= ShOnSaveEnabled;
+                //         PlatformWrapper.Services.Logger.WriteLine("save enabled");
+                //         AssetMover.MoveAllAssets();
+                //         Prefs.Instance.Save();
+                //     }
+                //
+                //     sh.RequestExternalWritePermission();
+                //     PlatformWrapper.Services.Logger.WriteLine("Write permission requested");
+                //     break;
+                // }
+                _ = Task.Run(
+                    () => {
+                        var npl = Matches.Select(x => x.NotePattern).ToList();
+                        builder.BatchToBrowser(SelectedTuning.Tuning,npl);
+                    });
+
             });
 
         public MpIAsyncCommand CancelEditInstrumentCommand => new MpAsyncCommand(
@@ -1608,23 +1593,23 @@ namespace Calcuchord {
                     }
 
                     DialogHost.Show(new LoadingView(),MainDialogHostName).FireAndForgetSafeAsync();
-
                     await Task.Delay(1_000);
-
-                    await Dispatcher.UIThread.InvokeAsync(
-                        async () => {
 //await DefaultDataBuilder.BuildAsync();
-                            PlatformWrapper.Services.Logger.WriteLine("Clearing instruments");
-                            Instruments.Clear();
+                    PlatformWrapper.Services.Logger.WriteLine("Clearing instruments");
+                    Instruments.Clear();
+
+                    _ = Task.Run(
+                        () => {
                             string def_json =
                                 MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/def.json");
                             var instl = JsonConvert.DeserializeObject<List<Instrument>>(def_json);
-                            //var instl = def_json.DeserializeBase64Object<List<Instrument>>();//JsonConvert.DeserializeObject<List<Instrument>>(def_json);
-                            PlatformWrapper.Services.Logger.WriteLine($"Adding {instl.Count} instruments");
-                            await InitAsync(instl);
-                        },DispatcherPriority.Background);
+                            Dispatcher.UIThread.Post(
+                                async () => {
+                                    await InitAsync(instl);
+                                    DialogHost.Close(MainDialogHostName);
+                                },DispatcherPriority.ContextIdle);
+                        });
 
-                    DialogHost.Close(MainDialogHostName);
                 } catch(Exception ex) {
                     PlatformWrapper.Services.Logger.WriteLine(ex.ToString());
                 }

@@ -23,8 +23,8 @@ namespace Calcuchord {
             }
         }
 
-
         public override void OnFrameworkInitializationCompleted() {
+            AssetMover.MoveAllAssets();
             Prefs.InitAsync().FireAndForget();
             ThemeViewModel.Instance.Init();
             _ = new MainViewModel();

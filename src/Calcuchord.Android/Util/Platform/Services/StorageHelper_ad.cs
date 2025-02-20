@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using Android;
 using Android.App;
 using Android.Content;
@@ -8,15 +7,15 @@ using Android.OS;
 using AndroidX.Core.App;
 
 namespace Calcuchord.Android {
-    public class PrefsIo_ad : PrefsIo_default {
+    public class StorageHelper_ad : StorageHelper_default {
         readonly Context _context;
 
-        public PrefsIo_ad(Context context) {
+        public StorageHelper_ad(Context context) {
             _context = context;
         }
 
         [SuppressMessage("Interoperability","CA1416:Validate platform compatibility",Justification = "<Pending>")]
-        bool DoPermissionCheck() {
+        public override bool IsExternalWriteEnabled() {
             if(_context is not Activity mac) {
                 return false;
             }
@@ -28,21 +27,21 @@ namespace Calcuchord.Android {
                     return true;
                 }
 
-                ActivityCompat.RequestPermissions(mac,[Manifest.Permission.ReadExternalStorage],1);
                 return false;
             }
 
             return true;
         }
 
-        public override async Task WritePrefsAsync(string prefsJson) {
-            if(DoPermissionCheck()) {
-                await base.WritePrefsAsync(prefsJson);
+        public override void RequestExternalWritePermission() {
+            if(_context is not Activity mac) {
                 return;
             }
 
-            PlatformWrapper.Services.Logger.WriteLine($"Prefs Error, cannot write to '{PrefsFilePath}'");
-
+            ActivityCompat.RequestPermissions(mac,[Manifest.Permission.ReadExternalStorage],1);
+            if(IsExternalWriteEnabled()) {
+                TriggerSaveEnabled();
+            }
         }
     }
 }

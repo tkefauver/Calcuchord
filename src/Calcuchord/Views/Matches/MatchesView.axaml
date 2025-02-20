@@ -184,11 +184,9 @@
             </Border.IsVisible>
 
             <Grid RowDefinitions="Auto,*">
-                <!-- SHARE 
-IsVisible="{Binding !IsBrowser, Source={x:Static local:ThemeViewModel.Instance}}"
-                               
--->
+                <!-- SHARE -->
                 <controls:Card Grid.Row="0"
+                               IsVisible="{Binding IsDesktopOs, Source={x:Static local:ThemeViewModel.Instance}}"
                                Classes="button-group"
                                Margin="10"
                                HorizontalAlignment="Left"
@@ -286,7 +284,7 @@ IsVisible="{Binding !IsBrowser, Source={x:Static local:ThemeViewModel.Instance}}
                         <Binding Path="IsMatchesEmpty"
                                  TargetNullValue="False"
                                  FallbackValue="False" />
-                        <Binding Path="!IsSearchInitiating" />
+                        <Binding Path="!IsLoadingMatches" />
                     </MultiBinding>
                 </ContentControl.IsVisible>
 

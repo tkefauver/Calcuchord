@@ -24,6 +24,9 @@ namespace Calcuchord {
 
         #region Properties
 
+        public bool IsDesktopOs =>
+            OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsLinux();
+
         public bool IsDesktop { get; }
 
         public bool IsBrowser { get; }

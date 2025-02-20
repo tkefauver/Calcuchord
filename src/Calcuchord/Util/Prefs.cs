@@ -105,8 +105,6 @@ namespace Calcuchord {
 
         #region Events
 
-        public event EventHandler Saved;
-
         #endregion
 
         #region Constructors
@@ -146,7 +144,6 @@ namespace Calcuchord {
                         string pref_json = JsonConvert.SerializeObject(this);
                         prefsIo.WritePrefsAsync(pref_json).FireAndForgetSafeAsync();
                         PlatformWrapper.Services.Logger.WriteLine("Prefs SAVED");
-                        Saved?.Invoke(this,EventArgs.Empty);
                     } catch(Exception e) {
                         e.Dump();
                     }
