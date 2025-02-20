@@ -68,7 +68,7 @@ function setInstrumentAsync(instName) {
         player.adjustPreset(audioContext, instrument);
         return;
     }
-    let inst_url = `js/midi/fonts/${instName}.js`;
+    let inst_url = `js/midi/${instName}.js`;
 
     fetch(inst_url)
         .then(response => response.text())

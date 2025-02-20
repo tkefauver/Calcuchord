@@ -1,13 +1,13 @@
 {
   "mainAssemblyName": "Calcuchord.Browser",
   "resources": {
-    "hash": "sha256-Zjkam+PnPBhJ5+HklwAkeeB5mQgYEvViRD9E7fgbu70=",
+    "hash": "sha256-Xy4cPCFGvFN3TFLpcUMCO8M9ou9CdT2U1e9lBuEtwV0=",
     "fingerprinting": {
-      "Avalonia.Base.pei3tgjxs1.wasm": "Avalonia.Base.wasm",
+      "Avalonia.Base.83kh23e7rk.wasm": "Avalonia.Base.wasm",
       "Avalonia.Browser.8v324cfbj7.wasm": "Avalonia.Browser.wasm",
       "Avalonia.Controls.DataGrid.0ngsecn3jg.wasm": "Avalonia.Controls.DataGrid.wasm",
       "Avalonia.Controls.ItemsRepeater.of90kqhhwn.wasm": "Avalonia.Controls.ItemsRepeater.wasm",
-      "Avalonia.Controls.wyg77jruty.wasm": "Avalonia.Controls.wasm",
+      "Avalonia.Controls.scfd6o827b.wasm": "Avalonia.Controls.wasm",
       "Avalonia.Fonts.Inter.zfs4u8brva.wasm": "Avalonia.Fonts.Inter.wasm",
       "Avalonia.Labs.Controls.lw91ja25qa.wasm": "Avalonia.Labs.Controls.wasm",
       "Avalonia.Markup.0v2e17wl95.wasm": "Avalonia.Markup.wasm",
@@ -18,8 +18,8 @@
       "Avalonia.Svg.Skia.28uzj2zgw6.wasm": "Avalonia.Svg.Skia.wasm",
       "Avalonia.Vulkan.7oi5vtz0jv.wasm": "Avalonia.Vulkan.wasm",
       "Avalonia.WebView.bmtgbajdid.wasm": "Avalonia.WebView.wasm",
-      "Calcuchord.Browser.ukke3hnhxi.wasm": "Calcuchord.Browser.wasm",
-      "Calcuchord.o3d4azv1uz.wasm": "Calcuchord.wasm",
+      "Calcuchord.Browser.vczih21eew.wasm": "Calcuchord.Browser.wasm",
+      "Calcuchord.xyd20vvcxw.wasm": "Calcuchord.wasm",
       "DialogHost.Avalonia.7jl4voyqcp.wasm": "DialogHost.Avalonia.wasm",
       "DryIoc.Shared.g2lmt9c5lp.wasm": "DryIoc.Shared.wasm",
       "ExCSS.xjcli73cny.wasm": "ExCSS.wasm",
@@ -63,7 +63,7 @@
       "System.Net.Primitives.yt6jlsbz5m.wasm": "System.Net.Primitives.wasm",
       "System.Net.Requests.ul3de73b7i.wasm": "System.Net.Requests.wasm",
       "System.ObjectModel.s1iskyxsz7.wasm": "System.ObjectModel.wasm",
-      "System.Private.CoreLib.4s6hzlhtt9.wasm": "System.Private.CoreLib.wasm",
+      "System.Private.CoreLib.mhkb2c766p.wasm": "System.Private.CoreLib.wasm",
       "System.Private.Uri.lmri8iz3mu.wasm": "System.Private.Uri.wasm",
       "System.Private.Xml.Linq.xr7n4ou61z.wasm": "System.Private.Xml.Linq.wasm",
       "System.Private.Xml.njtlpbg4yd.wasm": "System.Private.Xml.wasm",
@@ -80,7 +80,7 @@
       "System.Xml.Linq.omrm9aobo0.wasm": "System.Xml.Linq.wasm",
       "WebView.Core.9idkr0wo2b.wasm": "WebView.Core.wasm",
       "dotnet.native.5m9hhoz2th.js": "dotnet.native.js",
-      "dotnet.native.h891ukrmmc.wasm": "dotnet.native.wasm",
+      "dotnet.native.k54t4oo30p.wasm": "dotnet.native.wasm",
       "dotnet.js": "dotnet.js",
       "dotnet.runtime.tsg4gsv2hg.js": "dotnet.runtime.js",
       "icudt_CJK.tjcz0u77k5.dat": "icudt_CJK.dat",
@@ -94,7 +94,7 @@
       "dotnet.runtime.tsg4gsv2hg.js": "sha256-82FoDmY+LsehdN2u8aSGEutGEKXJHcYaSX/3zptbsCw="
     },
     "wasmNative": {
-      "dotnet.native.h891ukrmmc.wasm": "sha256-AcN8qI+8IysaE27xKFyGSFQX2suGBuou6bHez13eg00="
+      "dotnet.native.k54t4oo30p.wasm": "sha256-SN5Cb23rh78KZ9GndfS4Y82Ov/jZQih+fzvJeCMQ0GI="
     },
     "icu": {
       "icudt_CJK.tjcz0u77k5.dat": "sha256-SZLtQnRc0JkwqHab0VUVP7T3uBPSeYzxzDnpxPpUnHk=",
@@ -102,11 +102,11 @@
       "icudt_no_CJK.lfu7j35m59.dat": "sha256-L7sV7NEYP37/Qr2FPCePo5cJqRgTXRwGHuwF5Q+0Nfs="
     },
     "coreAssembly": {
-      "Avalonia.Base.pei3tgjxs1.wasm": "sha256-8Wz4aksAZVdelhiEnCEOATjjhxidDZN31MDRtRCek3A=",
+      "Avalonia.Base.83kh23e7rk.wasm": "sha256-9E2h+3dQDERJmLuvXsZSLX556eWQU+M6nF/KFjdaRi0=",
       "Avalonia.Browser.8v324cfbj7.wasm": "sha256-FGTFIWRPT6llcTJcCjXYKcGMlCPIRziDLCzryNweRdo=",
       "Avalonia.Controls.DataGrid.0ngsecn3jg.wasm": "sha256-PPHCGqVo89c8FxftCpVMdjbn7i3jHC42+xwXqCIIuco=",
       "Avalonia.Controls.ItemsRepeater.of90kqhhwn.wasm": "sha256-xLujaxFYjW0/9JvrD0AjvYtwq55FxYq6WyPLBEserA4=",
-      "Avalonia.Controls.wyg77jruty.wasm": "sha256-WOt1Q8aGi4Dtl8O4YGki/2JnM4I+23u57rUZLUUktzc=",
+      "Avalonia.Controls.scfd6o827b.wasm": "sha256-/LQqAl6RoSxrF1cr+CmO5XUcoAJ3wzhp6841kwOnBMQ=",
       "Avalonia.Fonts.Inter.zfs4u8brva.wasm": "sha256-ASmJa+v6VfOCtbb2Cs2vdi76bhB/vPP7jMRqQM5o+Kc=",
       "Avalonia.Labs.Controls.lw91ja25qa.wasm": "sha256-ZaMZAEyO2klm/8vrrJfAI8lUucbTv5kmEteECEz8XIs=",
       "Avalonia.Markup.0v2e17wl95.wasm": "sha256-/GK49XSmKgQkVHm6WXE5ovosaDaDGxQgDO/GiEBIPOs=",
@@ -117,8 +117,8 @@
       "Avalonia.Svg.Skia.28uzj2zgw6.wasm": "sha256-PhFvmr1JXe3jELyFPWhRStXKKPyUsNXNPMx5qMJ4rTU=",
       "Avalonia.Vulkan.7oi5vtz0jv.wasm": "sha256-xzARg/M4I5Fy5jonDsr3Q6+vP5Uomkw8aJv5a7FCPNA=",
       "Avalonia.WebView.bmtgbajdid.wasm": "sha256-DUMCOZ/78detxiOfsJFvSlkxUR+nq6sYZQay8Vx1yVI=",
-      "Calcuchord.Browser.ukke3hnhxi.wasm": "sha256-Uik+QXfvcdqIVo+ItjuMlRgLR6VKwbdDVPv5PLfnV7Q=",
-      "Calcuchord.o3d4azv1uz.wasm": "sha256-VAFDqGjK/CF5GttbDDF0VWfktQOUqOMyMGuv1FUS6VI=",
+      "Calcuchord.Browser.vczih21eew.wasm": "sha256-gfOUmOlKEmC/mj8+LcftQVhSGd0WRIUrixbX9HfWemI=",
+      "Calcuchord.xyd20vvcxw.wasm": "sha256-OX/Kcm9dY3J/ROARGRyqykUzAQ4ey1GfYeeB/srmwnk=",
       "DialogHost.Avalonia.7jl4voyqcp.wasm": "sha256-/TrgalNbpd6sorD8eAy+SW41ORXN7/eFBagAj7/F3Fg=",
       "DryIoc.Shared.g2lmt9c5lp.wasm": "sha256-KBVcnAWJWPorquZYWMAiHtFdTjglBJNzNWdekj38ltA=",
       "ExCSS.xjcli73cny.wasm": "sha256-M88BCUlKjPjOCnuGTguF0D00ovqHs+MvYyRb/bxNUJI=",
@@ -162,7 +162,7 @@
       "System.Net.Primitives.yt6jlsbz5m.wasm": "sha256-qsHIHJYY52Lxbc4HJOjqGMP9y9ZAIP0KszcK/dKLbQk=",
       "System.Net.Requests.ul3de73b7i.wasm": "sha256-go0jrLYNeCYGpP2DbR1ttxqKN/Y55/aRWLcD0Kwka+M=",
       "System.ObjectModel.s1iskyxsz7.wasm": "sha256-YLaNsVQKs6VoOj938GvM7kYTlrhB70ocG6Dd4BiEfVk=",
-      "System.Private.CoreLib.4s6hzlhtt9.wasm": "sha256-bPzki4Xp3xfan9/0Rfu0l+1gKdnZqTsK/PQaIbzDO0A=",
+      "System.Private.CoreLib.mhkb2c766p.wasm": "sha256-eh70K2bb5LMiV7Rejq9Feajtim+t/UI7ahtu+kBWeL4=",
       "System.Private.Uri.lmri8iz3mu.wasm": "sha256-XdxRoNiE5Zdis5k6jch/3gsFs/Qi4VbvYFaPHwuba9M=",
       "System.Private.Xml.Linq.xr7n4ou61z.wasm": "sha256-4zQTljhK3l7iHlkgl3ieZ1dO+a34lEc5EuTZmPdGBNU=",
       "System.Private.Xml.njtlpbg4yd.wasm": "sha256-LbIqPkBLJ1SFX48+z7XbvPhMcJQr1qzzmN2n5zNim4U=",
