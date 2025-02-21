@@ -1609,7 +1609,12 @@ namespace Calcuchord {
                                 async () => {
                                     await InitAsync(instl);
                                     DialogHost.Close(MainDialogHostName);
-                                },DispatcherPriority.ContextIdle);
+                                } //,
+                                // BUG  contextidle on browser is too low priority
+                                // OperatingSystem.IsBrowser()
+                                //     ? DispatcherPriority.Normal
+                                //     : DispatcherPriority.ContextIdle
+                            );
                         });
 
                 } catch(Exception ex) {
