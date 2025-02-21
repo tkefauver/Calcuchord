@@ -112,6 +112,17 @@ namespace Calcuchord {
                     );
         }
 
+        public static void Dump(this Exception ex) {
+            string msg = $"[{DateTime.Now}]{ex}";
+            if(PlatformWrapper.Services is not { } ps ||
+               ps.Logger is not { } logger) {
+                Debug.WriteLine(msg);
+                return;
+            }
+
+            logger.WriteLine(msg);
+        }
+
         public static List<List<T>> PowerSet3<T>(this List<T> list) {
             var result = new List<List<T>>();
             // head

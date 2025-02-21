@@ -1602,23 +1602,33 @@ namespace Calcuchord {
 
                     _ = Task.Run(
                         () => {
-                            string def_json =
-                                MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/def.json");
-                            var instl = JsonConvert.DeserializeObject<List<Instrument>>(def_json);
-                            Dispatcher.UIThread.Post(
-                                async () => {
-                                    await InitAsync(instl);
-                                    DialogHost.Close(MainDialogHostName);
-                                } //,
-                                // BUG  contextidle on browser is too low priority
-                                // OperatingSystem.IsBrowser()
-                                //     ? DispatcherPriority.Normal
-                                //     : DispatcherPriority.ContextIdle
-                            );
+                            List<Instrument> instl = null;
+                            try {
+                                string def_json =
+                                    MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/def.json");
+                                instl = JsonConvert.DeserializeObject<List<Instrument>>(def_json);
+
+                                Dispatcher.UIThread.Post(
+                                    async () => {
+                                        try {
+                                            await InitAsync(instl);
+                                            DialogHost.Close(MainDialogHostName);
+                                        } catch(Exception ex) {
+                                            ex.Dump();
+                                        }
+                                    } //,
+                                    // BUG  contextidle on browser is too low priority
+                                    // OperatingSystem.IsBrowser()
+                                    //     ? DispatcherPriority.Normal
+                                    //     : DispatcherPriority.ContextIdle
+                                );
+                            } catch(Exception ex) {
+                                ex.Dump();
+                            }
                         });
 
                 } catch(Exception ex) {
-                    PlatformWrapper.Services.Logger.WriteLine(ex.ToString());
+                    ex.Dump();
                 }
             });
 
