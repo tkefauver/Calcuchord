@@ -1616,12 +1616,7 @@ namespace Calcuchord {
                                         } catch(Exception ex) {
                                             ex.Dump();
                                         }
-                                    } //,
-                                    // BUG  contextidle on browser is too low priority
-                                    // OperatingSystem.IsBrowser()
-                                    //     ? DispatcherPriority.Normal
-                                    //     : DispatcherPriority.ContextIdle
-                                );
+                                    },DispatcherPriority.ContextIdle);
                             } catch(Exception ex) {
                                 ex.Dump();
                             }

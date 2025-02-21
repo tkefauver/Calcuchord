@@ -13,6 +13,11 @@ namespace Calcuchord {
                     return;
                 }
 
+                if(OperatingSystem.IsBrowser()) {
+                    // no assets on browser
+                    return;
+                }
+
                 if(!Directory.Exists(storage_dir)) {
                     Directory.CreateDirectory(storage_dir);
                 }

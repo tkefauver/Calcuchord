@@ -10,7 +10,6 @@
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <WasmBuildNative>true</WasmBuildNative>
         <RunAOTCompilation>true</RunAOTCompilation>
-        <!--        <_ExtraTrimmerArgs>&#45;&#45;keep-metadata parametername</_ExtraTrimmerArgs>-->
     </PropertyGroup>
 
     <ItemGroup>
