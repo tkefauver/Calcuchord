@@ -1,13 +1,13 @@
 {
   "mainAssemblyName": "Calcuchord.Browser",
   "resources": {
-    "hash": "sha256-Xy4cPCFGvFN3TFLpcUMCO8M9ou9CdT2U1e9lBuEtwV0=",
+    "hash": "sha256-hfzc7Fb0F57MifvBunI/W8tEWk+CvVRR98cSLZJbA3Y=",
     "fingerprinting": {
       "Avalonia.Base.83kh23e7rk.wasm": "Avalonia.Base.wasm",
       "Avalonia.Browser.8v324cfbj7.wasm": "Avalonia.Browser.wasm",
       "Avalonia.Controls.DataGrid.0ngsecn3jg.wasm": "Avalonia.Controls.DataGrid.wasm",
       "Avalonia.Controls.ItemsRepeater.of90kqhhwn.wasm": "Avalonia.Controls.ItemsRepeater.wasm",
-      "Avalonia.Controls.scfd6o827b.wasm": "Avalonia.Controls.wasm",
+      "Avalonia.Controls.sa9suhh0ih.wasm": "Avalonia.Controls.wasm",
       "Avalonia.Fonts.Inter.zfs4u8brva.wasm": "Avalonia.Fonts.Inter.wasm",
       "Avalonia.Labs.Controls.lw91ja25qa.wasm": "Avalonia.Labs.Controls.wasm",
       "Avalonia.Markup.0v2e17wl95.wasm": "Avalonia.Markup.wasm",
@@ -18,8 +18,8 @@
       "Avalonia.Svg.Skia.28uzj2zgw6.wasm": "Avalonia.Svg.Skia.wasm",
       "Avalonia.Vulkan.7oi5vtz0jv.wasm": "Avalonia.Vulkan.wasm",
       "Avalonia.WebView.bmtgbajdid.wasm": "Avalonia.WebView.wasm",
-      "Calcuchord.Browser.vczih21eew.wasm": "Calcuchord.Browser.wasm",
-      "Calcuchord.xyd20vvcxw.wasm": "Calcuchord.wasm",
+      "Calcuchord.Browser.cnfgfv4hbn.wasm": "Calcuchord.Browser.wasm",
+      "Calcuchord.1vl4pgf2by.wasm": "Calcuchord.wasm",
       "DialogHost.Avalonia.7jl4voyqcp.wasm": "DialogHost.Avalonia.wasm",
       "DryIoc.Shared.g2lmt9c5lp.wasm": "DryIoc.Shared.wasm",
       "ExCSS.xjcli73cny.wasm": "ExCSS.wasm",
@@ -80,7 +80,7 @@
       "System.Xml.Linq.omrm9aobo0.wasm": "System.Xml.Linq.wasm",
       "WebView.Core.9idkr0wo2b.wasm": "WebView.Core.wasm",
       "dotnet.native.5m9hhoz2th.js": "dotnet.native.js",
-      "dotnet.native.k54t4oo30p.wasm": "dotnet.native.wasm",
+      "dotnet.native.6u0dzmxtko.wasm": "dotnet.native.wasm",
       "dotnet.js": "dotnet.js",
       "dotnet.runtime.tsg4gsv2hg.js": "dotnet.runtime.js",
       "icudt_CJK.tjcz0u77k5.dat": "icudt_CJK.dat",
@@ -94,7 +94,7 @@
       "dotnet.runtime.tsg4gsv2hg.js": "sha256-82FoDmY+LsehdN2u8aSGEutGEKXJHcYaSX/3zptbsCw="
     },
     "wasmNative": {
-      "dotnet.native.k54t4oo30p.wasm": "sha256-SN5Cb23rh78KZ9GndfS4Y82Ov/jZQih+fzvJeCMQ0GI="
+      "dotnet.native.6u0dzmxtko.wasm": "sha256-gk85LPlZ1iiYr0mNxOf9VMGQ5/2iqmwOLPLOVC7zf6E="
     },
     "icu": {
       "icudt_CJK.tjcz0u77k5.dat": "sha256-SZLtQnRc0JkwqHab0VUVP7T3uBPSeYzxzDnpxPpUnHk=",
@@ -106,7 +106,7 @@
       "Avalonia.Browser.8v324cfbj7.wasm": "sha256-FGTFIWRPT6llcTJcCjXYKcGMlCPIRziDLCzryNweRdo=",
       "Avalonia.Controls.DataGrid.0ngsecn3jg.wasm": "sha256-PPHCGqVo89c8FxftCpVMdjbn7i3jHC42+xwXqCIIuco=",
       "Avalonia.Controls.ItemsRepeater.of90kqhhwn.wasm": "sha256-xLujaxFYjW0/9JvrD0AjvYtwq55FxYq6WyPLBEserA4=",
-      "Avalonia.Controls.scfd6o827b.wasm": "sha256-/LQqAl6RoSxrF1cr+CmO5XUcoAJ3wzhp6841kwOnBMQ=",
+      "Avalonia.Controls.sa9suhh0ih.wasm": "sha256-7A8wC9y/LW2jI9Die36PBjsd3IU4FJ6HQ99zCGmBf5g=",
       "Avalonia.Fonts.Inter.zfs4u8brva.wasm": "sha256-ASmJa+v6VfOCtbb2Cs2vdi76bhB/vPP7jMRqQM5o+Kc=",
       "Avalonia.Labs.Controls.lw91ja25qa.wasm": "sha256-ZaMZAEyO2klm/8vrrJfAI8lUucbTv5kmEteECEz8XIs=",
       "Avalonia.Markup.0v2e17wl95.wasm": "sha256-/GK49XSmKgQkVHm6WXE5ovosaDaDGxQgDO/GiEBIPOs=",
@@ -117,8 +117,8 @@
       "Avalonia.Svg.Skia.28uzj2zgw6.wasm": "sha256-PhFvmr1JXe3jELyFPWhRStXKKPyUsNXNPMx5qMJ4rTU=",
       "Avalonia.Vulkan.7oi5vtz0jv.wasm": "sha256-xzARg/M4I5Fy5jonDsr3Q6+vP5Uomkw8aJv5a7FCPNA=",
       "Avalonia.WebView.bmtgbajdid.wasm": "sha256-DUMCOZ/78detxiOfsJFvSlkxUR+nq6sYZQay8Vx1yVI=",
-      "Calcuchord.Browser.vczih21eew.wasm": "sha256-gfOUmOlKEmC/mj8+LcftQVhSGd0WRIUrixbX9HfWemI=",
-      "Calcuchord.xyd20vvcxw.wasm": "sha256-OX/Kcm9dY3J/ROARGRyqykUzAQ4ey1GfYeeB/srmwnk=",
+      "Calcuchord.Browser.cnfgfv4hbn.wasm": "sha256-OH57ai5p8WVEyvTM3zxsxhbJInXubifevtMHMNBK5LQ=",
+      "Calcuchord.1vl4pgf2by.wasm": "sha256-U0/gkFTSzKL3vDTcJ42WiJAAdk+oWD1Bh0ZmbpgLS0Y=",
       "DialogHost.Avalonia.7jl4voyqcp.wasm": "sha256-/TrgalNbpd6sorD8eAy+SW41ORXN7/eFBagAj7/F3Fg=",
       "DryIoc.Shared.g2lmt9c5lp.wasm": "sha256-KBVcnAWJWPorquZYWMAiHtFdTjglBJNzNWdekj38ltA=",
       "ExCSS.xjcli73cny.wasm": "sha256-M88BCUlKjPjOCnuGTguF0D00ovqHs+MvYyRb/bxNUJI=",
