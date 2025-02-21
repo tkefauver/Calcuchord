@@ -192,32 +192,46 @@ namespace Calcuchord {
                    mvm.SelectedTuning is not { } stvm) {
                     return;
                 }
+                
+                
+                
+
+                void MvmOnInstrumentInitialized(object sender,EventArgs e) {
+                    mvm.InstrumentInitialized -= MvmOnInstrumentInitialized;
+                    FinishSetNeckAsync().FireAndForgetSafeAsync();
+                }
 
                 if(!mvm.IsSearchModeSelected) {
                     // auto switch to search mode
+                    mvm.InstrumentInitialized += MvmOnInstrumentInitialized;
                     mvm.SelectOptionCommand.Execute(mvm.SearchOptionViewModel);
-                    await Task.Delay(500);
+                    return;
                 }
 
-                stvm.ResetSelection();
-                await Task.Delay(300);
+                await FinishSetNeckAsync();
 
-                foreach(NoteViewModel nvm in stvm.AllNotes.Where(x => x.IsRealNote)) {
-                    if(NotePattern.Notes.FirstOrDefault(
-                           x => x.RowNum == nvm.RowNum && Math.Max(0,x.ColNum) == nvm.NoteNum) is not { } ng_match) {
-                        continue;
-                    }
+                async Task FinishSetNeckAsync() {
+                    stvm.ResetSelection();
+                    await Task.Delay(300);
 
-                    nvm.Parent.ToggleNoteSelectedCommand.Execute(nvm);
-                    if(ng_match.IsMute) {
-                        // toggle to mute
+                    foreach(NoteViewModel nvm in stvm.AllNotes.Where(x => x.IsRealNote)) {
+                        if(NotePattern.Notes.FirstOrDefault(
+                               x => x.RowNum == nvm.RowNum && Math.Max(0,x.ColNum) == nvm.NoteNum) is not { } ng_match) {
+                            continue;
+                        }
+
                         nvm.Parent.ToggleNoteSelectedCommand.Execute(nvm);
+                        if(ng_match.IsMute) {
+                            // toggle to mute
+                            nvm.Parent.ToggleNoteSelectedCommand.Execute(nvm);
+                        }
                     }
+
+                    await Task.Delay(250);
+
+                    InstrumentView.Instance.ScrollSelectionIntoView();
                 }
-
-                await Task.Delay(250);
-
-                InstrumentView.Instance.ScrollSelectionIntoView();
+                
             });
 
         public ICommand SelectMatchCommand => new MpCommand(

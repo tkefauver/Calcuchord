@@ -415,6 +415,8 @@ namespace Calcuchord {
 
         #region Events
 
+        public event EventHandler InstrumentInitialized;
+
         #endregion
 
         #region Constructors
@@ -632,7 +634,7 @@ namespace Calcuchord {
                     async () => {
                         try {
 
-                            await LoadMatchesAsync2(source,MatchCts.Token);
+                            await LoadMatchesAsync(source,MatchCts.Token);
 
                             IsLoadingMatches = false;
                         } catch(Exception ex) {
@@ -674,7 +676,7 @@ namespace Calcuchord {
             SvgOptions.ForEach(x => x.OnPropertyChanged(nameof(x.IsChecked)));
         }
 
-        async Task LoadMatchesAsync2(MatchUpdateSource source,CancellationToken ct) {
+        async Task LoadMatchesAsync(MatchUpdateSource source,CancellationToken ct) {
             IsSearchInitiating = true;
             Matches.Clear();
             MatchCount = 0;
@@ -751,6 +753,7 @@ namespace Calcuchord {
             foreach(MatchViewModel mvm in sorted_results) {
                 Matches.Add(mvm);
                 MatchCount++;
+                
                 if(MatchCount >= init_count) {
                     IsSearchInitiating = false;
                     delay = 150;
@@ -1113,11 +1116,10 @@ namespace Calcuchord {
 
             Dispatcher.UIThread.Post(
                 async () => {
-                    if(MainView.Instance is { } mv) {
-                        mv.RefreshMainGrid();
-                    }
 
+                    InstrumentInitialized?.Invoke(this,EventArgs.Empty);
                     await Task.Delay(500);
+                    
                     await UpdateMatchesAsync(MatchUpdateSource.InstrumentInit);
 
 
@@ -1137,6 +1139,7 @@ namespace Calcuchord {
                         //IsBusy = false;
                         mtv.InvalidateArrange();
                     }
+
 
                 });
         }
