@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
+using MonkeyPaste.Common;
 using NFluidsynth;
 using NFluidSettings = NFluidsynth.Settings;
 
@@ -11,28 +13,41 @@ namespace Calcuchord.Desktop {
 
     public class MidiPlayer_fluid : MidiPlayerBase {
 
+        string MidiFilePath =>
+            Path.Combine(PlatformWrapper.Services.StorageHelper.StorageDir,"output.mid");
+
+        Player Player { get; set; }
         NFluidSettings Settings { get; set; }
         Synth Synth { get; set; }
         AudioDriver AudioDriver { get; set; }
 
         public override void Init(object obj) {
             base.Init(obj);
-            Settings = new NFluidSettings();
+            try {
+                Settings = new NFluidSettings();
 
-            // Change this if you don't have pulseaudio or want to change to anything else.
-            if(OperatingSystem.IsLinux()) {
-                Settings[ConfigurationKeys.AudioDriver].StringValue = "pulseaudio";
+                // Change this if you don't have pulseaudio or want to change to anything else.
+                if(OperatingSystem.IsLinux()) {
+                    Settings[ConfigurationKeys.AudioDriver].StringValue = "pulseaudio";
+                }
+
+                Settings[ConfigurationKeys.SynthAudioChannels].IntValue = 2;
+                Synth = new Synth(Settings);
+
+                Synth.LoadSoundFont(GetInstrumentSoundFontPath(null),true);
+                for(int i = 0; i < 16; i++) {
+                    Synth.SoundFontSelect(i,0);
+                }
+
+                AudioDriver = new AudioDriver(Synth.Settings,Synth);
+
+                Player = new Player(Synth);
+                Player.Add(MidiFilePath);
+            } catch(Exception ex) {
+                // TODO should notify user to install fluidsynth on play click prolly (or figure out how to bundle it?)
+                ex.Dump();
+                CanPlay = false;
             }
-
-            Settings[ConfigurationKeys.SynthAudioChannels].IntValue = 2;
-            Synth = new Synth(Settings);
-
-            Synth.LoadSoundFont(GetInstrumentSoundFontPath(null),true);
-            for(int i = 0; i < 16; i++) {
-                Synth.SoundFontSelect(i,0);
-            }
-
-            AudioDriver = new AudioDriver(Synth.Settings,Synth);
 
         }
 
@@ -93,22 +108,19 @@ namespace Calcuchord.Desktop {
 
         }
 
+
         void PlayFile(MidiFile midiFile,string soundFontPath) {
-            string midiPath = Path.Combine(PlatformWrapper.Services.StorageHelper.StorageDir,"output.mid");
-            if(File.Exists(midiPath)) {
-                File.Delete(midiPath);
-            }
+            Task.Run(
+                () => {
+                    if(File.Exists(MidiFilePath)) {
+                        File.Delete(MidiFilePath);
+                    }
 
-            midiFile.Write(midiPath);
+                    midiFile.Write(MidiFilePath);
 
-            if(File.Exists(soundFontPath)) {
-
-
-                using Player player = new Player(Synth);
-                player.Add(midiPath);
-                player.Play();
-                player.Join();
-            }
+                    Player.Play();
+                    Player.Join();
+                });
         }
 
         string GetInstrumentSoundFontPath(Note note) {

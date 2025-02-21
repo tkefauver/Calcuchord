@@ -13,6 +13,10 @@
 - sound preview using midi playback
 - (experimental) Chord fingering discovery
 
+## Requirements
+
+For desktop midi playback you need to install [fluidsynth](https://github.com/FluidSynth/fluidsynth)
+
 Desktop & mobile versions coming soon!
 
 
