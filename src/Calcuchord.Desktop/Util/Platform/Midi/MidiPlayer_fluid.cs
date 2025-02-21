@@ -1,13 +1,40 @@
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
+using NFluidsynth;
+using NFluidSettings = NFluidsynth.Settings;
 
 namespace Calcuchord.Desktop {
 
-    public class MidiPlayer_linux : MidiPlayerBase {
+    public class MidiPlayer_fluid : MidiPlayerBase {
+
+        NFluidSettings Settings { get; set; }
+        Synth Synth { get; set; }
+        AudioDriver AudioDriver { get; set; }
+
+        public override void Init(object obj) {
+            base.Init(obj);
+            Settings = new NFluidSettings();
+
+            // Change this if you don't have pulseaudio or want to change to anything else.
+            if(OperatingSystem.IsLinux()) {
+                Settings[ConfigurationKeys.AudioDriver].StringValue = "pulseaudio";
+            }
+
+            Settings[ConfigurationKeys.SynthAudioChannels].IntValue = 2;
+            Synth = new Synth(Settings);
+
+            Synth.LoadSoundFont(GetInstrumentSoundFontPath(null),true);
+            for(int i = 0; i < 16; i++) {
+                Synth.SoundFontSelect(i,0);
+            }
+
+            AudioDriver = new AudioDriver(Synth.Settings,Synth);
+
+        }
 
         public override void PlayChord(IEnumerable<Note> notes) {
             MidiFile midiFile = new MidiFile();
@@ -67,7 +94,7 @@ namespace Calcuchord.Desktop {
         }
 
         void PlayFile(MidiFile midiFile,string soundFontPath) {
-            string midiPath = "output.mid";
+            string midiPath = Path.Combine(PlatformWrapper.Services.StorageHelper.StorageDir,"output.mid");
             if(File.Exists(midiPath)) {
                 File.Delete(midiPath);
             }
@@ -75,14 +102,12 @@ namespace Calcuchord.Desktop {
             midiFile.Write(midiPath);
 
             if(File.Exists(soundFontPath)) {
-                ProcessStartInfo psi = new ProcessStartInfo
-                {
-                    FileName = "fluidsynth",
-                    Arguments = $"-a alsa -g 1.0 {soundFontPath} {midiPath}",
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-                using Process p = Process.Start(psi);
+
+
+                using Player player = new Player(Synth);
+                player.Add(midiPath);
+                player.Play();
+                player.Join();
             }
         }
 

@@ -15,6 +15,9 @@ namespace Calcuchord {
 
         #region Statics
 
+        public static bool IS_NFLUID_PLAYER =
+            OperatingSystem.IsMacOS() || OperatingSystem.IsLinux() || OperatingSystem.IsWindows();
+
         #endregion
 
         #region Interfaces

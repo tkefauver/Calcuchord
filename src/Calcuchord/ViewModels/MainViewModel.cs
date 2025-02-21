@@ -633,19 +633,18 @@ namespace Calcuchord {
                 await Dispatcher.UIThread.InvokeAsync(
                     async () => {
                         try {
-
                             await LoadMatchesAsync(source,MatchCts.Token);
 
                             IsLoadingMatches = false;
-                        } catch(Exception ex) {
-
+                        } catch {
+                            // canceled
                         }
                     },
                     DispatcherPriority.ApplicationIdle,
                     MatchCts.Token);
 
-            } catch(Exception ex) {
-                // ignored
+            } catch {
+                // canceled
             }
         }
 
@@ -753,7 +752,7 @@ namespace Calcuchord {
             foreach(MatchViewModel mvm in sorted_results) {
                 Matches.Add(mvm);
                 MatchCount++;
-                
+
                 if(MatchCount >= init_count) {
                     IsSearchInitiating = false;
                     delay = 150;
@@ -1119,7 +1118,7 @@ namespace Calcuchord {
 
                     InstrumentInitialized?.Invoke(this,EventArgs.Empty);
                     await Task.Delay(500);
-                    
+
                     await UpdateMatchesAsync(MatchUpdateSource.InstrumentInit);
 
 

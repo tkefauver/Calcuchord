@@ -1,6 +1,5 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:labs="clr-namespace:Avalonia.Labs.Controls;assembly=Avalonia.Labs.Controls"
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
@@ -19,7 +18,6 @@
         </themes:CustomMaterialTheme>
         <materialIcons:MaterialIconStyles />
         <dlg:DialogHostStyles />
-        <labs:ControlThemes />
         <StyleInclude Source="avares://Material.Avalonia.DataGrid/DataGrid.xaml" />
         <StyleInclude Source="avares://Calcuchord/Styles/Default.axaml" />
     </Application.Styles>

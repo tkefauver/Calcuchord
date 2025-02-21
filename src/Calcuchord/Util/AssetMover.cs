@@ -17,7 +17,7 @@ namespace Calcuchord {
                     Directory.CreateDirectory(storage_dir);
                 }
 
-                if(OperatingSystem.IsLinux() &&
+                if(MidiPlayerBase.IS_NFLUID_PLAYER &&
                    Path.Combine(storage_dir,"sound") is { } sound_dir &&
                    !sound_dir.IsDirectory()) {
                     // NOTE below only happens if sound/ doesn't exist

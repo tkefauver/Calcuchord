@@ -48,7 +48,6 @@
         <PackageReference Include="ReactiveUI"/>
         <PackageReference Include="System.Formats.Nrbf"/>
         <PackageReference Include="webview.avalonia"/>
-        <PackageReference Include="Melanchall.DryWetMidi" Condition="$(BuildOs) == 'LINUX'"/>
     </ItemGroup>
 
 
