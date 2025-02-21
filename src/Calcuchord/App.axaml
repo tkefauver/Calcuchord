@@ -18,7 +18,6 @@
         </themes:CustomMaterialTheme>
         <materialIcons:MaterialIconStyles />
         <dlg:DialogHostStyles />
-        <StyleInclude Source="avares://Material.Avalonia.DataGrid/DataGrid.xaml" />
         <StyleInclude Source="avares://Calcuchord/Styles/Default.axaml" />
     </Application.Styles>
 

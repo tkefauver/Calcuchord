@@ -22,7 +22,6 @@
         </PackageReference>
         <PackageReference Include="Avalonia.ReactiveUI"/>
         <PackageReference Include="SpaceWizards.NFluidsynth"/>
-        <PackageReference Include="webview.avalonia.desktop"/>
         <PackageReference Include="Melanchall.DryWetMidi"/>
     </ItemGroup>
 
