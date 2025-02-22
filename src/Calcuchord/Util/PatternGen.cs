@@ -428,7 +428,8 @@ namespace Calcuchord {
         }
 
 
-        IEnumerable<PatternNote> AddChordFingerings(IEnumerable<InstrumentNote> notes) {
+        IEnumerable<PatternNote> AddChordFingerings(IEnumerable<InstrumentNote> notes,int initialFinger = 1,
+            bool fingerPerFretMode = true) {
             /*
              1. Go from lowest to highest fret and lowest
              to highest string using fingers from lowest to highest.
@@ -451,7 +452,7 @@ namespace Calcuchord {
             if(fingered_fret_note_lookup.Count != 0) {
                 int min_fingered_fret = fingered_fret_note_lookup.Keys.Min();
                 int max_fingered_fret = fingered_fret_note_lookup.Keys.Max();
-                int cur_finger = 1;
+                int cur_finger = initialFinger;
                 for(int cur_fret_num = min_fingered_fret;
                     cur_fret_num <= max_fingered_fret;
                     cur_fret_num++) {
@@ -463,7 +464,7 @@ namespace Calcuchord {
                         int max_fret_str = cur_fret_notes.Max(x => x.RowNum);
                         bool do_bar = cur_fret_notes.Skip(1).Any() &&
                                       fingered_fret_note_lookup.Keys.Any(x => x > cur_fret_num);
-                        // check if any lower frets in str range have notes (then can't bar)
+                        // check if any lower frets in str range have notes (then can't barre)
                         bool can_bar = do_bar &&
                                        !notes
                                            .Any(

@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <!--        <WasmBuildNative>true</WasmBuildNative>-->
-        <!--        <RunAOTCompilation>true</RunAOTCompilation>-->
+        <WasmBuildNative>true</WasmBuildNative>
+        <RunAOTCompilation>true</RunAOTCompilation>
     </PropertyGroup>
 
     <ItemGroup>

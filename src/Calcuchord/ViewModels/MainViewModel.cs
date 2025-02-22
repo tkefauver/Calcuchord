@@ -195,15 +195,6 @@ namespace Calcuchord {
 
         public string BusyText { get; set; }
 
-        /*
-
-           Classes.piano="{Binding IsPianoSelected}"
-           Classes.no-inst="{Binding IsInstrumentsEmpty}"
-           Classes.no-tuning="{Binding IsTuningsEmpty}"
-           Classes.bookmark-mode="{Binding IsBookmarkModeSelected}"
-           Classes.search-mode="{Binding IsSearchModeSelected}"
-         */
-
         public string PatternName =>
             SelectedPatternType.ToString();
 
@@ -783,14 +774,7 @@ namespace Calcuchord {
                         score = (int)match.NotePattern.Key;
                         break;
                     case MatchSortType.Suffix:
-                        Type suffix_type =
-                            SelectedPatternType == MusicPatternType.Chords ?
-                                typeof(ChordSuffixType) :
-                                SelectedPatternType == MusicPatternType.Scales ?
-                                    typeof(ScaleSuffixType) :
-                                    typeof(ModeSuffixType);
-                        //score = (int)match.NotePattern.SuffixKey.ToEnum(suffix_type);
-
+                        score = match.NotePattern.Parent.SuffixId;
                         break;
                     case MatchSortType.Position:
                         score = match.NotePattern.Position;

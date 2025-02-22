@@ -32,6 +32,30 @@ namespace Calcuchord {
         #region Ignored
 
         [JsonIgnore]
+        int _suffixId = -1;
+
+        [JsonIgnore]
+        public int SuffixId {
+            get {
+                if(_suffixId < 0) {
+                    switch(PatternType) {
+                        case MusicPatternType.Chords:
+                            _suffixId = (int)SuffixKey.ToEnum<ChordSuffixType>();
+                            break;
+                        case MusicPatternType.Scales:
+                            _suffixId = (int)SuffixKey.ToEnum<ScaleSuffixType>();
+                            break;
+                        case MusicPatternType.Modes:
+                            _suffixId = (int)SuffixKey.ToEnum<ModeSuffixType>();
+                            break;
+                    }
+                }
+
+                return _suffixId;
+            }
+        }
+
+        [JsonIgnore]
         string _suffixDisplayValue;
 
         [JsonIgnore]
@@ -55,11 +79,8 @@ namespace Calcuchord {
 
         #region Constructors
 
-        public PatternKeyCollection() {
-        }
-
         public static PatternKeyCollection Create(MusicPatternType pt,NoteType key,string suffixKey) {
-            return new PatternKeyCollection()
+            return new PatternKeyCollection
             {
                 PatternType = pt,
                 Key = key,

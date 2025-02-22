@@ -192,9 +192,7 @@ namespace Calcuchord {
                    mvm.SelectedTuning is not { } stvm) {
                     return;
                 }
-                
-                
-                
+
 
                 void MvmOnInstrumentInitialized(object sender,EventArgs e) {
                     mvm.InstrumentInitialized -= MvmOnInstrumentInitialized;
@@ -216,7 +214,8 @@ namespace Calcuchord {
 
                     foreach(NoteViewModel nvm in stvm.AllNotes.Where(x => x.IsRealNote)) {
                         if(NotePattern.Notes.FirstOrDefault(
-                               x => x.RowNum == nvm.RowNum && Math.Max(0,x.ColNum) == nvm.NoteNum) is not { } ng_match) {
+                               x => x.RowNum == nvm.RowNum && Math.Max(0,x.ColNum) == nvm.NoteNum) is not
+                           { } ng_match) {
                             continue;
                         }
 
@@ -231,7 +230,12 @@ namespace Calcuchord {
 
                     InstrumentView.Instance.ScrollSelectionIntoView();
                 }
-                
+
+            });
+
+        public ICommand RefingerChordCommand => new MpCommand(
+            () => {
+
             });
 
         public ICommand SelectMatchCommand => new MpCommand(
