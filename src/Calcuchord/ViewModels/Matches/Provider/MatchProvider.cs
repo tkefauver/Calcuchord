@@ -52,6 +52,11 @@ namespace Calcuchord {
                 for(int i = 0; i < 12; i++) {
                     NoteType nt = (NoteType)i;
                     if(coll.Where(x => x.Key == nt) is { } all_key_groups) {
+                        if(all_key_groups.Where(x => string.IsNullOrEmpty(x.SuffixKey)) is { } blanks &&
+                           blanks.Any()) {
+
+                        }
+
                         try {
                             var key_suffix_lookup =
                                 all_key_groups
