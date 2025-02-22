@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -51,17 +52,22 @@ namespace Calcuchord {
                 for(int i = 0; i < 12; i++) {
                     NoteType nt = (NoteType)i;
                     if(coll.Where(x => x.Key == nt) is { } all_key_groups) {
-                        var key_suffix_lookup =
-                            all_key_groups
-                                .GroupBy(x => x.SuffixKey)
-                                .ToDictionary(
-                                    x => x.Key,
-                                    x =>
-                                        x.SelectMany(y => y.Patterns)
-                                            .OrderBy(y => y.Position)
-                                            .Select(y => CreateMatchViewModel(y,0))
-                                );
-                        PatternLookup.Add(nt,key_suffix_lookup);
+                        try {
+                            var key_suffix_lookup =
+                                all_key_groups
+                                    .Where(x => !string.IsNullOrEmpty(x.SuffixKey))
+                                    .GroupBy(x => x.SuffixKey)
+                                    .ToDictionary(
+                                        x => x.Key,
+                                        x =>
+                                            x.SelectMany(y => y.Patterns)
+                                                .OrderBy(y => y.Position)
+                                                .Select(y => CreateMatchViewModel(y,0))
+                                    );
+                            PatternLookup.Add(nt,key_suffix_lookup);
+                        } catch(Exception e) {
+                            e.Dump();
+                        }
                     }
                 }
             }

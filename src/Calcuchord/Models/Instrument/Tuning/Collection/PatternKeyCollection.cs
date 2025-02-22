@@ -58,10 +58,13 @@ namespace Calcuchord {
         public PatternKeyCollection() {
         }
 
-        public PatternKeyCollection(MusicPatternType pt,NoteType key,string suffixKey) {
-            PatternType = pt;
-            Key = key;
-            SuffixKey = suffixKey;
+        public static PatternKeyCollection Create(MusicPatternType pt,NoteType key,string suffixKey) {
+            return new PatternKeyCollection()
+            {
+                PatternType = pt,
+                Key = key,
+                SuffixKey = suffixKey
+            };
         }
 
         #endregion

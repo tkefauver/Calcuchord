@@ -13,7 +13,7 @@ namespace Calcuchord {
             var instl = new[]
                 { Instrument.CreateByType(InstrumentType.Guitar) }; //MainViewModel.CreateDefaultInstruments();
 
-            PatternKeyCollection ngc = new PatternKeyCollection(MusicPatternType.Chords,NoteType.C,"Major");
+            PatternKeyCollection ngc = PatternKeyCollection.Create(MusicPatternType.Chords,NoteType.C,"Major");
             ngc.SetParent(
                 instl.FirstOrDefault(x => x.InstrumentType == InstrumentType.Guitar)?.Tunings.FirstOrDefault());
 

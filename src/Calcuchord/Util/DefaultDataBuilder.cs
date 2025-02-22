@@ -65,7 +65,7 @@ namespace Calcuchord {
 
                 foreach(MusicKey chord_group in keys_obj) {
                     string cur_suffix = chord_group.suffix;
-                    PatternKeyCollection ngc = new PatternKeyCollection(
+                    PatternKeyCollection ngc = PatternKeyCollection.Create(
                         MusicPatternType.Chords,cur_key,chord_group.suffix);
                     foreach((Position pos,int pos_num) in chord_group.positions.WithIndex()) {
                         NotePattern ng = new NotePattern(ngc,pos_num);

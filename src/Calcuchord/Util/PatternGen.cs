@@ -236,7 +236,7 @@ namespace Calcuchord {
                     NoteType cur_key = (NoteType)cur_key_val;
                     var pattern = GenPattern(cur_key,suffix);
                     var all_pattern_inst_notes = GenNotes(pattern);
-                    PatternKeyCollection ngc = new PatternKeyCollection(PatternType,cur_key,suffix);
+                    PatternKeyCollection ngc = PatternKeyCollection.Create(PatternType,cur_key,suffix);
                     var all_pattern_notes =
                         all_pattern_inst_notes
                             .Select(x => PatternNote.Create(0,x));
@@ -291,7 +291,7 @@ namespace Calcuchord {
                     var pattern_inst_notes = GenNotes(pattern);
                     var blocks = pattern_inst_notes
                         .GroupBy(x => Math.Floor((x.ColNum + 0) / (double)PatternOpenFretSpan));
-                    PatternKeyCollection ngc = new PatternKeyCollection(PatternType,cur_key,suffix);
+                    PatternKeyCollection ngc = PatternKeyCollection.Create(PatternType,cur_key,suffix);
                     ngc.Patterns.AddRange(
                         blocks.Select(
                             (x,idx) => new NotePattern(ngc,idx,AddScaleFingering(x))));
@@ -389,7 +389,7 @@ namespace Calcuchord {
             var pattern = GenPattern(cur_key,suffix);
             var pattern_inst_notes = GenNotes(pattern);
             var valid_patterns = new List<IEnumerable<InstrumentNote>>();
-            PatternKeyCollection ngc = new PatternKeyCollection(PatternType,cur_key,suffix);
+            PatternKeyCollection ngc = PatternKeyCollection.Create(PatternType,cur_key,suffix);
 
             for(; min_fret_num <= max_min_fret_num; min_fret_num++) {
                 int max_fret_num = (min_fret_num + PatternOpenFretSpan) - 1;

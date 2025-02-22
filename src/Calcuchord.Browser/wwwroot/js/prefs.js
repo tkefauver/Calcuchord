@@ -8,7 +8,7 @@ function initStorage() {
         localforage.config({
             driver: localforage.INDEXEDDB,
             //driver: localforage.WEBSQL, // Force WebSQL; same as using setDriver()
-            name: 'myApp',
+            name: 'Calcuchord Storage',
             version: 1.0,
             size: 4980736, // Size of database, in bytes. WebSQL-only for now.
             storeName: 'keyvaluepairs', // Should be alphanumeric, with underscores.
@@ -41,7 +41,7 @@ function writePrefsAsync(prefsJson) {
     localforage.setItem('prefs', prefsJson).then(function (value) {
         // Do other things once the value has been saved.
         console.log('saved:')
-        console.log(value);
+        //console.log(value);
     }).catch(function (err) {
         // This code runs if there were any errors
         console.log('save error:');
