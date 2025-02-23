@@ -1283,11 +1283,6 @@ namespace Calcuchord {
 
         public MpIAsyncCommand AddInstrumentCommand => new MpAsyncCommand(
             async () => {
-                if(OperatingSystem.IsBrowser()) {
-                    ResetToDefaultsCommand.Execute(null);
-                    return;
-                }
-
                 EditModeInstrument = new InstrumentViewModel(this)
                 {
                     Instrument = Instrument.CreateByType(InstrumentType.Guitar)
