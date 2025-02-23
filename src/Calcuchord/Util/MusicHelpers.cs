@@ -4,6 +4,32 @@ using MonkeyPaste.Common;
 
 namespace Calcuchord {
     public static class MusicHelpers {
+        public static NoteType ToDegree(this NoteType nt,ChordKeyDegreeType ckdt) {
+            return new Note(nt,2).Offset(ckdt.GetOffset()).Key;
+        }
+
+        public static int GetOffset(this ChordKeyDegreeType ckdt) {
+            // E, F♯, G♯, A, B, C♯, and D♯
+            // 0, 2,  4,  5, 7, 9,      11
+            switch(ckdt) {
+                default:
+                case ChordKeyDegreeType.I:
+                    return 0;
+                case ChordKeyDegreeType.ii:
+                    return 2;
+                case ChordKeyDegreeType.iii:
+                    return 4;
+                case ChordKeyDegreeType.IV:
+                    return 5;
+                case ChordKeyDegreeType.V:
+                    return 7;
+                case ChordKeyDegreeType.vi:
+                    return 9;
+                case ChordKeyDegreeType.vii:
+                    return 11;
+            }
+        }
+
         public static string ToDisplayValue(this NoteType nt,int? register = null) {
             string result = nt.ToString();
             if(result.EndsWith("b")) {
@@ -54,7 +80,7 @@ namespace Calcuchord {
         {
             { "_","/" },
             { "Num",string.Empty },
-            { "sharp","#" }
+            { "sharp","#" },
         };
 
         public static string ToDisplayValue(this MusicPatternType mpt,string suffixKey) {

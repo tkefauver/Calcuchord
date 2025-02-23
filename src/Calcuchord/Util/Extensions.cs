@@ -34,7 +34,6 @@ namespace Calcuchord {
         }
 
         public static string ToIconName(this InstrumentType it) {
-            //return $"avares://Calcuchord/Assets/Svg/Instruments/{it.ToString().ToLower()}.svg";
             switch(it) {
                 default:
                     return "MusicClefBass";
@@ -76,7 +75,7 @@ namespace Calcuchord {
             return cms / 2.54d;
         }
 
-        public static double nchesToCentimeters(this double inches) {
+        public static double InchesToCentimeters(this double inches) {
             return inches * 2.54d;
         }
 
@@ -113,14 +112,13 @@ namespace Calcuchord {
         }
 
         public static void Dump(this Exception ex) {
-            string msg = $"[{DateTime.Now}]{ex}";
             if(PlatformWrapper.Services is not { } ps ||
                ps.Logger is not { } logger) {
-                Debug.WriteLine(msg);
+                Debug.WriteLine($"[{DateTime.Now}]{ex}");
                 return;
             }
 
-            logger.WriteLine(msg);
+            logger.WriteLine(ex.ToString());
         }
 
         public static List<List<T>> PowerSet3<T>(this List<T> list) {

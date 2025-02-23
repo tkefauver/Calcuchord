@@ -44,8 +44,16 @@
                                Text="Click 'wait' if your browser shows you a message"
                                TextAlignment="Center" />
                     <TextBlock FontSize="12"
-                               Foreground="Black"
-                               Text="It will go back to normal once complete. It shouldn't take more than a few minutes..." />
+                               Foreground="Black">
+                        <TextBlock.Inlines>
+                            <Run Text="This window" />
+                            <Run Text="must remain active"
+                                 Classes="bold" />
+                            <Run Text="or it won't process." />
+                            <Run
+                                Text="It will go back to normal once complete. It shouldn't take more than a few minutes..." />
+                        </TextBlock.Inlines>
+                    </TextBlock>
 
                     <TextBlock FontSize="10"
                                TextAlignment="Center"

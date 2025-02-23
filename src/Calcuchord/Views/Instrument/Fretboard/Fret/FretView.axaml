@@ -124,7 +124,16 @@
         </Style>
         <Style Selector="Border#FretMarker.desired-root">
             <Setter Property="RenderTransform"
-                    Value="rotate(45deg)" />
+                    Value="rotate(45deg) scale(0.75)" />
+        </Style>
+
+        <Style Selector="Border#FretMarker:not(.desired-root).nut">
+            <Setter Property="RenderTransform"
+                    Value="scale(0.75)" />
+        </Style>
+        <Style Selector="Border#FretMarker.desired-root">
+            <Setter Property="RenderTransform"
+                    Value="rotate(45deg) scale(0.75)" />
         </Style>
         <Style Selector="Border#FretMarker.desired-root > :is(Control)">
             <Setter Property="RenderTransform"
@@ -252,7 +261,8 @@
         </Border>
 
         <!-- EDGE (TOP) -->
-        <Border Background="{DynamicResource NutBg}"
+        <Border x:Name="TopEdge"
+                Background="{DynamicResource NutBg}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Top"
                 Height="2">
@@ -265,7 +275,8 @@
         </Border>
 
         <!-- EDGE (BOTTOM) -->
-        <Border Background="{DynamicResource NutBg}"
+        <Border x:Name="BottomEdge"
+                Background="{DynamicResource NutBg}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom"
                 Height="2">
@@ -319,6 +330,7 @@
         <Border x:Name="FretMarker"
                 Classes="note-marker"
                 Classes.desired-root="{Binding IsDesiredRoot}"
+                Classes.nut="{Binding IsNutFret}"
                 Width="{Binding $self.Bounds.Height}"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Stretch">

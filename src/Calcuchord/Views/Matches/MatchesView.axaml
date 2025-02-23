@@ -135,10 +135,9 @@
                                 <Run Text="No" />
                                 <Run Text="{Binding PatternSingularName}"
                                      Classes="article2" />
-                                <Run Text="bookmarks"
+                                <Run Text="bookmarks found."
                                      Classes="subject2" />
-                                <Run FontStyle="Italic"
-                                     Text="yet." />
+
                             </TextBlock.Inlines>
                         </TextBlock>
                     </Template>
@@ -163,6 +162,11 @@
                     </Template>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <Style Selector="controls|Card.peek">
+            <Setter Property="RenderTransform"
+                    Value="translate(-320px,0px)" />
         </Style>
     </UserControl.Styles>
     <Grid>
@@ -202,7 +206,9 @@
 
                 <!-- ZOOM BTNS -->
                 <controls:Card Grid.Row="0"
+                               x:Name="ZoomButtonCard"
                                Classes="button-group"
+                               Classes.peek="{Binding IsRightDrawerOpen}"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
                                Margin="10">
@@ -285,6 +291,7 @@
                                  TargetNullValue="False"
                                  FallbackValue="False" />
                         <Binding Path="!IsLoadingMatches" />
+                        <Binding Path="!IsSearchInitiating" />
                     </MultiBinding>
                 </ContentControl.IsVisible>
 

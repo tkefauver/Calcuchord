@@ -50,6 +50,8 @@ namespace Calcuchord {
                 return;
             }
 
+            tvm.DoOrientationCheck();
+
             mvm.SetMatchColumnCount(mvm.MatchColCount);
 
             InstrumentView.MeasureInstrument();

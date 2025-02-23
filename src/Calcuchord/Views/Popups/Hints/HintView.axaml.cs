@@ -8,6 +8,7 @@ namespace Calcuchord {
     public partial class HintView : UserControl {
         public HintView() {
             InitializeComponent();
+
         }
 
         void InputElement_OnPointerReleased(object sender,PointerReleasedEventArgs e) {

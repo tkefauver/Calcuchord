@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using MonkeyPaste.Common;
+using MonkeyPaste.Common.Avalonia;
 using Newtonsoft.Json;
 
 namespace Calcuchord {
@@ -20,6 +21,20 @@ namespace Calcuchord {
 
         #region Statics
 
+        static void DoModelUpToDateCheck() {
+            try {
+                string backup_prefs_json =
+                    MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/appstate_022325.json");
+                Prefs ValidationChecker = JsonConvert.DeserializeObject<Prefs>(backup_prefs_json);
+                Instance = null;
+            } catch(Exception ex) {
+                ex.Dump();
+                // Did you refactor part of the model? probably should put it back...or will need to catch 
+                // and transform it
+                Debugger.Break();
+            }
+        }
+
         public static bool IsLoaded { get; private set; }
 
         public static Prefs Instance { get; private set; }
@@ -33,6 +48,9 @@ namespace Calcuchord {
             if(RESET_PREFS) {
                 await prefsIo.WritePrefsAsync(string.Empty);
             }
+#if DEBUG
+            DoModelUpToDateCheck();
+#endif
 
             string prefs_json = await prefsIo.ReadPrefsAsync();
 
@@ -61,6 +79,8 @@ namespace Calcuchord {
 
             Instance.IsInitialStartup = is_initial_startup;
             IsLoaded = true;
+
+
         }
 
         #endregion
@@ -120,6 +140,10 @@ namespace Calcuchord {
 
         }
 
+        Prefs(bool isModelCheck) {
+            // only for validation
+        }
+
         #endregion
 
         #region Public Methods
@@ -139,7 +163,9 @@ namespace Calcuchord {
                     }
 
                     SyncModels();
-                    // Validate();
+#if DEBUG
+                    Validate();
+#endif
                     try {
                         string pref_json = JsonConvert.SerializeObject(this);
                         prefsIo.WritePrefsAsync(pref_json).FireAndForgetSafeAsync();
@@ -160,14 +186,7 @@ namespace Calcuchord {
 
         void SyncModels() {
             if(MainViewModel.Instance is { } mvm) {
-                // if(OperatingSystem.IsBrowser()) {
-                //     Instruments = mvm.Instruments.Select(x => x.Instrument.Clone()).ToList();
-                //     Instruments.SelectMany(x => x.Tunings).ForEach(x => x.ClearPatterns());
-                // } else {
-                //     Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
-                // }
                 Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
-
                 Options = mvm.OptionLookup.Values.SelectMany(x => x).ToList();
                 MatchColCount = mvm.MatchColCount;
             }
@@ -205,15 +224,11 @@ namespace Calcuchord {
                 return;
             }
 
-            // if(mvm.SelectedTuning == null) {
-            //     // should always have a selected tuning
-            //     Debugger.Break();
-            // }
-
             if(Instruments.SelectMany(x => x.Tunings).SelectMany(x => x.Collections.Values).SelectMany(x => x)
                    .SelectMany(x => x.Patterns) is { } all_ngl &&
                all_ngl.GroupBy(x => x.Id).Where(x => x.Count() > 1) is { } dup_nggl &&
                dup_nggl.Any()) {
+                Debugger.Break();
 
                 // BUG randomly bookmarking duplicates the notePattern
                 // i think its a virtualization thing maybe w/ the items repeater maybe 

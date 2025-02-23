@@ -79,7 +79,7 @@
         </Style>
         <Style Selector=":is(UserControl).note-btn.hover Border.note-marker">
             <Setter Property="Opacity"
-                    Value="0.75" />
+                    Value="0.875" />
         </Style>
 
     </UserControl.Styles>
@@ -104,30 +104,39 @@
             </TransitioningContentControl.DataTemplates>
         </TransitioningContentControl>
 
+        <!-- BUG Tooltip flickers on browser only -->
         <local:HintView Margin="12,10"
+                        ToolTip.ServiceEnabled="{Binding !IsBrowser, Source={x:Static local:ThemeViewModel.Instance}}"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top">
             <ToolTip.Tip>
                 <controls:ColorZone>
                     <StackPanel Spacing="10">
-                        <TextBlock>
-                            <TextBlock.Inlines>
-                                <Run Text="◦ " />
-                                <Run Classes="subject2"
-                                     Text="Long-press" />
-                                <Run Text="or" />
-                                <Run Classes="subject2"
-                                     Text="right-click" />
-                                <Run Text="{Binding InstrumentNoteName}" />
-                                <Run Text="to toggle" />
-                                <Run Text="desired root"
-                                     FontStyle="Italic"
-                                     Classes="subject2" />
-                                <Run Foreground="Black"
-                                     Text="♦" />
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="7">
+                            <TextBlock>
+                                <TextBlock.Inlines>
+                                    <Run Text="◦ " />
+                                    <Run Classes="subject2"
+                                         Text="Long-press" />
+                                    <Run Text="or" />
+                                    <Run Classes="subject2"
+                                         Text="right-click" />
+                                    <Run Text="{Binding InstrumentNoteName}" />
+                                    <Run Text="to toggle" />
+                                    <Run Text="desired root"
+                                         FontStyle="Italic"
+                                         Classes="subject2" />
+                                </TextBlock.Inlines>
+                            </TextBlock>
+                            <Border Width="12"
+                                    Height="12"
+                                    RenderTransform="rotate(45deg)"
+                                    Background="Black"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center" />
 
-                            </TextBlock.Inlines>
-                        </TextBlock>
+                        </StackPanel>
 
                         <TextBlock IsVisible="{Binding !IsKeyboard}">
                             <TextBlock.Inlines>

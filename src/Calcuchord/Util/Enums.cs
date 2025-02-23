@@ -59,9 +59,30 @@ namespace Calcuchord {
         RootToggle,
         FilterToggle,
         InstrumentInit,
-        ModeChange,
         BookmarkToggle,
         SortToggle
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum InstrumentInitSource {
+        Startup,
+        TuningChanged,
+        EditorCanceled,
+        EditorDone,
+        InstrumentRemoved,
+        TabChanged,
+        PatternChanged
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum ChordKeyDegreeType {
+        I,
+        ii,
+        iii,
+        IV,
+        V,
+        vi,
+        vii
     }
 
 
@@ -126,19 +147,19 @@ namespace Calcuchord {
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum OptionType {
-        Pattern,
         DisplayMode,
+        Pattern,
         Key,
-
+        Degree,
         ChordSuffix,
         ScaleSuffix,
         ModeSuffix,
-        ChordSvg,
-        ScaleSvg,
-        ModeSvg,
         ChordSort,
         ScaleSort,
-        ModeSort
+        ModeSort,
+        ChordSvg,
+        ScaleSvg,
+        ModeSvg
     }
 
     // _ = '/'

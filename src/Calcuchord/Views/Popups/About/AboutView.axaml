@@ -48,11 +48,11 @@
                     Value="18" />
         </Style>
 
-        <Style Selector="HyperlinkButton :is(TextBlock).body">
+        <Style Selector="HyperlinkButton :is(TextBlock)">
             <Setter Property="Foreground"
                     Value="Blue" />
         </Style>
-        <Style Selector="HyperlinkButton:pointerover :is(TextBlock).body">
+        <Style Selector="HyperlinkButton:pointerover :is(TextBlock)">
             <Setter Property="Foreground"
                     Value="Red" />
         </Style>

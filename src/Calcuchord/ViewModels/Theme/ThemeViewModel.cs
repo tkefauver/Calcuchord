@@ -39,24 +39,15 @@ namespace Calcuchord {
 
         bool IsForcedOrientation { get; set; }
 
+        bool? LastCheckWasLandscape { get; set; }
+
         public bool IsLandscape {
             get {
 
-                if((!IsPhone && !IsForcedOrientation) ||
+                if(!IsPhone ||
                    MainView.Instance is not { } mv ||
                    TopLevel.GetTopLevel(mv) is not { } tl) {
                     return false;
-                }
-
-                double w = 0;
-                double h = 0;
-                if(tl.Screens is { } scr &&
-                   scr.Primary is { } pscr) {
-                    w = pscr.Bounds.Width / pscr.Scaling;
-                    h = pscr.Bounds.Height / pscr.Scaling;
-                } else {
-                    w = tl.Bounds.Width / tl.RenderScaling;
-                    h = tl.Bounds.Height / tl.RenderScaling;
                 }
 
                 return tl.Bounds.Width > tl.Bounds.Height;
@@ -226,7 +217,7 @@ namespace Calcuchord {
                         {
                             PaletteColorType.MutedFretFg,
                             ("#FFFFFF","#000000")
-                        }
+                        },
                     };
 
                     if(IsDark) {
@@ -293,6 +284,17 @@ namespace Calcuchord {
             OnPropertyChanged(nameof(P));
             InitResoures();
             OnPropertyChanged(nameof(IsDark));
+        }
+
+        public void DoOrientationCheck() {
+            if(LastCheckWasLandscape is { } lcwl &&
+               lcwl != IsLandscape) {
+                OnPropertyChanged(nameof(IsLandscape));
+                OnPropertyChanged(nameof(Orientation));
+                OrientationChanged?.Invoke(this,EventArgs.Empty);
+            }
+
+            LastCheckWasLandscape = IsLandscape;
         }
 
         #endregion
