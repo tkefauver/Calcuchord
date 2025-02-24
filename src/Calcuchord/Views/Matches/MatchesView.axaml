@@ -30,13 +30,13 @@
                     Value="Center" />
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl">
+        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
                         <TextBlock Classes="empty-label">
                             <TextBlock.Inlines>
-                                <Run Text="Nothing." />
+                                <Run Text="" />
                             </TextBlock.Inlines>
                         </TextBlock>
                     </Template>
@@ -44,7 +44,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.init">
+        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.init">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -58,7 +58,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.no-inst:not(.init)">
+        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.no-inst:not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -74,7 +74,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.no-tuning:not(.no-inst):not(.init)">
+        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.no-tuning:not(.no-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -93,7 +93,7 @@
         </Style>
 
         <Style
-            Selector="ContentControl#EmptyTextCntrContentControl.search-mode:not(.no-tuning):not(.no-inst):not(.init)">
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode:not(.no-tuning):not(.no-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -110,7 +110,7 @@
         </Style>
 
         <Style
-            Selector="ContentControl#EmptyTextCntrContentControl.search-mode.piano:not(.no-tuning):not(.no-inst):not(.init)">
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode.piano:not(.no-tuning):not(.no-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -126,7 +126,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.bookmark-mode:not(.init)">
+        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.bookmark-mode:not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -145,7 +145,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="ContentControl#EmptyTextCntrContentControl.index-mode:not(.init)">
+        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.index-mode:not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -164,9 +164,14 @@
             </Setter>
         </Style>
 
+        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl[IsVisible=False]">
+            <Setter Property="Content"
+                    Value="{x:Null}" />
+        </Style>
+
         <Style Selector="controls|Card.peek">
-            <Setter Property="RenderTransform"
-                    Value="translate(-320px,0px)" />
+            <!-- <Setter Property="RenderTransform" -->
+            <!--         Value="translate(-320px,0px)" /> -->
         </Style>
     </UserControl.Styles>
     <Grid>
@@ -190,7 +195,7 @@
             <Grid RowDefinitions="Auto,*">
                 <!-- SHARE -->
                 <controls:Card Grid.Row="0"
-                               IsVisible="{Binding IsDesktopOs, Source={x:Static local:ThemeViewModel.Instance}}"
+                               IsVisible="{Binding !IsMobileOs, Source={x:Static local:ThemeViewModel.Instance}}"
                                Classes="button-group"
                                Margin="10"
                                HorizontalAlignment="Left"
@@ -276,26 +281,29 @@
 
             <!-- EMPTY LABEL -->
 
-            <ContentControl x:Name="EmptyTextCntrContentControl"
-                            Classes.piano="{Binding IsPianoSelected}"
-                            Classes.init="{Binding !IsLoaded}"
-                            Classes.no-inst="{Binding IsInstrumentsEmpty}"
-                            Classes.no-tuning="{Binding IsTuningsEmpty}"
-                            Classes.search-mode="{Binding IsSearchModeSelected}"
-                            Classes.bookmark-mode="{Binding IsBookmarkModeSelected}"
-                            Classes.index-mode="{Binding IsIndexModeSelected}">
-                <ContentControl.IsVisible>
+            <TransitioningContentControl x:Name="EmptyTextCntrContentControl"
+                                         Loaded="EmptyTextCntrContentControl_OnLoaded"
+                                         Classes.piano="{Binding IsPianoSelected}"
+                                         Classes.init="{Binding !IsLoaded}"
+                                         Classes.no-inst="{Binding IsInstrumentsEmpty}"
+                                         Classes.no-tuning="{Binding IsTuningsEmpty}"
+                                         Classes.search-mode="{Binding IsSearchModeSelected}"
+                                         Classes.bookmark-mode="{Binding IsBookmarkModeSelected}"
+                                         Classes.index-mode="{Binding IsIndexModeSelected}">
+                <TransitioningContentControl.PageTransition>
+                    <CrossFade Duration="0:0:0.5" />
+                </TransitioningContentControl.PageTransition>
+                <TransitioningContentControl.IsVisible>
                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                         <Binding Path="!IsSearchButtonVisible" />
-                        <Binding Path="IsMatchesEmpty"
-                                 TargetNullValue="False"
-                                 FallbackValue="False" />
+                        <Binding Path="IsMatchesEmpty" />
                         <Binding Path="!IsLoadingMatches" />
                         <Binding Path="!IsSearchInitiating" />
+                        <Binding Path="IsLoaded" />
                     </MultiBinding>
-                </ContentControl.IsVisible>
+                </TransitioningContentControl.IsVisible>
 
-            </ContentControl>
+            </TransitioningContentControl>
 
             <!-- RESET -->
             <HyperlinkButton x:Name="ResetInstrumentLinkBUtton"

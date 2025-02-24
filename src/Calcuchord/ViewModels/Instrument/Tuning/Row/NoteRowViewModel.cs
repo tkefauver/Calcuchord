@@ -211,9 +211,9 @@ namespace Calcuchord {
 
             if(nvm.IsDesiredRoot &&
                (root || Parent.AllNotes.Where(x => x.IsSelected).None(x => x != nvm && x.IsDesiredRoot))) {
-                mvm.DesiredRoot = null;
+                mvm.SetDesiredRoot(null);
             } else if(newState == NoteMarkerState.Root) {
-                mvm.DesiredRoot = nvm.InstrumentNote.Key;
+                mvm.SetDesiredRoot(nvm.InstrumentNote.Key);
             }
 
             if(newState == NoteMarkerState.Off) {

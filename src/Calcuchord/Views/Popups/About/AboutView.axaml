@@ -86,9 +86,15 @@
                            Source="avares://Calcuchord/Assets/Images/logo.png" />
                 </Border>
                 <StackPanel>
-                    <SelectableTextBlock FontSize="32"
-                                         Classes="theme-drop-shadow"
-                                         Text="Calcuchord" />
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="10">
+                        <SelectableTextBlock FontSize="32"
+                                             Classes="theme-drop-shadow"
+                                             Text="Calcuchord" />
+                        <TextBlock IsVisible="{Binding IsDebug, Source={x:Static local:ThemeViewModel.Instance}}"
+                                   Text="[DEBUG]"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
                     <SelectableTextBlock FontSize="10"
                                          VerticalAlignment="Top"
                                          TextAlignment="Right"

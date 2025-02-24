@@ -35,6 +35,11 @@
                 Value="7" />
     </Style>
 
+    <Style Selector="local|HintView">
+        <Setter Property="local:TapForToolTipExtension.IsEnabled"
+                Value="True" />
+    </Style>
+
     <!-- FONTS -->
     <Style Selector=":is(TextBlock)">
         <Setter Property="FontFamily"

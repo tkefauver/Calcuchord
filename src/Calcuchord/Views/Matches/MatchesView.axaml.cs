@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
 using PropertyChanged;
@@ -53,6 +56,20 @@ namespace Calcuchord {
 
 
                 });
+        }
+
+        void EmptyTextCntrContentControl_OnLoaded(object sender,RoutedEventArgs e) {
+            if(sender is not Control c) {
+                return;
+            }
+
+            void OnVisChanged() {
+                if(c.IsVisible && c.Classes.Contains("index-mode")) {
+
+                }
+            }
+
+            c.GetObservable(IsVisibleProperty).Subscribe(value => OnVisChanged());
         }
     }
 }

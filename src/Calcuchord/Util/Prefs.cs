@@ -21,6 +21,15 @@ namespace Calcuchord {
 
         #region Statics
 
+        static bool IsParsing { get; set; }
+
+        public static Prefs Parse(string prefsJson) {
+            IsParsing = true;
+            Prefs result = JsonConvert.DeserializeObject<Prefs>(prefsJson);
+            IsParsing = false;
+            return result;
+        }
+
         static void DoModelUpToDateCheck() {
             try {
                 string backup_prefs_json =
@@ -132,16 +141,18 @@ namespace Calcuchord {
         public Prefs() {
             PlatformWrapper.Services.Logger.WriteLine("prefs ctor called");
             if(Instance != null) {
-                // singleton erro
-                Debugger.Break();
+                if(!IsParsing) {
+                    // singleton error
+                    Debugger.Break();
+
+                    PlatformWrapper.Services.Logger.WriteLine("singleton error");
+                }
+
+                return;
             }
 
             Instance = this;
 
-        }
-
-        Prefs(bool isModelCheck) {
-            // only for validation
         }
 
         #endregion

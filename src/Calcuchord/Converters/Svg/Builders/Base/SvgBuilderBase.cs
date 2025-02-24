@@ -27,7 +27,7 @@ namespace Calcuchord {
             SvgOptionType.Matches,
             SvgOptionType.Frets,
             SvgOptionType.Colors,
-            SvgOptionType.Shadows
+            SvgOptionType.Shadows,
         ];
 
         #endregion
@@ -108,7 +108,7 @@ namespace Calcuchord {
                 PaletteColorType.Finger1Bg,
                 PaletteColorType.Finger2Bg,
                 PaletteColorType.Finger3Bg,
-                PaletteColorType.Finger4Bg
+                PaletteColorType.Finger4Bg,
             ];
             FingerBg = fbg.Select(x => ThemeViewModel.Instance.P[x]).ToArray();
             PaletteColorType[] ffg =
@@ -117,7 +117,7 @@ namespace Calcuchord {
                 PaletteColorType.Finger1Fg,
                 PaletteColorType.Finger2Fg,
                 PaletteColorType.Finger3Fg,
-                PaletteColorType.Finger4Fg
+                PaletteColorType.Finger4Fg,
             ];
             FingerFg = ffg.Select(x => ThemeViewModel.Instance.P[x]).ToArray();
 
@@ -203,6 +203,14 @@ namespace Calcuchord {
                     text-align: center;
                     margin-top: 30px;
                 }
+
+                .close-btn {
+                    position: fixed;
+                    font-size: 8px;
+                    left: 0;
+                    top: 0;
+                    cursor: pointer;
+                }
                 """;
             head.AppendChild(main_style);
 
@@ -252,6 +260,13 @@ namespace Calcuchord {
 
             string result = doc.DocumentNode.OuterHtml;
             try {
+                if(PlatformWrapper.Services.ShareHtml is { } share_service &&
+                   ngl.FirstOrDefault() is { } first_item) {
+                    string title =
+                        $"{tuning.Parent.Name}_{tuning.Name}_{MainViewModel.Instance.SelectedDisplayMode}";
+                    share_service.ShareHtml(result,title);
+                    return;
+                }
 
                 string fp = Path.Combine(
                     Path.GetTempPath(),

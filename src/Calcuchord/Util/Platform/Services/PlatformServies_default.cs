@@ -1,5 +1,6 @@
 namespace Calcuchord {
     public abstract class PlatformServies_default : IPlatformServices {
+        public virtual IShareHtml ShareHtml { get; }
 
         public virtual ILog Logger { get; } = new Logger_default();
 

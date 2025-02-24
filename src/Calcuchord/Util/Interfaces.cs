@@ -11,6 +11,11 @@ namespace Calcuchord {
         IPrefsIo PrefsIo { get; }
         IPlatformInfo PlatformInfo { get; }
         ILog Logger { get; }
+        IShareHtml ShareHtml { get; }
+    }
+
+    public interface IShareHtml {
+        void ShareHtml(string html,string title);
     }
 
     public interface ILog {

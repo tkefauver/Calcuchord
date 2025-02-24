@@ -1,5 +1,6 @@
 namespace Calcuchord.Browser {
     public class PlatformServices_browser : PlatformServies_default {
+        public override IShareHtml ShareHtml { get; } = new ShareHtml_browser();
         public override IMidiPlayer MidiPlayer { get; } = new MidiPlayer_browser();
         public override IUriNavigator UriNavigator { get; } = new UriNavigator_browser();
         public override IPrefsIo PrefsIo { get; } = new PrefsIo_browser();

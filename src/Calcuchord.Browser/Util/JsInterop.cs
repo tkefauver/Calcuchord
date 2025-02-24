@@ -49,5 +49,12 @@ namespace Calcuchord.Browser {
 
         #endregion
 
+        #region Share
+
+        [JSImport("globalThis.window.shareHtml")]
+        public static partial void ShareHtml(string htmlStr,string title);
+
+        #endregion
+
     }
 }

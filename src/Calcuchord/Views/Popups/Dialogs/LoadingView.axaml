@@ -16,7 +16,8 @@
         <StackPanel Spacing="10"
                     Margin="10"
                     MaxWidth="280">
-            <TextBlock TextAlignment="Center"
+            <TextBlock x:Name="MessageTextBlock"
+                       TextAlignment="Center"
                        FontSize="18"
                        Text="Loading default instruments, please wait..."
                        TextWrapping="WrapWithOverflow" />

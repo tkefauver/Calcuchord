@@ -41,7 +41,7 @@
 
 
     <dlg:DialogHost dlg:DialogHostStyle.ClipToBounds="True"
-                    Identifier="{x:Static local:InstrumentEditorView.DialogHostName}">
+                    Identifier="{Binding InstEditDialogHostName, Source={x:Static local:MainViewModel.Instance}}">
         <dlg:DialogHost.Resources>
             <SolidColorBrush x:Key="DialogHostOverlayBackgroundMixinBrush">Transparent</SolidColorBrush>
             <SolidColorBrush x:Key="DialogHostBackgroundMixinBrush">Transparent</SolidColorBrush>

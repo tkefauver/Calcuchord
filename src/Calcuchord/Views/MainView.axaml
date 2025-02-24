@@ -31,12 +31,17 @@
         <!-- RIGHT-DRAWER MODALITY -->
         <Style Selector="controls|NavigationDrawer">
             <Setter Property="RightDrawerExpandThresholdWidth"
-                    Value="{x:Null}" />
+                    Value="0" />
         </Style>
         <Style Selector="controls|NavigationDrawer.is-right-modal">
             <Setter Property="RightDrawerExpandThresholdWidth"
-                    Value="0" />
+                    Value="{x:Null}" />
         </Style>
+
+        <!-- <Style Selector="controls|NavigationDrawer /template/ "> -->
+        <!--     <Setter Property="RightDrawerExpandThresholdWidth" -->
+        <!--             Value="{x:Null}" /> -->
+        <!-- </Style> -->
 
         <!-- ORIENTATION (PORTRAIT) -->
         <Style Selector="Grid#MainContainerGrid local|InstrumentView">

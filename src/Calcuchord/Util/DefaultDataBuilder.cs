@@ -40,7 +40,7 @@ namespace Calcuchord {
             }
 
             await File.WriteAllTextAsync(
-                "/home/tkefauver/dev/projects/Calcuchord/src/Calcuchord/Assets/Text/def.json",
+                "/home/tkefauver/dev/projects/Calcuchord/src/Calcuchord/Assets/Text/appstate.json",
                 JsonConvert.SerializeObject(instl));
 
         }

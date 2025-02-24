@@ -360,16 +360,16 @@ namespace Calcuchord {
                         CancelCommand = new MpCommand(
                             () => {
                                 confirmed = false;
-                            })
-                    }
+                            }),
+                    },
                 };
-                DialogHost.Show(dlg_v,InstrumentEditorView.DialogHostName).FireAndForgetSafeAsync();
+                DialogHost.Show(dlg_v,MainViewModel.Instance.InstEditDialogHostName).FireAndForgetSafeAsync();
 
                 while(!confirmed.HasValue) {
                     await Task.Delay(100);
                 }
 
-                DialogHost.Close(InstrumentEditorView.DialogHostName);
+                DialogHost.Close(MainViewModel.Instance.InstEditDialogHostName);
 
                 if(!confirmed.Value) {
                     return;
@@ -418,15 +418,15 @@ namespace Calcuchord {
 
                 TuningStatsView stats_view = new TuningStatsView
                 {
-                    DataContext = this
+                    DataContext = this,
                 };
                 stats_view.OkButton.Command = new MpCommand(
                     () => {
-                        DialogHost.Close(InstrumentEditorView.DialogHostName);
+                        DialogHost.Close(MainViewModel.Instance.InstEditDialogHostName);
 
                     });
 
-                DialogHost.Show(stats_view,InstrumentEditorView.DialogHostName);
+                DialogHost.Show(stats_view,MainViewModel.Instance.InstEditDialogHostName);
 
             });
 

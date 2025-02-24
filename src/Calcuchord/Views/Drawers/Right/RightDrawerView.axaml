@@ -32,6 +32,8 @@
                     Value="Center" />
             <Setter Property="MaxHeight"
                     Value="180" />
+            <Setter Property="local:TapForToolTipExtension.IsEnabled"
+                    Value="True" />
         </Style>
 
         <Style Selector=":is(Control).opt-item"
@@ -150,7 +152,7 @@
                     Value="False" />
         </Style>
 
-        <!-- CONDTIONAL OPTIONS -->
+        <!-- DEGREE VIS -->
         <Style Selector="StackPanel.options :is(Control).chord-only">
             <Setter Property="IsVisible"
                     Value="False" />
@@ -160,6 +162,7 @@
                     Value="True" />
         </Style>
 
+        <!-- DEGREE NO KEY -->
         <Style Selector="controls|Card.degree ToggleButton">
             <Setter Property="ToolTip.Tip"
                     Value="{x:Null}" />
@@ -178,6 +181,41 @@
             <Setter Property="IsEnabled"
                     Value="False" />
         </Style>
+
+        <!-- KEY DESIRED ROOT -->
+        <Style Selector="controls|Card.key ToggleButton">
+            <Setter Property="ToolTip.Tip"
+                    Value="{x:Null}" />
+        </Style>
+        <Style Selector="StackPanel.options.search-mode.has-desired-root controls|Card.key">
+            <Setter Property="ToolTip.Tip">
+                <Setter.Value>
+                    <Template>
+                        <controls:ColorZone Mode="Inverted"
+                                            Padding="10">
+                            <TextBlock TextWrapping="Wrap"
+                                       MaxWidth="200">
+                                <TextBlock.Inlines>
+                                    <Run Text="Desired root '" />
+                                    <Run Text="{Binding DesiredRootDisplayName}" />
+                                    <Run Text="' is set on instrument. Deselect it to change the key." />
+                                </TextBlock.Inlines>
+                            </TextBlock>
+                        </controls:ColorZone>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style Selector="StackPanel.options.search-mode.has-desired-root controls|Card.key ToggleButton">
+            <Setter Property="IsEnabled"
+                    Value="False" />
+        </Style>
+
+        <!-- RESETABLE HEADER -->
+        <Style Selector="TextBlock.resettable">
+            <Setter Property="Cursor"
+                    Value="Hand" />
+        </Style>
     </UserControl.Styles>
     <controls:ColorZone Mode="Accent"
                         Foreground="{DynamicResource Fg}">
@@ -194,6 +232,8 @@
                 <StackPanel Classes="options"
                             Classes.chords="{Binding IsChordsSelected}"
                             Classes.has-key="{Binding IsKeySelected}"
+                            Classes.search-mode="{Binding IsSearchModeSelected}"
+                            Classes.has-desired-root="{Binding DesiredRoot, Converter={x:Static ObjectConverters.IsNotNull}}"
                             Margin="10"
                             Spacing="10">
 
@@ -208,7 +248,8 @@
 
 
                     <!-- KEY -->
-                    <TextBlock Classes="header"
+                    <TextBlock Classes="header resettable"
+                               PointerReleased="InputElement_OnPointerReleased"
                                Text="Key" />
                     <controls:Card Classes="button-group key">
                         <ScrollViewer>
@@ -217,7 +258,8 @@
                     </controls:Card>
 
                     <!-- DEGREE -->
-                    <TextBlock Classes="header degree chord-only"
+                    <TextBlock Classes="header degree chord-only resettable"
+                               PointerReleased="InputElement_OnPointerReleased"
                                Text="Degree" />
                     <controls:Card Classes="button-group degree chord-only">
                         <ScrollViewer>
@@ -227,7 +269,8 @@
 
 
                     <!-- SUFFIX -->
-                    <TextBlock Classes="header"
+                    <TextBlock Classes="header resettable"
+                               PointerReleased="InputElement_OnPointerReleased"
                                Text="Suffix" />
                     <controls:Card Classes="button-group suffix"
                                    Classes.chords="{Binding IsChordsSelected}"
@@ -239,7 +282,8 @@
                     </controls:Card>
 
                     <!-- SORT -->
-                    <TextBlock Classes="header"
+                    <TextBlock Classes="header resettable"
+                               PointerReleased="InputElement_OnPointerReleased"
                                Text="Sort" />
                     <controls:Card Classes="button-group sort">
                         <ListBox SelectedItem="{x:Null}">
