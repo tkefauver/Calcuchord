@@ -1,135 +1,98 @@
-namespace Calcuchord.iOS {
-    public class MidiPlayer_ios : MidiPlayerBase {
+using System;
+using System.IO;
+using System.Collections.Generic;
+using CoreMidi;
+using AudioToolbox;
+using CoreAudioKit;
+using Foundation;
 
-        string MidiFilePath =>
-            Path.Combine(PlatformWrapper.Services.StorageHelper.StorageDir,"output.mid");
+namespace Calcuchord.iOS
+{
+    
+public class MidiPlayer_ios : MidiPlayerBase {
+    // private MusicSequence sequence;
+    // private MusicPlayer _musicPlayer;
+    
 
-        Player Player { get; set; }
-        NFluidSettings Settings { get; set; }
-        Synth Synth { get; set; }
-        AudioDriver AudioDriver { get; set; }
+    public MidiPlayer_ios() {
+        InitializeMidi();
+    }
 
-        public override void Init(object obj) {
-            base.Init(obj);
-            try {
-                Settings = new NFluidSettings();
+    private void InitializeMidi()
+    {
+        // sequence = new MusicSequence();
+        // _musicPlayer = new MusicPlayer();
+    }
 
-                // Change this if you don't have pulseaudio or want to change to anything else.
-                if(OperatingSystem.IsLinux()) {
-                    Settings[ConfigurationKeys.AudioDriver].StringValue = "pulseaudio";
-                }
+    void PlayNotes(IEnumerable<int> notes, double delayMs) {
+        // Create a new MusicSequence
+        MusicSequence sequence = new MusicSequence();
+        
 
-                Settings[ConfigurationKeys.SynthAudioChannels].IntValue = 2;
-                Synth = new Synth(Settings);
+        // Create a new track in the sequence
+        MusicTrack track = sequence.CreateTrack();
 
-                Synth.LoadSoundFont(GetInstrumentSoundFontPath(null),true);
-                for(int i = 0; i < 16; i++) {
-                    Synth.SoundFontSelect(i,0);
-                }
+        // Set the tempo (beats per minute)
+        double bpm = 120d / 60.0;
+        track.AddExtendedTempoEvent(0, bpm);
 
-                AudioDriver = new AudioDriver(Synth.Settings,Synth);
+        // Add notes to the track
+        double dt = 0.0;
+        double noteDuration = 1.0; // Duration of each note (in beats)
 
-                Player = new Player(Synth);
-                Player.Add(MidiFilePath);
-            } catch(Exception ex) {
-                // TODO should notify user to install fluidsynth on play click prolly (or figure out how to bundle it?)
-                ex.Dump();
-                CanPlay = false;
-            }
-
+        foreach (int note in notes)
+        {
+            track.AddMidiNoteEvent(
+                dt,
+                new MidiNoteMessage(0,(byte)note,127,0,(float)noteDuration));
+            dt += noteDuration + delayMs;
         }
 
-        public override void PlayChord(IEnumerable<Note> notes) {
-            MidiFile midiFile = new MidiFile();
-            TrackChunk trackChunk = new TrackChunk();
-            midiFile.Chunks.Add(trackChunk);
-            int delta = 0;
+        string filePath = Path.Combine(PlatformWrapper.Services.StorageHelper.StorageDir, "output.mid");
 
-            int[] tones = GetMidiNotes(notes);
-
-            foreach(int tone in tones) {
-                int vel = 127;
-                trackChunk.Events.Add(
-                    new NoteOnEvent((SevenBitNumber)tone,(SevenBitNumber)vel)
-                    {
-                        DeltaTime = delta,
-                    });
-                delta += 5;
-            }
-
-            foreach(int tone in tones) {
-                trackChunk.Events.Add(
-                    new NoteOffEvent((SevenBitNumber)tone,(SevenBitNumber)0)
-                    {
-                        DeltaTime = 200,
-                    });
-            }
-
-            PlayFile(midiFile,GetInstrumentSoundFontPath(notes.FirstOrDefault()));
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
         }
+        // Save the sequence as a MIDI file
+        NSUrl fileUrl = NSUrl.FromFilename(filePath);
+        //sequence.Save(fileUrl, MusicSequenceFileTypeID.Midi);
+        sequence.CreateFile(fileUrl, MusicSequenceFileTypeID.Midi);
+        
+        PlayMidiFile(filePath);
+    }
 
-        public override void PlayScale(IEnumerable<Note> notes) {
-            MidiFile midiFile = new MidiFile();
-            TrackChunk trackChunk = new TrackChunk();
-            midiFile.Chunks.Add(trackChunk);
+    void PlayMidiFile(string midiFilePath)
+    {
+        try
+        {
+            // Load the MIDI file into the MusicSequence
+            NSUrl midiFileUrl = NSUrl.FromFilename(midiFilePath);
+            var sequence = new MusicSequence();
+            sequence.LoadFile(midiFileUrl, MusicSequenceFileTypeID.Midi);
 
-            int delay = 25;
-            int deltaTime = 0;
+            // Set the MusicSequence to the MusicPlayer
+            var _musicPlayer = new MusicPlayer();
+            _musicPlayer.MusicSequence = sequence;
 
-            foreach(int note in notes.Select(x => x.MidiTone)) {
-                int vel = 127;
-
-                trackChunk.Events.Add(
-                    new NoteOnEvent((SevenBitNumber)note,(SevenBitNumber)vel)
-                    {
-                        DeltaTime = deltaTime,
-                    });
-                trackChunk.Events.Add(
-                    new NoteOffEvent((SevenBitNumber)note,(SevenBitNumber)0)
-                    {
-                        DeltaTime = delay,
-                    });
-                deltaTime = 0;
-            }
-
-            PlayFile(midiFile,GetInstrumentSoundFontPath(notes.FirstOrDefault()));
-
+            // Start playback
+            _musicPlayer.Start();
+            
         }
-
-
-        void PlayFile(MidiFile midiFile,string soundFontPath) {
-            Task.Run(
-                () => {
-                    if(File.Exists(MidiFilePath)) {
-                        File.Delete(MidiFilePath);
-                    }
-
-                    midiFile.Write(MidiFilePath);
-
-                    Player.Play();
-                    Player.Join();
-                });
-        }
-
-        string GetInstrumentSoundFontPath(Note note) {
-            if(PlatformWrapper.Services is not { } sv ||
-               sv.StorageHelper is not { } sh) {
-                return string.Empty;
-            }
-
-            string sounds_dir = Path.Combine(sh.StorageDir,"sound");
-            string fn = "guitar.sf2";
-            if(note is PatternNote pn &&
-               pn.Parent is { } ng &&
-               ng.Parent is { } ngc &&
-               ngc.Parent is { } tuning &&
-               tuning.Parent is { } inst) {
-                if(inst.InstrumentType == InstrumentType.Piano) {
-                    fn = "piano.sf2";
-                }
-            }
-
-            return Path.Combine(sounds_dir,fn);
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error playing MIDI file: {ex.Message}");
         }
     }
+
+    public override bool CanPlay => true;
+
+    public override void PlayChord(IEnumerable<Note> notes) {
+        PlayNotes(GetMidiNotes(notes),10);
+    }
+
+    public override void PlayScale(IEnumerable<Note> notes) {
+        PlayNotes(GetMidiNotes(notes),100);
+    }
+}
 }

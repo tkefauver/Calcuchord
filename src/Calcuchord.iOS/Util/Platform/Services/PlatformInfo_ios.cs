@@ -1,3 +1,5 @@
+using UIKit;
+
 namespace Calcuchord.iOS {
     public class PlatformInfo_ios : IPlatformInfo {
         public PlatformInfo_ios() {

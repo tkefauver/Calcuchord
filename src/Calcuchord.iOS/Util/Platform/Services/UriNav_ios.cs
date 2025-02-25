@@ -1,3 +1,6 @@
+using System;
+using Xamarin.Essentials;
+
 namespace Calcuchord.iOS {
     public class UriNav_ios : IUriNavigator {
 
