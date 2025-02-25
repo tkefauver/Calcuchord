@@ -20,7 +20,7 @@
                 .LogToTrace()
                 .AfterPlatformServicesSetup(
                     _ => {
-                        PlatformWrapper.Init(new PlatformServices_desktop());
+                        PlatformWrapper.Init(new PlatformServices_mac());
                     });
         }
     }
