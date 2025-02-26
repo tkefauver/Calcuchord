@@ -1,0 +1,100 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <!--If you are willing to use Windows/MacOS native APIs you will need to create 3 projects.
+        One for Windows with net9.0-windows TFM, one for MacOS with net9.0-macos and one with net9.0 TFM for Linux.-->
+ <TargetFramework>net$(DotNetVersion)</TargetFramework>
+        <Nullable>disable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    </PropertyGroup>
+
+<!--    <PropertyGroup>-->
+<!--        <ApplicationId>com.Monkey.Calcuchord</ApplicationId>-->
+<!--    </PropertyGroup>-->
+    
+    <PropertyGroup>
+        <UseAppHost>true</UseAppHost>
+<!--        <PublishSingleFile>true</PublishSingleFile>-->
+        <SelfContained>true</SelfContained>
+        <PublishTrimmed>true</PublishTrimmed>
+        <PublishReadyToRun>true</PublishReadyToRun>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+      <CreatePackage>false</CreatePackage>
+      <UseSGen>false</UseSGen>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+      <CreatePackage>false</CreatePackage>
+      <UseSGen>false</UseSGen>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Desktop" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Include="Avalonia.Diagnostics">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Avalonia.ReactiveUI" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-60x60%402x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-60x60%402x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-76x76%401x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-76x76%401x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-40x40%403x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-40x40%403x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-29x29%402x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-29x29%402x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-29x29%403x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-29x29%403x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-40x40%402x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-40x40%402x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-60x60%403x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-60x60%403x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-20x20%402x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-20x20%402x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-20x20%403x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-20x20%403x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-83.5x83.5%402x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-83.5x83.5%402x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-1024x1024%401x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-1024x1024%401x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-20x20%401x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-20x20%401x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-40x40%401x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-40x40%401x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-76x76%402x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-76x76%402x.png</Link>
+      </ImageAsset>
+      <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-29x29%401x.png">
+        <Link>Media.xcassets\AppIcon.appiconset\app_icon-29x29%401x.png</Link>
+      </ImageAsset>
+    </ItemGroup>
+    
+<!--    <ItemGroup>-->
+<!--      <Reference Include="Microsoft.macOS">-->
+<!--        <HintPath>..\..\..\..\..\..\usr\local\share\dotnet\packs\Microsoft.macOS.Ref.net9.0_15.2\15.2.9180\ref\net9.0\Microsoft.macOS.dll</HintPath>-->
+<!--      </Reference>-->
+<!--    </ItemGroup>-->
+</Project>

@@ -2,7 +2,7 @@
 using Avalonia;
 using Avalonia.Browser;
 using Calcuchord;
-using Calcuchord.Browser;
+namespace Calcuchord.Browser;
 
 internal sealed partial class Program {
     static Task Main(string[] args) {

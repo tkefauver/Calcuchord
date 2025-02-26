@@ -21,25 +21,27 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Android"/>
-        <PackageReference Include="Avalonia.ReactiveUI"/>
-        <PackageReference Include="webview.avalonia.android"/>
-        <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"/>
-        <PackageReference Include="Xamarin.Essentials"/>
+        <PackageReference Include="Avalonia.Android" />
+        <PackageReference Include="Avalonia.ReactiveUI" />
+        <PackageReference Include="webview.avalonia.android" />
+        <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" />
+        <PackageReference Include="Xamarin.Essentials" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
+        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj">
+          <ReferenceSourceTarget></ReferenceSourceTarget>
+        </ProjectReference>
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Resources\drawable\Icon.png"/>
+        <AvaloniaResource Include="Resources\drawable\Icon.png" />
     </ItemGroup>
 
     <PropertyGroup>
         <FixSourceDir>obj/$(Configuration)/$(TargetFramework)</FixSourceDir>
     </PropertyGroup>
     <Target Name="FixObj" BeforeTargets="_ResolveAssemblies">
-        <Exec Command="$(ProjectDir)scripts\fix_obj.sh $(FixSourceDir)"/>
+        <Exec Command="$(ProjectDir)scripts\fix_obj.sh $(FixSourceDir)" />
     </Target>
 </Project>
