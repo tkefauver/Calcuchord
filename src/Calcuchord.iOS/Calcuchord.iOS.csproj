@@ -23,6 +23,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
     </ItemGroup>
+    
     <ItemGroup>
       <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-60x60%402x.png">
         <Link>Media.xcassets\AppIcon.appiconset\app_icon-60x60%402x.png</Link>

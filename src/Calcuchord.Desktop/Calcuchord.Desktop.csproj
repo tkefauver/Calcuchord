@@ -21,14 +21,13 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Avalonia.ReactiveUI" />
+        <PackageReference Include="MonoMac.NetStandard" />
         <PackageReference Include="SpaceWizards.NFluidsynth" />
         <PackageReference Include="Melanchall.DryWetMidi" />
     </ItemGroup>
 
 
     <ItemGroup>
-        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj">
-          <ReferenceSourceTarget></ReferenceSourceTarget>
-        </ProjectReference>
+        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
     </ItemGroup>
 </Project>

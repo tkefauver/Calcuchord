@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+        <OutputType>WinExe</OutputType>
         <!--If you are willing to use Windows/MacOS native APIs you will need to create 3 projects.
         One for Windows with net9.0-windows TFM, one for MacOS with net9.0-macos and one with net9.0 TFM for Linux.-->
-        <TargetFramework>net$(DotNetVersion)-macos</TargetFramework>
+ <TargetFramework>net$(DotNetVersion)</TargetFramework>
         <Nullable>disable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <ApplicationId>com.Monkey.Calcuchord</ApplicationId>
-    </PropertyGroup>
+<!--    <PropertyGroup>-->
+<!--        <ApplicationId>com.Monkey.Calcuchord</ApplicationId>-->
+<!--    </PropertyGroup>-->
     
     <PropertyGroup>
         <UseAppHost>true</UseAppHost>
@@ -37,15 +37,13 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Avalonia.ReactiveUI" />
-<!--        <PackageReference Include="MonoMac.NetStandard" />-->
     </ItemGroup>
 
 
     <ItemGroup>
-        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj">
-          <ReferenceSourceTarget></ReferenceSourceTarget>
-        </ProjectReference>
+        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj" />
     </ItemGroup>
+    
     <ItemGroup>
       <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-60x60%402x.png">
         <Link>Media.xcassets\AppIcon.appiconset\app_icon-60x60%402x.png</Link>
@@ -93,4 +91,10 @@
         <Link>Media.xcassets\AppIcon.appiconset\app_icon-29x29%401x.png</Link>
       </ImageAsset>
     </ItemGroup>
+    
+<!--    <ItemGroup>-->
+<!--      <Reference Include="Microsoft.macOS">-->
+<!--        <HintPath>..\..\..\..\..\..\usr\local\share\dotnet\packs\Microsoft.macOS.Ref.net9.0_15.2\15.2.9180\ref\net9.0\Microsoft.macOS.dll</HintPath>-->
+<!--      </Reference>-->
+<!--    </ItemGroup>-->
 </Project>
