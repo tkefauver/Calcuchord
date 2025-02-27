@@ -543,7 +543,10 @@ namespace Calcuchord {
         }
 
         async Task InitAsync(IEnumerable<Instrument> instl = null) {
+            BusyText = "Loading...";
             IsBusy = true;
+
+            await Task.Delay(500);
 
             while(!Prefs.IsLoaded) {
                 await Task.Delay(100);
