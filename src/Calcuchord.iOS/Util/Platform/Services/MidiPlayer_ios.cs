@@ -38,7 +38,6 @@ public class MidiPlayer_ios : MidiPlayerBase {
 
             if (File.Exists(filePath))
             {
-                // yo
                 File.Delete(filePath);
             }
 
@@ -61,7 +60,6 @@ public class MidiPlayer_ios : MidiPlayerBase {
         NSUrl midiFileUrl = NSUrl.FromFilename(midiFilePath);
         NSUrl sf2Url = NSUrl.FromFilename(GetInstrumentSoundFontPath(null));
         var mp = new AVMidiPlayer(midiFileUrl,sf2Url, out NSError error);
-        mp.Init();
         mp.PrepareToPlay();
         await mp.PlayAsync();
     }

@@ -16,6 +16,10 @@ namespace Calcuchord.Mac
 {
     
 public class MidiPlayer_mac : MidiPlayerBase {
+    public override void Init(object obj) {
+        base.Init(obj);
+        
+    }
 
     void PlayNotes(IEnumerable<int> notes, double delayMs, double durSeconds) {
         try
