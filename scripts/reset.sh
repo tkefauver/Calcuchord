@@ -17,3 +17,6 @@ rm -fr ../src/Calcuchord.Android/obj
 
 rm -fr ../src/Calcuchord.iOS/bin
 rm -fr ../src/Calcuchord.iOS/obj
+
+rm -fr ../src/Calcuchord.Mac/bin
+rm -fr ../src/Calcuchord.Mac/obj

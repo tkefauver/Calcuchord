@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
+using MonkeyPaste.Common.Avalonia;
 using PropertyChanged;
 
 namespace Calcuchord {
@@ -35,6 +37,14 @@ namespace Calcuchord {
             };
         }
 
+        public void ScrollItemIntoView(MatchViewModel mtvm) {
+            if(this.GetVisualDescendants<MatchView>().FirstOrDefault(x => x.DataContext == mtvm) is not { } mv) {
+                return;
+            }
+
+            mv.BringIntoView();
+        }
+
         void MatchesOnCollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
             DoBusyCheck();
         }
@@ -53,8 +63,6 @@ namespace Calcuchord {
                     }
 
                     MatchesBusyOverlay.IsVisible = false;
-
-
                 });
         }
 

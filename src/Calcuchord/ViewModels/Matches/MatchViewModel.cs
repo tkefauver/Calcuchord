@@ -5,7 +5,6 @@ using System.Windows.Input;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
-using MonkeyPaste.Common.Avalonia;
 
 namespace Calcuchord {
     public class MatchViewModel : ViewModelBase {
@@ -246,12 +245,7 @@ namespace Calcuchord {
 
                 mvm.SelectedMatch = this;
 
-                if(MatchesView.Instance is not { } msv ||
-                   msv.GetVisualDescendants<MatchView>().FirstOrDefault(x => x.DataContext == this) is not { } mv) {
-                    return;
-                }
-
-                mv.BringIntoView();
+                MatchesView.Instance.ScrollItemIntoView(this);
             });
 
         #endregion

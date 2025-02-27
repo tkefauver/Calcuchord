@@ -52,6 +52,10 @@
             <Setter Property="Foreground"
                     Value="Blue" />
         </Style>
+        <Style Selector="HyperlinkButton.donate :is(TextBlock)">
+            <Setter Property="Foreground"
+                    Value="Yellow" />
+        </Style>
         <Style Selector="HyperlinkButton:pointerover :is(TextBlock)">
             <Setter Property="Foreground"
                     Value="Red" />
@@ -108,6 +112,12 @@
                              Command="{Binding OpenLinkCommand}"
                              CommandParameter="https://github.com/tkefauver/Calcuchord">
                 <TextBlock Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
+            </HyperlinkButton>
+            <HyperlinkButton Cursor="Hand"
+                             Classes="donate"
+                             Command="{Binding OpenLinkCommand}"
+                             CommandParameter="https://buymeacoffee.com/tkefauver">
+                <TextBlock Text="Donate Here!" />
             </HyperlinkButton>
         </StackPanel>
     </controls:ColorZone>
