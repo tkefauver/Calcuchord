@@ -47,6 +47,8 @@ namespace Calcuchord {
                 mvm.OnPropertyChanged(nameof(mvm.SortOption1));
                 mvm.OnPropertyChanged(nameof(mvm.SortOption2));
                 mvm.OnPropertyChanged(nameof(mvm.SortOption3));
+
+                mvm.UpdateMatchesAsync(MatchUpdateSource.SortToggle).FireAndForgetSafeAsync();
             }
         }
     }

@@ -151,12 +151,13 @@
                     <Template>
                         <TextBlock Classes="empty-label">
                             <TextBlock.Inlines>
-                                <Run Text="No" />
-                                <Run Text="{Binding PatternSingularName}"
-                                     Classes="article2" />
-                                <Run Text="results"
-                                     Classes="subject2" />
-                                <Run Text="found." />
+                                <!-- <Run Text="No" /> -->
+                                <!-- <Run Text="{Binding PatternSingularName}" -->
+                                <!--      Classes="article2" /> -->
+                                <!-- <Run Text="results" -->
+                                <!--      Classes="subject2" /> -->
+                                <!-- <Run Text="found." /> -->
+                                <Run Text="Loading..." />
                             </TextBlock.Inlines>
                         </TextBlock>
                     </Template>
@@ -203,7 +204,7 @@
                     <Button x:Name="ShareButton"
                             ToolTip.Tip="Export"
                             Padding="8"
-                            Classes="float"
+                            Classes="float tt-fix"
                             Command="{Binding ConvertMatchesCommand}">
                         <avalonia:MaterialIcon Kind="Share" />
                     </Button>
@@ -220,16 +221,38 @@
                     <StackPanel Orientation="Horizontal">
                         <!-- ZOOM OUT (COLS+1) -->
                         <Button x:Name="ZoomMinusButton"
-                                ToolTip.Tip="Zoom out"
-                                Classes="float"
+                                Classes="float tt-fix"
                                 Command="{Binding IncreaseMatchColumnsCommand}">
+                            <ToolTip.Tip>
+                                <controls:ColorZone Classes="tt">
+                                    <TextBlock>
+                                        <TextBlock.Inlines>
+                                            <Run Text="Zoom out (" />
+                                            <Run Classes="bold"
+                                                 Text="O" />
+                                            <Run Text=")" />
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
+                                </controls:ColorZone>
+                            </ToolTip.Tip>
                             <avalonia:MaterialIcon Kind="Minus" />
                         </Button>
                         <!-- ZOOM IN (COLS-1) -->
                         <Button x:Name="ZoomPlusButton"
-                                ToolTip.Tip="Zoom in"
-                                Classes="float"
+                                Classes="float tt-fix"
                                 Command="{Binding DecreaseMatchColumnsCommand}">
+                            <ToolTip.Tip>
+                                <controls:ColorZone Classes="tt">
+                                    <TextBlock>
+                                        <TextBlock.Inlines>
+                                            <Run Text="Zoom in (" />
+                                            <Run Classes="bold"
+                                                 Text="I" />
+                                            <Run Text=")" />
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
+                                </controls:ColorZone>
+                            </ToolTip.Tip>
                             <avalonia:MaterialIcon Kind="Plus" />
                         </Button>
                     </StackPanel>
@@ -249,6 +272,7 @@
                         <ItemsRepeater.ItemTemplate>
                             <DataTemplate x:DataType="local:MatchViewModel">
                                 <local:MatchView Background="{DynamicResource HttTransparent}"
+                                                 Focusable="True"
                                                  Width="{Binding MatchWidth, Source={x:Static local:MainViewModel.Instance}}" />
                             </DataTemplate>
                         </ItemsRepeater.ItemTemplate>

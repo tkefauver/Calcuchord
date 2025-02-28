@@ -182,7 +182,7 @@
                 </MultiBinding>
             </Border.IsVisible>
 
-            <TextBlock IsVisible="{Binding !BusyText, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+            <TextBlock IsVisible="{Binding BusyText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                        Text="{Binding BusyText}"
                        TextAlignment="Center"
                        HorizontalAlignment="Stretch"

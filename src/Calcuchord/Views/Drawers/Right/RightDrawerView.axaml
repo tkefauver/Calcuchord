@@ -171,8 +171,7 @@
             <Setter Property="ToolTip.Tip">
                 <Setter.Value>
                     <Template>
-                        <controls:ColorZone Mode="Inverted"
-                                            Padding="10">
+                        <controls:ColorZone Classes="tt">
                             <TextBlock Text="Select a key" />
                         </controls:ColorZone>
                     </Template>
@@ -191,8 +190,7 @@
             <Setter Property="ToolTip.Tip">
                 <Setter.Value>
                     <Template>
-                        <controls:ColorZone Mode="Inverted"
-                                            Padding="10">
+                        <controls:ColorZone Classes="tt">
                             <TextBlock TextWrapping="Wrap"
                                        MaxWidth="200">
                                 <TextBlock.Inlines>

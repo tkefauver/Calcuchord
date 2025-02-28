@@ -24,15 +24,24 @@
         <Setter Property="Padding"
                 Value="0" />
     </Style>
-    <Style Selector=":is(ToolTip) controls|ColorZone">
+
+    <Style Selector="controls|ColorZone.tt">
         <Setter Property="Mode"
-                Value="Accent" />
+                Value="Inverted" />
         <Setter Property="Margin"
                 Value="0" />
         <Setter Property="Padding"
                 Value="10" />
         <Setter Property="CornerRadius"
                 Value="7" />
+    </Style>
+    <Style Selector=":is(Control).tt-fix">
+        <Setter Property="ToolTip.ServiceEnabled"
+                Value="False" />
+        <Setter Property="ToolTip.ShowDelay"
+                Value="1000" />
+        <Setter Property="local:ToolTipHelperExtension.IsEnabled"
+                Value="True" />
     </Style>
 
     <Style Selector="local|HintView">

@@ -110,7 +110,8 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top">
             <ToolTip.Tip>
-                <controls:ColorZone>
+                <controls:ColorZone Classes="tt"
+                                    Mode="Accent">
                     <StackPanel Spacing="10">
                         <StackPanel Orientation="Horizontal"
                                     Spacing="7">

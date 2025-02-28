@@ -65,6 +65,11 @@
             <Setter Property="Opacity"
                     Value="1" />
         </Style>
+
+        <Style Selector=":is(Button):pointerover">
+            <Setter Property="ToolTip.IsOpen"
+                    Value="True" />
+        </Style>
     </UserControl.Styles>
     <Viewbox>
         <Border x:Name="MatchContainerBorder"
@@ -131,17 +136,56 @@
                     </StackPanel.Styles>
 
                     <!-- SET NECK BTN -->
-                    <Button Command="{Binding SetMatchToInstrumentCommand}">
+                    <Button Classes="tt-fix"
+                            Command="{Binding SetMatchToInstrumentCommand}">
+                        <ToolTip.Tip>
+                            <controls:ColorZone Classes="tt">
+                                <TextBlock>
+                                    <TextBlock.Inlines>
+                                        <Run Text="Copy to neck (" />
+                                        <Run Classes="bold"
+                                             Text="C" />
+                                        <Run Text=")" />
+                                    </TextBlock.Inlines>
+                                </TextBlock>
+                            </controls:ColorZone>
+                        </ToolTip.Tip>
                         <avalonia:MaterialIcon Kind="ContentCopy" />
                     </Button>
 
                     <!-- PLAY SAMPLE BTN -->
-                    <Button Command="{Binding ToggleMatchPlaybackCommand}">
+                    <Button Classes="tt-fix"
+                            Command="{Binding ToggleMatchPlaybackCommand}">
+                        <ToolTip.Tip>
+                            <controls:ColorZone Classes="tt">
+                                <TextBlock>
+                                    <TextBlock.Inlines>
+                                        <Run Text="Preview (" />
+                                        <Run Classes="bold"
+                                             Text="P" />
+                                        <Run Text=")" />
+                                    </TextBlock.Inlines>
+                                </TextBlock>
+                            </controls:ColorZone>
+                        </ToolTip.Tip>
                         <avalonia:MaterialIcon Kind="{Binding PlaybackIcon}" />
                     </Button>
 
                     <!-- BOOKMARK BTN  -->
-                    <Button Command="{Binding ToggleBookmarkCommand}">
+                    <Button Classes="tt-fix"
+                            Command="{Binding ToggleBookmarkCommand}">
+                        <ToolTip.Tip>
+                            <controls:ColorZone Classes="tt">
+                                <TextBlock>
+                                    <TextBlock.Inlines>
+                                        <Run Text="Toggle bookmark (" />
+                                        <Run Classes="bold"
+                                             Text="B" />
+                                        <Run Text=")" />
+                                    </TextBlock.Inlines>
+                                </TextBlock>
+                            </controls:ColorZone>
+                        </ToolTip.Tip>
                         <avalonia:MaterialIcon Kind="{Binding BookmarkIcon}" />
                     </Button>
                 </StackPanel>

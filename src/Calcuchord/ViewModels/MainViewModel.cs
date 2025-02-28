@@ -9,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Controls;
-using Avalonia.Controls.Presenters;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -350,6 +349,7 @@ namespace Calcuchord {
 
         int MatchCount { get; set; }
         public int MatchColCount { get; private set; } = 3;
+        int MaxMatchColCount => 8;
 
         //IEnumerable<ChordKeyDegreeType> AvailableDegrees { get; set; } = [];
         IEnumerable<NoteType> AvailableKeys { get; } = [];
@@ -478,14 +478,11 @@ namespace Calcuchord {
                     OnPropertyChanged(nameof(RightDrawerExpandWidth));
 
                     if(MatchesView.Instance is not { } mtv ||
-                       SelectedMatch == null ||
-                       mtv.MatchItemsRepeater.GetVisualDescendants<MatchView>()
-                           .FirstOrDefault(x => x.DataContext == SelectedMatch) is not { } sel_mv ||
-                       sel_mv.GetVisualAncestor<ContentPresenter>() is not { } sel_cp) {
+                       SelectedMatch == null) {
                         break;
                     }
 
-                    sel_cp.BringIntoView();
+                    mtv.ScrollItemIntoView(SelectedMatch);
                     break;
                 case nameof(SelectedTuning):
                     if(SelectedTuning == LastSelectedTuning) {
@@ -546,7 +543,11 @@ namespace Calcuchord {
         }
 
         async Task InitAsync(IEnumerable<Instrument> instl = null) {
-            //await DefaultDataBuilder.BuildAsync();
+            BusyText = "Loading...";
+            IsBusy = true;
+
+            await Task.Delay(500);
+
             while(!Prefs.IsLoaded) {
                 await Task.Delay(100);
             }
@@ -559,13 +560,7 @@ namespace Calcuchord {
             MatchColCount = Prefs.Instance.MatchColCount;
 
             if(!instl.Any()) {
-                // if(OperatingSystem.IsBrowser()) {
-                //     ResetToDefaultsCommand.Execute(null);
-                //     return;
-                // }
-                //
-                // DoIntroCommand.ExecuteAsync().FireAndForgetSafeAsync();
-
+                IsBusy = false;
                 ResetToDefaultsCommand.Execute(null);
                 return;
             }
@@ -579,7 +574,7 @@ namespace Calcuchord {
             InitInstrument(InstrumentInitSource.Startup);
             Prefs.Instance.IsSaveIgnored = false;
             IsLoaded = true;
-
+            IsBusy = false;
         }
 
         public MpIAsyncCommand DoIntroCommand => new MpAsyncCommand(
@@ -912,16 +907,16 @@ namespace Calcuchord {
                 SelectedTuning == null ? null : SelectedTuning.Tuning);
         }
 
-        public void DiscoverMatchColumnCount() {
+        public int DiscoverMatchColumnCount() {
             if(MatchesView.Instance is not { } mv ||
                !mv.IsLoaded ||
                mv.GetVisualDescendant<ItemsRepeater>() is not { } mir) {
-                return;
+                return MatchColCount;
             }
 
             double avail_w = mir.Bounds.Width;
             int cols = (int)Math.Max(1,avail_w / MatchWidth);
-            MatchColCount = Math.Max(1,Math.Min(Matches.Count,cols));
+            return Math.Max(1,Math.Min(Matches.Count,cols));
         }
 
         public bool SetMatchColumnCount(int newColCount) {
@@ -931,7 +926,7 @@ namespace Calcuchord {
             }
 
             if(MatchCount > 0 && !IsLoadingMatches) {
-                newColCount = Math.Min(MatchCount,newColCount);
+                newColCount = Math.Min(MaxMatchColCount,Math.Min(MatchCount,newColCount));
             }
 
             double avail_w = mir.Bounds.Width;
@@ -959,9 +954,8 @@ namespace Calcuchord {
                     await Task.Delay(100,ct);
                 }
 
-                if(SelectedMatch is { } sel_mtvm &&
-                   mir.GetVisualDescendants<MatchView>().FirstOrDefault(x => x.DataContext == sel_mtvm) is { } sel_mv) {
-                    sel_mv.BringIntoView();
+                if(SelectedMatch is { } sel_mtvm) {
+                    mv.ScrollItemIntoView(sel_mtvm);
                 }
 
                 ZoomCts?.Dispose();
@@ -1433,11 +1427,11 @@ namespace Calcuchord {
                     return;
                 }
 
-                await SetMatchColumnCountAsync(MatchColCount - 1,ZoomCts.Token);
+                int cur_col_count = DiscoverMatchColumnCount();
+                await SetMatchColumnCountAsync(cur_col_count - 1,ZoomCts.Token);
                 IsMatchZoomChanging = false;
             },
             () => {
-                //return MatchColCount > 1;
                 return CanDecreaseMatchColumnCount;
             });
 
@@ -1451,11 +1445,11 @@ namespace Calcuchord {
                     return;
                 }
 
-                await SetMatchColumnCountAsync(MatchColCount + 1,ZoomCts.Token);
+                int cur_col_count = DiscoverMatchColumnCount();
+                await SetMatchColumnCountAsync(cur_col_count + 1,ZoomCts.Token);
                 IsMatchZoomChanging = false;
             },
             () => {
-                //return MatchColCount < Matches.Count;
                 return CanIncreaseMatchColumnCount;
             });
 
