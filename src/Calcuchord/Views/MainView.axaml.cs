@@ -74,12 +74,12 @@ namespace Calcuchord {
                 return;
             }
 
-            if(e.Key == Key.O) {
+            if(e.Key == Key.OemMinus && e.KeyModifiers.HasFlag(KeyModifiers.Control)) {
                 mvm.IncreaseMatchColumnsCommand.Execute(null);
                 return;
             }
 
-            if(e.Key == Key.I) {
+            if(e.Key == Key.OemPlus && e.KeyModifiers.HasFlag(KeyModifiers.Control)) {
                 mvm.DecreaseMatchColumnsCommand.Execute(null);
                 return;
             }
@@ -98,17 +98,17 @@ namespace Calcuchord {
                 return;
             }
 
-            if(e.Key == Key.P) {
+            if(e.Key == Key.Space || e.Key == Key.Enter) {
                 sel_mtvm.ToggleMatchPlaybackCommand.Execute(sel_mtvm);
                 return;
             }
 
-            if(e.Key == Key.B) {
+            if(e.Key == Key.D && e.KeyModifiers.HasFlag(KeyModifiers.Control)) {
                 sel_mtvm.ToggleBookmarkCommand.Execute(null);
                 return;
             }
 
-            if(e.Key == Key.C) {
+            if(e.Key == Key.C && e.KeyModifiers.HasFlag(KeyModifiers.Control)) {
                 sel_mtvm.SetMatchToInstrumentCommand.Execute(null);
             }
 
