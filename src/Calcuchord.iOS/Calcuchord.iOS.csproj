@@ -37,6 +37,7 @@
       <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-29x29%402x.png">
         <Link>Media.xcassets\AppIcon.appiconset\app_icon-29x29%402x.png</Link>
       </ImageAsset>
+        
       <ImageAsset Update="Media.xcassets\AppIcon.appiconset\app_icon-29x29%403x.png">
         <Link>Media.xcassets\AppIcon.appiconset\app_icon-29x29%403x.png</Link>
       </ImageAsset>
