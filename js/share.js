@@ -1,7 +1,7 @@
 async function shareHtml(htmlString, title) {
-    let success = false;
-    let domParser = new DOMParser();
-    let doc = domParser.parseFromString(htmlString, 'text/html');
+    // let success = false;
+    // let domParser = new DOMParser();
+    // let doc = domParser.parseFromString(htmlString, 'text/html');
     try {
         // let pdf_doc = new window.jspdf.jsPDF();
         // var svgElements = doc.body.querySelectorAll('svg');
@@ -26,7 +26,7 @@ async function shareHtml(htmlString, title) {
                 files: [file],
             });
             console.log('Content shared successfully');
-            success = true;
+            //success = true;
         } else {
             // pdf_doc.save(title + '.pdf');
             // success = true;
@@ -34,20 +34,20 @@ async function shareHtml(htmlString, title) {
     } catch (error) {
         console.error('Error sharing content:', error);
     }
-    if (success) {
-        return;
-    }
+    // if (success) {
+    //     return;
+    // }
 
-    let close_btn = doc.createElement('button');
-    close_btn.setAttribute('class', 'close-btn');
-    close_btn.setAttribute('onclick', 'window.parent.closeShare();');
-    close_btn.InnerHtml = 'Close';
-    doc.body.appendChild(close_btn);
-
-    const iframe = document.createElement('iframe');
-    iframe.srcdoc = doc.documentElement.outerHTML;
-    iframe.setAttribute('class', "share");
-    document.body.appendChild(iframe);
+    // let close_btn = doc.createElement('button');
+    // close_btn.setAttribute('class', 'close-btn');
+    // close_btn.setAttribute('onclick', 'window.parent.closeShare();');
+    // close_btn.InnerHtml = 'Close';
+    // doc.body.appendChild(close_btn);
+    //
+    // const iframe = document.createElement('iframe');
+    // iframe.srcdoc = doc.documentElement.outerHTML;
+    // iframe.setAttribute('class', "share");
+    // document.body.appendChild(iframe);
 }
 
 function closeShare() {
