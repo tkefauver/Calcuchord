@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.iOS;
 using Foundation;
+//using Microsoft.Maui.ApplicationModel;
+using UIKit;
 
 namespace Calcuchord.iOS {
     // The UIApplicationDelegate for the application. This class is responsible for launching the 
@@ -11,12 +13,19 @@ namespace Calcuchord.iOS {
     public partial class AppDelegate : AvaloniaAppDelegate<App>
     #pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
+        
         protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) {
             return base.CustomizeAppBuilder(builder)
                 .WithInterFont()
+                // .AfterSetup(_ =>
+                // {
+                //     if (Platform.GetCurrentUIViewController()  is {} rvc)
+                //     {
+                //         Platform.Init(()=>rvc);
+                //     }
+                // })
                 .AfterPlatformServicesSetup(
                     _ => {
-
                         PlatformWrapper.Init(new PlatformServices_ios());
                     });
         }

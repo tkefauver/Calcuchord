@@ -5,7 +5,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>Calcuchord</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.Monkey.Calcuchord</string>
+	<string>com.thomaskefauver.calcuchord</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
@@ -43,5 +43,10 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Media.xcassets/AppIcon.appiconset</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>
