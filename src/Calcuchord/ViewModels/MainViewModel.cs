@@ -699,6 +699,62 @@ namespace Calcuchord {
             SvgOptions.ForEach(x => x.OnPropertyChanged(nameof(x.IsChecked)));
         }
 
+        IEnumerable<MatchViewModel> GetResults(bool byFilter,IEnumerable<NoteViewModel> sel_notes) {
+            // prefer desired root over key?
+            NoteType? target_key = null;
+            if(DesiredRoot is { } dr) {
+                target_key = dr;
+            } else if(SelectedKey is { } sk) {
+                target_key = sk;
+            }
+
+            if(IsChordsSelected &&
+               target_key is { } tk &&
+               SelectedKeyDegree is { } td) {
+                // shift to sel degree
+                target_key = tk.ToDegree(td);
+            }
+
+            foreach(var kvp in MatchProvider.PatternLookup) {
+                if(target_key is { } tk2 && tk2 != kvp.Key) {
+                    // some key(s) selected, this isn't one
+                    if(byFilter) {
+                        continue;
+                    }
+                }
+
+                foreach(var kvp2 in kvp.Value) {
+                    if(SelectedSuffixes.Any() && !SelectedSuffixes.Contains(kvp2.Key)) {
+                        // some suffix(es) selected, this isn't one
+                        if(byFilter) {
+                            continue;
+                        }
+                    }
+
+                    foreach(MatchViewModel mvm in kvp2.Value) {
+                        if(IsSearchModeSelected) {
+                            mvm.Score = MatchProvider.GetScore(mvm.NotePattern,sel_notes);
+                            if(mvm.Score > 0) {
+                                yield return mvm;
+                            }
+
+                            continue;
+                        }
+
+                        if(IsBookmarkModeSelected) {
+                            if(mvm.IsBookmarked) {
+                                yield return mvm;
+                            }
+
+                            continue;
+                        }
+
+                        yield return mvm;
+                    }
+                }
+            }
+        }
+
         async Task LoadMatchesAsync(MatchUpdateSource source,CancellationToken ct) {
             IsSearchInitiating = true;
             Matches.Clear();
@@ -707,67 +763,6 @@ namespace Calcuchord {
             int init_count = Math.Max(1,MatchColCount);
             int delay = ThemeViewModel.Instance.IsDesktop ? 5 : 50;
 
-            var sel_notes = SelectedTuning.SelectedNotes.ToArray();
-            LastNotes = sel_notes.ToList();
-            LastDesiredRoot = DesiredRoot;
-            LastKeyDegree = SelectedKeyDegree;
-            LastSelectedKey = SelectedKey;
-
-            IEnumerable<MatchViewModel> GetResults(bool byFilter) {
-                // prefer desired root over key?
-                NoteType? target_key = null;
-                if(DesiredRoot is { } dr) {
-                    target_key = dr;
-                } else if(SelectedKey is { } sk) {
-                    target_key = sk;
-                }
-
-                if(IsChordsSelected &&
-                   target_key is { } tk &&
-                   SelectedKeyDegree is { } td) {
-                    // shift to sel degree
-                    target_key = tk.ToDegree(td);
-                }
-
-                foreach(var kvp in MatchProvider.PatternLookup) {
-                    if(target_key is { } tk2 && tk2 != kvp.Key) {
-                        // some key(s) selected, this isn't one
-                        if(byFilter) {
-                            continue;
-                        }
-                    }
-
-                    foreach(var kvp2 in kvp.Value) {
-                        if(SelectedSuffixes.Any() && !SelectedSuffixes.Contains(kvp2.Key)) {
-                            // some suffix(es) selected, this isn't one
-                            if(byFilter) {
-                                continue;
-                            }
-                        }
-
-                        foreach(MatchViewModel mvm in kvp2.Value) {
-                            if(IsSearchModeSelected) {
-                                mvm.Score = MatchProvider.GetScore(mvm.NotePattern,sel_notes);
-                                if(mvm.Score > 0) {
-                                    yield return mvm;
-                                }
-
-                                continue;
-                            }
-
-                            if(IsBookmarkModeSelected) {
-                                if(mvm.IsBookmarked) {
-                                    yield return mvm;
-                                }
-
-                                continue;
-                            }
-
-                            yield return mvm;
-                        }
-                    }
-                }
-            }
 
             // void SetDegreeAvailability() {
             //     if(SelectedKey == null) {
@@ -801,9 +796,17 @@ namespace Calcuchord {
             //     UpdateFilters();
             // }
 
+            var sel_notes = SelectedTuning.SelectedNotes;
+            LastNotes = sel_notes.ToList();
+            LastDesiredRoot = DesiredRoot;
+            LastKeyDegree = SelectedKeyDegree;
+            LastSelectedKey = SelectedKey;
+
+
             IEnumerable<MatchViewModel> sorted_results = null;
             lock(_matchCreateLock) {
-                var results = GetResults(true);
+
+                var results = GetResults(true,sel_notes);
                 if(source is MatchUpdateSource.FindClick
                    or MatchUpdateSource.FilterToggle) {
                     AvSnackbarHost.Post(
@@ -1261,22 +1264,6 @@ namespace Calcuchord {
                     return;
                 }
 
-                // if(PlatformWrapper.Services is { } ps &&
-                //    ps.StorageHelper is { } sh &&
-                //    !sh.CanWrite) {
-                //     sh.ExternalWriteEnabled += ShOnSaveEnabled;
-                //
-                //     void ShOnSaveEnabled(object o,EventArgs eventArgs) {
-                //         sh.ExternalWriteEnabled -= ShOnSaveEnabled;
-                //         PlatformWrapper.Services.Logger.WriteLine("save enabled");
-                //         AssetMover.MoveAllAssets();
-                //         Prefs.Instance.Save();
-                //     }
-                //
-                //     sh.RequestExternalWritePermission();
-                //     PlatformWrapper.Services.Logger.WriteLine("Write permission requested");
-                //     break;
-                // }
                 LoadingView busy_view = new LoadingView();
                 busy_view.MessageTextBlock.Text = "Please wait...";
 
@@ -1284,9 +1271,10 @@ namespace Calcuchord {
                 bool is_done = false;
                 _ = Task.Run(
                     async () => {
-                        await Task.Delay(3_000);
-                        var npl = Matches.Select(x => x.NotePattern).ToList();
-                        builder.BatchToBrowser(SelectedTuning.Tuning,npl);
+                        await Task.Delay(1_500);
+                        //var npl = Matches.Select(x => x.NotePattern).ToList();
+                        var npl = GetResults(true,SelectedTuning.SelectedNotes);
+                        builder.BatchToBrowser(SelectedTuning.Tuning,npl.Select(x => x.NotePattern));
                         is_done = true;
                     });
 
