@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Android.Webkit;
 using Avalonia.WebView.Android.Core;
-using MonkeyPaste.Common;
 using AvWebView = AvaloniaWebView.WebView;
 using WkWebView = Android.Webkit.WebView;
 
@@ -15,6 +14,7 @@ namespace Calcuchord.Android {
             if(wv.PlatformWebView is not AndroidWebViewCore wvc) {
                 return;
             }
+
 
             WkWebView wkwv = wvc.WebView;
 

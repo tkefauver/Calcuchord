@@ -1,6 +1,6 @@
 namespace Calcuchord.Desktop {
 
     public class PlatformServices_desktop : PlatformServies_default {
-        public override IMidiPlayer MidiPlayer { get; } = new MidiPlayer_fluid();
+        public override IMidiPlayer MidiPlayer { get; } = new MidiPlayer_fluid_desktop();
     }
 }

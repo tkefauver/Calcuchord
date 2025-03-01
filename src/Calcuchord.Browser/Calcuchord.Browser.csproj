@@ -13,26 +13,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Browser" />
-        <PackageReference Include="PublishSPAforGitHubPages.Build" />
+        <PackageReference Include="Avalonia.Browser"/>
+        <PackageReference Include="PublishSPAforGitHubPages.Build"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj">
-          <ReferenceSourceTarget></ReferenceSourceTarget>
-          <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-        </ProjectReference>
+        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="wwwroot\favicon.ico" />
+        <AvaloniaResource Include="wwwroot\favicon.ico"/>
     </ItemGroup>
 
     <Target Name="MoveMidi" BeforeTargets="BeforeBuild">
         <!-- Keep midi stuff in 1 place (xplat\Assets) -->
         <ItemGroup>
-            <_CopyItems Include="..\Calcuchord\Assets\Text\js\midi\**\*" />
+            <_CopyItems Include="..\Calcuchord\Assets\Text\js\midi\**\*"/>
         </ItemGroup>
-        <Copy SourceFiles="@(_CopyItems)" DestinationFiles="@(_CopyItems-&gt;'wwwroot/js/midi/%(RecursiveDir)%(Filename)%(Extension)')" />
+        <Copy SourceFiles="@(_CopyItems)" DestinationFiles="@(_CopyItems-&gt;'wwwroot/js/midi/%(RecursiveDir)%(Filename)%(Extension)')"/>
     </Target>
 </Project>

@@ -17,6 +17,7 @@ namespace Calcuchord.Android {
         MainLauncher = true,
         ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
     public class MainActivity : AvaloniaMainActivity<App> {
+
         public override void OnCreate(Bundle savedInstanceState,PersistableBundle persistentState) {
             base.OnCreate(savedInstanceState,persistentState);
             Platform.Init(this,savedInstanceState);
@@ -25,9 +26,9 @@ namespace Calcuchord.Android {
         protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) {
             return base.CustomizeAppBuilder(builder)
                 .UseReactiveUI()
-                .UseAndroidWebView()
                 .WithInterFont()
                 .LogToTrace()
+                .UseAndroidWebView()
                 .AfterPlatformServicesSetup(
                     _ => {
                         AppDomain.CurrentDomain.UnhandledException += (s,e) => {

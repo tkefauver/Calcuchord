@@ -22,11 +22,11 @@ namespace Calcuchord {
                     Directory.CreateDirectory(storage_dir);
                 }
 
-                if(MidiPlayerBase.IS_NFLUID_PLAYER &&
-                   Path.Combine(storage_dir,"sound") is { } sound_dir &&
+                if(ps.MidiPlayer is MidiFilePlayerBase mpb &&
+                   mpb.SoundFontDir is { } sound_dir &&
                    !sound_dir.IsDirectory()) {
                     // NOTE below only happens if sound/ doesn't exist
-                    Directory.CreateDirectory(sound_dir);
+                    Directory.CreateDirectory(mpb.SoundFontDir);
 
                     byte[] guitar_bytes =
                         MpAvFileIo.ReadBytesFromResource("avares://Calcuchord/Assets/Sounds/guitar.sf2");
@@ -37,13 +37,10 @@ namespace Calcuchord {
                         MpAvFileIo.ReadBytesFromResource("avares://Calcuchord/Assets/Sounds/piano.sf2");
                     string piano_path = Path.Combine(sound_dir,"piano.sf2");
                     File.WriteAllBytes(piano_path,piano_bytes);
-                }
-
-
-                if(ps.MidiPlayer is MidiPlayer_sugarwv wvh &&
-                   wvh.PlayerUrl is { } tone_target_url &&
-                   tone_target_url.ToPathFromUri() is { } tone_target_path &&
-                   !tone_target_path.IsFile()) {
+                } else if(ps.MidiPlayer is MidiPlayer_sugarwv wvh &&
+                          wvh.PlayerUrl is { } tone_target_url &&
+                          tone_target_url.ToPathFromUri() is { } tone_target_path &&
+                          !tone_target_path.IsFile()) {
                     // NOTE below only happens if tone.html doesn't exist
 
                     File.WriteAllText(

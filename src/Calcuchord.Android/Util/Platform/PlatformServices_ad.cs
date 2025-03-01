@@ -9,8 +9,12 @@ namespace Calcuchord.Android {
         }
 
         public override IStorageHelper StorageHelper { get; }
+
         public override IPlatformInfo PlatformInfo { get; }
-        public override IMidiPlayer MidiPlayer { get; } = new MidiPlayer_ad_sugarwv();
+
+        //public override IMidiPlayer MidiPlayer { get; } = new MidiPlayer_ad_sugarwv();
+
+        public override IMidiPlayer MidiPlayer { get; } = new MidiPlayer_fluid_ad();
         public override IUriNavigator UriNavigator { get; } = new UriNav_ad();
     }
 }

@@ -12,10 +12,15 @@ namespace Calcuchord {
         IPlatformInfo PlatformInfo { get; }
         ILog Logger { get; }
         IShareHtml ShareHtml { get; }
+        IShareMidi ShareMidi { get; }
     }
 
     public interface IShareHtml {
         void ShareHtml(string html,string title);
+    }
+
+    public interface IShareMidi {
+        void ShareMidi(string midiFile,string title);
     }
 
     public interface ILog {

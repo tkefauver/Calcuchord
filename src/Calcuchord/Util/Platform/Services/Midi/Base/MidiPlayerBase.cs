@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Calcuchord {
+
     public abstract class MidiPlayerBase : IMidiPlayer {
 
         #region Private Variables
@@ -14,12 +15,6 @@ namespace Calcuchord {
         #endregion
 
         #region Statics
-
-        public static bool IS_NFLUID_PLAYER =>
-            OperatingSystem.IsIOS() || 
-            OperatingSystem.IsMacOS() || 
-            OperatingSystem.IsLinux() || 
-            OperatingSystem.IsWindows();
 
         #endregion
 
