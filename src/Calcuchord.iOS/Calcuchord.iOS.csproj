@@ -10,9 +10,12 @@
     <PropertyGroup>
         <CodesignKey>Apple Development: thomas kefauver (MY7R67BXWM)</CodesignKey>
     </PropertyGroup>
-    
-    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-        <PublishAot>false</PublishAot>
+        
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<PublishAot>false</PublishAot>
+        <CodesignKey>Apple Distribution: thomas kefauver (3382GDS46D)</CodesignKey>
+        <CodesignProvision>cc dist profile</CodesignProvision>
+        <ArchiveOnBuild>true</ArchiveOnBuild>
     </PropertyGroup>
     
     <ItemGroup>
