@@ -13,7 +13,7 @@ using MonkeyPaste.Common;
 
 namespace Calcuchord {
 
-    public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
+    public partial class TuningViewModel : ViewModelBase<InstrumentViewModel> {
 
         #region Private Variables
 
@@ -56,7 +56,7 @@ namespace Calcuchord {
             get => AllNotes.Where(x => x.IsSelected);
             set {
                 AllNotes.ForEach(x => x.IsSelected = value == null ? false : value.Contains(x));
-                OnPropertyChanged(nameof(SelectedNotes));
+                OnPropertyChanged();
             }
         }
 
@@ -115,10 +115,11 @@ namespace Calcuchord {
                     Tuning.IsSelected = value;
                     if(IsSelected) {
                         // only trigger save when seleted to avoid a million writes
-                        HasModelChanged = true;
+                        //HasModelChanged = true;
+                        Prefs.Instance.Save();
                     }
 
-                    OnPropertyChanged(nameof(IsSelected));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -128,7 +129,7 @@ namespace Calcuchord {
             set {
                 if(CapoNum != value) {
                     Tuning.CapoFretNum = value;
-                    OnPropertyChanged(nameof(CapoNum));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -143,7 +144,7 @@ namespace Calcuchord {
             set {
                 if(Name != value) {
                     Tuning.Name = value;
-                    OnPropertyChanged(nameof(Name));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -251,7 +252,7 @@ namespace Calcuchord {
                             break;
                         }
 
-                        MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.SelectedTuning));
+                        MainViewModel.Instance.RaisePropertyChanged(nameof(MainViewModel.Instance.SelectedTuning));
 
                         if(Design.IsDesignMode) {
                             break;

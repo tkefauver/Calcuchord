@@ -33,7 +33,7 @@
             <Setter Property="ToolTip.Tip">
                 <Setter.Value>
                     <Template>
-                        <controls:ColorZone>
+                        <controls:ColorZone Classes="tt">
                             <TextBlock Text="{Binding MarkerDetail}" />
                         </controls:ColorZone>
                     </Template>

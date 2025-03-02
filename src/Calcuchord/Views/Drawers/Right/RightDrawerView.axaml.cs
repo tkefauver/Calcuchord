@@ -44,9 +44,9 @@ namespace Calcuchord {
                 mvm.SortOptions.Move(mvm.SortOptions.IndexOf(so2),1);
                 mvm.SortOptions.Move(mvm.SortOptions.IndexOf(so3),2);
 
-                mvm.OnPropertyChanged(nameof(mvm.SortOption1));
-                mvm.OnPropertyChanged(nameof(mvm.SortOption2));
-                mvm.OnPropertyChanged(nameof(mvm.SortOption3));
+                mvm.RaisePropertyChanged(nameof(mvm.SortOption1));
+                mvm.RaisePropertyChanged(nameof(mvm.SortOption2));
+                mvm.RaisePropertyChanged(nameof(mvm.SortOption3));
 
                 mvm.UpdateMatchesAsync(MatchUpdateSource.SortToggle).FireAndForgetSafeAsync();
             }

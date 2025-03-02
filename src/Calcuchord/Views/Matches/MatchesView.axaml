@@ -5,6 +5,7 @@
              mc:Ignorable="d"
              d:DesignWidth="800"
              d:DesignHeight="450"
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
@@ -93,7 +94,22 @@
         </Style>
 
         <Style
-            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode:not(.no-tuning):not(.no-inst):not(.init)">
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode:not(.no-sel):not(.no-tuning):not(.no-inst):not(.init)">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Template>
+                        <TextBlock Classes="empty-label">
+                            <TextBlock.Inlines>
+                                <Run Text="No results." />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode.no-sel:not(.no-tuning):not(.no-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -110,7 +126,7 @@
         </Style>
 
         <Style
-            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode.piano:not(.no-tuning):not(.no-inst):not(.init)">
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode.no-sel.piano:not(.no-tuning):not(.no-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -169,12 +185,8 @@
             <Setter Property="Content"
                     Value="{x:Null}" />
         </Style>
-
-        <Style Selector="controls|Card.peek">
-            <!-- <Setter Property="RenderTransform" -->
-            <!--         Value="translate(-320px,0px)" /> -->
-        </Style>
     </UserControl.Styles>
+    <!-- <Viewbox> -->
     <Grid>
         <!-- RESULTS CNTR -->
 
@@ -194,6 +206,32 @@
             </Border.IsVisible>
 
             <Grid RowDefinitions="Auto,*">
+
+                <ScrollViewer x:Name="MatchGalleryScrollViewer"
+                              Grid.Row="1">
+                    <Viewbox>
+                        <!-- NOTE no margin/padding on repeater to get accurate bounds -->
+                        <ItemsRepeater x:Name="MatchItemsRepeater"
+                                       Width="{Binding MatchesViewFixedWidth}"
+                                       Classes.can-resize="true"
+                                       VerticalCacheLength="1"
+                                       HorizontalCacheLength="0"
+                                       ItemsSource="{Binding Matches}">
+                            <ItemsRepeater.Layout>
+                                <WrapLayout Orientation="Horizontal" />
+                                <!-- <UniformGridLayout MaximumRowsOrColumns="{Binding MatchColCount}" /> -->
+                            </ItemsRepeater.Layout>
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="local:MatchViewModel">
+                                    <local:MatchView Background="{DynamicResource HttTransparent}"
+                                                     MaxWidth="{local:MathBinding a={Binding $parent[ItemsRepeater].Bounds.Width}, b={Binding MatchColCount, Source={x:Static local:MainViewModel.Instance}}, exp=(a/b)-10}"
+                                                     Focusable="True" />
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                    </Viewbox>
+                </ScrollViewer>
+
                 <!-- SHARE -->
                 <controls:Card Grid.Row="0"
                                IsVisible="{Binding !IsMobileOs, Source={x:Static local:ThemeViewModel.Instance}}"
@@ -205,15 +243,32 @@
                             ToolTip.Tip="Export"
                             Padding="8"
                             Classes="float"
-                            Command="{Binding ConvertMatchesCommand}">
+                            Command="{Binding ExportMatchesCommand}">
                         <avalonia:MaterialIcon Kind="Share" />
                     </Button>
                 </controls:Card>
 
+                <!-- BUSY OVERLAY -->
+
+                <Border x:Name="MatchesBusyOverlay"
+                        Grid.RowSpan="2"
+                        Classes="busy-cntr">
+                    <Border.IsVisible>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="!IsBusy" />
+                            <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                                <Binding Path="IsSearchInitiating" />
+                                <Binding Path="IsMatchZoomChanging" />
+                            </MultiBinding>
+                        </MultiBinding>
+                    </Border.IsVisible>
+                </Border>
+
+
                 <!-- ZOOM BTNS -->
                 <controls:Card Grid.Row="0"
                                x:Name="ZoomButtonCard"
-                               Classes="button-group"
+                               Classes="button-group right-drawer-float"
                                Classes.peek="{Binding IsRightDrawerOpen}"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
@@ -233,27 +288,6 @@
                         </Button>
                     </StackPanel>
                 </controls:Card>
-
-                <ScrollViewer x:Name="MatchGalleryScrollViewer"
-                              Grid.Row="1">
-                    <!-- NOTE no margin/padding on repeater to get accurate bounds -->
-                    <ItemsRepeater x:Name="MatchItemsRepeater"
-                                   ItemsSource="{Binding Matches}">
-                        <ItemsRepeater.RenderTransform>
-                            <TranslateTransform />
-                        </ItemsRepeater.RenderTransform>
-                        <ItemsRepeater.Layout>
-                            <WrapLayout Orientation="Horizontal" />
-                        </ItemsRepeater.Layout>
-                        <ItemsRepeater.ItemTemplate>
-                            <DataTemplate x:DataType="local:MatchViewModel">
-                                <local:MatchView Background="{DynamicResource HttTransparent}"
-                                                 Focusable="True"
-                                                 Width="{Binding MatchWidth, Source={x:Static local:MainViewModel.Instance}}" />
-                            </DataTemplate>
-                        </ItemsRepeater.ItemTemplate>
-                    </ItemsRepeater>
-                </ScrollViewer>
             </Grid>
         </Border>
 
@@ -282,11 +316,11 @@
             <!-- EMPTY LABEL -->
 
             <TransitioningContentControl x:Name="EmptyTextCntrContentControl"
-                                         Loaded="EmptyTextCntrContentControl_OnLoaded"
                                          Classes.piano="{Binding IsPianoSelected}"
                                          Classes.init="{Binding !IsLoaded}"
                                          Classes.no-inst="{Binding IsInstrumentsEmpty}"
                                          Classes.no-tuning="{Binding IsTuningsEmpty}"
+                                         Classes.no-sel="{Binding IsDefaultSelection}"
                                          Classes.search-mode="{Binding IsSearchModeSelected}"
                                          Classes.bookmark-mode="{Binding IsBookmarkModeSelected}"
                                          Classes.index-mode="{Binding IsIndexModeSelected}">
@@ -332,17 +366,7 @@
 
         </StackPanel>
 
-        <!-- BUSY OVERLAY -->
-
-        <Border x:Name="MatchesBusyOverlay"
-                Classes="busy-cntr">
-            <Border.IsVisible>
-                <MultiBinding Converter="{x:Static BoolConverters.Or}">
-                    <Binding Path="IsSearchInitiating" />
-                    <Binding Path="IsMatchZoomChanging" />
-                </MultiBinding>
-            </Border.IsVisible>
-        </Border>
 
     </Grid>
+    <!-- </Viewbox> -->
 </UserControl>

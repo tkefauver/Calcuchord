@@ -73,7 +73,7 @@
     </UserControl.Styles>
     <Viewbox>
         <Border x:Name="MatchContainerBorder"
-                Background="{DynamicResource HttTransparent}"
+                Background="Transparent"
                 BorderThickness="1"
                 Margin="10"
                 Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"

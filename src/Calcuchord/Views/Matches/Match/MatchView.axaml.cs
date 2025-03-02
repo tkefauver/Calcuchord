@@ -10,14 +10,6 @@ namespace Calcuchord {
 
         }
 
-        void InitSvg() {
-            // SKSvg Svg = new SKSvg();
-            // CustomTypefaceProvider test = new CustomTypefaceProvider(@"C:\Fonts\Pacifico.ttf");
-            // Svg.Settings.TypefaceProviders.Insert(0,test);
-            // Svg.Load(@"c:\TEMP\sample.svg");
-            // canvas.DrawPicture(Svg.Picture,ref matrix);
-        }
-
         void MatchContainerBorder_OnPointerReleased(object sender,PointerReleasedEventArgs e) {
             if(DataContext is not MatchViewModel mtvm) {
                 return;

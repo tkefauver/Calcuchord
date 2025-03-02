@@ -6,7 +6,7 @@ using System.Windows.Input;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
-    public class NoteRowViewModel : ViewModelBase<TuningViewModel> {
+    public partial class NoteRowViewModel : ViewModelBase<TuningViewModel> {
 
         #region Private Variables
 
@@ -38,7 +38,7 @@ namespace Calcuchord {
             get => SelectedNotes.FirstOrDefault();
             set {
                 Notes.ForEach(x => x.IsSelected = x == value);
-                OnPropertyChanged(nameof(SelectedNote));
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedNotes));
             }
         }
@@ -48,7 +48,7 @@ namespace Calcuchord {
             set {
                 Notes.ForEach(x => x.IsSelected = value == null ? false : value.Contains(x));
                 OnPropertyChanged(nameof(SelectedNote));
-                OnPropertyChanged(nameof(SelectedNotes));
+                OnPropertyChanged();
             }
         }
 
@@ -155,12 +155,12 @@ namespace Calcuchord {
         void NoteRowViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
                 case nameof(IsMuted):
-                    Notes.ForEach(x => x.OnPropertyChanged(nameof(x.IsRowMuted)));
-                    Notes.ForEach(x => x.OnPropertyChanged(nameof(x.IsEnabled)));
+                    Notes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsRowMuted)));
+                    Notes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsEnabled)));
                     break;
                 case nameof(SelectedNote):
                 case nameof(SelectedNotes):
-                    MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.IsDefaultSelection));
+                    MainViewModel.Instance.RaisePropertyChanged(nameof(MainViewModel.Instance.IsDefaultSelection));
                     break;
             }
         }
@@ -263,7 +263,7 @@ namespace Calcuchord {
             }
 
             if(SelectedNotes.Difference(last_sel).Any()) {
-                Notes.ForEach(x => x.OnPropertyChanged(nameof(x.IsSelected)));
+                Notes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsSelected)));
             }
 
             bool was_root = false;
@@ -275,7 +275,7 @@ namespace Calcuchord {
             }
 
             if(root || was_root) {
-                Parent.AllNotes.ForEach(x => x.OnPropertyChanged(nameof(x.IsDesiredRoot)));
+                Parent.AllNotes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsDesiredRoot)));
             }
         }
 

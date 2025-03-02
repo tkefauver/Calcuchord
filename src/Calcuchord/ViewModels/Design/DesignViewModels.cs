@@ -3,10 +3,10 @@ using System.Linq;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
-    public class DesignMainViewModel : MainViewModel {
+    public partial class DesignMainViewModel : MainViewModel {
     }
 
-    public class DesignChordMatchViewModel : MatchViewModel {
+    public partial class DesignChordMatchViewModel : MatchViewModel {
         public DesignChordMatchViewModel() {
             PatternType = MusicPatternType.Chords;
 
@@ -25,18 +25,18 @@ namespace Calcuchord {
                     PatternNote.Create(2,InstrumentNote.Create(2,2,NoteType.E,3)),
                     PatternNote.Create(0,InstrumentNote.Create(0,3,NoteType.G,3)),
                     PatternNote.Create(1,InstrumentNote.Create(1,4,NoteType.C,4)),
-                    PatternNote.Create(0,InstrumentNote.Create(0,5,NoteType.E,4))
+                    PatternNote.Create(0,InstrumentNote.Create(0,5,NoteType.E,4)),
                 });
             NotePattern.SetParent(ngc);
             instl.ForEach(x => x.RefreshModelTree());
         }
     }
 
-    public class DesignInstrumentViewModel : InstrumentViewModel {
+    public partial class DesignInstrumentViewModel : InstrumentViewModel {
         public DesignInstrumentViewModel() {
             Instrument = new()
             {
-                InstrumentType = InstrumentType.Guitar
+                InstrumentType = InstrumentType.Guitar,
             };
             Instrument = Instrument.CreateByType(InstrumentType.Banjo);
             SelectedInstrumentTypeIndex = 1;

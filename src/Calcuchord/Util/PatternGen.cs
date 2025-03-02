@@ -9,7 +9,7 @@ using MonkeyPaste.Common;
 
 namespace Calcuchord {
 
-    public class PatternGen : ViewModelBase {
+    public partial class PatternGen : ViewModelBase {
 
         #region Private Variables
 
@@ -59,7 +59,7 @@ namespace Calcuchord {
             { ChordSuffixType.m9,[0,3,4,3,4] },
             { ChordSuffixType.Num11,[0,4,3,3,4,3] },
             { ChordSuffixType.maj11,[0,4,3,4,3,3] },
-            { ChordSuffixType.m11,[0,3,4,3,4,3] }
+            { ChordSuffixType.m11,[0,3,4,3,4,3] },
         };
 
         Dictionary<ScaleSuffixType,int[]> Scales { get; } = new Dictionary<ScaleSuffixType,int[]>
@@ -70,7 +70,7 @@ namespace Calcuchord {
             { ScaleSuffixType.MelodicMinor,[0,2,1,2,2,2,2,2] },
             { ScaleSuffixType.MinorPentatonic,[0,3,2,2,3,2] },
             { ScaleSuffixType.Pentatonic,[0,2,2,3,2,3] },
-            { ScaleSuffixType.Blues,[0,3,2,1,1,3] }
+            { ScaleSuffixType.Blues,[0,3,2,1,1,3] },
         };
 
         Dictionary<ModeSuffixType,int[]> Modes { get; } = new Dictionary<ModeSuffixType,int[]>
@@ -80,7 +80,7 @@ namespace Calcuchord {
             { ModeSuffixType.Lydian,[0,2,2,2,1,2,2,1] },
             { ModeSuffixType.Mixolydian,[0,2,2,1,2,2,1,2] },
             { ModeSuffixType.Locrian,[0,1,2,2,1,2,2,2] },
-            { ModeSuffixType.AhavaRaba,[0,1,3,1,2,1,2,2] }
+            { ModeSuffixType.AhavaRaba,[0,1,3,1,2,1,2,2] },
         };
 
         Dictionary<MusicPatternType,Dictionary<string,int[]>> _patterns;
@@ -101,7 +101,7 @@ namespace Calcuchord {
                         {
                             MusicPatternType.Modes,
                             Modes.ToDictionary(x => x.Key.ToString(),x => x.Value)
-                        }
+                        },
                     };
                 }
 
@@ -160,7 +160,7 @@ namespace Calcuchord {
             CancellationToken ct) {
             DispatcherTimer dt = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(500)
+                Interval = TimeSpan.FromMilliseconds(500),
             };
             dt.Tick += DtOnTick;
 
@@ -349,7 +349,7 @@ namespace Calcuchord {
                 RejectNotEnoughNotes,
                 RejectNotAllNotes,
                 RejectNotStartOnRoot,
-                RejectNotesOnSameString
+                RejectNotesOnSameString,
             ];
             foreach(var reject_func in reject_funcs) {
                 if(reject_func.Invoke(notes,pattern)) {

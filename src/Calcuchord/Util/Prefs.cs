@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace Calcuchord {
     [JsonObject]
-    public class Prefs : ViewModelBase {
+    public partial class Prefs : ViewModelBase {
 
         #region Private Variables
 
@@ -106,7 +106,7 @@ namespace Calcuchord {
         public bool IsThemeDark { get; set; }
 
         [JsonProperty]
-        public int MatchColCount { get; set; } = 3;
+        public int MatchColCount { get; set; } = 1;
 
 
         [JsonProperty]
@@ -159,9 +159,13 @@ namespace Calcuchord {
 
         #region Public Methods
 
+        DateTime LastSaveCalledDt { get; set; }
+
         public void Save() {
+            DateTime call_time = DateTime.Now;
+            LastSaveCalledDt = call_time;
             Task.Run(
-                () => {
+                async () => {
                     if(PlatformWrapper.Services is not { } ps ||
                        ps.PrefsIo is not { } prefsIo) {
                         PlatformWrapper.Services.Logger.WriteLine("prefs io service unavailable");
@@ -171,6 +175,19 @@ namespace Calcuchord {
                     if(IsSaveIgnored) {
                         PlatformWrapper.Services.Logger.WriteLine("prefs save ignored");
                         return;
+                    }
+
+                    while(true) {
+                        if(LastSaveCalledDt != call_time) {
+                            // ignore since called again
+                            return;
+                        }
+
+                        if(DateTime.Now - call_time > TimeSpan.FromSeconds(10)) {
+                            break;
+                        }
+
+                        await Task.Delay(1000);
                     }
 
                     SyncModels();

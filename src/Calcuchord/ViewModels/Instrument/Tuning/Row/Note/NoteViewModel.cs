@@ -3,7 +3,7 @@ using System.Windows.Input;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
-    public class NoteViewModel : ViewModelBase<NoteRowViewModel> {
+    public partial class NoteViewModel : ViewModelBase<NoteRowViewModel> {
 
         #region Private Variables
 
@@ -103,6 +103,7 @@ namespace Calcuchord {
 
         public bool IsBottomFret =>
             RowNum == Parent.Parent.RowCount - 1;
+
 
         public bool IsSelected { get; set; }
         public bool IsHovering { get; set; }
@@ -340,7 +341,7 @@ namespace Calcuchord {
                         Reset();
                     }
 
-                    Parent.OnPropertyChanged(nameof(Parent.SelectedNotes));
+                    Parent.RaisePropertyChanged(nameof(Parent.SelectedNotes));
 
                     break;
             }

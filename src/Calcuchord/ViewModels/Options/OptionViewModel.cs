@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Calcuchord {
     [JsonObject]
-    public class OptionViewModel : ViewModelBase {
+    public partial class OptionViewModel : ViewModelBase {
 
         #region Private Variables
 

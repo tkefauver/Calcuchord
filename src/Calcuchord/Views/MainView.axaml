@@ -28,20 +28,13 @@
                     Value="0" />
         </Style>
 
-        <!-- RIGHT-DRAWER MODALITY -->
-        <Style Selector="controls|NavigationDrawer">
-            <Setter Property="RightDrawerExpandThresholdWidth"
-                    Value="0" />
+        <!-- SCRIM -->
+        <Style Selector="controls|NavigationDrawer.main:open:not(:left) /template/ Border#PART_Scrim">
+            <Setter Property="IsHitTestVisible"
+                    Value="False" />
+            <Setter Property="Background"
+                    Value="{DynamicResource HttTransparent}" />
         </Style>
-        <Style Selector="controls|NavigationDrawer.is-right-modal">
-            <Setter Property="RightDrawerExpandThresholdWidth"
-                    Value="{x:Null}" />
-        </Style>
-
-        <!-- <Style Selector="controls|NavigationDrawer /template/ "> -->
-        <!--     <Setter Property="RightDrawerExpandThresholdWidth" -->
-        <!--             Value="{x:Null}" /> -->
-        <!-- </Style> -->
 
         <!-- ORIENTATION (PORTRAIT) -->
         <Style Selector="Grid#MainContainerGrid local|InstrumentView">
@@ -118,19 +111,11 @@
                                    SnackbarHorizontalAlignment="Center"
                                    SnackbarVerticalAlignment="Top">
                 <controls:NavigationDrawer x:Name="MainNavDrawer"
+                                           LeftDrawerExpandThresholdWidth="{x:Null}"
+                                           RightDrawerExpandThresholdWidth="{x:Null}"
                                            LeftDrawerOpened="{Binding IsLeftDrawerOpen, Mode=TwoWay}"
                                            RightDrawerOpened="{Binding IsRightDrawerOpen, Mode=TwoWay}"
-                                           Classes="permanent">
-                    <Classes.is-right-modal>
-                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                            <!-- when window is significantly wider than right drawer, right drawer is NOT modal -->
-                            <local:MathBinding IsBoolResult="True"
-                                               a="{Binding $parent[local:MainView].Bounds.Width}"
-                                               exp="IF(380-a>0,0,1)" />
-                            <Binding ElementName="MainNavDrawer"
-                                     Path="RightDrawerOpened" />
-                        </MultiBinding>
-                    </Classes.is-right-modal>
+                                           Classes="permanent main">
                     <controls:NavigationDrawer.LeftDrawerContent>
                         <local:LeftDrawerView x:Name="LeftDrawerView" />
                     </controls:NavigationDrawer.LeftDrawerContent>
@@ -142,6 +127,7 @@
                         <local:MainHeaderView x:Name="HeaderView"
                                               IsEnabled="{Binding !IsOpen, ElementName=DlgHost}"
                                               DockPanel.Dock="Top" />
+                        <!-- FOOTER MENU -->
                         <local:MainFooterView x:Name="FooterView"
                                               DockPanel.Dock="Bottom" />
 
@@ -175,20 +161,10 @@
         </dlg:DialogHost>
 
         <Border x:Name="MainContainerBusyOverlay"
-                Classes="busy-cntr">
-            <Border.IsVisible>
-                <MultiBinding Converter="{x:Static BoolConverters.Or}">
-                    <Binding Path="IsBusy" />
-                </MultiBinding>
-            </Border.IsVisible>
-
-            <TextBlock IsVisible="{Binding BusyText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                       Text="{Binding BusyText}"
-                       TextAlignment="Center"
-                       HorizontalAlignment="Stretch"
-                       RenderTransform="translate(0,100px)"
-                       VerticalAlignment="Center" />
-        </Border>
+                Classes="busy-cntr"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                IsVisible="{Binding IsBusy, Source={x:Static local:MainViewModel.Instance}, Mode=OneWay}" />
 
     </Grid>
 </UserControl>

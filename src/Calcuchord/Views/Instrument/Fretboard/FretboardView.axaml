@@ -52,7 +52,9 @@
                       Classes="inst-scroll"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Hidden">
-            <Viewbox>
+            <Viewbox Stretch="UniformToFill"
+                     MinHeight="{local:MathBinding a={Binding $parent[local:FretboardView].Bounds.Width}, b={Binding Bounds.Width, ElementName=FretboardContainerGrid}, c={Binding Bounds.Height, ElementName=FretboardContainerGrid}, exp=a*(c/(b+0.001))}"
+                     MinWidth="{Binding $parent[local:FretboardView].Bounds.Width}">
                 <Grid x:Name="FretboardContainerGrid">
                     <Image x:Name="FretboardBgImage"
                            Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"

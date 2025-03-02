@@ -28,7 +28,7 @@ namespace Calcuchord.Android {
                 .UseReactiveUI()
                 .WithInterFont()
                 .LogToTrace()
-                .UseAndroidWebView()
+                //.UseAndroidWebView()
                 .AfterPlatformServicesSetup(
                     _ => {
                         AppDomain.CurrentDomain.UnhandledException += (s,e) => {

@@ -13,7 +13,7 @@ using MonkeyPaste.Common.Avalonia;
 
 namespace Calcuchord {
 
-    public class ThemeViewModel : ViewModelBase {
+    public partial class ThemeViewModel : ViewModelBase {
 
         #region Statics
 
@@ -65,8 +65,9 @@ namespace Calcuchord {
             private set {
                 if(IsDark != value && Prefs.Instance != null) {
                     Prefs.Instance.IsThemeDark = value;
-                    HasModelChanged = true;
-                    OnPropertyChanged(nameof(IsDark));
+                    //HasModelChanged = true;
+                    Prefs.Instance.Save();
+                    OnPropertyChanged();
                 }
             }
         }

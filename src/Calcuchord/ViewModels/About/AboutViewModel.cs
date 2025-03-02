@@ -2,7 +2,7 @@ using System.Windows.Input;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
-    public class AboutViewModel : ViewModelBase {
+    public partial class AboutViewModel : ViewModelBase {
 
         #region Private Variables
 

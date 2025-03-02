@@ -112,8 +112,8 @@ namespace Calcuchord {
             double lt = label_width + nut_width;
             double tt = str_h;
             FretboardBgImage.Width = frets_width;
-            FretboardBgImage.Height = th - str_h;
-            FretboardBgImage.Margin = new(lt,tt,0,0);
+            FretboardBgImage.Height = th - str_h - 1;
+            FretboardBgImage.Margin = new(lt,tt + 1,0,0);
         }
 
         void FretView_Loaded(object sender,RoutedEventArgs e) {

@@ -7,7 +7,7 @@ using Avalonia.Threading;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
-    public class MatchViewModel : ViewModelBase {
+    public partial class MatchViewModel : ViewModelBase {
 
         #region Private Variables
 
@@ -78,7 +78,7 @@ namespace Calcuchord {
             set {
                 if(IsBookmarked != value) {
                     NotePattern.IsBookmarked = value;
-                    OnPropertyChanged(nameof(IsBookmarked));
+                    OnPropertyChanged();
                     OnPropertyChanged(nameof(BookmarkIcon));
                 }
 
@@ -195,19 +195,24 @@ namespace Calcuchord {
 
                 void MvmOnInstrumentInitialized(object sender,EventArgs e) {
                     mvm.InstrumentInitialized -= MvmOnInstrumentInitialized;
-                    FinishSetNeckAsync().FireAndForgetSafeAsync();
+                    FinishSetNeckAsync(true).FireAndForgetSafeAsync();
                 }
 
                 if(!mvm.IsSearchModeSelected) {
-                    // auto switch to search mode
+                    // switch to search mode
                     mvm.InstrumentInitialized += MvmOnInstrumentInitialized;
                     mvm.SelectOptionCommand.Execute(mvm.SearchOptionViewModel);
                     return;
                 }
 
-                await FinishSetNeckAsync();
+                await FinishSetNeckAsync(false);
 
-                async Task FinishSetNeckAsync() {
+                async Task FinishSetNeckAsync(bool fromEvent) {
+                    if(fromEvent) {
+                        // wait for inst to load...
+                        await Task.Delay(500);
+                    }
+
                     stvm.ResetSelection();
                     await Task.Delay(300);
 

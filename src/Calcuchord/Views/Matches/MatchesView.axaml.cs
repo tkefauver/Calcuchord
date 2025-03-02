@@ -1,13 +1,8 @@
 using System;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Threading;
-using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
 using PropertyChanged;
 
@@ -25,16 +20,16 @@ namespace Calcuchord {
             Instance = this;
             InitializeComponent();
 
-            MatchItemsRepeater.Loaded += async (sender,args) => {
-                if(MainViewModel.Instance is not { } mvm) {
-                    return;
-                }
-
-                await mvm.CancelMatchZoomAsync();
-                mvm.SetMatchColumnCountAsync(mvm.MatchColCount,mvm.ZoomCts.Token)
-                    .FireAndForgetSafeAsync();
-
-            };
+            // MatchItemsRepeater.Loaded += async (sender,args) => {
+            //     if(MainViewModel.Instance is not { } mvm) {
+            //         return;
+            //     }
+            //
+            //     await mvm.CancelMatchZoomAsync();
+            //     mvm.SetMatchColumnCountAsync(mvm.MatchColCount,mvm.ZoomCts.Token)
+            //         .FireAndForgetSafeAsync();
+            //
+            // };
         }
 
         public void ScrollItemIntoView(MatchViewModel mtvm) {
@@ -45,39 +40,50 @@ namespace Calcuchord {
             mv.BringIntoView();
         }
 
-        void MatchesOnCollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
-            DoBusyCheck();
-        }
-
-        void DoBusyCheck() {
-            if(MatchesBusyOverlay.IsVisible) {
-                return;
+        public int GetVisualColCount() {
+            if(this.GetVisualDescendants<MatchView>() is { } mvl &&
+               mvl.FirstOrDefault() is { } head_mv &&
+               head_mv.TranslatePoint(head_mv.Bounds.TopLeft,this) is { } head_tl) {
+                return mvl.Count(
+                    x => Math.Abs(x.TranslatePoint(x.Bounds.TopLeft,this).Value.Y - head_tl.Y) < double.Epsilon);
             }
 
-            MatchesBusyOverlay.IsVisible = true;
-            Dispatcher.UIThread.Post(
-                async () => {
-                    await Task.Delay(100);
-                    while(!MatchItemsRepeater.IsArrangeValid) {
-                        await Task.Delay(100);
-                    }
-
-                    MatchesBusyOverlay.IsVisible = false;
-                });
+            return 1;
         }
 
-        void EmptyTextCntrContentControl_OnLoaded(object sender,RoutedEventArgs e) {
-            if(sender is not Control c) {
-                return;
-            }
+        // void MatchesOnCollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
+        //     DoBusyCheck();
+        // }
 
-            void OnVisChanged() {
-                if(c.IsVisible && c.Classes.Contains("index-mode")) {
+        // void DoBusyCheck() {
+        //     if(MatchesBusyOverlay.IsVisible) {
+        //         return;
+        //     }
+        //
+        //     MatchesBusyOverlay.IsVisible = true;
+        //     Dispatcher.UIThread.Post(
+        //         async () => {
+        //             await Task.Delay(100);
+        //             while(!MatchItemsRepeater.IsArrangeValid) {
+        //                 await Task.Delay(100);
+        //             }
+        //
+        //             MatchesBusyOverlay.IsVisible = false;
+        //         });
+        // }
 
-                }
-            }
-
-            c.GetObservable(IsVisibleProperty).Subscribe(value => OnVisChanged());
-        }
+        // void EmptyTextCntrContentControl_OnLoaded(object sender,RoutedEventArgs e) {
+        //     if(sender is not Control c) {
+        //         return;
+        //     }
+        //
+        //     void OnVisChanged() {
+        //         if(c.IsVisible && c.Classes.Contains("index-mode")) {
+        //
+        //         }
+        //     }
+        //
+        //     c.GetObservable(IsVisibleProperty).Subscribe(value => OnVisChanged());
+        // }
     }
 }

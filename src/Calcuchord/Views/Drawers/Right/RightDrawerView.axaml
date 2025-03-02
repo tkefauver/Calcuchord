@@ -133,6 +133,10 @@
             <Setter Property="Columns"
                     Value="2" />
         </Style>
+        <Style Selector="controls|Card.suffix.chords UniformGrid">
+            <Setter Property="Columns"
+                    Value="4" />
+        </Style>
         <Style Selector="controls|Card.key UniformGrid">
             <Setter Property="Columns"
                     Value="6" />

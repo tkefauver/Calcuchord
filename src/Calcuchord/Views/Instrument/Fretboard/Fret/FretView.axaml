@@ -140,12 +140,22 @@
                     Value="rotate(-45deg)" />
         </Style>
 
+        <Style Selector="TextBlock.fb-label">
+            <Setter Property="Effect"
+                    Value="drop-shadow(1 1 1 white)" />
+        </Style>
+        <Style Selector="Grid.dark TextBlock.fb-label">
+            <Setter Property="Effect"
+                    Value="drop-shadow(1 1 1 black)" />
+        </Style>
+
 
     </UserControl.Styles>
-    <Grid>
+    <Grid Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}">
         <!-- FRET NUM LABEL -->
-        <TextBlock Text="{Binding MarkerLabel}"
-                   Classes="Subtitle2"
+        <TextBlock x:Name="FretNumLabel"
+                   Text="{Binding MarkerLabel}"
+                   Classes="Subtitle2 fb-label"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Bottom">
             <TextBlock.IsVisible>
@@ -157,8 +167,9 @@
         </TextBlock>
 
         <!-- STRING NAME LABEL -->
-        <TextBlock Text="{Binding MarkerLabel}"
-                   Classes="Subtitle2"
+        <TextBlock x:Name="StringNameLabel"
+                   Text="{Binding MarkerLabel}"
+                   Classes="Subtitle2 fb-label"
                    Margin="0,0,5,0"
                    HorizontalAlignment="Right"
                    VerticalAlignment="Center">
@@ -206,7 +217,8 @@
                  VerticalAlignment="Center" />
 
         <!-- FRET BAR (LEFT) -->
-        <Border HorizontalAlignment="Left"
+        <Border x:Name="FretBarLeft"
+                HorizontalAlignment="Left"
                 VerticalAlignment="Stretch"
                 Width="1.5">
             <Border.IsVisible>
@@ -234,7 +246,8 @@
 
         <!-- FRET BAR (RIGHT) -->
 
-        <Border HorizontalAlignment="Right"
+        <Border x:Name="FretBarRight"
+                HorizontalAlignment="Right"
                 VerticalAlignment="Stretch"
                 Width="1.5">
             <Border.IsVisible>
@@ -279,6 +292,7 @@
                 Background="{DynamicResource NutBg}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom"
+                Margin="0,0,0,2"
                 Height="2">
             <Border.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
@@ -288,9 +302,25 @@
             </Border.IsVisible>
         </Border>
 
+        <!-- EDGE (RIGHT) -->
+        <Border x:Name="RightEdge"
+                Background="{DynamicResource NutBg}"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Stretch"
+                Margin="0,0,2,0"
+                Width="2">
+            <Border.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsRealNote" />
+                    <Binding Path="IsLastFret" />
+                </MultiBinding>
+            </Border.IsVisible>
+        </Border>
+
         <!-- CAPO -->
 
-        <Border IsVisible="{Binding IsCapoFret}"
+        <Border x:Name="Capo"
+                IsVisible="{Binding IsCapoFret}"
                 Background="DarkOrange"
                 Margin="10,0"
                 HorizontalAlignment="Stretch"
@@ -299,7 +329,9 @@
 
         <!-- NUT -->
 
-        <Border IsVisible="{Binding IsNutFret}"
+        <Border x:Name="Nut"
+                Margin="0,-2"
+                IsVisible="{Binding IsNutFret}"
                 Background="{DynamicResource NutBg}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch" />

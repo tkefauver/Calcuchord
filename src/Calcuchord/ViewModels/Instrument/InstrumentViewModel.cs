@@ -10,7 +10,7 @@ using System.Windows.Input;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
-    public class InstrumentViewModel : ViewModelBase<MainViewModel> {
+    public partial class InstrumentViewModel : ViewModelBase<MainViewModel> {
 
         #region Private Variables
 
@@ -49,7 +49,7 @@ namespace Calcuchord {
             set {
                 if(SelectedTuning != value) {
                     Tunings.ForEach(x => x.IsSelected = x == value);
-                    OnPropertyChanged(nameof(SelectedTuning));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -109,7 +109,7 @@ namespace Calcuchord {
             set {
                 if(SelectedInstrumentTypeIndex != value) {
                     InstrumentType = InstrumentTypeNames[value].ToEnum<InstrumentType>();
-                    OnPropertyChanged(nameof(SelectedInstrumentTypeIndex));
+                    OnPropertyChanged();
 
                 }
             }
@@ -154,10 +154,11 @@ namespace Calcuchord {
                     Instrument.IsSelected = value;
 
                     if(IsSelected) {
-                        HasModelChanged = true;
+                        //HasModelChanged = true;
+                        Prefs.Instance.Save();
                     }
 
-                    OnPropertyChanged(nameof(IsSelected));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -167,7 +168,7 @@ namespace Calcuchord {
             set {
                 if(Name != value) {
                     Instrument.Name = value;
-                    OnPropertyChanged(nameof(Name));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -184,7 +185,7 @@ namespace Calcuchord {
             set {
                 if(InstrumentType != value) {
                     Instrument.InstrumentType = value;
-                    OnPropertyChanged(nameof(InstrumentType));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -255,7 +256,7 @@ namespace Calcuchord {
                     if(IsEditModeEnabled) {
                         UpdateEditorSelectionToType();
                         // BUG sel tuning checkbox not always working
-                        Tunings.ForEach(x => x.OnPropertyChanged(nameof(x.IsSelected)));
+                        Tunings.ForEach(x => x.RaisePropertyChanged(nameof(x.IsSelected)));
                     }
 
                     break;
@@ -283,10 +284,10 @@ namespace Calcuchord {
 
                     break;
                 case nameof(SelectedTuning):
-                    Tunings.ForEach(x => x.OnPropertyChanged(nameof(x.IsSelected)));
+                    Tunings.ForEach(x => x.RaisePropertyChanged(nameof(x.IsSelected)));
 
                     if(IsSelected) {
-                        Parent.OnPropertyChanged(nameof(SelectedTuning));
+                        Parent.RaisePropertyChanged(nameof(SelectedTuning));
                     }
 
                     break;
@@ -325,7 +326,7 @@ namespace Calcuchord {
         void Tunings_OnCollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
             OnPropertyChanged(nameof(Tunings));
 
-            MainViewModel.Instance.OnPropertyChanged(nameof(MainViewModel.Instance.CanFinishEdit));
+            MainViewModel.Instance.RaisePropertyChanged(nameof(MainViewModel.Instance.CanFinishEdit));
         }
 
         void UpdateEditorSelectionToType() {
@@ -433,7 +434,7 @@ namespace Calcuchord {
                 if(Tunings.Any()) {
                     int to_sel_idx = to_remove_idx >= Tunings.Count ? to_remove_idx - 1 : to_remove_idx;
                     SelectedTuning = Tunings[to_sel_idx];
-                    Tunings.ForEach(x => x.OnPropertyChanged(nameof(x.CanDelete)));
+                    Tunings.ForEach(x => x.RaisePropertyChanged(nameof(x.CanDelete)));
                     PlatformWrapper.Services.Logger.WriteLine(
                         $"'{tuning_vm_to_remove.Tuning.Name}' removed from {Instrument.Name}");
                 }

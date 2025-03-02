@@ -20,7 +20,7 @@ namespace Calcuchord {
             MultiBinding mb = new MultiBinding
             {
                 Bindings = new[] { a,b,c,d }.Where(x => x != null).Cast<IBinding>().ToList(),
-                Converter = new MathMultiValueConverter(exp,IsBoolResult)
+                Converter = new MathMultiValueConverter(exp,IsBoolResult),
             };
 
             return mb;
@@ -44,7 +44,8 @@ namespace Calcuchord {
                     if(values[i] == null ||
                        !double.TryParse(values[i].ToString(),out double dbl_val) ||
                        !dbl_val.IsNumber()) {
-                        continue;
+                        //continue;
+                        dbl_val = 0;
                     }
 
                     Exp.Bind(VariableNames[i],dbl_val);
@@ -76,7 +77,7 @@ namespace Calcuchord {
                     PlatformWrapper.Services.Logger.WriteLine(variable); // will print x, a
                 }
 
-                return null;
+                return IsBoolResult ? false : 0;
             }
         }
     }

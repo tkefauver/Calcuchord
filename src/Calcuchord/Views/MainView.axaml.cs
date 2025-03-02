@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,7 +23,7 @@ namespace Calcuchord {
             Instance = this;
             InitializeComponent();
 
-            EffectiveViewportChanged += (sender,args) => OnMainContainerSizeChanged();
+            EffectiveViewportChanged += (_,_) => OnMainContainerSizeChanged();
         }
 
         protected override void OnLoaded(RoutedEventArgs e) {
@@ -35,9 +34,8 @@ namespace Calcuchord {
             // BUG right drawer opens automatically when threshold width == 0
             mvm.IsRightDrawerOpen = false;
 
-            if(
-                PlatformWrapper.Services is { } ps &&
-                ps.MidiPlayer is { } mp) {
+            if(PlatformWrapper.Services is { } ps &&
+               ps.MidiPlayer is { } mp) {
                 Dispatcher.UIThread.Post(
                     async () => {
                         // wait for load
@@ -63,7 +61,7 @@ namespace Calcuchord {
 
             tvm.DoOrientationCheck();
 
-            mvm.SetMatchColumnCount(mvm.MatchColCount);
+            //mvm.SetMatchColumnCount(mvm.MatchColCount);
 
             InstrumentView.MeasureInstrument();
         }
@@ -146,11 +144,12 @@ namespace Calcuchord {
                 return false;
             }
 
+            int cc = MatchesView.Instance.GetVisualColCount();
+
             int sel_idx = mvm.Matches.IndexOf(sel_mtvm);
-            int sel_row = (int)Math.Floor(sel_idx / (double)mvm.MatchColCount);
-            int sel_col = sel_idx % mvm.MatchColCount;
-            PlatformWrapper.Services.Logger.WriteLine(
-                $"'{sel_mtvm.NotePattern}' idx: {sel_idx} r: {sel_row} c: {sel_col}");
+            int sel_row = sel_idx / cc;
+            int sel_col = sel_idx % cc;
+            //PlatformWrapper.Services.Logger.WriteLine($"'{sel_mtvm.NotePattern}' idx: {sel_idx} r: {sel_row} c: {sel_col}");
 
             int new_sel_col = sel_col + dx;
             int new_sel_row = sel_row + dy;
@@ -158,7 +157,7 @@ namespace Calcuchord {
                 return false;
             }
 
-            int new_sel_idx = (mvm.MatchColCount * new_sel_row) + new_sel_col;
+            int new_sel_idx = (cc * new_sel_row) + new_sel_col;
             if(new_sel_idx >= mvm.Matches.Count ||
                mvm.Matches.ElementAt(new_sel_idx) is not { } to_sel_mtvm) {
                 return false;

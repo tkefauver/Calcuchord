@@ -18,6 +18,13 @@
         <AvaloniaResource Include="Assets\**"/>
     </ItemGroup>
 
+    <PropertyGroup>
+        <PropertyChangedAnalyzerConfiguration>
+            <IsCodeGeneratorDisabled>false</IsCodeGeneratorDisabled>
+            <EventInvokerName>OnPropertyChanged</EventInvokerName>
+        </PropertyChangedAnalyzerConfiguration>
+    </PropertyGroup>
+
 
     <ItemGroup>
         <PackageReference Include="Avalonia"/>
