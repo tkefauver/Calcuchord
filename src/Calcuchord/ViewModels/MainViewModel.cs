@@ -1197,12 +1197,14 @@ namespace Calcuchord {
             IsBusy = true;
             await Task.Delay(100);
 
-            if(source == InstrumentInitSource.Startup && IsIndexModeSelected) {
-                await Task.Delay(3_000);
-            }
+            
 
             await Dispatcher.UIThread.InvokeAsync(
                 async () => {
+                    if(source == InstrumentInitSource.Startup && IsIndexModeSelected) {
+                        await Task.Delay(3_000);
+                    }
+                    
                     Matches.Clear();
 
                     bool do_sel_reset =
