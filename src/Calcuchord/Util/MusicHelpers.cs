@@ -4,6 +4,85 @@ using MonkeyPaste.Common;
 
 namespace Calcuchord {
     public static class MusicHelpers {
+        public static Note ToNote(this (NoteType,int) nt_tup) {
+            return Note.GetNote(nt_tup.Item1.Id(nt_tup.Item2));
+        }
+
+        public static int Id(this NoteType nt,int register) {
+            return (int)nt + (register * 12);
+        }
+
+        public static string ToIconName(this InstrumentType it) {
+            switch(it) {
+                default:
+                    return "MusicClefBass";
+                case InstrumentType.Guitar:
+                    return "GuitarElectric";
+                case InstrumentType.Ukulele:
+                case InstrumentType.Banjo:
+                    return "GuitarAcoustic";
+                case InstrumentType.Piano:
+                    return "Piano";
+                case InstrumentType.Cello:
+                case InstrumentType.Viola:
+                case InstrumentType.Violin:
+                    return "Violin";
+            }
+        }
+
+        public static bool IsNylon(this InstrumentType it) {
+            switch(it) {
+                default:
+                    return false;
+                case InstrumentType.Ukulele:
+                case InstrumentType.Cello:
+                case InstrumentType.Viola:
+                case InstrumentType.Violin:
+                    return true;
+            }
+        }
+
+        public static bool IsDoubledStrings(this InstrumentType it) {
+            switch(it) {
+                default:
+                    return false;
+                case InstrumentType.Lute:
+                case InstrumentType.Mandolin:
+                    return true;
+            }
+        }
+
+        public static bool IsFretless(this InstrumentType it) {
+            switch(it) {
+                default:
+                    return false;
+                case InstrumentType.Viola:
+                case InstrumentType.Violin:
+                    return true;
+            }
+        }
+
+        public static bool IsWoundSteel(this NoteType nt,int register) {
+            // anything at/below guitar G3 string...
+            return nt.Id(register) <= 43;
+        }
+
+        public static (NoteType key,int register) GetDoubledString(this InstrumentType it,NoteType nt,int register,
+            int strNum) {
+            /*
+             The lowest four strings are tuned an octave higher,
+             and the highest two strings are tuned in uniso
+             */
+            int dbl_register = register;
+            if((it == InstrumentType.Guitar ||
+                it == InstrumentType.Lute) &&
+               strNum < 4) {
+                dbl_register--;
+            }
+
+            return (nt,dbl_register);
+        }
+
         public static NoteType ToDegree(this NoteType nt,ChordKeyDegreeType ckdt) {
             return new Note(nt,2).Offset(ckdt.GetOffset()).Key;
         }

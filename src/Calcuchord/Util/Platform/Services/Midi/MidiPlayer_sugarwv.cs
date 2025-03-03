@@ -10,7 +10,7 @@ using WebViewCore.Configurations;
 
 namespace Calcuchord {
 
-    public class MidiPlayer_sugarwv : MidiPlayerBase {
+    public class MidiPlayer_sugarwv : MidiWebPlayerBase {
         WebView _wv;
 
         public override bool CanPlay =>
@@ -59,7 +59,7 @@ namespace Calcuchord {
             {
                 Width = 0,
                 Height = 0,
-                IsVisible = false
+                IsVisible = false,
             };
             if(OperatingSystem.IsAndroid()) {
                 // NOTE android won't load webview w/o being visible
@@ -119,13 +119,14 @@ namespace Calcuchord {
             }
         }
 
-        public override void PlayChord(IEnumerable<Note> notes) {
-            ExecuteScriptAsync($"playChord([{string.Join(",",GetMidiNotes(notes))}])")
+
+        public override void PlayChord(IEnumerable<IEnumerable<int>> notes) {
+            ExecuteScriptAsync($"playChord('{GetParam(notes)}')")
                 .FireAndForgetSafeAsync();
         }
 
-        public override void PlayScale(IEnumerable<Note> notes) {
-            ExecuteScriptAsync($"playScale([{string.Join(",",GetMidiNotes(notes))}])")
+        public override void PlayScale(IEnumerable<IEnumerable<int>> notes) {
+            ExecuteScriptAsync($"playScale('{GetParam(notes)}')")
                 .FireAndForgetSafeAsync();
         }
     }

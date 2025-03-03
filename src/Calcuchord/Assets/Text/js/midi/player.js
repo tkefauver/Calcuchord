@@ -13,7 +13,7 @@ var delayScaleMs = 300;
 var isPlaying = false;
 var needsStop = false;
 
-const testNoteNumbers = [60, 64, 67];
+const testNoteNumbers = [[60, 48], [64, 52], [67, 55]];
 
 function initMidi() {
     audioContext = new AudioContextFunc();
@@ -27,16 +27,18 @@ function stopPlayback() {
 
 function playNotes(midiNotes, delayMs) {
     let cur_delay = 300 / 1000;
-    const notes = midiNotes;//midiNotes.map(midiNote => Tone.Midi(midiNote).toNote());
+    const notes = JSON.parse(midiNotes);//midiNotes.map(midiNote => Tone.Midi(midiNote).toNote());
     for (var i = 0; i < notes.length; i++) {
-        player.queueWaveTable(
-            audioContext,
-            audioContext.destination,
-            instrument,
-            audioContext.currentTime + cur_delay,
-            notes[i],
-            sustain,
-            volumeDb);
+        for (var j = 0; j < notes[i].length; j++) {
+            player.queueWaveTable(
+                audioContext,
+                audioContext.destination,
+                instrument,
+                audioContext.currentTime + cur_delay,
+                notes[i][j],
+                sustain,
+                volumeDb);
+        }
 
         cur_delay += (delayMs / 1000);
     }
@@ -51,11 +53,11 @@ function playScale(midiNotes) {
 }
 
 function testChord() {
-    playChord(testNoteNumbers);
+    playChord(JSON.stringify(testNoteNumbers));
 }
 
 function testScale() {
-    playScale(testNoteNumbers);
+    playScale(JSON.stringify(testNoteNumbers));
 }
 
 function setInstrumentAsync(instName) {

@@ -120,27 +120,27 @@ namespace Calcuchord {
 
         #region Protected Methods
 
+        #endregion
+
+        #region Private Methods
+
         void PlayGroupMidi() {
             if(PlatformWrapper.Services is not { } ps ||
-               ps.MidiPlayer is not { } mp) {
+               ps.MidiPlayer is not { } mp ||
+               NotePattern.GetToneGroups() is not { } tgl) {
                 return;
             }
 
 
             Dispatcher.UIThread.Post(
                 () => {
-
                     if(PatternType == MusicPatternType.Chords) {
-                        mp.PlayChord(NotePattern.Notes.ToArray());
+                        mp.PlayChord(tgl);
                     } else {
-                        mp.PlayScale(NotePattern.Notes.ToArray());
+                        mp.PlayScale(tgl);
                     }
                 },DispatcherPriority.Background);
         }
-
-        #endregion
-
-        #region Private Methods
 
         #endregion
 

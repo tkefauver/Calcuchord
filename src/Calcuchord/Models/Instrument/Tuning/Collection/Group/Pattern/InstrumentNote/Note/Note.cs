@@ -31,11 +31,12 @@ namespace Calcuchord {
             return new(note_tup.nt,reg);
         }
 
+
         public static int GetId(Note nt) {
-            return nt.IsMute ? int.MaxValue : (int)nt.Key + (nt.Register * MAX_NOTE_TYPE);
+            return nt.IsMute ? int.MaxValue : nt.Key.Id(nt.Register);
         }
 
-        static Note GetNote(int id) {
+        public static Note GetNote(int id) {
             if(id == int.MaxValue) {
                 return new(null,null);
             }

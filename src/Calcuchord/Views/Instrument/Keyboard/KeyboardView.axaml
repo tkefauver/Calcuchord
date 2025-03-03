@@ -97,43 +97,46 @@
         </Style>
 
     </UserControl.Styles>
-    <Viewbox Margin="10">
-        <Grid>
-            <ItemsControl x:Name="KeyboardItemsControl"
-                          ItemsSource="{Binding AllNotes}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas Classes="keyboard" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="local:NoteViewModel">
-                        <local:KeyView Classes="note-btn input"
-                                       Classes.altered="{Binding IsAltered}"
-                                       Classes.selected="{Binding IsSelected}"
-                                       Classes.desired-root="{Binding IsDesiredRoot}"
-                                       Classes.hover="{Binding IsHovering}"
-                                       Loaded="KeyView_Loaded"
-                                       Unloaded="KeyView_Unloaded" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <!-- KEYBOARD SHADOW -->
-            <Border IsHitTestVisible="False">
-                <Border.Background>
-                    <LinearGradientBrush TransformOrigin="50%,50%"
-                                         StartPoint="50%,0%"
-                                         EndPoint="50%,100%">
-                        <GradientStops>
-                            <GradientStop Color="#DD000000"
-                                          Offset="0" />
-                            <GradientStop Color="Transparent"
-                                          Offset="0.2" />
-                        </GradientStops>
-                    </LinearGradientBrush>
-                </Border.Background>
-            </Border>
-        </Grid>
-    </Viewbox>
+    <ScrollViewer Classes="inst-scroll"
+                  Classes.drawer-test="false">
+        <Viewbox Margin="10">
+            <Grid>
+                <ItemsControl x:Name="KeyboardItemsControl"
+                              ItemsSource="{Binding AllNotes}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas Classes="keyboard" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="local:NoteViewModel">
+                            <local:KeyView Classes="note-btn input"
+                                           Classes.altered="{Binding IsAltered}"
+                                           Classes.selected="{Binding IsSelected}"
+                                           Classes.desired-root="{Binding IsDesiredRoot}"
+                                           Classes.hover="{Binding IsHovering}"
+                                           Loaded="KeyView_Loaded"
+                                           Unloaded="KeyView_Unloaded" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <!-- KEYBOARD SHADOW -->
+                <Border IsHitTestVisible="False">
+                    <Border.Background>
+                        <LinearGradientBrush TransformOrigin="50%,50%"
+                                             StartPoint="50%,0%"
+                                             EndPoint="50%,100%">
+                            <GradientStops>
+                                <GradientStop Color="#DD000000"
+                                              Offset="0" />
+                                <GradientStop Color="Transparent"
+                                              Offset="0.2" />
+                            </GradientStops>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
+            </Grid>
+        </Viewbox>
+    </ScrollViewer>
 
 </UserControl>

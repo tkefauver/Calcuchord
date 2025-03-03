@@ -7,10 +7,10 @@ namespace Calcuchord.Browser {
         #region Midi
 
         [JSImport("globalThis.window.playChord")]
-        public static partial void PlayChord(int[] notes);
+        public static partial void PlayChord(string toneGroupsJson);
 
         [JSImport("globalThis.window.playScale")]
-        public static partial void PlayScale(int[] notes);
+        public static partial void PlayScale(string toneGroupsJson);
 
         #endregion
 

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Calcuchord.Browser {
 
-    public class MidiPlayer_browser : MidiPlayerBase {
+    public class MidiPlayer_browser : MidiWebPlayerBase {
 
 
         int GetTone(Note note) {
@@ -13,12 +13,12 @@ namespace Calcuchord.Browser {
             return note.NoteId;
         }
 
-        public override void PlayChord(IEnumerable<Note> notes) {
-            JsInterop.PlayChord(GetMidiNotes(notes));
+        public override void PlayChord(IEnumerable<IEnumerable<int>> notes) {
+            JsInterop.PlayChord(GetParam(notes));
         }
 
-        public override void PlayScale(IEnumerable<Note> notes) {
-            JsInterop.PlayScale(GetMidiNotes(notes));
+        public override void PlayScale(IEnumerable<IEnumerable<int>> notes) {
+            JsInterop.PlayScale(GetParam(notes));
         }
     }
 

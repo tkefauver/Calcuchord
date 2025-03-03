@@ -1,6 +1,8 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -26,10 +28,37 @@ namespace Calcuchord {
             EffectiveViewportChanged += (_,_) => OnMainContainerSizeChanged();
         }
 
+
+        void SetupDrawers() {
+            if(MainNavDrawer.GetVisualDescendant<Border>(name: "PART_RightDrawerBorder") is not { } rdb ||
+               MainNavDrawer.GetVisualDescendant<Border>(name: "PART_LeftDrawerBorder") is not { } ldb) {
+                return;
+            }
+
+            void OnDrawerOpenChanged(bool right) {
+                //var mtsv = MatchesView.MatchesScrollViewer.Viewport
+                double lm = ldb.Bounds.Width + ldb.Margin.Left;
+                double rm = rdb.Bounds.Width + rdb.Margin.Right;
+
+                MatchesView.MatchesScrollViewer.Width = MainContainerGrid.Bounds.Width - rm;
+                if(InstrumentView.GetVisualDescendant<FretboardView>() is { } fbv) {
+                    fbv.FretboardScrollViewer.Width = MainContainerGrid.Bounds.Width - rm;
+                }
+            }
+
+            EffectiveViewportChanged += (_,_) => OnDrawerOpenChanged(false);
+
+            ldb.GetObservable(MarginProperty).Subscribe(value => OnDrawerOpenChanged(false));
+            rdb.GetObservable(MarginProperty).Subscribe(value => OnDrawerOpenChanged(true));
+        }
+
         protected override void OnLoaded(RoutedEventArgs e) {
             if(MainViewModel.Instance is not { } mvm) {
                 return;
             }
+
+            //SetupDrawers();
+
 
             // BUG right drawer opens automatically when threshold width == 0
             mvm.IsRightDrawerOpen = false;
@@ -64,6 +93,7 @@ namespace Calcuchord {
             //mvm.SetMatchColumnCount(mvm.MatchColCount);
 
             InstrumentView.MeasureInstrument();
+
         }
 
         protected override void OnKeyUp(KeyEventArgs e) {

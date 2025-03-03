@@ -32,6 +32,12 @@ namespace Calcuchord {
 
         #region View Models
 
+        TuningViewModel TuningVm =>
+            Parent;
+
+        InstrumentViewModel InstrumentVm =>
+            TuningVm.Parent;
+
         public ObservableCollection<NoteViewModel> Notes { get; } = [];
 
         public NoteViewModel SelectedNote {
@@ -70,6 +76,11 @@ namespace Calcuchord {
         #endregion
 
         #region State
+
+        public bool IsWoundSteel =>
+            InstrumentVm.IsSteel &&
+            BaseNote != null &&
+            BaseNote.Key.IsWoundSteel(BaseNote.Register);
 
         public int BaseNoteNum =>
             Parent.CapoNum;

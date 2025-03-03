@@ -34,12 +34,9 @@ namespace Calcuchord {
 
     public partial class DesignInstrumentViewModel : InstrumentViewModel {
         public DesignInstrumentViewModel() {
-            Instrument = new()
-            {
-                InstrumentType = InstrumentType.Guitar,
-            };
-            Instrument = Instrument.CreateByType(InstrumentType.Banjo);
-            SelectedInstrumentTypeIndex = 1;
+            _ = MainViewModel.Instance;
+            MainViewModel.Instance.Instruments.Add(this);
+            InitAsync(Instrument.CreateByType(InstrumentType.Guitar)).FireAndForgetSafeAsync();
         }
     }
 }

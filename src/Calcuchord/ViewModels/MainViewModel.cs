@@ -32,6 +32,8 @@ namespace Calcuchord {
 
         #region Constants
 
+        public const int DEFAULT_MATCH_COL_COUNT = 3;
+
         #endregion
 
         #region Statics
@@ -94,6 +96,8 @@ namespace Calcuchord {
             SelectedInstrument == null ? null : SelectedInstrument.SelectedTuning;
 
         public TuningViewModel LastSelectedTuning { get; private set; }
+
+        InstrumentViewModel LastSelectedInstrument { get; set; }
 
         #endregion
 
@@ -309,9 +313,12 @@ namespace Calcuchord {
             EditModeInstrument.Tunings.Any();
 
         public bool IsInstrumentVisible =>
+            !IsInstrumentChanging &&
             SelectedTuning != null &&
             SelectedDisplayMode == DisplayModeType.Search &&
             EditModeInstrument == null;
+
+        bool IsInstrumentChanging { get; set; }
 
         public int SelectedInstrumentIndex {
             get => Instruments.IndexOf(SelectedInstrument);
@@ -342,9 +349,8 @@ namespace Calcuchord {
 
         #region Matches
 
-        //int MatchCount { get; set; }
-        public int MatchColCount { get; private set; } = 1;
-        int MaxMatchColCount => 5;
+        public int MatchColCount { get; private set; } = DEFAULT_MATCH_COL_COUNT;
+        int MaxMatchColCount => 8;
 
         //IEnumerable<ChordKeyDegreeType> AvailableDegrees { get; set; } = [];
         IEnumerable<NoteType> AvailableKeys { get; } = [];
@@ -535,7 +541,7 @@ namespace Calcuchord {
 
         void MatchesOnCollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
             //OnPropertyChanged(nameof(IsMatchesEmpty));
-            //OnPropertyChanged(nameof(CanIncreaseMatchColumnCount));
+            //OnPropertyChanged(nameof(CanIncreaseMatchColumnCount));F
         }
 
         async Task InitAsync(IEnumerable<Instrument> instl = null) {
@@ -548,13 +554,11 @@ namespace Calcuchord {
                 await Task.Delay(100);
             }
 
+
             instl = instl ?? Prefs.Instance.Instruments;
 
             ThemeViewModel.Instance.Init();
-            //MatchColCount = 1;
-
-            //Prefs.Instance.IsSaveIgnored = true;
-            //MatchColCount = Prefs.Instance.MatchColCount;
+            MatchColCount = Prefs.Instance.MatchColCount;
 
             if(!instl.Any()) {
                 IsBusy = false;
@@ -826,7 +830,7 @@ namespace Calcuchord {
             sorted_results = SortMatches(results);
             SelectedMatch = null;
             if(MatchesView.Instance is { } mv) {
-                mv.MatchGalleryScrollViewer.ScrollToHome();
+                mv.MatchesScrollViewer.ScrollToHome();
             }
 
             //}
@@ -1193,18 +1197,16 @@ namespace Calcuchord {
         }
 
         async Task InitInstrumentAsync(InstrumentInitSource source) {
-            bool was_busy = IsBusy;
             IsBusy = true;
             await Task.Delay(100);
-
-            
 
             await Dispatcher.UIThread.InvokeAsync(
                 async () => {
                     if(source == InstrumentInitSource.Startup && IsIndexModeSelected) {
                         await Task.Delay(3_000);
                     }
-                    
+
+
                     Matches.Clear();
 
                     bool do_sel_reset =
@@ -1213,6 +1215,12 @@ namespace Calcuchord {
                         sel_tvm.ResetSelection();
                     }
 
+                    if(SelectedInstrument != LastSelectedInstrument &&
+                       LastSelectedInstrument != null) {
+                        IsInstrumentChanging = true;
+                    }
+
+                    LastSelectedInstrument = SelectedInstrument;
                     LastSelectedTuning = SelectedTuning;
 
                     bool reset_opts = source == InstrumentInitSource.Startup &&
@@ -1235,6 +1243,10 @@ namespace Calcuchord {
                         st.RaisePropertyChanged(nameof(st.IsSelected));
                     }
 
+                    if(IsInstrumentChanging) {
+                        await Task.Delay(500);
+                    }
+
                     InstrumentInitialized?.Invoke(this,EventArgs.Empty);
                     UpdateMatchesAsync(MatchUpdateSource.InstrumentInit).FireAndForgetSafeAsync();
 
@@ -1248,10 +1260,19 @@ namespace Calcuchord {
                 await Task.Delay(100);
             }
 
+            if(IsInstrumentChanging &&
+               InstrumentView.Instance is { } iv) {
+                await Task.Delay(500);
+                while(!iv.IsArrangeValid) {
+                    await Task.Delay(100);
+                }
+
+                IsInstrumentChanging = false;
+            }
 
             if(source != InstrumentInitSource.Startup ||
                MatchesView.Instance is not { } mtv) {
-                IsBusy = was_busy;
+                IsBusy = false;
                 return;
             }
 
@@ -1264,7 +1285,7 @@ namespace Calcuchord {
 
             //IsBusy = false;
             mtv.InvalidateArrange();
-            IsBusy = was_busy;
+            IsBusy = false;
         }
 
         #endregion

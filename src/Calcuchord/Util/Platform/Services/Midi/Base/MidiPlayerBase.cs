@@ -39,9 +39,9 @@ namespace Calcuchord {
 
         }
 
-        public abstract void PlayChord(IEnumerable<Note> notes);
+        public abstract void PlayChord(IEnumerable<IEnumerable<int>> tone_sets);
 
-        public abstract void PlayScale(IEnumerable<Note> notes);
+        public abstract void PlayScale(IEnumerable<IEnumerable<int>> tone_sets);
 
         #endregion
 

@@ -19,10 +19,10 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <PropertyChangedAnalyzerConfiguration>
-            <IsCodeGeneratorDisabled>false</IsCodeGeneratorDisabled>
-            <EventInvokerName>OnPropertyChanged</EventInvokerName>
-        </PropertyChangedAnalyzerConfiguration>
+        <!--        <PropertyChangedAnalyzerConfiguration>-->
+        <!--            <IsCodeGeneratorDisabled>false</IsCodeGeneratorDisabled>-->
+        <!--            <EventInvokerName>OnPropertyChanged</EventInvokerName>-->
+        <!--        </PropertyChangedAnalyzerConfiguration>-->
     </PropertyGroup>
 
 
@@ -31,6 +31,12 @@
         <PackageReference Include="Avalonia.ReactiveUI"/>
         <PackageReference Include="Avalonia.Svg.Skia"/>
         <PackageReference Include="Avalonia.Fonts.Inter"/>
+        <PackageReference Include="Material.Avalonia"/>
+        <PackageReference Include="Material.Avalonia.Dialogs"/>
+        <PackageReference Include="Material.Icons.Avalonia"/>
+        <PackageReference Include="MonkeyPaste.Common.Avalonia"/>
+        <PackageReference Include="org.matheval"/>
+
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="Avalonia.Diagnostics">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
@@ -41,25 +47,11 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Material.Avalonia"/>
-        <PackageReference Include="Material.Avalonia.Dialogs"/>
-        <PackageReference Include="Material.Icons.Avalonia"/>
-        <PackageReference Include="MonkeyPaste.Common.Avalonia"/>
-        <PackageReference Include="org.matheval"/>
         <PackageReference Include="PropertyChanged.Fody" PrivateAssets="All"/>
         <PackageReference Include="ReactiveUI"/>
         <PackageReference Include="System.Formats.Nrbf"/>
         <PackageReference Include="webview.avalonia"/>
+        <PackageReference Include="Melanchall.DryWetMidi"/>
     </ItemGroup>
 
-
-    <ItemGroup>
-        <Reference Include="Melanchall.DryWetMidi">
-            <HintPath>..\..\..\..\..\.nuget\packages\melanchall.drywetmidi\7.2.0\lib\netstandard2.0\Melanchall.DryWetMidi.dll</HintPath>
-        </Reference>
-    </ItemGroup>
-
-    <Target Name="Kill_Zombies" BeforeTargets="BeforeBuild">
-        <!--        <Exec ContinueOnError="True" Command="$(SolutionDir)scripts\kill_zombies.sh"/>-->
-    </Target>
 </Project>

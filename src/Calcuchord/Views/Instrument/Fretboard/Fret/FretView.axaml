@@ -12,13 +12,111 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:NoteViewModel"
              x:Class="Calcuchord.FretView">
+    <UserControl.Resources>
+        <!-- WOUND STEEL -->
+        <ImageBrush x:Key="WoundSteelBrush"
+                    Source="/Assets/Images/stringchunk_10x6.png"
+                    DestinationRect="0 0 3 3"
+                    TileMode="Tile" />
+        <!-- STEEL -->
+        <LinearGradientBrush x:Key="SteelBrush"
+                             StartPoint="0%,0%"
+                             EndPoint="0%,50%"
+                             SpreadMethod="Reflect">
+            <LinearGradientBrush.Transform>
+                <SkewTransform AngleX="10" />
+            </LinearGradientBrush.Transform>
+            <GradientStops>
+                <GradientStop Color="DimGray"
+                              Offset="0" />
+                <GradientStop Color="White"
+                              Offset="0.95" />
+            </GradientStops>
+        </LinearGradientBrush>
+
+        <!-- NYLON -->
+        <LinearGradientBrush x:Key="NylonBrush"
+                             Opacity="0.7"
+                             StartPoint="0%,0%"
+                             EndPoint="0%,50%"
+                             SpreadMethod="Reflect">
+            <LinearGradientBrush.Transform>
+                <SkewTransform AngleX="10" />
+            </LinearGradientBrush.Transform>
+            <GradientStops>
+                <GradientStop Color="DarkGoldenrod"
+                              Offset="0" />
+                <GradientStop Color="Bisque"
+                              Offset="0.95" />
+            </GradientStops>
+        </LinearGradientBrush>
+        <!-- UNKNOWN -->
+        <LinearGradientBrush x:Key="UnknownBrush"
+                             StartPoint="0%,0%"
+                             EndPoint="5%,0%"
+                             SpreadMethod="Reflect">
+            <LinearGradientBrush.Transform>
+                <SkewTransform AngleX="22" />
+            </LinearGradientBrush.Transform>
+            <GradientStops>
+                <GradientStop Color="Black"
+                              Offset="0" />
+                <GradientStop Color="Yellow"
+                              Offset="1" />
+            </GradientStops>
+        </LinearGradientBrush>
+
+        <!-- FRET BAR (RIGHT) -->
+
+        <LinearGradientBrush x:Key="FretBarBrushR"
+                             StartPoint="100%,0%"
+                             EndPoint="0%,0%"
+                             SpreadMethod="Reflect">
+            <GradientStops>
+                <GradientStop Color="DimGray"
+                              Offset="0" />
+                <GradientStop Color="White"
+                              Offset="0.95" />
+            </GradientStops>
+        </LinearGradientBrush>
+        <!-- FRET BAR (LEFT) -->
+
+        <LinearGradientBrush x:Key="FretBarBrushL"
+                             StartPoint="0%,0%"
+                             EndPoint="100%,0%"
+                             SpreadMethod="Reflect">
+            <GradientStops>
+                <GradientStop Color="DimGray"
+                              Offset="0" />
+                <GradientStop Color="White"
+                              Offset="0.95" />
+            </GradientStops>
+        </LinearGradientBrush>
+
+        <!-- FRET BAR (FRETLESS) -->
+
+        <LinearGradientBrush x:Key="FretBarBrushFretless"
+                             Opacity="0.5"
+                             StartPoint="0%,0%"
+                             EndPoint="0%,30%"
+                             SpreadMethod="Repeat">
+            <GradientStops>
+                <GradientStop Color="Transparent"
+                              Offset="0" />
+                <GradientStop Color="Transparent"
+                              Offset="0.49" />
+                <GradientStop Color="White"
+                              Offset="0.5" />
+                <GradientStop Color="White"
+                              Offset="1" />
+            </GradientStops>
+        </LinearGradientBrush>
+    </UserControl.Resources>
     <UserControl.Styles>
         <!-- FRET DOTS -->
         <Style Selector="Ellipse.dot">
             <Setter Property="ClipToBounds"
                     Value="True" />
-            <!-- <Setter Property="Width" -->
-            <!--         Value="20" /> -->
             <Setter Property="Height"
                     Value="{Binding $self.Bounds.Width}" />
             <Setter Property="HorizontalAlignment"
@@ -32,81 +130,29 @@
             </Setter>
         </Style>
 
+        <!-- STRING CHUNK (SOLID) -->
+        <Style Selector="Border.str-chunk">
+            <Setter Property="Background"
+                    Value="{StaticResource SteelBrush}" />
+        </Style>
+
         <!-- STRING CHUNK (WOUND) -->
 
-        <Style Selector="Border#StringChunkBorder">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <ImageBrush Source="/Assets/Images/stringchunk_10x6.png"
-                                DestinationRect="0 0 3 3"
-                                TileMode="Tile" />
-                </Setter.Value>
-            </Setter>
+        <Style Selector="Border.str-chunk.wound">
+            <Setter Property="Background"
+                    Value="{StaticResource WoundSteelBrush}" />
         </Style>
 
-        <!-- STRING CHUNK (SOLID) -->
-        <Style Selector="Border#StringChunkBorder.solid">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0%,0%"
-                                         EndPoint="0%,50%"
-                                         SpreadMethod="Reflect">
-                        <LinearGradientBrush.Transform>
-                            <SkewTransform AngleX="10" />
-                        </LinearGradientBrush.Transform>
-                        <GradientStops>
-                            <GradientStop Color="DimGray"
-                                          Offset="0" />
-                            <GradientStop Color="White"
-                                          Offset="0.95" />
-                        </GradientStops>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
         <!-- STRING CHUNK (SOLID) -->
-        <Style Selector="Border#StringChunkBorder.nylon">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush Opacity="0.7"
-                                         StartPoint="0%,0%"
-                                         EndPoint="0%,50%"
-                                         SpreadMethod="Reflect">
-                        <LinearGradientBrush.Transform>
-                            <SkewTransform AngleX="10" />
-                        </LinearGradientBrush.Transform>
-                        <GradientStops>
-                            <GradientStop Color="DarkGoldenrod"
-                                          Offset="0" />
-                            <GradientStop Color="Bisque"
-                                          Offset="0.95" />
-                        </GradientStops>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+        <Style Selector="Border.str-chunk.nylon">
+            <Setter Property="Background"
+                    Value="{StaticResource NylonBrush}" />
         </Style>
         <!-- STRING CHUNK (UNKNOWN) -->
-        <Style Selector="Border#StringChunkBorder.unknown">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <!-- UNKNOWN BRUSH -->
-                    <LinearGradientBrush StartPoint="0%,0%"
-                                         EndPoint="5%,0%"
-                                         SpreadMethod="Reflect">
-                        <LinearGradientBrush.Transform>
-                            <SkewTransform AngleX="22" />
-                        </LinearGradientBrush.Transform>
-                        <GradientStops>
-                            <GradientStop Color="Black"
-                                          Offset="0" />
-                            <GradientStop Color="Yellow"
-                                          Offset="1" />
-                        </GradientStops>
-                    </LinearGradientBrush>
-
-                </Setter.Value>
-            </Setter>
+        <Style Selector="Border.str-chunk.unknown">
+            <Setter Property="Background"
+                    Value="{StaticResource UnknownBrush}" />
         </Style>
 
 
@@ -149,9 +195,29 @@
                     Value="drop-shadow(1 1 1 black)" />
         </Style>
 
+        <Style Selector="Border.fbl">
+            <Setter Property="Background"
+                    Value="{StaticResource FretBarBrushL}" />
+            <Setter Property="Width"
+                    Value="1.5" />
+        </Style>
+        <Style Selector="Border.fbr">
+            <Setter Property="Background"
+                    Value="{StaticResource FretBarBrushR}" />
+            <Setter Property="Width"
+                    Value="1.5" />
+        </Style>
+        <Style Selector="Grid.fretless Border.fbl, Grid.fretless Border.fbr">
+            <Setter Property="Background"
+                    Value="{StaticResource FretBarBrushFretless}" />
+            <Setter Property="Width"
+                    Value="0.5" />
+        </Style>
+
 
     </UserControl.Styles>
-    <Grid Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}">
+    <Grid Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
+          Classes.fretless="{Binding Parent.Parent.Parent.IsFretless}">
         <!-- FRET NUM LABEL -->
         <TextBlock x:Name="FretNumLabel"
                    Text="{Binding MarkerLabel}"
@@ -188,6 +254,7 @@
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="IsTopDotFret" />
                     <Binding Path="!IsFullDot" />
+                    <Binding Path="!IsFretless" />
                 </MultiBinding>
             </Ellipse.IsVisible>
             <Ellipse.RenderTransform>
@@ -203,6 +270,7 @@
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="IsBottomDotFret" />
                     <Binding Path="!IsFullDot" />
+                    <Binding Path="!IsFretless" />
                 </MultiBinding>
             </Ellipse.IsVisible>
             <Ellipse.RenderTransform>
@@ -212,65 +280,41 @@
 
         <!-- PEARL DOT (FULL) -->
         <Ellipse Classes="dot"
-                 IsVisible="{Binding IsFullDot}"
                  HorizontalAlignment="Center"
-                 VerticalAlignment="Center" />
+                 VerticalAlignment="Center">
+            <Ellipse.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsFullDot" />
+                    <Binding Path="!IsFretless" />
+                </MultiBinding>
+            </Ellipse.IsVisible>
+        </Ellipse>
 
         <!-- FRET BAR (LEFT) -->
         <Border x:Name="FretBarLeft"
+                Classes="fbl"
                 HorizontalAlignment="Left"
-                VerticalAlignment="Stretch"
-                Width="1.5">
+                VerticalAlignment="Stretch">
             <Border.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="IsRealNote" />
                     <Binding Path="!IsFirstFret" />
                 </MultiBinding>
             </Border.IsVisible>
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0%,0%"
-                                     EndPoint="100%,0%"
-                                     SpreadMethod="Reflect">
-                    <LinearGradientBrush.Transform>
-                        <!-- <SkewTransform AngleX="10" /> -->
-                    </LinearGradientBrush.Transform>
-                    <GradientStops>
-                        <GradientStop Color="DimGray"
-                                      Offset="0" />
-                        <GradientStop Color="White"
-                                      Offset="0.95" />
-                    </GradientStops>
-                </LinearGradientBrush>
-            </Border.Background>
         </Border>
 
         <!-- FRET BAR (RIGHT) -->
 
         <Border x:Name="FretBarRight"
+                Classes="fbr"
                 HorizontalAlignment="Right"
-                VerticalAlignment="Stretch"
-                Width="1.5">
+                VerticalAlignment="Stretch">
             <Border.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="IsRealNote" />
                     <Binding Path="!IsLastFret" />
                 </MultiBinding>
             </Border.IsVisible>
-            <Border.Background>
-                <LinearGradientBrush StartPoint="100%,0%"
-                                     EndPoint="0%,0%"
-                                     SpreadMethod="Reflect">
-                    <LinearGradientBrush.Transform>
-                        <!-- <SkewTransform AngleX="10" /> -->
-                    </LinearGradientBrush.Transform>
-                    <GradientStops>
-                        <GradientStop Color="DimGray"
-                                      Offset="0" />
-                        <GradientStop Color="White"
-                                      Offset="0.95" />
-                    </GradientStops>
-                </LinearGradientBrush>
-            </Border.Background>
         </Border>
 
         <!-- EDGE (TOP) -->
@@ -339,13 +383,52 @@
         <!-- STRING CHUNK -->
 
         <Border x:Name="StringChunkBorder"
+                Classes="str-chunk"
                 Classes.nylon="{Binding IsRowNylon}"
-                Classes.solid="{Binding IsRowSolid}"
-                IsVisible="{Binding IsRealNote}"
+                Classes.wound="{Binding IsRowWound}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
                 Effect="drop-shadow(1 1 2 black)"
-                Height="{Binding StringChunkHeight}" />
+                Height="{Binding StringChunkHeight}">
+            <Border.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsRealNote" />
+                    <Binding Path="!IsDoubleString" />
+                </MultiBinding>
+            </Border.IsVisible>
+        </Border>
+
+        <Border x:Name="StringChunkBorder_lo"
+                Classes="str-chunk"
+                Classes.wound="{Binding IsRowWound}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Effect="drop-shadow(1 1 2 black)"
+                RenderTransform="translate(0,-3px)"
+                Height="{Binding StringChunkHeight}">
+            <Border.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsRealNote" />
+                    <Binding Path="IsDoubleString" />
+                </MultiBinding>
+            </Border.IsVisible>
+        </Border>
+
+        <Border x:Name="StringChunkBorder_hi"
+                Classes="str-chunk"
+                Background="{StaticResource SteelBrush}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Effect="drop-shadow(1 1 2 black)"
+                RenderTransform="translate(0,3px)"
+                Height="1">
+            <Border.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsRealNote" />
+                    <Binding Path="IsDoubleString" />
+                </MultiBinding>
+            </Border.IsVisible>
+        </Border>
 
 
         <!-- MUTE OVERLAY -->

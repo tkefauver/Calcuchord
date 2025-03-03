@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Calcuchord {
@@ -96,6 +97,29 @@ namespace Calcuchord {
 
         public override string ToString() {
             return FullName;
+        }
+
+        public IEnumerable<IEnumerable<int>> GetToneGroups() {
+            if(Parent is not { } ngc ||
+               ngc.Parent is not { } tuning ||
+               tuning.Parent is not { } inst) {
+                return null;
+            }
+
+            var note_sets = new List<List<Note>>();
+            InstrumentType it = inst.InstrumentType;
+            note_sets = Notes.Where(x => !x.IsMute).Select(x => new List<Note> { x }).ToList();
+            if(it.IsDoubledStrings()) {
+                foreach(var note_set in note_sets) {
+                    if(note_set.FirstOrDefault() is not InstrumentNote inn) {
+                        continue;
+                    }
+
+                    note_set.Add(it.GetDoubledString(inn.Key,inn.Register,inn.RowNum).ToNote());
+                }
+            }
+
+            return note_sets.Select(x => x.Select(y => y.MidiTone));
         }
 
         #endregion

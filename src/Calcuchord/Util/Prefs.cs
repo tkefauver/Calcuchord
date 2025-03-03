@@ -106,7 +106,7 @@ namespace Calcuchord {
         public bool IsThemeDark { get; set; }
 
         [JsonProperty]
-        public int MatchColCount { get; set; } = 1;
+        public int MatchColCount { get; set; } = MainViewModel.DEFAULT_MATCH_COL_COUNT;
 
 
         [JsonProperty]

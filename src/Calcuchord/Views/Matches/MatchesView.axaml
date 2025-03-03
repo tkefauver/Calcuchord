@@ -207,7 +207,8 @@
 
             <Grid RowDefinitions="Auto,*">
 
-                <ScrollViewer x:Name="MatchGalleryScrollViewer"
+                <ScrollViewer x:Name="MatchesScrollViewer"
+                              Classes.drawer-test="false"
                               Grid.Row="1">
                     <Viewbox>
                         <!-- NOTE no margin/padding on repeater to get accurate bounds -->
@@ -268,7 +269,8 @@
                 <!-- ZOOM BTNS -->
                 <controls:Card Grid.Row="0"
                                x:Name="ZoomButtonCard"
-                               Classes="button-group right-drawer-float"
+                               Classes="button-group"
+                               Classes.right-drawer-float="{Binding !IsPhone, Source={x:Static local:ThemeViewModel.Instance}}"
                                Classes.peek="{Binding IsRightDrawerOpen}"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
@@ -29,36 +28,40 @@ namespace Calcuchord {
             return Path.Combine(sounds_dir,fn);
         }
 
-        public override void PlayChord(IEnumerable<Note> notes) {
+        public override void PlayChord(IEnumerable<IEnumerable<int>> tone_sets) {
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
             int delta = 0;
+            int vel = 127;
 
-            int[] tones = GetMidiNotes(notes);
 
-            foreach(int tone in tones) {
-                int vel = 127;
-                trackChunk.Events.Add(
-                    new NoteOnEvent((SevenBitNumber)tone,(SevenBitNumber)vel)
-                    {
-                        DeltaTime = delta,
-                    });
+            foreach(var tone_set in tone_sets) {
+                foreach(int tone in tone_set) {
+                    trackChunk.Events.Add(
+                        new NoteOnEvent((SevenBitNumber)tone,(SevenBitNumber)vel)
+                        {
+                            DeltaTime = delta,
+                        });
+                }
+
                 delta += 5;
             }
 
-            foreach(int tone in tones) {
-                trackChunk.Events.Add(
-                    new NoteOffEvent((SevenBitNumber)tone,(SevenBitNumber)0)
-                    {
-                        DeltaTime = 200,
-                    });
+            foreach(var tone_set in tone_sets) {
+                foreach(int tone in tone_set) {
+                    trackChunk.Events.Add(
+                        new NoteOffEvent((SevenBitNumber)tone,(SevenBitNumber)0)
+                        {
+                            DeltaTime = 200,
+                        });
+                }
             }
 
-            PreparePlayback(midiFile,GetInstrumentSoundFontPath(notes.FirstOrDefault()));
+            PreparePlayback(midiFile,GetInstrumentSoundFontPath(null));
         }
 
-        public override void PlayScale(IEnumerable<Note> notes) {
+        public override void PlayScale(IEnumerable<IEnumerable<int>> tone_sets) {
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
@@ -66,23 +69,26 @@ namespace Calcuchord {
             int delay = 25;
             int deltaTime = 0;
 
-            foreach(int note in notes.Select(x => x.MidiTone)) {
-                int vel = 127;
+            foreach(var tone_set in tone_sets) {
+                foreach(int note in tone_set) {
+                    int vel = 127;
 
-                trackChunk.Events.Add(
-                    new NoteOnEvent((SevenBitNumber)note,(SevenBitNumber)vel)
-                    {
-                        DeltaTime = deltaTime,
-                    });
-                trackChunk.Events.Add(
-                    new NoteOffEvent((SevenBitNumber)note,(SevenBitNumber)0)
-                    {
-                        DeltaTime = delay,
-                    });
-                deltaTime = 0;
+                    trackChunk.Events.Add(
+                        new NoteOnEvent((SevenBitNumber)note,(SevenBitNumber)vel)
+                        {
+                            DeltaTime = deltaTime,
+                        });
+                    trackChunk.Events.Add(
+                        new NoteOffEvent((SevenBitNumber)note,(SevenBitNumber)0)
+                        {
+                            DeltaTime = delay,
+                        });
+                    deltaTime = 0;
+                }
             }
 
-            PreparePlayback(midiFile,GetInstrumentSoundFontPath(notes.FirstOrDefault()));
+
+            PreparePlayback(midiFile,GetInstrumentSoundFontPath(null));
         }
 
         void PreparePlayback(MidiFile midiFile,string soundFontPath) {

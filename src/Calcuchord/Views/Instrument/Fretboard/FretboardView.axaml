@@ -12,6 +12,9 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:TuningViewModel"
              x:Class="Calcuchord.FretboardView">
+    <Design.DataContext>
+        <local:DesignInstrumentViewModel />
+    </Design.DataContext>
     <UserControl.Resources>
 
     </UserControl.Resources>
@@ -26,7 +29,7 @@
             <Setter Property="Source"
                     Value="/Assets/Images/rosewood.jpg" />
         </Style>
-        <Style Selector="Image#FretboardBgImage.dark">
+        <Style Selector="Image#FretboardBgImage.dark,Image#FretboardBgImage.fretless">
             <Setter Property="Source"
                     Value="/Assets/Images/ebony.jpg" />
         </Style>
@@ -50,6 +53,7 @@
     <Grid>
         <ScrollViewer x:Name="FretboardScrollViewer"
                       Classes="inst-scroll"
+                      Classes.drawer-test="false"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Hidden">
             <Viewbox Stretch="UniformToFill"
@@ -57,6 +61,7 @@
                      MinWidth="{Binding $parent[local:FretboardView].Bounds.Width}">
                 <Grid x:Name="FretboardContainerGrid">
                     <Image x:Name="FretboardBgImage"
+                           Classes.fretless="{Binding Parent.IsFretless}"
                            Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"
                            HorizontalAlignment="Left"
                            VerticalAlignment="Top"

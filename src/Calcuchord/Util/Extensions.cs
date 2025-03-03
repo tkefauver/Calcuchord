@@ -33,23 +33,6 @@ namespace Calcuchord {
             return !source.Any(predicate);
         }
 
-        public static string ToIconName(this InstrumentType it) {
-            switch(it) {
-                default:
-                    return "MusicClefBass";
-                case InstrumentType.Guitar:
-                    return "GuitarElectric";
-                case InstrumentType.Ukulele:
-                case InstrumentType.Banjo:
-                    return "GuitarAcoustic";
-                case InstrumentType.Piano:
-                    return "Piano";
-                case InstrumentType.Cello:
-                case InstrumentType.Viola:
-                case InstrumentType.Violin:
-                    return "Violin";
-            }
-        }
 
         public static bool IsFlagEnabled(this SvgOptionType optionType,InstrumentType it,MusicPatternType pt,
             DisplayModeType dmt) {

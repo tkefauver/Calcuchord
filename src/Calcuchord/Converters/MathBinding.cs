@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
-using MonkeyPaste.Common;
 using org.matheval;
 
 namespace Calcuchord {
@@ -32,52 +31,44 @@ namespace Calcuchord {
             bool IsBoolResult { get; }
 
             internal MathMultiValueConverter(string exp,bool isBoolResult) {
-                Exp = new(exp);
+                Exp = new Expression(exp);
                 IsBoolResult = isBoolResult;
-                if(IsBoolResult) {
-
-                }
             }
 
             public object Convert(IList<object> values,Type targetType,object parameter,CultureInfo culture) {
                 for(int i = 0; i < values.Count; i++) {
                     if(values[i] == null ||
                        !double.TryParse(values[i].ToString(),out double dbl_val) ||
-                       !dbl_val.IsNumber()) {
-                        //continue;
+                       double.IsNaN(dbl_val) ||
+                       double.IsPositiveInfinity(dbl_val) ||
+                       double.IsNegativeInfinity(dbl_val)) {
+                        // when variable unset, undefined, NAN etc. default to 0
                         dbl_val = 0;
                     }
 
                     Exp.Bind(VariableNames[i],dbl_val);
                 }
 
-                var errors = Exp.GetError();
-                if(errors.Count == 0) {
-                    if(IsBoolResult) {
-                        int bool_result = Exp.Eval<int>();
-                        if(bool_result == 1) {
-
-                        }
-
-                        // test
-                        return bool_result == 1;
+                if(Exp.GetError().Count > 0) {
+                    // handle error (dumps variables)
+                    var variables = Exp.getVariables();
+                    foreach(string variable in variables) {
+                        Console.WriteLine(variable); // will print x, a
                     }
 
-                    double result = Exp.Eval<double>();
-                    if(!result.IsNumber() || result == 0) {
-
-                    }
-
-                    return result;
+                    return IsBoolResult ? false : 0;
                 }
 
-                // get variables
-                var variables = Exp.getVariables();
-                foreach(string variable in variables) {
-                    PlatformWrapper.Services.Logger.WriteLine(variable); // will print x, a
+
+                double result = Exp.Eval<double>();
+                if(IsBoolResult) {
+                    // example:
+                    // exp: IF(a+5<b,1,0)
+                    // ie: IF(cond,true val,false val)
+                    return (int)result == 1;
                 }
 
-                return IsBoolResult ? false : 0;
+                return result;
             }
         }
     }

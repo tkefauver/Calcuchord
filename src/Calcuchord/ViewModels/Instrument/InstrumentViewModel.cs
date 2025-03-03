@@ -89,7 +89,20 @@ namespace Calcuchord {
 
         #region State
 
-        public bool CanEdit => true; //!IsKeyboard;
+        public bool IsSteel =>
+            !InstrumentType.IsNylon();
+
+        public bool IsNylon =>
+            InstrumentType.IsNylon();
+
+        public bool IsFretless =>
+            InstrumentType.IsFretless();
+
+        public bool IsDoubledStrings =>
+            InstrumentType.IsDoubledStrings();
+
+
+        public bool CanEdit => true;
 
         public bool IsInstrumentTabSelected { get; set; }
         public bool IsTuningTabSelected { get; set; }

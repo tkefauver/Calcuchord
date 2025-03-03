@@ -56,8 +56,8 @@ namespace Calcuchord {
     public interface IMidiPlayer {
         bool CanPlay { get; }
         void Init(object obj);
-        void PlayChord(IEnumerable<Note> notes);
-        void PlayScale(IEnumerable<Note> notes);
+        void PlayChord(IEnumerable<IEnumerable<int>> tone_sets);
+        void PlayScale(IEnumerable<IEnumerable<int>> tone_sets);
 
     }
 }

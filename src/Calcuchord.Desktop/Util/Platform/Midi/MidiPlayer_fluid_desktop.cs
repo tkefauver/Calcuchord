@@ -6,7 +6,6 @@ namespace Calcuchord.Desktop {
 
     public class MidiPlayer_fluid_desktop : MidiFilePlayerBase {
 
-        Player Player { get; set; }
         NFluidSettings Settings { get; set; }
         Synth Synth { get; set; }
         AudioDriver AudioDriver { get; set; }
@@ -31,8 +30,7 @@ namespace Calcuchord.Desktop {
 
                 AudioDriver = new AudioDriver(Synth.Settings,Synth);
 
-                Player = new Player(Synth);
-                Player.Add(MidiFilePath);
+
             } catch(Exception ex) {
                 // TODO should notify user to install fluidsynth on play click prolly (or figure out how to bundle it?)
                 ex.Dump();
@@ -41,8 +39,10 @@ namespace Calcuchord.Desktop {
         }
 
         protected override void PlayFile(string soundFontPath) {
-            Player.Play();
-            Player.Join();
+            Player player = new Player(Synth);
+            player.Add(MidiFilePath);
+            player.Play();
+            player.Join();
         }
 
 

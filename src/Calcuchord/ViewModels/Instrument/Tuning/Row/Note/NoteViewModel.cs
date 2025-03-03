@@ -33,6 +33,15 @@ namespace Calcuchord {
 
         #region View Models
 
+        NoteRowViewModel RowVm =>
+            Parent;
+
+        TuningViewModel TuningVm =>
+            RowVm.Parent;
+
+        InstrumentViewModel InstrumentVm =>
+            TuningVm.Parent;
+
         #endregion
 
         #region Appearance
@@ -116,11 +125,18 @@ namespace Calcuchord {
             RowNum >= 0 &&
             NoteNum >= 0;
 
-        public bool IsRowSolid =>
-            !IsRowNylon && RowNum >= 4;
+        public bool IsDoubleString =>
+            InstrumentVm.IsDoubledStrings;
+
+        public bool IsRowWound =>
+            RowVm.IsWoundSteel;
 
         public bool IsRowNylon =>
-            Parent.Parent.Parent.InstrumentType == InstrumentType.Ukulele;
+            InstrumentVm.IsNylon;
+
+        public bool IsFretless =>
+            InstrumentVm.IsFretless;
+
 
         public bool IsRowMuted =>
             Parent.IsMuted;
