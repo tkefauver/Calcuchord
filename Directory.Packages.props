@@ -4,7 +4,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageVersion Include="MonkeyPaste.Common.Avalonia" Version="1.0.3.30"/>
+        <PackageVersion Include="MonkeyPaste.Common.Avalonia" Version="1.0.3.32"/>
         <PackageVersion Include="MonoMac.NetStandard" Version="0.0.4"/>
         <PackageVersion Include="PublishSPAforGitHubPages.Build" Version="3.0.0"/>
         <PackageVersion Include="org.matheval" Version="1.0.0.3"/>
@@ -33,5 +33,7 @@
         <PackageVersion Include="Melanchall.DryWetMidi" Version="7.2.0"/>
         <PackageVersion Include="SpaceWizards.NFluidsynth" Version="0.1.1"/>
         <PackageVersion Include="webview.avalonia" Version="11.0.0.1"/>
+        <PackageVersion Include="Material.Avalonia.DataGrid" Version="$(MaterialAvaloniaVersion)"/>
+        <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)"/>
     </ItemGroup>
 </Project>

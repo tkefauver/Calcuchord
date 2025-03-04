@@ -7,12 +7,13 @@ namespace Calcuchord {
         protected string GetParam(IEnumerable<IEnumerable<int>> noteSets) {
             StringBuilder sb = new StringBuilder();
             sb.Append("[");
-
-            foreach(var ns in noteSets) {
+            var nsl = noteSets.ToArray();
+            for(int i = 0; i < nsl.Length; i++) {
+                var ns = nsl[i];
                 sb.Append("[");
                 sb.Append(string.Join(",",ns));
                 sb.Append("]");
-                if(ns != noteSets.Last()) {
+                if(i < nsl.Length - 1) {
                     sb.Append(",");
                 }
             }
