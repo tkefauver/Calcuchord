@@ -1,34 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
+        <OutputType>Exe</OutputType>
         <!--If you are willing to use Windows/MacOS native APIs you will need to create 3 projects.
         One for Windows with net9.0-windows TFM, one for MacOS with net9.0-macos and one with net9.0 TFM for Linux.-->
-        <TargetFramework>net$(DotNetVersion)</TargetFramework>
+        <TargetFramework>net$(DotNetVersion)-macos</TargetFramework>
         <Nullable>disable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     </PropertyGroup>
 
 <!--    <PropertyGroup>-->
-<!--        <ApplicationId>com.Monkey.Calcuchord</ApplicationId>-->
+<!--        <CFBundleName>Calcuchord</CFBundleName> &lt;!&ndash; Also defines .app file name &ndash;&gt;-->
+<!--        <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>-->
+<!--        <CFBundleDisplayName>Calcuchord</CFBundleDisplayName>-->
+<!--        <CFBundleIdentifier>com.thomaskefauver.Calcuchord</CFBundleIdentifier>-->
+<!--        <CFBundleVersion>1.0.0</CFBundleVersion>-->
+<!--        <CFBundleShortVersionString>1.0.0</CFBundleShortVersionString>-->
+<!--        <CFBundlePackageType>APPL</CFBundlePackageType>-->
+<!--        <CFBundleSignature>????</CFBundleSignature>-->
+<!--        <CFBundleExecutable>Calcuchord.Mac</CFBundleExecutable>-->
+<!--        <CFBundleIconFile>icon.icns</CFBundleIconFile> &lt;!&ndash; Will be copied from output directory &ndash;&gt;-->
+<!--        <NSPrincipalClass>NSApplication</NSPrincipalClass>-->
 <!--    </PropertyGroup>-->
-    
+
     <PropertyGroup>
-        <UseAppHost>true</UseAppHost>
-<!--        <PublishSingleFile>true</PublishSingleFile>-->
-        <SelfContained>true</SelfContained>
-        <PublishTrimmed>true</PublishTrimmed>
-        <PublishReadyToRun>true</PublishReadyToRun>
+        <ApplicationId>com.Monkey.Calcuchord</ApplicationId>
     </PropertyGroup>
     
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-      <CreatePackage>false</CreatePackage>
-      <UseSGen>false</UseSGen>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-      <CreatePackage>false</CreatePackage>
-      <UseSGen>false</UseSGen>
-    </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia.Desktop" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
@@ -37,6 +35,7 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Avalonia.ReactiveUI" />
+        <PackageReference Include="dotnet.bundle" />
     </ItemGroup>
 
 

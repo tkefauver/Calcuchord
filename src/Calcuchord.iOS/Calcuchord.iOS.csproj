@@ -9,13 +9,23 @@
 
     <PropertyGroup>
         <CodesignKey>Apple Development: thomas kefauver (MY7R67BXWM)</CodesignKey>
+        <CodesignProvision>tk ios dev</CodesignProvision>
+        <ArchiveOnBuild>true</ArchiveOnBuild>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(IsPublishMode)' == 'true'">
+        <CodesignKey>Apple Distribution: thomas kefauver (3382GDS46D)</CodesignKey>
+        <CodesignProvision>cc ios dist</CodesignProvision>
     </PropertyGroup>
         
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-		<PublishAot>false</PublishAot>
-        <CodesignKey>Apple Distribution: thomas kefauver (3382GDS46D)</CodesignKey>
-        <CodesignProvision>cc dist profile</CodesignProvision>
-        <ArchiveOnBuild>true</ArchiveOnBuild>
+        <PublishAot>true</PublishAot>
+    </PropertyGroup>
+        
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <MtouchLink>SdkOnly</MtouchLink>
+      <MtouchDebug>true</MtouchDebug>
+      <IOSDebugOverWiFi>true</IOSDebugOverWiFi>
     </PropertyGroup>
     
     <ItemGroup>

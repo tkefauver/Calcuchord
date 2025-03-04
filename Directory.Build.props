@@ -1,13 +1,15 @@
 <Project>
     <PropertyGroup>
         <DotNetVersion>9.0</DotNetVersion>
-        <AvaloniaVersion>11.2.4</AvaloniaVersion>
+        <AvaloniaVersion>11.2.5</AvaloniaVersion>
         <MaterialAvaloniaVersion>3.9.2</MaterialAvaloniaVersion>
     </PropertyGroup>
 
     <PropertyGroup>
         <!--        <BuildOs>LINUX</BuildOs>-->
-        <BuildOs>BROWSER</BuildOs>
+<!--        <BuildOs>BROWSER</BuildOs>-->
+        <BuildOs>IOS</BuildOs>
+<!--        <BuildOs>MAC</BuildOs>-->
         <!--        <BuildOs>ANDROID</BuildOs>-->
         <UseSugarWv>true</UseSugarWv>
     </PropertyGroup>
@@ -19,6 +21,11 @@
 
     <PropertyGroup Condition="$(BuildOs) == 'BROWSER'">
         <DefineConstants>$(DefineConstants);BROWSER</DefineConstants>
+        <UseSugarWv>false</UseSugarWv>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="$(BuildOs) == 'IOS'">
+        <DefineConstants>$(DefineConstants);IOS</DefineConstants>
         <UseSugarWv>false</UseSugarWv>
     </PropertyGroup>
 

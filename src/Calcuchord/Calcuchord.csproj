@@ -50,8 +50,11 @@
         <PackageReference Include="PropertyChanged.Fody" PrivateAssets="All"/>
         <PackageReference Include="ReactiveUI"/>
         <PackageReference Include="System.Formats.Nrbf"/>
-        <PackageReference Include="webview.avalonia"/>
-        <PackageReference Include="Melanchall.DryWetMidi"/>
+        <PackageReference Include="Melanchall.DryWetMidi" Condition="'$(BuildOs)' != 'IOS'"/>
+
+        <PackageReference Include="webview.avalonia" />
+        <PackageReference Include="Material.Avalonia.DataGrid" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" />
     </ItemGroup>
 
 </Project>

@@ -24,6 +24,7 @@ namespace Calcuchord.iOS {
                 //         Platform.Init(()=>rvc);
                 //     }
                 // })
+                .With(new iOSPlatformOptions() {})
                 .AfterPlatformServicesSetup(
                     _ => {
                         PlatformWrapper.Init(new PlatformServices_ios());

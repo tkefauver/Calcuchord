@@ -22,7 +22,7 @@ namespace Calcuchord {
                     Directory.CreateDirectory(storage_dir);
                 }
 
-                if(ps.MidiPlayer is MidiFilePlayerBase mpb &&
+                if(ps.MidiPlayer is MidiSoundFontPlayerBase mpb &&
                    mpb.SoundFontDir is { } sound_dir &&
                    !sound_dir.IsDirectory()) {
                     // NOTE below only happens if sound/ doesn't exist

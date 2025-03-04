@@ -4,14 +4,13 @@ using NFluidSettings = NFluidsynth.Settings;
 
 namespace Calcuchord.Desktop {
 
-    public class MidiPlayer_fluid_desktop : MidiFilePlayerBase {
+    public class MidiPlayer_fluid_desktop : MidiFluidPlayerBase {
 
         NFluidSettings Settings { get; set; }
         Synth Synth { get; set; }
         AudioDriver AudioDriver { get; set; }
 
         public override void Init(object obj) {
-            base.Init(obj);
             try {
                 Settings = new NFluidSettings();
 

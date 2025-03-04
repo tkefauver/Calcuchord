@@ -1,34 +1,15 @@
 using System.Collections.Generic;
+#if !IOS
 using System.IO;
 using System.Threading.Tasks;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
+#endif
 
 namespace Calcuchord {
-    public abstract class MidiFilePlayerBase : MidiPlayerBase {
-        public string SoundFontDir =>
-            Path.Combine(PlatformWrapper.Services.StorageHelper.StorageDir,"sound");
-
-        protected string MidiFilePath =>
-            Path.Combine(PlatformWrapper.Services.StorageHelper.StorageDir,"output.mid");
-
-        protected string GetInstrumentSoundFontPath(Note note) {
-            string sounds_dir = SoundFontDir;
-            string fn = "guitar.sf2";
-            if(note is PatternNote pn &&
-               pn.Parent is { } ng &&
-               ng.Parent is { } ngc &&
-               ngc.Parent is { } tuning &&
-               tuning.Parent is { } inst) {
-                if(inst.InstrumentType == InstrumentType.Piano) {
-                    fn = "piano.sf2";
-                }
-            }
-
-            return Path.Combine(sounds_dir,fn);
-        }
-
+    public abstract class MidiFluidPlayerBase : MidiSoundFontPlayerBase {
         public override void PlayChord(IEnumerable<IEnumerable<int>> tone_sets) {
+#if !IOS
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
@@ -59,9 +40,11 @@ namespace Calcuchord {
             }
 
             PreparePlayback(midiFile,GetInstrumentSoundFontPath(null));
+#endif
         }
 
         public override void PlayScale(IEnumerable<IEnumerable<int>> tone_sets) {
+            #if !IOS
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
@@ -89,7 +72,9 @@ namespace Calcuchord {
 
 
             PreparePlayback(midiFile,GetInstrumentSoundFontPath(null));
+#endif
         }
+#if !IOS
 
         void PreparePlayback(MidiFile midiFile,string soundFontPath) {
             Task.Run(
@@ -103,6 +88,7 @@ namespace Calcuchord {
                     PlayFile(soundFontPath);
                 });
         }
+#endif
 
         protected abstract void PlayFile(string soundFontPath);
     }
