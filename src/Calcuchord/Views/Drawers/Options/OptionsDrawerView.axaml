@@ -12,7 +12,7 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              x:DataType="local:MainViewModel"
-             x:Class="Calcuchord.RightDrawerView">
+             x:Class="Calcuchord.OptionsDrawerView">
     <UserControl.Styles>
         <Style Selector="ScrollViewer">
             <Setter Property="IsScrollChainingEnabled"
@@ -25,6 +25,8 @@
         <Style Selector="TextBlock.header">
             <Setter Property="FontSize"
                     Value="24" />
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Bg}" />
         </Style>
 
         <Style Selector="StackPanel.options controls|Card">
@@ -222,13 +224,60 @@
     <controls:ColorZone Mode="Accent"
                         Foreground="{DynamicResource Fg}">
         <DockPanel Margin="5">
-            <Button x:Name="CloseRightDrawerButton"
-                    DockPanel.Dock="Top"
-                    Command="{Binding CloseRightDrawerCommand}"
-                    HorizontalAlignment="Left"
-                    Classes="float">
-                <avalonia:MaterialIcon Kind="Close" />
-            </Button>
+            <DockPanel DockPanel.Dock="Top">
+
+                <Button x:Name="BackButton"
+                        DockPanel.Dock="Left"
+                        Command="{Binding BackCommand}"
+                        HorizontalAlignment="Left"
+                        Classes="float">
+                    <avalonia:MaterialIcon Kind="ArrowLeft" />
+                </Button>
+                <Button x:Name="InstrumentOptionsButton"
+                        DockPanel.Dock="Right"
+                        DataContext="{Binding SelectedInstrument}"
+                        HorizontalAlignment="Right"
+                        Classes="float">
+                    <Button.Flyout>
+                        <Flyout>
+                            <ContextMenu HorizontalAlignment="Right"
+                                         VerticalAlignment="Top">
+                                <MenuItem Header="Edit..."
+                                          Command="{Binding BeginEditInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                          CommandParameter="{Binding ElementName=InstrumentOptionsButton}">
+                                    <MenuItem.Icon>
+                                        <avalonia:MaterialIcon Kind="Cog"
+                                                               Width="24"
+                                                               Height="24" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem StaysOpenOnClick="False"
+                                          Header="Remove"
+                                          Command="{Binding RemoveInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                          CommandParameter="{Binding ElementName=InstrumentOptionsButton}">
+                                    <MenuItem.Icon>
+                                        <avalonia:MaterialIcon Kind="TrashCan"
+                                                               Width="24"
+                                                               Height="24" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </Flyout>
+                    </Button.Flyout>
+                    <avalonia:MaterialIcon Kind="DotsVertical" />
+                </Button>
+                <StackPanel DataContext="{Binding SelectedInstrument}"
+                            IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <TextBlock FontSize="18"
+                               TextAlignment="Center"
+                               Text="{Binding Title}" />
+                    <TextBlock FontSize="14"
+                               TextAlignment="Center"
+                               Opacity="0.6"
+                               Text="{Binding Subtitle}" />
+                </StackPanel>
+
+            </DockPanel>
 
             <ScrollViewer>
                 <StackPanel Classes="options"

@@ -4,7 +4,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageVersion Include="MonkeyPaste.Common.Avalonia" Version="1.0.3.30"/>
+        <PackageVersion Include="MonkeyPaste.Common.Avalonia" Version="1.0.3.32"/>
         <PackageVersion Include="MonoMac.NetStandard" Version="0.0.4"/>
         <PackageVersion Include="PublishSPAforGitHubPages.Build" Version="3.0.0"/>
         <PackageVersion Include="org.matheval" Version="1.0.0.3"/>

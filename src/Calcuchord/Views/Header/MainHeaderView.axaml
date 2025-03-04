@@ -17,17 +17,18 @@
         <DockPanel Margin="4">
             <ToggleButton x:Name="NavDrawerSwitch"
                           DockPanel.Dock="Left"
-                          IsChecked="{Binding IsLeftDrawerOpen,Mode=TwoWay}"
+                          IsChecked="{Binding IsDrawerOpen,Mode=TwoWay}"
                           Classes="float">
                 <avalonia:MaterialIcon Kind="Menu" />
             </ToggleButton>
-
-            <ToggleButton x:Name="OptionDrawerSwitch"
-                          DockPanel.Dock="Right"
-                          IsChecked="{Binding IsRightDrawerOpen,Mode=TwoWay}"
-                          Classes="float">
-                <avalonia:MaterialIcon Kind="DotsVertical" />
-            </ToggleButton>
+            <!-- -->
+            <!-- <ToggleButton x:Name="OptionDrawerSwitch" -->
+            <!--               DockPanel.Dock="Right" -->
+            <!--               IsVisible="False" -->
+            <!--               IsChecked="{Binding IsRightDrawerOpen,Mode=TwoWay}" -->
+            <!--               Classes="float"> -->
+            <!--     <avalonia:MaterialIcon Kind="DotsVertical" /> -->
+            <!-- </ToggleButton> -->
 
             <TextBlock Classes="Headline6"
                        IsVisible="False"

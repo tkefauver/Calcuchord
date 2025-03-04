@@ -6,7 +6,12 @@ namespace Calcuchord {
     public enum MatchSortType {
         Key,
         Position,
-        Suffix
+        Suffix,
+    }
+
+    public enum DrawerPageType {
+        Main,
+        Options,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -42,14 +47,14 @@ namespace Calcuchord {
         PianoBlackKeyBg3,
         PianoBlackKeyFg,
         PianoMatch,
-        DisabledAccentFg
+        DisabledAccentFg,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum NoteMarkerState {
         Off,
         On,
-        Root
+        Root,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -60,7 +65,7 @@ namespace Calcuchord {
         FilterToggle,
         InstrumentInit,
         BookmarkToggle,
-        SortToggle
+        SortToggle,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -71,7 +76,7 @@ namespace Calcuchord {
         EditorDone,
         InstrumentRemoved,
         TabChanged,
-        PatternChanged
+        PatternChanged,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -82,7 +87,7 @@ namespace Calcuchord {
         IV,
         V,
         vi,
-        vii
+        vii,
     }
 
 
@@ -96,7 +101,7 @@ namespace Calcuchord {
         Frets,
         Tuning,
         Barres,
-        Shadows
+        Shadows,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -112,7 +117,7 @@ namespace Calcuchord {
         Ab,
         A,
         Bb,
-        B
+        B,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -128,21 +133,21 @@ namespace Calcuchord {
         Cello,
         Lute,
         Balalaika,
-        Other
+        Other,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum MusicPatternType {
         Chords,
         Scales,
-        Modes
+        Modes,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum DisplayModeType {
         Search,
         Bookmarks,
-        Index
+        Index,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -159,7 +164,7 @@ namespace Calcuchord {
         ModeSort,
         ChordSvg,
         ScaleSvg,
-        ModeSvg
+        ModeSvg,
     }
 
     // _ = '/'
@@ -173,7 +178,7 @@ namespace Calcuchord {
         MelodicMinor,
         MinorPentatonic,
         Pentatonic,
-        Blues
+        Blues,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -184,7 +189,7 @@ namespace Calcuchord {
         Mixolydian,
         Locrian,
 
-        AhavaRaba
+        AhavaRaba,
         // missing:
         // Ionian,
         // Aeolian
@@ -287,7 +292,7 @@ namespace Calcuchord {
         // Num9b5,
         // Num7b9,
         // Num7sharp9,
-        Num11
+        Num11,
         // Num9sharp11,
         // Num13,
         // Num7b9sharp5,

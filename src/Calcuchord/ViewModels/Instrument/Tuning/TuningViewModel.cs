@@ -236,6 +236,7 @@ namespace Calcuchord {
             switch(e.PropertyName) {
                 case nameof(Name):
                     if(IsSelected) {
+                        Parent.RaisePropertyChanged(nameof(Parent.Subtitle));
                     }
 
                     break;
@@ -329,24 +330,13 @@ namespace Calcuchord {
             await InitAsync(Tuning);
         }
 
-        void CloseFlyout(object args) {
-            if(args is not Button b ||
-               b.Flyout is not { } fo) {
-                return;
-            }
-
-            // BUG context menu blocks popup and doesn't close 
-            // so manually closing
-            fo.Hide();
-        }
-
         #endregion
 
         #region Commands
 
         public ICommand DeleteThisTuningCommand => new MpCommand<object>(
             async (args) => {
-                CloseFlyout(args);
+                Extensions.CloseFlyout(args);
 
                 bool? confirmed = null;
                 YesNoDialogView dlg_v = new YesNoDialogView
@@ -383,7 +373,7 @@ namespace Calcuchord {
 
         public ICommand DuplicateThisTuningCommand => new MpCommand<object>(
             (args) => {
-                CloseFlyout(args);
+                Extensions.CloseFlyout(args);
                 Tuning dup_tuning = Tuning.Clone();
                 dup_tuning.IsReadOnly = false;
                 dup_tuning.Name = Parent.GetUniqueTuningName(Name,[]);
@@ -407,7 +397,7 @@ namespace Calcuchord {
 
         public ICommand ShowStatsCommand => new MpCommand<object>(
             (args) => {
-                CloseFlyout(args);
+                Extensions.CloseFlyout(args);
                 ChordsCount = Tuning.Chords.SelectMany(x => x.Patterns).Count();
                 ScalesCount = Tuning.Scales.SelectMany(x => x.Patterns).Count();
                 ModesCount = Tuning.Modes.SelectMany(x => x.Patterns).Count();

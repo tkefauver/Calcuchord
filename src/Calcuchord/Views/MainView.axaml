@@ -111,16 +111,13 @@
                                    SnackbarHorizontalAlignment="Center"
                                    SnackbarVerticalAlignment="Top">
                 <controls:NavigationDrawer x:Name="MainNavDrawer"
-                                           LeftDrawerExpandThresholdWidth="{x:Null}"
-                                           RightDrawerExpandThresholdWidth="{x:Null}"
-                                           LeftDrawerOpened="{Binding IsLeftDrawerOpen, Mode=TwoWay}"
-                                           RightDrawerOpened="{Binding IsRightDrawerOpen, Mode=TwoWay}"
+                                           LeftDrawerOpened="{Binding IsDrawerOpen, Mode=TwoWay}"
                                            Classes="permanent main">
                     <controls:NavigationDrawer.LeftDrawerContent>
-                        <local:LeftDrawerView x:Name="LeftDrawerView" />
+                        <local:DrawerHostView />
                     </controls:NavigationDrawer.LeftDrawerContent>
                     <controls:NavigationDrawer.RightDrawerContent>
-                        <local:RightDrawerView x:Name="RightDrawerView" />
+                        <!-- <local:OptionsDrawerView x:Name="RightDrawerView" /> -->
                     </controls:NavigationDrawer.RightDrawerContent>
                     <DockPanel LastChildFill="true">
                         <!-- HEADER MENU -->

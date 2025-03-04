@@ -59,7 +59,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.no-inst:not(.init)">
+        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.empty-inst:not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -75,13 +75,45 @@
             </Setter>
         </Style>
 
-        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.no-tuning:not(.no-inst):not(.init)">
+        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.no-inst-sel:not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
                         <TextBlock Classes="empty-label">
                             <TextBlock.Inlines>
-                                <Run Text="{Binding SelectedInstrument.Name}"
+                                <Run Text="Select an" />
+                                <Run Text="instrument."
+                                     Classes="subject2" />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.no-tuning-sel:not(.init)">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Template>
+                        <TextBlock Classes="empty-label">
+                            <TextBlock.Inlines>
+                                <Run Text="Select a" />
+                                <Run Text="tuning."
+                                     Classes="subject2" />
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.empty-tuning:not(.empty-inst):not(.init)">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Template>
+                        <TextBlock Classes="empty-label">
+                            <TextBlock.Inlines>
+                                <Run Text="{Binding SelectedInstrument.Title}"
                                      Classes="article" />
                                 <Run Text="needs a" />
                                 <Run Text="tuning."
@@ -94,7 +126,7 @@
         </Style>
 
         <Style
-            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode:not(.no-sel):not(.no-tuning):not(.no-inst):not(.init)">
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode:not(.no-sel):not(.empty-tuning):not(.empty-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -109,7 +141,7 @@
         </Style>
 
         <Style
-            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode.no-sel:not(.no-tuning):not(.no-inst):not(.init)">
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode.no-sel:not(.empty-tuning):not(.empty-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -126,7 +158,7 @@
         </Style>
 
         <Style
-            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode.no-sel.piano:not(.no-tuning):not(.no-inst):not(.init)">
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode.no-sel.piano:not(.empty-tuning):not(.empty-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -271,7 +303,6 @@
                                x:Name="ZoomButtonCard"
                                Classes="button-group"
                                Classes.right-drawer-float="{Binding !IsPhone, Source={x:Static local:ThemeViewModel.Instance}}"
-                               Classes.peek="{Binding IsRightDrawerOpen}"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
                                Margin="10">
@@ -320,9 +351,11 @@
             <TransitioningContentControl x:Name="EmptyTextCntrContentControl"
                                          Classes.piano="{Binding IsPianoSelected}"
                                          Classes.init="{Binding !IsLoaded}"
-                                         Classes.no-inst="{Binding IsInstrumentsEmpty}"
-                                         Classes.no-tuning="{Binding IsTuningsEmpty}"
+                                         Classes.no-inst-sel="{Binding SelectedInstrument, Converter={x:Static ObjectConverters.IsNull}}"
+                                         Classes.no-tuning-sel="{Binding SelectedTuning, Converter={x:Static ObjectConverters.IsNull}}"
                                          Classes.no-sel="{Binding IsDefaultSelection}"
+                                         Classes.empty-inst="{Binding IsInstrumentsEmpty}"
+                                         Classes.empty-tuning="{Binding IsTuningsEmpty}"
                                          Classes.search-mode="{Binding IsSearchModeSelected}"
                                          Classes.bookmark-mode="{Binding IsBookmarkModeSelected}"
                                          Classes.index-mode="{Binding IsIndexModeSelected}">

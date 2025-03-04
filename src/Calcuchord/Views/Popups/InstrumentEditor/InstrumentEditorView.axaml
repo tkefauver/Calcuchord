@@ -15,12 +15,16 @@
              x:Class="Calcuchord.InstrumentEditorView">
     <UserControl.Styles>
         <Style Selector="TextBlock.tab-header">
+            <Setter Property="Background"
+                    Value="{DynamicResource HttTransparent}" />
             <Setter Property="Foreground"
                     Value="{DynamicResource Fg}" />
             <Setter Property="FontSize"
                     Value="24" />
             <Setter Property="TextAlignment"
                     Value="Center" />
+            <Setter Property="Cursor"
+                    Value="Hand" />
         </Style>
         <Style Selector="TabItem:selected TextBlock.tab-header">
             <Setter Property="Foreground"
@@ -37,6 +41,8 @@
             <Setter Property="Margin"
                     Value="0,30,0,0" />
         </Style>
+
+        <Style Selector="TabItem" />
     </UserControl.Styles>
 
 
