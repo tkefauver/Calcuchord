@@ -6,16 +6,14 @@
         <Nullable>disable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <ApplicationId>com.thomaskefauver.Calcuchord</ApplicationId>
-        <ApplicationVersion>1</ApplicationVersion>
+        <ApplicationVersion>1.0.0.1</ApplicationVersion>
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-        <AndroidPackageFormat>apk</AndroidPackageFormat>
         <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
         <AndroidSdkDirectory>/home/tkefauver/android-sdk</AndroidSdkDirectory>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <RunAOTCompilation>true</RunAOTCompilation>
-        <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
         <EnableLLVM>true</EnableLLVM>
         <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
@@ -26,15 +24,17 @@
         <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"/>
         <PackageReference Include="Xamarin.Essentials"/>
         <PackageReference Include="Melanchall.DryWetMidi"/>
-        <PackageReference Include="webview.avalonia.android"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
     </ItemGroup>
-
     <ItemGroup>
         <AvaloniaResource Include="Resources\drawable\Icon.png"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="Util\Platform\Services\MidiPlayer_ad_sugarwv.cs"/>
     </ItemGroup>
 
     <PropertyGroup>

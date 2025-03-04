@@ -6,7 +6,6 @@ using Android.Runtime;
 using Avalonia;
 using Avalonia.Android;
 using Avalonia.ReactiveUI;
-using Avalonia.WebView.Android;
 using Xamarin.Essentials;
 
 namespace Calcuchord.Android {
