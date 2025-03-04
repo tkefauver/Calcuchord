@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Avalonia.Svg"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             x:Class="Calcuchord.DrawerHostView"
+             x:DataType="local:MainViewModel">
+    <Carousel x:Name="DrawerCarousel"
+              SelectedIndex="{Binding CurrentDrawerPage, Converter={x:Static local:EnumToIntConverter.Instance}}">
+        <Carousel.PageTransition>
+            <PageSlide Duration="0:0:0.25" />
+        </Carousel.PageTransition>
+        <Carousel.Items>
+            <local:MainDrawerView DataContext="{x:Static local:MainViewModel.Instance}" />
+            <local:OptionsDrawerView DataContext="{x:Static local:MainViewModel.Instance}" />
+        </Carousel.Items>
+    </Carousel>
+</UserControl>

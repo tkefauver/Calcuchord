@@ -61,7 +61,7 @@ namespace Calcuchord {
 
 
             // BUG right drawer opens automatically when threshold width == 0
-            mvm.IsRightDrawerOpen = false;
+            //mvm.IsRightDrawerOpen = false;
 
             if(PlatformWrapper.Services is { } ps &&
                ps.MidiPlayer is { } mp) {

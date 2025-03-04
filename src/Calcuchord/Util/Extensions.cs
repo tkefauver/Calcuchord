@@ -2,10 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Avalonia.Controls;
 using HtmlAgilityPack;
 
 namespace Calcuchord {
     public static class Extensions {
+        public static void CloseFlyout(object args) {
+            if(args is not Button b ||
+               b.Flyout is not { } fo) {
+                return;
+            }
+
+            // BUG context menu blocks popup and doesn't close 
+            // so manually closing
+            fo.Hide();
+        }
+
         public static void OpenInBrowser(this Uri uri) {
             string url = uri.AbsoluteUri;
             if(OperatingSystem.IsWindows()) {

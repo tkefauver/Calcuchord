@@ -6,8 +6,8 @@ using PropertyChanged;
 
 namespace Calcuchord {
     [DoNotNotify]
-    public partial class RightDrawerView : UserControl {
-        public RightDrawerView() {
+    public partial class OptionsDrawerView : UserControl {
+        public OptionsDrawerView() {
             InitializeComponent();
         }
 

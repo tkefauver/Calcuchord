@@ -11,7 +11,7 @@
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:MainViewModel"
-             x:Class="Calcuchord.LeftDrawerView">
+             x:Class="Calcuchord.MainDrawerView">
     <Design.DataContext>
         <local:MainViewModel />
     </Design.DataContext>
@@ -63,15 +63,15 @@
                     Value="Center" />
             <Setter Property="HorizontalContentAlignment"
                     Value="Left" />
-            <Setter Property="ContextMenu">
-                <Setter.Value>
-                    <ContextMenu>
-                        <MenuItem Header="Delete"
-                                  Command="{Binding RemoveInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                  CommandParameter="{Binding .}" />
-                    </ContextMenu>
-                </Setter.Value>
-            </Setter>
+            <!-- <Setter Property="ContextMenu"> -->
+            <!--     <Setter.Value> -->
+            <!--         <ContextMenu> -->
+            <!--             <MenuItem Header="Delete" -->
+            <!--                       Command="{Binding RemoveInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}" -->
+            <!--                       CommandParameter="{Binding .}" /> -->
+            <!--         </ContextMenu> -->
+            <!--     </Setter.Value> -->
+            <!-- </Setter> -->
         </Style>
     </UserControl.Styles>
 
@@ -109,7 +109,7 @@
                       Grid.Row="0"
                       Margin="3"
                       Classes="float"
-                      HorizontalAlignment="Right"
+                      HorizontalAlignment="Left"
                       VerticalAlignment="Top"
                       IsChecked="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, Mode=OneWay, FallbackValue=False, TargetNullValue=False}"
                       Command="{Binding ToggleThemeCommand, Source={x:Static local:ThemeViewModel.Instance}}">
@@ -117,22 +117,21 @@
                 Kind="{Binding ThemeIcon, Source={x:Static local:ThemeViewModel.Instance}, Mode=OneWay}" />
         </ToggleButton>
 
-        <!-- LANDSCAPE TOGGLE BTN -->
-        <ToggleButton x:Name="LandscapeToggleButton"
-                      Grid.Row="0"
-                      Margin="3"
-                      Classes="float"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Top"
-                      IsVisible="{Binding IsDebug, Source={x:Static local:ThemeViewModel.Instance}}"
-                      IsChecked="{Binding IsLandscape, Source={x:Static local:ThemeViewModel.Instance}, Mode=OneWay}"
-                      Command="{Binding ToggleLandscapeCommand, Source={x:Static local:ThemeViewModel.Instance}}">
-            <avalonia:MaterialIcon Kind="PhoneRotateLandscape" />
-        </ToggleButton>
+        <!-- FORWARD BTN -->
+        <Button Grid.Row="0"
+                Margin="3"
+                Classes="float"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                IsVisible="False"
+                Command="{Binding CloseDrawerCommand}">
+            <avalonia:MaterialIcon Kind="Close" />
+        </Button>
         <!-- INST LIST -->
         <ScrollViewer Grid.Row="1">
 
             <ListBox x:Name="InstrumentListBox"
+                     PointerReleased="InstrumentListBox_OnPointerReleased"
                      SelectedIndex="{Binding SelectedInstrumentIndex, Mode=TwoWay}"
                      ItemsSource="{Binding Instruments}">
                 <ListBox.ItemsPanel>
@@ -152,15 +151,13 @@
                                        Grid.Column="1"
                                        Classes="Headline5"
                                        VerticalAlignment="Center"
-                                       Text="{Binding Name}" />
+                                       Text="{Binding Title}" />
 
                             <TextBlock Grid.Row="1"
                                        Grid.Column="1"
-                                       IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}"
-                                       DataContext="{Binding SelectedTuning}"
                                        Margin="3,0,0,0"
                                        Classes="Body2"
-                                       Text="{Binding Name}">
+                                       Text="{Binding Subtitle}">
                                 <TextBlock.Foreground>
                                     <SolidColorBrush Color="{DynamicResource FgColor}"
                                                      Opacity="0.7" />
@@ -168,22 +165,27 @@
                             </TextBlock>
 
 
-                            <Button Grid.RowSpan="2"
-                                    Grid.Column="2"
-                                    Margin="0,0,5,0"
-                                    Classes="float"
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Center"
-                                    Command="{Binding BeginEditInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                    CommandParameter="{Binding .}">
-                                <Button.IsVisible>
-                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                        <Binding Path="IsSelected" />
-                                        <Binding Path="CanEdit" />
-                                    </MultiBinding>
-                                </Button.IsVisible>
-                                <avalonia:MaterialIcon Kind="Cog" />
-                            </Button>
+                            <!-- <StackPanel Orientation="Horizontal" -->
+                            <!--             Grid.RowSpan="2" -->
+                            <!--             Grid.Column="2" -->
+                            <!--             Spacing="5" -->
+                            <!--             Margin="0,0,5,0" -->
+                            <!--             HorizontalAlignment="Right" -->
+                            <!--             VerticalAlignment="Center"> -->
+                            <!--     <StackPanel.IsVisible> -->
+                            <!--         <MultiBinding Converter="{x:Static BoolConverters.And}"> -->
+                            <!--             <Binding Path="IsSelected" /> -->
+                            <!--             <Binding Path="CanEdit" /> -->
+                            <!--         </MultiBinding> -->
+                            <!--     </StackPanel.IsVisible> -->
+                            <!--     <Button Classes="float" -->
+                            <!--             Command="{Binding ForwardCommand, Source={x:Static local:MainViewModel.Instance}}" -->
+                            <!--             CommandParameter="{Binding .}"> -->
+                            <!--         <avalonia:MaterialIcon Kind="ChevronRight" /> -->
+                            <!--     </Button> -->
+                            <!-- -->
+                            <!-- </StackPanel> -->
+
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -226,6 +228,16 @@
 
                     <avalonia:MaterialIcon Kind="About" />
                 </Button>
+                <!-- LANDSCAPE TOGGLE BTN -->
+                <ToggleButton DockPanel.Dock="Right"
+                              Margin="3"
+                              Classes="float"
+                              VerticalAlignment="Top"
+                              IsVisible="{Binding IsDebug, Source={x:Static local:ThemeViewModel.Instance}}"
+                              IsChecked="{Binding IsLandscape, Source={x:Static local:ThemeViewModel.Instance}, Mode=OneWay}"
+                              Command="{Binding ToggleLandscapeCommand, Source={x:Static local:ThemeViewModel.Instance}}">
+                    <avalonia:MaterialIcon Kind="PhoneRotateLandscape" />
+                </ToggleButton>
             </DockPanel>
         </controls:ColorZone>
     </Grid>

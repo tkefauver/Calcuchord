@@ -58,12 +58,13 @@ namespace Calcuchord {
 
         #region Appearance
 
+        public string Subtitle =>
+            SelectedTuning == null ? string.Empty : SelectedTuning.Name;
+
         public string InstrumentNoteName =>
             IsKeyboard ? "key" : "fret";
 
         public string Icon =>
-            // InstrumentNameToSvgConverter.Instance.Convert(
-            //     InstrumentType.ToString(),typeof(string),null,CultureInfo.CurrentCulture) as string;
             InstrumentType.ToIconName();
 
 
@@ -176,10 +177,10 @@ namespace Calcuchord {
             }
         }
 
-        public string Name {
+        public string Title {
             get => Instrument.Name;
             set {
-                if(Name != value) {
+                if(Title != value) {
                     Instrument.Name = value;
                     OnPropertyChanged();
                 }
@@ -364,8 +365,8 @@ namespace Calcuchord {
 
             bool needs_default_name =
                 Instrument == null ||
-                string.IsNullOrWhiteSpace(Name) ||
-                Enum.GetNames(typeof(InstrumentType)).Any(x => Name.ToLower().StartsWith(x.ToLower()));
+                string.IsNullOrWhiteSpace(Title) ||
+                Enum.GetNames(typeof(InstrumentType)).Any(x => Title.ToLower().StartsWith(x.ToLower()));
             if(needs_default_name) {
                 // user hasn't changed name
                 new_inst_name = MainViewModel.Instance.GetUniqueInstrumentName(
@@ -373,7 +374,7 @@ namespace Calcuchord {
                     [this]);
             } else {
                 // use current name
-                new_inst_name = Name;
+                new_inst_name = Title;
             }
 
             await InitAsync(
@@ -385,7 +386,7 @@ namespace Calcuchord {
 
             OnPropertyChanged(nameof(FretCounts));
             OnPropertyChanged(nameof(StringCounts));
-            OnPropertyChanged(nameof(Name));
+            OnPropertyChanged(nameof(Title));
 
             // BUG init will end up using previous string counts
             // so block changes until complete 
