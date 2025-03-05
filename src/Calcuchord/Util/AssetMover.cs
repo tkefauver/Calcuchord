@@ -37,39 +37,40 @@ namespace Calcuchord {
                         MpAvFileIo.ReadBytesFromResource("avares://Calcuchord/Assets/Sounds/piano.sf2");
                     string piano_path = Path.Combine(sound_dir,"piano.sf2");
                     File.WriteAllBytes(piano_path,piano_bytes);
-                } else if(ps.MidiPlayer is MidiPlayer_sugarwv wvh &&
-                          wvh.PlayerUrl is { } tone_target_url &&
-                          tone_target_url.ToPathFromUri() is { } tone_target_path &&
-                          !tone_target_path.IsFile()) {
-                    // NOTE below only happens if tone.html doesn't exist
-
-                    File.WriteAllText(
-                        tone_target_path,
-                        MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/tone.html"));
-
-                    string js_dir = Path.Combine(storage_dir,"js");
-                    Directory.CreateDirectory(js_dir);
-
-                    string midi_dir = Path.Combine(js_dir,"midi");
-                    Directory.CreateDirectory(midi_dir);
-
-                    File.WriteAllText(
-                        Path.Combine(midi_dir,"0240_Aspirin_sf2_file.js"),
-                        MpAvFileIo.ReadTextFromResource(
-                            "avares://Calcuchord/Assets/Text/js/midi/0240_Aspirin_sf2_file.js"));
-
-                    File.WriteAllText(
-                        Path.Combine(midi_dir,"player.js"),
-                        MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/js/midi/player.js"));
-
-                    File.WriteAllText(
-                        Path.Combine(midi_dir,"WebAudioFontPlayer.js"),
-                        MpAvFileIo.ReadTextFromResource(
-                            "avares://Calcuchord/Assets/Text/js/midi/WebAudioFontPlayer.js"));
-
-
-                    PlatformWrapper.Services.Logger.WriteLine($"tone.html was written to: {tone_target_path}");
-                }
+                } 
+                // else if(ps.MidiPlayer is MidiPlayer_sugarwv wvh &&
+                //           wvh.PlayerUrl is { } tone_target_url &&
+                //           tone_target_url.ToPathFromUri() is { } tone_target_path &&
+                //           !tone_target_path.IsFile()) {
+                //     // NOTE below only happens if tone.html doesn't exist
+                //
+                //     File.WriteAllText(
+                //         tone_target_path,
+                //         MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/tone.html"));
+                //
+                //     string js_dir = Path.Combine(storage_dir,"js");
+                //     Directory.CreateDirectory(js_dir);
+                //
+                //     string midi_dir = Path.Combine(js_dir,"midi");
+                //     Directory.CreateDirectory(midi_dir);
+                //
+                //     File.WriteAllText(
+                //         Path.Combine(midi_dir,"0240_Aspirin_sf2_file.js"),
+                //         MpAvFileIo.ReadTextFromResource(
+                //             "avares://Calcuchord/Assets/Text/js/midi/0240_Aspirin_sf2_file.js"));
+                //
+                //     File.WriteAllText(
+                //         Path.Combine(midi_dir,"player.js"),
+                //         MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/js/midi/player.js"));
+                //
+                //     File.WriteAllText(
+                //         Path.Combine(midi_dir,"WebAudioFontPlayer.js"),
+                //         MpAvFileIo.ReadTextFromResource(
+                //             "avares://Calcuchord/Assets/Text/js/midi/WebAudioFontPlayer.js"));
+                //
+                //
+                //     PlatformWrapper.Services.Logger.WriteLine($"tone.html was written to: {tone_target_path}");
+                // }
             } catch(Exception e) {
                 e.Dump();
             }

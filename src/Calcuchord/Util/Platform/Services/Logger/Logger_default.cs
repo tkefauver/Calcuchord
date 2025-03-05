@@ -5,7 +5,12 @@ namespace Calcuchord {
     public class Logger_default : ILog {
 
         public void WriteLine(string message) {
-            Debug.WriteLine($"[{DateTime.Now}] {message}");
+            string result = $"[{DateTime.Now}] {message}";
+#if DEBUG
+            Debug.WriteLine(result);
+#else 
+            Console.WriteLine(result);
+            #endif
         }
     }
 }

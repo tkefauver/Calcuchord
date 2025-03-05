@@ -6,8 +6,8 @@
         <Nullable>disable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <ApplicationId>com.thomaskefauver.Calcuchord</ApplicationId>
-        <ApplicationVersion>1.0.0.1</ApplicationVersion>
-        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
+        <ApplicationDisplayVersion>1.0.0.1</ApplicationDisplayVersion>
         <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     </PropertyGroup>
 

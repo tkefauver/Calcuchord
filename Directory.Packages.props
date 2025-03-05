@@ -32,7 +32,6 @@
         <PackageVersion Include="Xamarin.Essentials" Version="1.8.1"/>
         <PackageVersion Include="Melanchall.DryWetMidi" Version="7.2.0"/>
         <PackageVersion Include="SpaceWizards.NFluidsynth" Version="0.1.1"/>
-        <PackageVersion Include="webview.avalonia" Version="11.0.0.1"/>
         <PackageVersion Include="Material.Avalonia.DataGrid" Version="$(MaterialAvaloniaVersion)"/>
         <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)"/>
     </ItemGroup>

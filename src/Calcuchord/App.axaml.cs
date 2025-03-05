@@ -1,9 +1,8 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using AvaloniaWebView;
 using PropertyChanged;
-using WebViewCore.Extensions;
+using MonkeyPaste.Common;
 
 namespace Calcuchord {
     [DoNotNotify]
@@ -12,20 +11,20 @@ namespace Calcuchord {
             AvaloniaXamlLoader.Load(this);
         }
 
-        public override void RegisterServices() {
-            base.RegisterServices();
-            if(PlatformWrapper.Services is { } ps &&
-               ps.MidiPlayer is MidiPlayer_sugarwv mp_swv) {
-                AvaloniaWebViewBuilder.Initialize(
-                    config => {
-                        mp_swv.Init(config);
-                    });
-            }
-        }
+        // public override void RegisterServices() {
+        //     base.RegisterServices();
+        //     if(PlatformWrapper.Services is { } ps &&
+        //        ps.MidiPlayer is MidiPlayer_sugarwv mp_swv) {
+        //         AvaloniaWebViewBuilder.Initialize(
+        //             config => {
+        //                 mp_swv.Init(config);
+        //             });
+        //     }
+        // }
 
         public override void OnFrameworkInitializationCompleted() {
             AssetMover.MoveAllAssets();
-            Prefs.InitAsync().FireAndForget();
+            Prefs.InitAsync().FireAndForgetSafeAsync();
             ThemeViewModel.Instance.Init();
             _ = new MainViewModel();
 

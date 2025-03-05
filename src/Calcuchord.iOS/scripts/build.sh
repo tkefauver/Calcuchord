@@ -7,7 +7,7 @@ DEVICE_ID="00008020-001945DA3669402E"
 DEVICE_ARG="-p:_DeviceName="
 EXE_NAME="Calcuchord.iOS"
 PUB_PROP_ARG="-p:IsPublishMode=false"
-
+BUNDLE_ID="com.thomaskefauver.calcuchord"
 
 if [ "$1" = "sim" ] || [ "$2" = "sim" ] || [ "$3" = "sim" ]; then
 	RUNTIME="iossimulator-x64"
@@ -33,6 +33,10 @@ fi
 clear
 
 cd ..
+
+rm -fr obj
+rm -fr bin
+rm *.csproj.user
 
 if [ "$1" = "man" ] || [ "$2" = "man" ] || [ "$3" = "man" ]; then
 	dotnet publish -c ${CONFIG} -f ${FRAMEWORK} ${PUB_PROP_ARG} -p:RuntimeIdentifier=${RUNTIME} ${DEVICE_ARG}${DEVICE_ID}

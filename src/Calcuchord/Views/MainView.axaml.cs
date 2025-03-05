@@ -63,22 +63,22 @@ namespace Calcuchord {
             // BUG right drawer opens automatically when threshold width == 0
             //mvm.IsRightDrawerOpen = false;
 
-            if(PlatformWrapper.Services is { } ps &&
-               ps.MidiPlayer is MidiPlayer_sugarwv mp) {
-                Dispatcher.UIThread.Post(
-                    async () => {
-                        // wait for load
-                        while(!mvm.IsLoaded) {
-                            await Task.Delay(100);
-                        }
-
-                        // wait for asset move
-                        await Task.Delay(500);
-
-                        // only handled by sugarwv
-                        mp.Init(MainContainerGrid);
-                    });
-            }
+            // if(PlatformWrapper.Services is { } ps &&
+            //    ps.MidiPlayer is MidiPlayer_sugarwv mp) {
+            //     Dispatcher.UIThread.Post(
+            //         async () => {
+            //             // wait for load
+            //             while(!mvm.IsLoaded) {
+            //                 await Task.Delay(100);
+            //             }
+            //
+            //             // wait for asset move
+            //             await Task.Delay(500);
+            //
+            //             // only handled by sugarwv
+            //             mp.Init(MainContainerGrid);
+            //         });
+            // }
         }
 
         void OnMainContainerSizeChanged() {
