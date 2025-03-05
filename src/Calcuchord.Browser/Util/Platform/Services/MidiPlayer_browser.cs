@@ -4,6 +4,7 @@ namespace Calcuchord.Browser {
 
     public class MidiPlayer_browser : MidiWebPlayerBase {
         public override void Init(object obj) {
+            JsInterop.InitMidi();
         }
 
         public override void PlayChord(IEnumerable<IEnumerable<int>> notes) {

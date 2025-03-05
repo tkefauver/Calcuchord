@@ -58,9 +58,6 @@ namespace Calcuchord.iOS {
 
         public override bool CanPlay => true;
 
-        public override void Init(object obj) {
-        }
-
         public override void PlayChord(IEnumerable<IEnumerable<int>> notes) {
             PlayNotes(notes,30,4);
         }

@@ -6,6 +6,9 @@ namespace Calcuchord.Browser {
 
         #region Midi
 
+        [JSImport("globalThis.window.initMidi")]
+        public static partial void InitMidi();
+        
         [JSImport("globalThis.window.playChord")]
         public static partial void PlayChord(string toneGroupsJson);
 

@@ -64,7 +64,7 @@ namespace Calcuchord {
             //mvm.IsRightDrawerOpen = false;
 
             if(PlatformWrapper.Services is { } ps &&
-               ps.MidiPlayer is { } mp) {
+               ps.MidiPlayer is MidiPlayer_sugarwv mp) {
                 Dispatcher.UIThread.Post(
                     async () => {
                         // wait for load
