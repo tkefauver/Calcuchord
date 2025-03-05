@@ -28,6 +28,11 @@
         <DefineConstants>$(DefineConstants);IOS</DefineConstants>
         <UseSugarWv>false</UseSugarWv>
     </PropertyGroup>
+    
+    <PropertyGroup Condition="$(BuildOs) == 'ANDROID'">
+        <DefineConstants>$(DefineConstants);ANDROID</DefineConstants>
+        <UseSugarWv>false</UseSugarWv>
+    </PropertyGroup>
 
     <PropertyGroup Condition="$(UseSugarWv) == 'True'">
         <DefineConstants>$(DefineConstants);SUGAR_WV</DefineConstants>
