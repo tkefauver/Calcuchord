@@ -6,10 +6,10 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <!--        <BuildOs>LINUX</BuildOs>-->
-<!--        <BuildOs>BROWSER</BuildOs>-->
-        <BuildOs>IOS</BuildOs>
-<!--        <BuildOs>MAC</BuildOs>-->
+        <BuildOs>LINUX</BuildOs>
+        <!--        <BuildOs>BROWSER</BuildOs>-->
+        <!--        <BuildOs>IOS</BuildOs>-->
+        <!--        <BuildOs>MAC</BuildOs>-->
         <!--        <BuildOs>ANDROID</BuildOs>-->
         <UseSugarWv>true</UseSugarWv>
     </PropertyGroup>
@@ -23,12 +23,12 @@
         <DefineConstants>$(DefineConstants);BROWSER</DefineConstants>
         <UseSugarWv>false</UseSugarWv>
     </PropertyGroup>
-    
+
     <PropertyGroup Condition="$(BuildOs) == 'IOS'">
         <DefineConstants>$(DefineConstants);IOS</DefineConstants>
         <UseSugarWv>false</UseSugarWv>
     </PropertyGroup>
-    
+
     <PropertyGroup Condition="$(BuildOs) == 'ANDROID'">
         <DefineConstants>$(DefineConstants);ANDROID</DefineConstants>
         <UseSugarWv>false</UseSugarWv>

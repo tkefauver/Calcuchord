@@ -11,6 +11,10 @@
         <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     </PropertyGroup>
 
+    <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+        <AndroidSdkDirectory>/home/tkefauver/android-sdk</AndroidSdkDirectory>
+    </PropertyGroup>
+
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <RunAOTCompilation>true</RunAOTCompilation>
         <EnableLLVM>true</EnableLLVM>

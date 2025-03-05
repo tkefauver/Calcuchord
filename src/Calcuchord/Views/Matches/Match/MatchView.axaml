@@ -104,6 +104,14 @@
                     </TextBlock.Inlines>
                 </TextBlock>
 
+                <!-- SCORE -->
+                <!-- <TextBlock x:Name="ScoreTextBlock" -->
+                <!--            IsVisible="{Binding IsSearchModeSelected, Source={x:Static local:MainViewModel.Instance}}" -->
+                <!--            HorizontalAlignment="Right" -->
+                <!--            VerticalAlignment="Center" -->
+                <!--            TextAlignment="Right" -->
+                <!--            Text="{Binding Score, StringFormat={}{0:N2}}" /> -->
+
                 <Svg x:Name="MatchSvg"
                      Grid.Row="1"
                      Css="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}"

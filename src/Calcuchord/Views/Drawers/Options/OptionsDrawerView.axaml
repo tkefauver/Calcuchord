@@ -11,7 +11,7 @@
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
-             x:DataType="local:MainViewModel"
+             x:DataType="local:InstrumentViewModel"
              x:Class="Calcuchord.OptionsDrawerView">
     <UserControl.Styles>
         <Style Selector="ScrollViewer">
@@ -93,6 +93,12 @@
             </Setter>
         </Style>
 
+        <Style
+            Selector="controls|Card.sort:not(.fuzzy) :is(Control).is-score, controls|Card.sort:not(.scored) :is(Control).is-score">
+            <Setter Property="IsVisible"
+                    Value="False" />
+        </Style>
+
         <Style Selector=":is(Button).opt-btn">
             <Setter Property="CornerRadius"
                     Value="0" />
@@ -121,7 +127,7 @@
             <Setter Property="Kind"
                     Value="MenuDown" />
         </Style>
-        <Style Selector=":is(ItemsControl) TextBlock"
+        <Style Selector=":is(Button).opt-btn TextBlock"
                x:DataType="local:OptionViewModel">
             <Setter Property="Text"
                     Value="{Binding Label}" />
@@ -141,6 +147,19 @@
         </Style>
         <Style Selector="controls|Card.key UniformGrid">
             <Setter Property="Columns"
+                    Value="6" />
+        </Style>
+
+        <Style Selector="UniformGrid.sort-panel">
+            <Setter Property="Columns"
+                    Value="3" />
+        </Style>
+        <Style Selector="controls|Card.sort.scored.fuzzy UniformGrid.sort-panel">
+            <Setter Property="Columns"
+                    Value="4" />
+        </Style>
+        <Style Selector="controls|Card.sort.scored.fuzzy Button.opt-btn.key">
+            <Setter Property="Padding"
                     Value="6" />
         </Style>
         <Style Selector="controls|Card.degree UniformGrid">
@@ -201,7 +220,8 @@
                                        MaxWidth="200">
                                 <TextBlock.Inlines>
                                     <Run Text="Desired root '" />
-                                    <Run Text="{Binding DesiredRootDisplayName}" />
+                                    <Run
+                                        Text="{Binding DesiredRootDisplayName, Source={x:Static local:MainViewModel.Instance}}" />
                                     <Run Text="' is set on instrument. Deselect it to change the key." />
                                 </TextBlock.Inlines>
                             </TextBlock>
@@ -226,16 +246,19 @@
         <DockPanel Margin="5">
             <DockPanel DockPanel.Dock="Top">
 
+                <!-- BACK BTN -->
+
                 <Button x:Name="BackButton"
                         DockPanel.Dock="Left"
-                        Command="{Binding BackCommand}"
+                        Command="{Binding BackCommand, Source={x:Static local:MainViewModel.Instance}}"
                         HorizontalAlignment="Left"
                         Classes="float">
                     <avalonia:MaterialIcon Kind="ArrowLeft" />
                 </Button>
+
+                <!-- OPT BTN -->
                 <Button x:Name="InstrumentOptionsButton"
                         DockPanel.Dock="Right"
-                        DataContext="{Binding SelectedInstrument}"
                         HorizontalAlignment="Right"
                         Classes="float">
                     <Button.Flyout>
@@ -266,8 +289,10 @@
                     </Button.Flyout>
                     <avalonia:MaterialIcon Kind="DotsVertical" />
                 </Button>
-                <StackPanel DataContext="{Binding SelectedInstrument}"
-                            IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}">
+
+                <!-- TITLE -->
+
+                <StackPanel>
                     <TextBlock FontSize="18"
                                TextAlignment="Center"
                                Text="{Binding Title}" />
@@ -281,6 +306,8 @@
 
             <ScrollViewer>
                 <StackPanel Classes="options"
+                            DataContext="{x:Static local:MainViewModel.Instance}"
+                            x:DataType="local:MainViewModel"
                             Classes.chords="{Binding IsChordsSelected}"
                             Classes.has-key="{Binding IsKeySelected}"
                             Classes.search-mode="{Binding IsSearchModeSelected}"
@@ -336,18 +363,33 @@
                     <TextBlock Classes="header resettable"
                                PointerReleased="InputElement_OnPointerReleased"
                                Text="Sort" />
-                    <controls:Card Classes="button-group sort">
+                    <controls:Card Classes="button-group sort"
+                                   Classes.fuzzy="{Binding !IsExactMatchOnly}"
+                                   Classes.scored="{Binding IsSearchModeSelected}">
                         <ListBox SelectedItem="{x:Null}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Classes="sort-panel" />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
                             <ListBoxItem
+                                Classes.is-score="{Binding ConverterParameter=0, Converter={x:Static local:IsScoreOptionConverter.Instance}}"
                                 DataContext="{Binding SortOption1, Source={x:Static local:MainViewModel.Instance}}">
                                 <local:SortItemView />
                             </ListBoxItem>
                             <ListBoxItem
+                                Classes.is-score="{Binding ConverterParameter=1, Converter={x:Static local:IsScoreOptionConverter.Instance}}"
                                 DataContext="{Binding SortOption2, Source={x:Static local:MainViewModel.Instance}}">
                                 <local:SortItemView />
                             </ListBoxItem>
                             <ListBoxItem
+                                Classes.is-score="{Binding ConverterParameter=2, Converter={x:Static local:IsScoreOptionConverter.Instance}}"
                                 DataContext="{Binding SortOption3, Source={x:Static local:MainViewModel.Instance}}">
+                                <local:SortItemView />
+                            </ListBoxItem>
+                            <ListBoxItem
+                                Classes.is-score="{Binding ConverterParameter=3, Converter={x:Static local:IsScoreOptionConverter.Instance}}"
+                                DataContext="{Binding SortOption4, Source={x:Static local:MainViewModel.Instance}}">
                                 <local:SortItemView />
                             </ListBoxItem>
                         </ListBox>

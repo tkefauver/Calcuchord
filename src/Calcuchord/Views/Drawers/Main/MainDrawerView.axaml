@@ -157,6 +157,7 @@
                                        Grid.Column="1"
                                        Margin="3,0,0,0"
                                        Classes="Body2"
+                                       IsVisible="False"
                                        Text="{Binding Subtitle}">
                                 <TextBlock.Foreground>
                                     <SolidColorBrush Color="{DynamicResource FgColor}"
