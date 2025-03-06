@@ -60,6 +60,7 @@ function testScale() {
     playScale(JSON.stringify(testNoteNumbers));
 }
 
+
 function setInstrumentAsync(instName) {
     //https://surikov.github.io/webaudiofontdata/sound/0240_SBLive_sf2.html
     instrumentName = instName;

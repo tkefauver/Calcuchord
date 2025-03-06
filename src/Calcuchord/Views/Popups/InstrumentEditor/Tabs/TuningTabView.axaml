@@ -97,9 +97,7 @@
                                                               Command="{Binding DuplicateThisTuningCommand}"
                                                               CommandParameter="{Binding ElementName=TuningOptionButton}">
                                                         <MenuItem.Icon>
-                                                            <avalonia:MaterialIcon Kind="Sheep"
-                                                                Width="24"
-                                                                Height="24" />
+                                                            <avalonia:MaterialIcon Kind="Sheep" />
                                                         </MenuItem.Icon>
                                                     </MenuItem>
                                                     <MenuItem StaysOpenOnClick="False"
@@ -107,9 +105,7 @@
                                                               Command="{Binding ShowStatsCommand}"
                                                               CommandParameter="{Binding ElementName=TuningOptionButton}">
                                                         <MenuItem.Icon>
-                                                            <avalonia:MaterialIcon Kind="ChartBar"
-                                                                Width="24"
-                                                                Height="24" />
+                                                            <avalonia:MaterialIcon Kind="ChartBar" />
                                                         </MenuItem.Icon>
                                                     </MenuItem>
 
@@ -118,9 +114,7 @@
                                                               Command="{Binding DeleteThisTuningCommand}"
                                                               CommandParameter="{Binding ElementName=TuningOptionButton}">
                                                         <MenuItem.Icon>
-                                                            <avalonia:MaterialIcon Kind="Delete"
-                                                                Width="24"
-                                                                Height="24" />
+                                                            <avalonia:MaterialIcon Kind="Delete" />
                                                         </MenuItem.Icon>
                                                     </MenuItem>
                                                 </ContextMenu>

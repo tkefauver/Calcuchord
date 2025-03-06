@@ -6,7 +6,7 @@ using NFluidSettings = NFluidsynth.Settings;
 
 namespace Calcuchord.Desktop {
 
-    public class MidiPlayer_fluid_desktop : MidiFluidPlayerBase {
+    public class MidiPlayer_fluid_lib_desktop : MidiFluidPlayerBase {
 
         NFluidSettings Settings { get; set; }
         Synth Synth { get; set; }

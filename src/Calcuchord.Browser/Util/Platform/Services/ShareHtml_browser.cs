@@ -5,4 +5,5 @@ namespace Calcuchord.Browser {
             JsInterop.ShareHtml(html,title);
         }
     }
+
 }

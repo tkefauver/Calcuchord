@@ -274,9 +274,39 @@
                                VerticalAlignment="Center">
                     <Button x:Name="ShareButton"
                             ToolTip.Tip="Export"
+                            local:CloseFlyoutExtension.IsEnabled="True"
+                            IsEnabled="{Binding !IsMatchesEmpty}"
                             Padding="8"
-                            Classes="float"
-                            Command="{Binding ExportMatchesCommand}">
+                            Classes="float">
+                        <Button.Flyout>
+                            <Flyout>
+                                <ContextMenu>
+                                    <MenuItem Header="Save Midi..."
+                                              IsEnabled="{Binding SelectedMatch, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                              Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                              CommandParameter="MIDI">
+                                        <MenuItem.Icon>
+                                            <avalonia:MaterialIcon Kind="Midi" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="Save Pdf..."
+                                              IsEnabled="{Binding SelectedMatch, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                              Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                              CommandParameter="PDF">
+                                        <MenuItem.Icon>
+                                            <avalonia:MaterialIcon Kind="FilePdfBox" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="Open in browser..."
+                                              Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                              CommandParameter="HTML">
+                                        <MenuItem.Icon>
+                                            <avalonia:MaterialIcon Kind="CodeBlockTags" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </Flyout>
+                        </Button.Flyout>
                         <avalonia:MaterialIcon Kind="Share" />
                     </Button>
                 </controls:Card>

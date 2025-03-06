@@ -269,9 +269,7 @@
                                           Command="{Binding BeginEditInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
                                           CommandParameter="{Binding ElementName=InstrumentOptionsButton}">
                                     <MenuItem.Icon>
-                                        <avalonia:MaterialIcon Kind="Cog"
-                                                               Width="24"
-                                                               Height="24" />
+                                        <avalonia:MaterialIcon Kind="Cog" />
                                     </MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem StaysOpenOnClick="False"
@@ -279,9 +277,7 @@
                                           Command="{Binding RemoveInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
                                           CommandParameter="{Binding ElementName=InstrumentOptionsButton}">
                                     <MenuItem.Icon>
-                                        <avalonia:MaterialIcon Kind="TrashCan"
-                                                               Width="24"
-                                                               Height="24" />
+                                        <avalonia:MaterialIcon Kind="TrashCan" />
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </ContextMenu>

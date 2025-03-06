@@ -345,5 +345,14 @@
                 Value="0" />
     </Style>
 
+    <!-- CONTEXT MENUS -->
+
+    <Style Selector="ContextMenu MenuItem avalonia|MaterialIcon">
+        <Setter Property="Width"
+                Value="24" />
+        <Setter Property="Height"
+                Value="24" />
+    </Style>
+
 
 </Styles>

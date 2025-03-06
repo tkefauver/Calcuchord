@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -17,7 +18,10 @@ using DialogHostAvalonia;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
 using Newtonsoft.Json;
+using Svg.Skia;
 using AvSnackbarHost = Material.Styles.Controls.SnackbarHost;
+using AvSvg = Avalonia.Svg.Skia.Svg;
+
 #if DEBUG
 using System.Diagnostics;
 #endif
@@ -856,13 +860,12 @@ namespace Calcuchord {
             }
 
             sorted_results = SortMatches(results);
-            SelectedMatch = null;
+            Matches.AddRange(sorted_results);
+            SelectedMatch = Matches.FirstOrDefault();
             if(MatchesView.Instance is { } mv) {
                 mv.MatchesScrollViewer.ScrollToHome();
             }
 
-            //}
-            Matches.AddRange(sorted_results);
             await Task.Delay(1);
             OnPropertyChanged(nameof(CanIncreaseMatchColumnCount));
             OnPropertyChanged(nameof(CanDecreaseMatchColumnCount));
@@ -1335,6 +1338,38 @@ namespace Calcuchord {
         public ICommand ExportMatchesCommand => new MpCommand<object>(
             async (args) => {
                 await Task.Delay(1);
+                if(args.ToString() is not { } exp_type) {
+                    return;
+                }
+
+                if(exp_type == "MIDI") {
+                    if(PlatformWrapper.Services.ShareMidi is { } sm) {
+                        await sm.ShareMidiAsync(
+                            SelectedMatch.NotePattern.GetToneGroups(),
+                            SelectedMatch.NotePattern.PatternType != MusicPatternType.Chords,
+                            SelectedMatch.ShareTitle);
+                    }
+
+                    return;
+                }
+
+                if(exp_type == "PDF") {
+                    if(PlatformWrapper.Services.SharePdf is { } sp &&
+                       SelectedMatch is { } sm &&
+                       PatternToSvgConverter.Instance.Convert(
+                           sm.NotePattern,typeof(string),"styled",CultureInfo.CurrentCulture) is string sel_svg_str) {
+                        using(SKSvg svg = new SKSvg()) {
+
+                            if(svg.FromSvg(sel_svg_str) is not null) {
+                                await sp.SharePdfAsync(svg,SelectedMatch.ShareTitle);
+                            }
+                        }
+
+                    }
+
+                    return;
+                }
+
                 if(Matches.FirstOrDefault() is not { } first_match ||
                    first_match.NotePattern is not { } np ||
                    PatternToSvgConverter.Instance.GetBuilder(np) is not { } builder) {
@@ -1351,6 +1386,7 @@ namespace Calcuchord {
 
                 DialogHost.Show(busy_view,MainDialogHostName).FireAndForgetSafeAsync();
                 bool is_done = false;
+
                 _ = Task.Run(
                     async () => {
                         await Task.Delay(1_500);

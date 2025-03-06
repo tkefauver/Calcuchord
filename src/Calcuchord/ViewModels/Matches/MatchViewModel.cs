@@ -63,6 +63,9 @@ namespace Calcuchord {
 
         #region State
 
+        public string ShareTitle =>
+            NotePattern.FullName.Replace("#","Sharp").Replace(" ",string.Empty);
+
         public bool IsMatchPlaying { get; set; }
 
         public MusicPatternType PatternType { get; protected set; }

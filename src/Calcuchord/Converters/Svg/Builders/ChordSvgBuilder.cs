@@ -89,7 +89,7 @@ namespace Calcuchord {
             double header_h = fh + 0.25;
             double curx = min_fret_x;
             double cury = header_h;
-            if(ForPrint) {
+            if(WithTitle) {
                 rows++;
                 cury += fh * 2;
             }
@@ -97,7 +97,7 @@ namespace Calcuchord {
             double tw = fw * cols;
             double th = fh * rows;
 
-            if(ForPrint) {
+            if(WithTitle) {
                 AddCenteredText(bg_g,ng.FullName,6,Bg,0,0,tw,fh * 2,classes: "match-title");
             }
 
@@ -142,7 +142,7 @@ namespace Calcuchord {
 
             if(show_header_labels) {
                 double header_x = min_fret_x;
-                double header_y = fh + (ForPrint ? fh * 2 : 0); //-1;
+                double header_y = fh + (WithTitle ? fh * 2 : 0); //-1;
                 for(int i = 0; i < str_count; i++) {
                     if(notes.FirstOrDefault(x => x.RowNum == i) is { } str_fret &&
                        str_fret.ColNum <= 0) {
@@ -345,8 +345,6 @@ namespace Calcuchord {
 
             svg.Attributes.Add("width",tw);
             svg.Attributes.Add("height",th);
-
-            //bg_g.Attributes.Add("transform",$"translate({tox},{toy})");
 
             return svg;
         }

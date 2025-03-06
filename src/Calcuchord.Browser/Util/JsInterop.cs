@@ -8,7 +8,7 @@ namespace Calcuchord.Browser {
 
         [JSImport("globalThis.window.initMidi")]
         public static partial void InitMidi();
-        
+
         [JSImport("globalThis.window.playChord")]
         public static partial void PlayChord(string toneGroupsJson);
 
@@ -56,6 +56,9 @@ namespace Calcuchord.Browser {
 
         [JSImport("globalThis.window.shareHtml")]
         public static partial void ShareHtml(string htmlStr,string title);
+
+        [JSImport("globalThis.window.shareFileAsync")]
+        public static partial void ShareFile(string base64,string mimeType,string fileName,string title);
 
         #endregion
 

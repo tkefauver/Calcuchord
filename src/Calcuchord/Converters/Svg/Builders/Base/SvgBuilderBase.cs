@@ -38,7 +38,7 @@ namespace Calcuchord {
 
         #region Properties
 
-        protected bool ForPrint { get; set; }
+        protected bool WithTitle { get; set; }
 
         protected HtmlDocument CurrentDoc { get; private set; }
         protected string DefaultFontFamily => "Mono";
@@ -301,14 +301,8 @@ namespace Calcuchord {
             HtmlNode svg = CurrentDoc.CreateElement("svg");
             svg.Attributes.Add("xmlns","http://www.w3.org/2000/svg");
 
-            if(args is string arg_str &&
-               arg_str == "PDF") {
-                ForPrint = true;
-            } else {
-                ForPrint = false;
-            }
-
             if(args.ToStringOrEmpty() == "styled") {
+                //WithTitle = true;
                 HtmlNode style_elm = CurrentDoc.CreateElement("style");
                 style_elm.InnerHtml = MainViewModel.Instance.MatchSvgCss;
                 svg.AppendChild(style_elm);

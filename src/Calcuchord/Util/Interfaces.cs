@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Svg.Skia;
 
 namespace Calcuchord {
 
@@ -13,14 +14,19 @@ namespace Calcuchord {
         ILog Logger { get; }
         IShareHtml ShareHtml { get; }
         IShareMidi ShareMidi { get; }
+        ISharePdf SharePdf { get; }
     }
 
     public interface IShareHtml {
         void ShareHtml(string html,string title);
     }
 
+    public interface ISharePdf {
+        Task SharePdfAsync(SKSvg svg,string title);
+    }
+
     public interface IShareMidi {
-        void ShareMidi(string midiFile,string title);
+        Task ShareMidiAsync(IEnumerable<IEnumerable<int>> toneSets,bool isScale,string title);
     }
 
     public interface ILog {

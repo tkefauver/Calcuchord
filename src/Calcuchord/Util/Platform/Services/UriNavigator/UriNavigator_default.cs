@@ -1,12 +1,17 @@
 using System;
 using System.Diagnostics;
+using MonkeyPaste.Common;
 
 namespace Calcuchord {
     public class UriNavigator_default : IUriNavigator {
 
         public virtual void NavigateTo(string url) {
             if(OperatingSystem.IsWindows()) {
-                //Process.Start(new ProcessStartInfo("cmd",$"/c start {url}") {UseShellExecute = true});
+                if(url.IsDirectory()) {
+                    Process.Start("explorer",url);
+                    return;
+                }
+
                 Process.Start(new ProcessStartInfo { FileName = url,UseShellExecute = true });
                 return;
             }
