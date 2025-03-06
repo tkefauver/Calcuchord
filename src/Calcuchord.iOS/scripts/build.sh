@@ -9,6 +9,8 @@ EXE_NAME="Calcuchord.iOS"
 PUB_PROP_ARG="-p:IsPublishMode=false"
 BUNDLE_ID="com.thomaskefauver.calcuchord"
 
+clear
+
 if [ "$1" = "sim" ] || [ "$2" = "sim" ] || [ "$3" = "sim" ]; then
 	RUNTIME="iossimulator-x64"
 	# ipad 18.0 4th gen
@@ -28,15 +30,14 @@ fi
 if [ "$1" = "pub" ] || [ "$2" = "pub" ] || [ "$3" = "pub" ]; then
   CONFIG="Release"
   PUB_PROP_ARG="-p:IsPublishMode=true"
+  read -p "DID YOU TICK THE VERSION?? Press enter to continue..."
 fi
-
-clear
 
 cd ..
 
 rm -fr obj
 rm -fr bin
-rm *.csproj.user
+rm -f *.csproj.user
 
 if [ "$1" = "man" ] || [ "$2" = "man" ] || [ "$3" = "man" ]; then
 	dotnet publish -c ${CONFIG} -f ${FRAMEWORK} ${PUB_PROP_ARG} -p:RuntimeIdentifier=${RUNTIME} ${DEVICE_ARG}${DEVICE_ID}
