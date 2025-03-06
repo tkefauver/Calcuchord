@@ -84,6 +84,13 @@
 
     <!-- TEXT -->
 
+    <Style Selector="SelectableTextBlock">
+        <Setter Property="SelectionBrush">
+            <Setter.Value>
+                <SolidColorBrush Color="Pink" />
+            </Setter.Value>
+        </Setter>
+    </Style>
     <Style Selector="TextBlock.subject">
         <Setter Property="Foreground"
                 Value="{DynamicResource MaterialPrimaryMidBrush}" />
@@ -327,6 +334,15 @@
                 Value="Left" />
         <Setter Property="VerticalAlignment"
                 Value="Top" />
+    </Style>
+
+    <!-- FLYOUTS -->
+
+    <Style Selector="Flyout FlyoutPresenter">
+        <Setter Property="Margin"
+                Value="0" />
+        <Setter Property="Padding"
+                Value="0" />
     </Style>
 
 

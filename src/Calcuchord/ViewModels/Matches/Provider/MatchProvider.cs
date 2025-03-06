@@ -80,11 +80,29 @@ namespace Calcuchord {
             return new MatchViewModel(PatternType,notePattern,score);
         }
 
-        public double GetScore(NotePattern pattern,IEnumerable<NoteViewModel> matchNotes) {
+        public double GetScore(NotePattern pattern,NoteViewModel[] matchNotes) {
             double score = 0;
             foreach(NoteViewModel mn in matchNotes) {
                 if(pattern.Notes.Any(x => x.ColNum == mn.WorkingNoteNum && x.RowNum == mn.RowNum)) {
+                    // exact
                     score += 1;
+                    continue;
+                }
+                // find all notes in pattern with a matching tone,
+                // then the closest one of those on the instrument
+
+
+                if(pattern.Notes
+                       .Where(x => !x.IsMute && x.Key == mn.InstrumentNote.Key)
+                       .OrderBy(x => x.Distance(mn.InstrumentNote))
+                       .FirstOrDefault() is { } closest_pattern_match) {
+                    double dist = closest_pattern_match.Distance(mn.InstrumentNote);
+                    if(MainViewModel.Instance.IsExactMatchOnly && dist > 0) {
+                        // inexact match
+                        return 0;
+                    }
+
+                    score += 1 / (dist + 1d);
                     continue;
                 }
 
@@ -92,7 +110,7 @@ namespace Calcuchord {
 
             }
 
-            return score;
+            return score / Math.Max(1,matchNotes.Length);
         }
 
         #endregion

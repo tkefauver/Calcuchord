@@ -242,7 +242,7 @@
                 <ScrollViewer x:Name="MatchesScrollViewer"
                               Classes.drawer-test="false"
                               Grid.Row="1">
-                    <Viewbox>
+                    <Viewbox VerticalAlignment="Top">
                         <!-- NOTE no margin/padding on repeater to get accurate bounds -->
                         <ItemsRepeater x:Name="MatchItemsRepeater"
                                        Width="{Binding MatchesViewFixedWidth}"

@@ -34,7 +34,7 @@ namespace Calcuchord {
             try {
                 string backup_prefs_json =
                     MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/appstate_022325.json");
-                Prefs ValidationChecker = JsonConvert.DeserializeObject<Prefs>(backup_prefs_json);
+                Prefs ValidationChecker = Parse(backup_prefs_json);
                 Instance = null;
             } catch(Exception ex) {
                 ex.Dump();
@@ -87,6 +87,9 @@ namespace Calcuchord {
             }
 
             Instance.IsInitialStartup = is_initial_startup;
+            Instance.LastPrefsVersion = Instance.PrefsVersion;
+            Instance.WasOptionsOutOfDateOnStartup =
+                Instance.PrefsVersion.ToVersion() < Instance.LastOptionsUpdatedPrefsVersion;
             IsLoaded = true;
 
 
@@ -101,6 +104,9 @@ namespace Calcuchord {
         #region Properties
 
         #region Members
+
+        [JsonProperty]
+        public string PrefsVersion { get; set; } = string.Empty;
 
         [JsonProperty]
         public bool IsThemeDark { get; set; }
@@ -118,6 +124,18 @@ namespace Calcuchord {
         #endregion
 
         #region Ignored
+
+        [JsonIgnore]
+        public bool WasOptionsOutOfDateOnStartup { get; private set; }
+
+        [JsonIgnore]
+        public string LastPrefsVersion { get; private set; } = string.Empty;
+
+        [JsonIgnore]
+        BuildInfo RuntimeBuildInfo { get; } = new BuildInfo();
+
+        [JsonIgnore]
+        public Version LastOptionsUpdatedPrefsVersion { get; } = new Version("1.0.9195.22711");
 
         [JsonIgnore]
         public bool IsSaveIgnored { get; set; }
@@ -217,6 +235,7 @@ namespace Calcuchord {
                 Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
                 Options = mvm.OptionLookup.Values.SelectMany(x => x).ToList();
                 MatchColCount = mvm.MatchColCount;
+                PrefsVersion = RuntimeBuildInfo.Version.ToString();
             }
 
             if(ThemeViewModel.Instance is { } tvm) {

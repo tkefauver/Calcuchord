@@ -18,6 +18,9 @@ using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
 using Newtonsoft.Json;
 using AvSnackbarHost = Material.Styles.Controls.SnackbarHost;
+#if DEBUG
+using System.Diagnostics;
+#endif
 
 namespace Calcuchord {
     public partial class MainViewModel : ViewModelBase {
@@ -60,9 +63,9 @@ namespace Calcuchord {
 
         public ObservableCollection<MatchViewModel> Matches { get; } = [];
         IEnumerable<MatchViewModel> UnfilteredMatches { get; set; } = [];
-        List<NoteViewModel> LastNotes { get; set; } = [];
+        IEnumerable<NoteViewModel> LastNotes { get; set; } = [];
         IEnumerable<MatchViewModel> LastMatches { get; } = [];
-        List<OptionViewModel> LastOptions { get; } = [];
+        IEnumerable<OptionViewModel> LastOptions { get; } = [];
 
         public MatchViewModel SelectedMatch {
             get => Matches.FirstOrDefault(x => x.IsSelected);
@@ -153,6 +156,9 @@ namespace Calcuchord {
         public OptionViewModel SortOption3 =>
             SortOptions.Any() ? SortOptions[2] : null;
 
+        public OptionViewModel SortOption4 =>
+            SortOptions.Any() ? SortOptions[3] : null;
+
         #endregion
 
         #region Svg
@@ -240,6 +246,8 @@ namespace Calcuchord {
         #endregion
 
         #region Options
+
+        public bool IsExactMatchOnly { get; set; } = false;
 
         DisplayModeType LastDisplayMode { get; set; }
         MusicPatternType LastPatternType { get; set; }
@@ -531,7 +539,7 @@ namespace Calcuchord {
                        MatchesView.Instance is { } matchesView &&
                        matchesView.MatchItemsRepeater is { } mir) {
                         // BUG items repeater overlaps items on load intermittently
-                        //mir.InvalidateMeasure();
+                        mir.InvalidateMeasure();
                     }
 
                     break;
@@ -586,7 +594,7 @@ namespace Calcuchord {
                 Instruments.Add(ivm);
             }
 
-            await InitInstrumentAsync(InstrumentInitSource.Startup);
+            await InitInstrumentAsync(InstrumentInitSource.Startup,is_reset);
 
             if(is_reset) {
                 Prefs.Instance.Save();
@@ -730,7 +738,7 @@ namespace Calcuchord {
             SvgOptions.ForEach(x => x.RaisePropertyChanged(nameof(x.IsChecked)));
         }
 
-        IEnumerable<MatchViewModel> GetMatchResults(bool byFilter,IEnumerable<NoteViewModel> sel_notes) {
+        IEnumerable<MatchViewModel> GetMatchResults(bool byFilter,NoteViewModel[] sel_notes) {
             // prefer desired root over key?
             NoteType? target_key = null;
             if(IsSearchModeSelected &&
@@ -828,7 +836,7 @@ namespace Calcuchord {
             //     UpdateFilters();
             // }
 
-            var sel_notes = SelectedTuning.SelectedNotes;
+            var sel_notes = SelectedTuning.SelectedNotes.ToArray();
             LastNotes = sel_notes.ToList();
             LastDesiredRoot = DesiredRoot;
             LastKeyDegree = SelectedKeyDegree;
@@ -891,21 +899,25 @@ namespace Calcuchord {
             var result = matches
                 .OrderBy(x => GetSortOptionValue(sorts[0],x))
                 .ThenBy(x => GetSortOptionValue(sorts[1],x))
-                .ThenBy(x => GetSortOptionValue(sorts[2],x));
+                .ThenBy(x => GetSortOptionValue(sorts[2],x))
+                .ThenBy(x => GetSortOptionValue(sorts[3],x));
             return result;
 
 
-            int GetSortOptionValue((MatchSortType field,bool desc) sort,MatchViewModel match) {
-                int score = 0;
+            double GetSortOptionValue((MatchSortType field,bool desc) sort,MatchViewModel match) {
+                double score = 0;
                 switch(sort.field) {
                     case MatchSortType.Key:
-                        score = (int)match.NotePattern.Key;
+                        score = (double)match.NotePattern.Key;
                         break;
                     case MatchSortType.Suffix:
                         score = match.NotePattern.Parent.SuffixId;
                         break;
                     case MatchSortType.Position:
                         score = match.NotePattern.Position;
+                        break;
+                    case MatchSortType.Score:
+                        score = IsSearchModeSelected && !IsExactMatchOnly ? match.Score : 1;
                         break;
                 }
 
@@ -963,15 +975,16 @@ namespace Calcuchord {
             }
 
             if(Matches.Count > 0 && !IsLoadingMatches) {
-                newColCount = Math.Min(MaxMatchColCount,Math.Min(Matches.Count,newColCount));
+                //newColCount = Math.Min(MaxMatchColCount,Math.Min(Matches.Count,newColCount));
+                newColCount = Math.Min(MaxMatchColCount,newColCount);
             }
 
-            double avail_w = mir.Bounds.Width;
-            double new_match_w = avail_w / newColCount;
-            if(!new_match_w.IsNumber() ||
-               new_match_w <= 0) {
-                return false;
-            }
+            // double avail_w = mir.Bounds.Width;
+            // double new_match_w = avail_w / newColCount;
+            // if(!new_match_w.IsNumber() ||
+            //    new_match_w <= 0) {
+            //     return false;
+            // }
 
             MatchColCount = newColCount;
             return true;
@@ -1126,21 +1139,20 @@ namespace Calcuchord {
             return all_opts;
         }
 
-        void VerifyOptions(List<OptionViewModel> opts) {
-            var missing_opt_names = Enum.GetNames<OptionType>()
-                .Where(x => !opts.Select(y => y.OptionType.ToString()).Distinct().Contains(x));
-            if(missing_opt_names.None()) {
+        bool VerifyOptions(List<OptionViewModel> opts) {
+            if(!Prefs.Instance.WasOptionsOutOfDateOnStartup) {
                 // options up to date
                 PlatformWrapper.Services.Logger.WriteLine("Options up-to-date");
-                return;
+                return true;
             }
 
             // just reset them..
             PlatformWrapper.Services.Logger.WriteLine(
-                $"Options expired! Missing types: {string.Join(",",missing_opt_names)}");
+                $"Options expired! This Version: {Prefs.Instance.LastPrefsVersion} Needed Version: {Prefs.Instance.LastOptionsUpdatedPrefsVersion}");
             opts.Clear();
             opts.AddRange(CreateOptions());
             PlatformWrapper.Services.Logger.WriteLine("Options reset");
+            return false;
         }
 
         void InitOptions(bool reset) {
@@ -1151,7 +1163,14 @@ namespace Calcuchord {
             }
 
             if(OptionLookup.Values.SelectMany(x => x).None()) {
-                VerifyOptions(all_opts);
+                if(!VerifyOptions(all_opts)) {
+                    // out of date
+#if DEBUG
+                    Debugger.Break();
+#endif
+
+                }
+
                 // create option lookup (on startup)
                 foreach(var kvp in OptionLookup) {
                     kvp.Value.Clear();
@@ -1199,6 +1218,7 @@ namespace Calcuchord {
             OnPropertyChanged(nameof(SortOption1));
             OnPropertyChanged(nameof(SortOption2));
             OnPropertyChanged(nameof(SortOption3));
+            OnPropertyChanged(nameof(SortOption4));
 
             UpdateMatchCss();
 
@@ -1216,9 +1236,10 @@ namespace Calcuchord {
             return ivm;
         }
 
-        async Task InitInstrumentAsync(InstrumentInitSource source) {
+        async Task InitInstrumentAsync(InstrumentInitSource source,bool isStartupReset = false) {
+            // NOTE isStartupReset prevents double spinners on initial startup...
             PlatformWrapper.Services.Logger.WriteLine($"Init instrument. Source: {source}");
-            IsBusy = true;
+            IsBusy = !(isStartupReset && source == InstrumentInitSource.Startup);
             await Task.Delay(100);
 
             await Dispatcher.UIThread.InvokeAsync(
@@ -1334,7 +1355,7 @@ namespace Calcuchord {
                     async () => {
                         await Task.Delay(1_500);
                         //var npl = Matches.Select(x => x.NotePattern).ToList();
-                        var npl = GetMatchResults(true,SelectedTuning.SelectedNotes);
+                        var npl = GetMatchResults(true,SelectedTuning.SelectedNotes.ToArray());
                         builder.BatchToBrowser(SelectedTuning.Tuning,npl.Select(x => x.NotePattern));
                         is_done = true;
                     });
@@ -1487,8 +1508,8 @@ namespace Calcuchord {
                     return;
                 }
 
-                int cur_col_count = DiscoverMatchColumnCount();
-                await SetMatchColumnCountAsync(cur_col_count - 1,ZoomCts.Token);
+                int new_col_count = Math.Clamp(DiscoverMatchColumnCount() - 1,1,MaxMatchColCount);
+                await SetMatchColumnCountAsync(new_col_count,ZoomCts.Token);
                 IsMatchZoomChanging = false;
             },
             () => {
@@ -1505,8 +1526,8 @@ namespace Calcuchord {
                     return;
                 }
 
-                int cur_col_count = DiscoverMatchColumnCount();
-                await SetMatchColumnCountAsync(cur_col_count + 1,ZoomCts.Token);
+                int new_col_count = Math.Clamp(DiscoverMatchColumnCount() + 1,1,MaxMatchColCount);
+                await SetMatchColumnCountAsync(new_col_count,ZoomCts.Token);
                 IsMatchZoomChanging = false;
             },
             () => {
@@ -1517,7 +1538,7 @@ namespace Calcuchord {
             () => {
                 DesiredRoot = null;
                 SelectedTuning.ResetSelection();
-                LastNotes.Clear();
+                LastNotes = [];
 
                 Matches.Clear();
 
@@ -1738,6 +1759,7 @@ namespace Calcuchord {
                             OnPropertyChanged(nameof(SortOption1));
                             OnPropertyChanged(nameof(SortOption2));
                             OnPropertyChanged(nameof(SortOption3));
+                            OnPropertyChanged(nameof(SortOption4));
                             await Task.Delay(SortAnimDelayMs);
                         }
 
@@ -1775,7 +1797,7 @@ namespace Calcuchord {
                         PlatformWrapper.Services.Logger.WriteLine("suff or key change");
                         mus = MatchUpdateSource.FilterToggle;
 
-                    } else if(Enumerable.Range(0,3).Any(
+                    } else if(Enumerable.Range(0,4).Any(
                                   x => SelectedMatchSort.ElementAtOrDefault(x).Item1 !=
                                        LastMatchSort.ElementAtOrDefault(x).Item1 ||
                                        SelectedMatchSort.ElementAtOrDefault(x).Item2 !=
@@ -1807,6 +1829,7 @@ namespace Calcuchord {
 
         public ICommand ResetToDefaultsCommand => new MpCommand(
             async () => {
+                LoadingView lv = new LoadingView();
                 try {
                     while(true) {
                         if(MainView.Instance is not { } mv ||
@@ -1817,7 +1840,7 @@ namespace Calcuchord {
                         break;
                     }
 
-                    DialogHost.Show(new LoadingView(),MainDialogHostName).FireAndForgetSafeAsync();
+                    DialogHost.Show(lv,MainDialogHostName).FireAndForgetSafeAsync();
                     await Task.Delay(1_000);
                     //await DefaultDataBuilder.BuildAsync();
                     PlatformWrapper.Services.Logger.WriteLine("Clearing instruments");
@@ -1837,15 +1860,29 @@ namespace Calcuchord {
                                             await InitAsync(instl);
                                             DialogHost.Close(MainDialogHostName);
                                         } catch(Exception ex) {
+                                            lv.MessageTextBlock.Text = ex.ToString();
+                                            lv.MessageTextBlock.FontSize = 5;
                                             ex.Dump();
                                         }
-                                    },DispatcherPriority.ContextIdle);
+                                    },DispatcherPriority.Background);
                             } catch(Exception ex) {
+                                Dispatcher.UIThread.Post(
+                                    () => {
+                                        lv.MessageTextBlock.Text = ex.ToString();
+                                        lv.MessageTextBlock.FontSize = 5;
+                                    });
                                 ex.Dump();
                             }
                         });
 
                 } catch(Exception ex) {
+                    Dispatcher.UIThread.Post(
+                        () => {
+
+                            lv.MessageTextBlock.Text = ex.ToString();
+                            lv.MessageTextBlock.FontSize = 5;
+
+                        });
                     ex.Dump();
                 }
             });

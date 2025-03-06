@@ -3,10 +3,18 @@ using Newtonsoft.Json.Converters;
 
 namespace Calcuchord {
     [JsonConverter(typeof(StringEnumConverter))]
+    public enum MatchScoreMethodType {
+        Exact,
+        Voicing,
+
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MatchSortType {
         Key,
         Position,
         Suffix,
+        Score,
     }
 
     public enum DrawerPageType {

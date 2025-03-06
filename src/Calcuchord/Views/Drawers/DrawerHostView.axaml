@@ -20,7 +20,8 @@
         </Carousel.PageTransition>
         <Carousel.Items>
             <local:MainDrawerView DataContext="{x:Static local:MainViewModel.Instance}" />
-            <local:OptionsDrawerView DataContext="{x:Static local:MainViewModel.Instance}" />
+            <local:OptionsDrawerView
+                DataContext="{Binding SelectedInstrument, Source={x:Static local:MainViewModel.Instance}}" />
         </Carousel.Items>
     </Carousel>
 </UserControl>

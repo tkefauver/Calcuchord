@@ -13,6 +13,20 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              x:Class="Calcuchord.SortItemView"
              x:DataType="local:OptionViewModel">
+    <UserControl.Styles>
+        <Style Selector="Button.sub">
+            <Setter Property="IsVisible">
+                <Setter.Value>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="$parent[Button].DataContext"
+                                 ConverterParameter="$self.Data"
+                                 Converter="{x:Static ObjectConverters.NotEqual}" />
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Styles>
     <TransitioningContentControl Content="{Binding .}">
         <TransitioningContentControl.PageTransition>
             <PageSlide Orientation="Horizontal"
@@ -37,12 +51,68 @@
                         <avalonia:MaterialIcon HorizontalAlignment="Center"
                                                VerticalAlignment="Center" />
                     </ToggleButton>
-                    <Button Grid.Column="1"
-                            Classes="opt-btn"
+                    <Button x:Name="SortPropButton"
+                            Grid.Column="1"
+                            Classes="opt-btn key"
                             Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}"
                             CommandParameter="{Binding .}">
-                        <TextBlock />
+                        <Viewbox StretchDirection="DownOnly">
+                            <TextBlock />
+                        </Viewbox>
+
                     </Button>
+
+                    <!-- <Button x:Name="SortPropButton" -->
+                    <!--         Grid.Column="1" -->
+                    <!--         Classes="opt-btn key"> -->
+                    <!--     <Button.Flyout> -->
+                    <!--         <Flyout> -->
+                    <!--             <StackPanel x:DataType="local:MainViewModel" -->
+                    <!--                         Background="{DynamicResource Bg}" -->
+                    <!--                         DataContext="{x:Static local:MainViewModel.Instance}"> -->
+                    <!--                 <Button Classes="sub opt-btn key" -->
+                    <!--                         DataContext="{Binding SortOption1}" -->
+                    <!--                         Classes.is-score="{Binding ConverterParameter=0, Converter={x:Static local:IsScoreOptionConverter.Instance}}" -->
+                    <!--                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}" -->
+                    <!--                         CommandParameter="{Binding .}"> -->
+                    <!--                     <Viewbox StretchDirection="DownOnly"> -->
+                    <!--                         <TextBlock /> -->
+                    <!--                     </Viewbox> -->
+                    <!--                 </Button> -->
+                    <!--                 <Button Classes="sub opt-btn key" -->
+                    <!--                         DataContext="{Binding SortOption2, Source={x:Static local:MainViewModel.Instance}}" -->
+                    <!--                         Classes.is-score="{Binding ConverterParameter=0, Converter={x:Static local:IsScoreOptionConverter.Instance}}" -->
+                    <!--                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}" -->
+                    <!--                         CommandParameter="{Binding .}"> -->
+                    <!--                     <Viewbox StretchDirection="DownOnly"> -->
+                    <!--                         <TextBlock /> -->
+                    <!--                     </Viewbox> -->
+                    <!--                 </Button> -->
+                    <!--                 <Button Classes="sub opt-btn key" -->
+                    <!--                         DataContext="{Binding SortOption3, Source={x:Static local:MainViewModel.Instance}}" -->
+                    <!--                         Classes.is-score="{Binding ConverterParameter=0, Converter={x:Static local:IsScoreOptionConverter.Instance}}" -->
+                    <!--                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}" -->
+                    <!--                         CommandParameter="{Binding .}"> -->
+                    <!--                     <Viewbox StretchDirection="DownOnly"> -->
+                    <!--                         <TextBlock /> -->
+                    <!--                     </Viewbox> -->
+                    <!--                 </Button> -->
+                    <!--                 <Button Classes="sub opt-btn key" -->
+                    <!--                         DataContext="{Binding SortOption4, Source={x:Static local:MainViewModel.Instance}}" -->
+                    <!--                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}" -->
+                    <!--                         CommandParameter="{Binding .}"> -->
+                    <!--                     <Viewbox StretchDirection="DownOnly"> -->
+                    <!--                         <TextBlock /> -->
+                    <!--                     </Viewbox> -->
+                    <!--                 </Button> -->
+                    <!--             </StackPanel> -->
+                    <!--         </Flyout> -->
+                    <!--     </Button.Flyout> -->
+                    <!--     <Viewbox StretchDirection="DownOnly"> -->
+                    <!--         <TextBlock /> -->
+                    <!--     </Viewbox> -->
+                    <!-- -->
+                    <!-- </Button> -->
 
                 </Grid>
 

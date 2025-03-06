@@ -1,9 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MonkeyPaste.Common;
 
 namespace Calcuchord {
     public static class MusicHelpers {
+        public static double Distance(this InstrumentNote a,InstrumentNote b) {
+            return Math.Abs(a.RowNum - b.RowNum) + Math.Abs(a.ColNum - b.ColNum);
+        }
+
         public static Note ToNote(this (NoteType,int) nt_tup) {
             return Note.GetNote(nt_tup.Item1.Id(nt_tup.Item2));
         }
