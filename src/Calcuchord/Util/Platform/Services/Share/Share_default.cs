@@ -15,7 +15,7 @@ namespace Calcuchord {
         protected IStorageFolder LastFolder { get; set; }
         protected MidiFileBuilder Builder { get; } = new MidiFileBuilder();
 
-        public async Task ShareMidiAsync(IEnumerable<IEnumerable<int>> toneSets,bool isScale,string title) {
+        public virtual async Task ShareMidiAsync(IEnumerable<IEnumerable<int>> toneSets,bool isScale,string title) {
             string fp = await ShowFileBrowserAsync(title,["mid","midi"]);
             if(fp is null) {
                 return;
@@ -31,7 +31,7 @@ namespace Calcuchord {
 
         }
 
-        public async Task SharePdfAsync(SKSvg svg,string title) {
+        public virtual async Task SharePdfAsync(SKSvg svg,string title) {
             string fp = await ShowFileBrowserAsync(title,["pdf"]);
             if(fp is null) {
                 return;
