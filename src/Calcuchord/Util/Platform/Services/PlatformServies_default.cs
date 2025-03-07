@@ -4,7 +4,7 @@ namespace Calcuchord {
 
         public virtual ISharePdf SharePdf => ShareDefault;
         public virtual IShareMidi ShareMidi => ShareDefault;
-        public virtual IShareHtml ShareHtml { get; } = null;
+        public virtual IShareHtml ShareHtml => ShareDefault;
         public virtual ILog Logger { get; } = new Logger_default();
         public virtual IPlatformInfo PlatformInfo { get; } = new PlatformInfo_default();
         public virtual IUriNavigator UriNavigator { get; } = new UriNavigator_default();

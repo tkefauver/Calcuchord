@@ -29,6 +29,14 @@
                 <ProgressBar Classes="circular"
                              IsIndeterminate="True" />
             </controls:Card>
+
+            <Button x:Name="CancelButton"
+                    Classes="float-text"
+                    IsDefault="True"
+                    HorizontalAlignment="Center"
+                    IsVisible="False">
+                <TextBlock Text="Cancel" />
+            </Button>
         </StackPanel>
     </controls:ColorZone>
 </UserControl>

@@ -174,7 +174,7 @@ namespace Calcuchord {
                 if(ThemeViewModel.Instance.IsDesktop &&
                    TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
                    tl.Clipboard is { } cb &&
-                   PatternToSvgConverter.Instance.Convert(NotePattern,null,"styled",null) is string svg) {
+                   PatternToSvgConverter.Instance.Convert(NotePattern,null,"styled|titled",null) is string svg) {
                     cb.SetTextAsync(svg.ToPrettyPrintXml()).FireAndForgetSafeAsync();
                 }
 #endif

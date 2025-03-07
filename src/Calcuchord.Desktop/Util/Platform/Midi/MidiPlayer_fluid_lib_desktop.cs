@@ -1,6 +1,4 @@
 using System;
-using System.Diagnostics;
-using System.IO;
 using NFluidsynth;
 using NFluidSettings = NFluidsynth.Settings;
 
@@ -40,23 +38,10 @@ namespace Calcuchord.Desktop {
         }
 
         protected override void PlayFile(string soundFontPath) {
-            // Player player = new Player(Synth);
-            // player.Add(MidiFilePath);
-            // player.Play();
-            // player.Join();
-            if(!File.Exists(soundFontPath)) {
-                return;
-            }
-
-            ProcessStartInfo psi = new ProcessStartInfo
-            {
-                FileName = "fluidsynth",
-                Arguments = $"-a alsa -g 1.0 {soundFontPath} {MidiFilePath}",
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            };
-            using Process p = Process.Start(psi);
-
+            Player player = new Player(Synth);
+            player.Add(MidiFilePath);
+            player.Play();
+            player.Join();
         }
     }
 

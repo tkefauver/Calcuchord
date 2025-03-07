@@ -13,7 +13,7 @@ namespace Calcuchord {
 
         public object Convert(object value,Type targetType,object parameter,CultureInfo culture) {
             if(value is not NotePattern ng ||
-               GetBuilder(ng) is not { } builder ||
+               GetBuilder(ng,true) is not { } builder ||
                builder.Build(ng,parameter) is not { } htmlNode) {
                 return "<svg></svg>";
             }
@@ -21,16 +21,16 @@ namespace Calcuchord {
             return htmlNode.OuterHtml;
         }
 
-        public SvgBuilderBase GetBuilder(NotePattern ng) {
+        public SvgBuilderBase GetBuilder(NotePattern ng,bool common) {
             if(ng.Parent.Parent.Parent.InstrumentType == InstrumentType.Piano) {
-                return PianoBuilder;
+                return common ? PianoBuilder : new PianoSvgBuilder();
             }
 
             if(ng.Parent.PatternType == MusicPatternType.Chords) {
-                return ChordBuilder;
+                return common ? ChordBuilder : new ChordSvgBuilder();
             }
 
-            return ScaleBuilder;
+            return common ? ScaleBuilder : new ScaleSvgBuilder();
         }
 
         public object ConvertBack(object value,Type targetType,object parameter,CultureInfo culture) {

@@ -61,7 +61,7 @@
                     Value="0" />
         </Style>
         <Style
-            Selector="Grid#OuterContainer:pointerover StackPanel#MatchButtonStripPanel, Grid#OuterContainer.selected StackPanel#MatchButtonStripPanel, Grid#OuterContainer:pointerover Button#ShareButton, Grid#OuterContainer.selected Button#ShareButton">
+            Selector="Border#MatchContainerBorder:pointerover StackPanel#MatchButtonStripPanel, Border#MatchContainerBorder.selected StackPanel#MatchButtonStripPanel, Border#MatchContainerBorder:pointerover Button#ShareButton, Border#MatchContainerBorder.selected Button#ShareButton">
             <Setter Property="Opacity"
                     Value="1" />
         </Style>
@@ -162,36 +162,40 @@
                         </Button>
                     </StackPanel>
 
+
+                    <Button x:Name="ShareButton"
+                            local:CloseFlyoutExtension.IsEnabled="False"
+                            Margin="15"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Classes="float">
+                        <Button.Flyout>
+                            <Flyout Placement="AnchorAndGravity"
+                                    PlacementAnchor="TopRight"
+                                    PlacementGravity="BottomRight">
+                                <ContextMenu>
+                                    <MenuItem Header="Save as midi..."
+                                              Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                              CommandParameter="MIDI">
+                                        <MenuItem.Icon>
+                                            <avalonia:MaterialIcon Kind="Midi" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="Save as pdf..."
+                                              Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                              CommandParameter="PDF">
+                                        <MenuItem.Icon>
+                                            <avalonia:MaterialIcon Kind="FilePdfBox" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </Flyout>
+                        </Button.Flyout>
+                        <avalonia:MaterialIcon Kind="DotsVertical" />
+                    </Button>
+
                 </Grid>
             </Border>
         </Viewbox>
-        <Button x:Name="ShareButton"
-                local:CloseFlyoutExtension.IsEnabled="True"
-                Margin="15"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Classes="float">
-            <Button.Flyout>
-                <Flyout>
-                    <ContextMenu>
-                        <MenuItem Header="Save as midi..."
-                                  Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                  CommandParameter="MIDI">
-                            <MenuItem.Icon>
-                                <avalonia:MaterialIcon Kind="Midi" />
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Save as pdf..."
-                                  Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                  CommandParameter="PDF">
-                            <MenuItem.Icon>
-                                <avalonia:MaterialIcon Kind="FilePdfBox" />
-                            </MenuItem.Icon>
-                        </MenuItem>
-                    </ContextMenu>
-                </Flyout>
-            </Button.Flyout>
-            <avalonia:MaterialIcon Kind="DotsVertical" />
-        </Button>
     </Grid>
 </UserControl>

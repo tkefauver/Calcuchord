@@ -251,7 +251,7 @@ namespace Calcuchord {
 
         #region Options
 
-        public bool IsExactMatchOnly { get; set; } = false;
+        public bool IsExactMatchOnly { get; set; } = true;
 
         DisplayModeType LastDisplayMode { get; set; }
         MusicPatternType LastPatternType { get; set; }
@@ -467,6 +467,20 @@ namespace Calcuchord {
         public void SetDesiredRoot(NoteType? nt) {
             //var last_dr = DesiredRoot;
             DesiredRoot = nt;
+            if(SelectedKey == DesiredRoot) {
+                return;
+            }
+
+            object[] args = ["dummy",null];
+            if(DesiredRoot == null) {
+                // deselect key
+                args[1] = KeyOptions.FirstOrDefault(x => x.OptionValue == SelectedKey.Value.ToString());
+            } else {
+                // set selected key to desired root
+                args[1] = KeyOptions.FirstOrDefault(x => x.OptionValue == DesiredRoot.Value.ToString());
+            }
+
+            SelectOptionCommand.Execute(args);
         }
 
         #endregion
@@ -853,11 +867,17 @@ namespace Calcuchord {
             var results = GetMatchResults(true,sel_notes);
             if(source is MatchUpdateSource.FindClick
                or MatchUpdateSource.FilterToggle) {
+
                 AvSnackbarHost.Post(
                     $"{results.Count():n0} found",
-                    null,
+                    MainView.SnackbarHostName,
                     DispatcherPriority.Background);
+                await Task.Delay(200);
+            } else {
+
+                await Task.Delay(100);
             }
+
 
             sorted_results = SortMatches(results);
             Matches.AddRange(sorted_results);
@@ -866,7 +886,6 @@ namespace Calcuchord {
                 mv.MatchesScrollViewer.ScrollToHome();
             }
 
-            await Task.Delay(1);
             OnPropertyChanged(nameof(CanIncreaseMatchColumnCount));
             OnPropertyChanged(nameof(CanDecreaseMatchColumnCount));
 
@@ -1357,14 +1376,14 @@ namespace Calcuchord {
                     if(PlatformWrapper.Services.SharePdf is { } sp &&
                        SelectedMatch is { } sm &&
                        PatternToSvgConverter.Instance.Convert(
-                           sm.NotePattern,typeof(string),"styled",CultureInfo.CurrentCulture) is string sel_svg_str) {
+                           sm.NotePattern,typeof(string),"styled|titled",
+                           CultureInfo.CurrentCulture) is string sel_svg_str) {
                         using(SKSvg svg = new SKSvg()) {
 
                             if(svg.FromSvg(sel_svg_str) is not null) {
                                 await sp.SharePdfAsync(svg,SelectedMatch.ShareTitle);
                             }
                         }
-
                     }
 
                     return;
@@ -1372,29 +1391,62 @@ namespace Calcuchord {
 
                 if(Matches.FirstOrDefault() is not { } first_match ||
                    first_match.NotePattern is not { } np ||
-                   PatternToSvgConverter.Instance.GetBuilder(np) is not { } builder) {
+                   PatternToSvgConverter.Instance.GetBuilder(np,false) is not { } builder) {
                     return;
                 }
 
+                bool is_done = false;
                 LoadingView busy_view = new LoadingView
                 {
                     MessageTextBlock =
                     {
-                        Text = "Please wait...",
+                        Text = "Please wait...(This may take a while)",
                     },
                 };
-
-                DialogHost.Show(busy_view,MainDialogHostName).FireAndForgetSafeAsync();
-                bool is_done = false;
-
-                _ = Task.Run(
-                    async () => {
-                        await Task.Delay(1_500);
-                        //var npl = Matches.Select(x => x.NotePattern).ToList();
-                        var npl = GetMatchResults(true,SelectedTuning.SelectedNotes.ToArray());
-                        builder.BatchToBrowser(SelectedTuning.Tuning,npl.Select(x => x.NotePattern));
+                CancellationTokenSource batch_cts = new CancellationTokenSource();
+                busy_view.CancelButton.IsVisible = true;
+                busy_view.CancelButton.Command = new MpCommand(
+                    () => {
+                        batch_cts.Cancel();
                         is_done = true;
                     });
+
+                DialogHost.Show(busy_view,MainDialogHostName).FireAndForgetSafeAsync();
+
+                try {
+                    _ = Task.Run(
+                        async () => {
+                            await Task.Delay(1_500);
+                            var npl = GetMatchResults(true,SelectedTuning.SelectedNotes.ToArray());
+                            string title = SelectedTuning.FullName.RemoveInvalidPathChars().Replace(" - "," ");
+
+                            if(exp_type == "HTML" && PlatformWrapper.Services.ShareHtml is { } shtml) {
+                                string html = builder.GetBatchHtml(
+                                    SelectedTuning.Tuning,npl.Select(x => x.NotePattern));
+                                shtml.ShareHtml(html,title);
+                            } else if(exp_type == "FULLPDF" && PlatformWrapper.Services.SharePdf is { } spdf) {
+                                string svg_html = builder.GetBatchSvg(
+                                    SelectedTuning.Tuning,npl.Select(x => x.NotePattern),MatchColCount);
+#if DEBUG
+                                // if(ThemeViewModel.Instance.IsDesktop &&
+                                //    TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
+                                //    tl.Clipboard is { } cb) {
+                                //     cb.SetTextAsync(svg_html.ToPrettyPrintXml()).FireAndForgetSafeAsync();
+                                // }
+#endif
+                                using(SKSvg svg = new SKSvg()) {
+                                    if(svg.FromSvg(svg_html) is not null) {
+                                        await spdf.SharePdfAsync(svg,title);
+                                    }
+                                }
+                            }
+
+                            is_done = true;
+                        },batch_cts.Token);
+                } catch(Exception ex) {
+                    // canceled
+                    ex.Dump();
+                }
 
                 while(!is_done) {
                     await Task.Delay(100);
@@ -1710,11 +1762,20 @@ namespace Calcuchord {
 
         public ICommand SelectOptionCommand => new MpAsyncCommand<object>(
             async (args) => {
+                bool suppress_action = false;
                 if(args is not OptionViewModel ovm) {
                     if(args is object[] arg_parts &&
                        arg_parts.Any() &&
                        arg_parts[0] is OptionViewModel sort_ovm) {
                         ovm = sort_ovm;
+
+                    } else if(args is object[] arg_parts2 &&
+                              arg_parts2.Length == 2 &&
+                              arg_parts2[0] is string dummy &&
+                              arg_parts2[1] is OptionViewModel key_ovm) {
+                        // suppress
+                        ovm = key_ovm;
+                        suppress_action = true;
 
                     } else {
                         return;
@@ -1800,6 +1861,10 @@ namespace Calcuchord {
                         }
 
                         break;
+                }
+
+                if(suppress_action) {
+                    return;
                 }
 
                 while(true) {

@@ -85,7 +85,7 @@ namespace Calcuchord {
                     return;
                 }
 
-                PlatformWrapper.Services.UriNavigator.NavigateTo(arg_url);
+                PlatformWrapper.Services.UriNavigator.NavigateTo(arg_url,null);
             });
 
         #endregion

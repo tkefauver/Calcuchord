@@ -36,11 +36,29 @@ namespace Calcuchord {
             string pattern_fg = ThemeViewModel.Instance.P[PaletteColorType.UserFretFg];
 
             var pattern_notes = ng.Notes.OrderBy(x => x.ColNum);
-            InstrumentNote root_note = ng.Parent.Parent.OpenNotes.FirstOrDefault();
+            InstrumentNote root_note = ng.Parent.Parent.OpenNotes.First();
             int key_count = ng.Parent.Parent.WorkingColCount;
 
+
+            double title_h = 0;
+            if(WithTitle) {
+                int wkc = Enumerable.Range(0,ng.Parent.Parent.WorkingColCount).Select(x => root_note.Offset(x))
+                    .Count(x => !x.IsAltered);
+                double tfs = TitleFontSize * 3;
+
+                double scaled_w = wkc * wkw;
+                AddTitleText(
+                    wk_bg_g,
+                    ng.Name,
+                    ng.Position == 0 ? string.Empty : ng.Position.ToString(),
+                    ng.SubPosition == 0 ? string.Empty : ng.SubPosition.ToString(),
+                    tfs,Fg,scaled_w,classes: "match-title",
+                    oy: -tfs);
+                title_h = tfs + 5;
+            }
+
             double cur_x = 0;
-            double cur_y = 0;
+            double cur_y = title_h;
 
             for(int i = 0; i < key_count; i++) {
                 Note cur_note = root_note.Offset(i);
@@ -70,26 +88,9 @@ namespace Calcuchord {
                 // bg
                 AddRect(cntr,fill,stroke,x,y,w,h,lw);
 
-                // root
-                if(is_root) {
-                    //ReduceDims();
-                    //AddRect(cntr,RootBg,RootBg,x,y,w,h,lw);
-                    //marker_bg = Fg;
-                }
-
-
-                // user
-                // if(is_user && flags.HasFlag(SvgOptionType.Matches)) {
-                //     ReduceDims();
-                //     AddRect(cntr,UserBg,UserBg,x,y,w,h,lw);
-                // }
-
                 if(pattern_note != null) {
                     ReduceDims();
                     AddRect(cntr,UserBg,UserBg,x,y,w,h,lw);
-
-                    string marker_bg = Transparent;
-                    string marker_fg = Bg;
 
                     double pad = is_black ? 0.5 : 1;
                     double mw = w - (pad * 2);
@@ -123,11 +124,11 @@ namespace Calcuchord {
             }
 
             double tw = cur_x;
-            double th = wkh;
+            double th = wkh + title_h;
 
             svg.Attributes.Add("width",tw);
             svg.Attributes.Add("height",th);
-
+            FinishBuild(args);
             return svg;
         }
     }

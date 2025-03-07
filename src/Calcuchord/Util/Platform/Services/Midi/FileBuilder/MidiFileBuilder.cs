@@ -17,24 +17,21 @@ namespace Calcuchord {
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
 
-            int delay = 25;
-            int deltaTime = 0;
+            int vel = 127;
+            int sus = 25;
 
             foreach(var tone_set in toneSets) {
                 foreach(int note in tone_set) {
-                    int vel = 127;
-
                     trackChunk.Events.Add(
-                        new NoteOnEvent((SevenBitNumber)note,(SevenBitNumber)vel)
-                        {
-                            DeltaTime = deltaTime,
-                        });
+                        new NoteOnEvent((SevenBitNumber)note,(SevenBitNumber)vel));
+                }
+
+                foreach(int note in tone_set) {
                     trackChunk.Events.Add(
                         new NoteOffEvent((SevenBitNumber)note,(SevenBitNumber)0)
                         {
-                            DeltaTime = delay,
+                            DeltaTime = sus,
                         });
-                    deltaTime = 0;
                 }
             }
 
@@ -58,6 +55,7 @@ namespace Calcuchord {
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
             int delta = 0;
+            int sus = 200;
             int vel = 127;
 
             foreach(var tone_set in toneSets) {
@@ -77,7 +75,7 @@ namespace Calcuchord {
                     trackChunk.Events.Add(
                         new NoteOffEvent((SevenBitNumber)tone,(SevenBitNumber)0)
                         {
-                            DeltaTime = 200,
+                            DeltaTime = sus,
                         });
                 }
             }

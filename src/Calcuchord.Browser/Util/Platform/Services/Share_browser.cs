@@ -2,13 +2,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using MonkeyPaste.Common;
+using MonkeyPaste.Common.Plugin;
 using SkiaSharp;
 using Svg.Skia;
 
 namespace Calcuchord.Browser {
     public class Share_browser : Share_default,IShareHtml {
-        public void ShareHtml(string html,string title) {
-            JsInterop.ShareHtml(html,title);
+        public override void ShareHtml(string html,string title) {
+            string fileName = title + ".html";
+
+            string b64 = html.ToBase64String();
+            JsInterop.ShareFile(b64,"text/html",fileName,title);
         }
 
         public override async Task ShareMidiAsync(IEnumerable<IEnumerable<int>> toneSets,bool isScale,string title) {
@@ -26,6 +30,7 @@ namespace Calcuchord.Browser {
         }
 
         public override async Task SharePdfAsync(SKSvg svg,string title) {
+            await Task.Delay(1);
             string tempFile = "temp.pdf";
             string fileName = title + ".pdf";
             svg.Picture.ToPdf(tempFile,ThemeViewModel.Instance.IsDark ? SKColors.Black : SKColors.White,1f,1f);

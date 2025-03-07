@@ -16,7 +16,7 @@
 
     <ItemGroup>
         <AvaloniaResource Include="Assets\**"/>
-        <AvaloniaResource Remove="Util\Platform\Services\Midi\sugarwv\**" />
+        <AvaloniaResource Remove="Util\Platform\Services\Midi\sugarwv\**"/>
     </ItemGroup>
 
     <PropertyGroup>
@@ -52,33 +52,37 @@
         <PackageReference Include="ReactiveUI"/>
         <PackageReference Include="System.Formats.Nrbf"/>
         <PackageReference Include="Melanchall.DryWetMidi" Condition="'$(BuildOs)' != 'IOS'"/>
-        <PackageReference Include="Material.Avalonia.DataGrid" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" />
+        <PackageReference Include="Material.Avalonia.DataGrid"/>
+        <PackageReference Include="Avalonia.Controls.DataGrid"/>
     </ItemGroup>
 
 
     <ItemGroup>
-      <AvaloniaXaml Remove="Util\Platform\Services\Midi\sugarwv\**" />
+        <AvaloniaXaml Remove="Util\Platform\Services\Midi\sugarwv\**"/>
     </ItemGroup>
 
 
     <ItemGroup>
-      <Compile Remove="Util\Platform\Services\Midi\sugarwv\**" />
+        <Compile Remove="Util\Platform\Services\Midi\sugarwv\**"/>
+        <Compile Update="Views\Popups\Dialogs\ProgressView.axaml.cs">
+            <DependentUpon>ProgressView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 
 
     <ItemGroup>
-      <EmbeddedResource Remove="Util\Platform\Services\Midi\sugarwv\**" />
+        <EmbeddedResource Remove="Util\Platform\Services\Midi\sugarwv\**"/>
     </ItemGroup>
 
 
     <ItemGroup>
-      <AdditionalFiles Remove="Util\Platform\Services\Midi\sugarwv\**" />
+        <AdditionalFiles Remove="Util\Platform\Services\Midi\sugarwv\**"/>
     </ItemGroup>
 
 
     <ItemGroup>
-      <None Remove="Util\Platform\Services\Midi\sugarwv\**" />
+        <None Remove="Util\Platform\Services\Midi\sugarwv\**"/>
     </ItemGroup>
 
 </Project>

@@ -90,6 +90,7 @@ namespace Calcuchord {
 
         protected double BodyFontSize => 4;
         protected double HeaderFontSize => 6;
+        protected double TitleFontSize => 6;
 
         #endregion
 
@@ -133,7 +134,7 @@ namespace Calcuchord {
 
         public abstract HtmlNode Build(NotePattern ng,object args);
 
-        public void BatchToBrowser(Tuning tuning,IEnumerable<NotePattern> ngl) {
+        public string GetBatchHtml(Tuning tuning,IEnumerable<NotePattern> ngl) {
             HtmlDocument doc = new HtmlDocument();
 
             HtmlNode head = doc.CreateElement("head");
@@ -258,7 +259,69 @@ namespace Calcuchord {
             footer_link_label_elm.InnerHtml = "Calcuchord";
             footer_link_elm.AppendChild(footer_link_label_elm);
 
-            string result = doc.DocumentNode.OuterHtml;
+            return doc.DocumentNode.OuterHtml;
+        }
+
+        public string GetBatchSvg(Tuning tuning,IEnumerable<NotePattern> ngl,int colCount) {
+            object args = "styled|titled";
+            var sub_svg_elml = ngl.Select(x => Build(x,args)).ToArray();
+            colCount = Math.Min(sub_svg_elml.Length,colCount);
+
+            HtmlNode svg_elm = InitBuild(args);
+            HtmlDocument doc = CurrentDoc;
+
+            double item_w = sub_svg_elml.First().GetAttributeValue("width",0d);
+            double item_h = sub_svg_elml.First().GetAttributeValue("height",0d);
+
+            double tw = item_w * colCount;
+            double th = item_h * Math.Ceiling(sub_svg_elml.Length / (double)colCount);
+
+            double title_fs = 12;
+            double title_h = title_fs * 1d;
+            AddTitleText(svg_elm,tuning.FullName,string.Empty,string.Empty,title_fs,Fg,tw,oy: -title_fs);
+            double title_pad = 15;
+            double content_y = title_h + title_pad;
+            th += title_h + title_pad;
+
+            for(int i = 0; i < sub_svg_elml.Length; i++) {
+                HtmlNode sub_svg_elm = sub_svg_elml[i];
+                double w = sub_svg_elm.GetAttributeValue("width",0d);
+                double h = sub_svg_elm.GetAttributeValue("height",0d);
+                int r = i / colCount;
+                int c = i % colCount;
+                double x = c * w;
+                double y = content_y + (r * h);
+
+                HtmlNode wrapper_g = doc.CreateElement("g");
+                wrapper_g.SetAttributeValue("transform",$"translate({x},{y}) scale(0.9)");
+
+                HtmlNode cntr_g = sub_svg_elm.FirstChild.NextSibling;
+                cntr_g.Remove();
+                wrapper_g.AppendChild(cntr_g);
+                svg_elm.AppendChild(wrapper_g);
+            }
+
+            double logo_fs = 3;
+            double logo_h = logo_fs * 1.5;
+            double logo_y = th;
+            AddTitleText(
+                svg_elm,$"Created with Calcuchord ©{DateTime.Now.Year}",string.Empty,string.Empty,logo_fs,Fg,tw,oy: th);
+            th += logo_h;
+
+            logo_y += logo_h;
+            double ox = 0; //800d / tw;
+            AddTitleText(
+                svg_elm,"https://tkefauver.github.io/Calcuchord",string.Empty,string.Empty,logo_fs,Fg,tw,ox: ox,oy: th);
+            th += logo_h + 4;
+
+            svg_elm.Attributes.Add("width",tw);
+            svg_elm.Attributes.Add("height",th);
+
+            return svg_elm.OuterHtml;
+        }
+
+        public void BatchToBrowser(Tuning tuning,IEnumerable<NotePattern> ngl) {
+            string result = GetBatchHtml(tuning,ngl);
             try {
                 if(PlatformWrapper.Services.ShareHtml is { } share_service &&
                    ngl.FirstOrDefault() is { } first_item) {
@@ -273,7 +336,7 @@ namespace Calcuchord {
                     Path.GetRandomFileName().SplitNoEmpty(".")[0] + ".html");
                 File.WriteAllText(fp,result);
                 PlatformWrapper.Services.UriNavigator.NavigateTo(
-                    fp.ToFileSystemUriFromPath());
+                    fp.ToFileSystemUriFromPath(),null);
             } catch(Exception ex) {
                 ex.Dump();
             }
@@ -301,14 +364,21 @@ namespace Calcuchord {
             HtmlNode svg = CurrentDoc.CreateElement("svg");
             svg.Attributes.Add("xmlns","http://www.w3.org/2000/svg");
 
-            if(args.ToStringOrEmpty() == "styled") {
-                //WithTitle = true;
+            if(args.ToStringOrEmpty().Contains("styled")) {
                 HtmlNode style_elm = CurrentDoc.CreateElement("style");
                 style_elm.InnerHtml = MainViewModel.Instance.MatchSvgCss;
                 svg.AppendChild(style_elm);
             }
 
+            if(args.ToStringOrEmpty().Contains("titled")) {
+                WithTitle = true;
+            }
+
             return svg;
+        }
+
+        protected void FinishBuild(object args) {
+            WithTitle = false;
         }
 
         protected HtmlNode CreateG(HtmlNode cntr,string classes = "") {
@@ -337,6 +407,44 @@ namespace Calcuchord {
             }
         }
 
+
+        protected void AddTitleText(
+            HtmlNode cntr,
+            string text,
+            string text2,
+            string text3,
+            double fs,
+            string fill,
+            double w,
+            bool isBold = false,
+            string classes = null,
+            bool shadow = false,
+            double ox = 0,
+            double oy = 0) {
+            // fs: 6 each char is ~3.6 w so fsr = fs* 3.6/6
+            double fsr = fs * 0.6d;
+            double tw = (text.Length - 1) * fsr;
+            double tx = (w / 2d) - (tw / 2d);
+            double ty = fs * 2;
+            double fsr2 = fsr / 2d;
+            double fs2 = fs / 2d;
+            double ty2 = ty + (fs / 3d);
+            double w2 = text2.Length * fsr2;
+            double ty3 = ty - (fs / 3d);
+            double w3 = text3.Length * fsr2;
+            tx -= (w2 + w3) / 2d;
+            double tx2 = tx + tw + fsr2;
+            double tx3 = tx2 + fsr2;
+            AddText(cntr,text,fs,fill,tx + ox,ty + oy,isBold,classes,shadow);
+            if(!string.IsNullOrEmpty(text2)) {
+                AddText(cntr,text2,fs2,fill,tx2 + ox,ty2 + oy,isBold,classes,shadow);
+            }
+
+            if(!string.IsNullOrEmpty(text3)) {
+                AddText(cntr,text3,fs2,fill,tx3 + ox,ty3 + oy,isBold,classes,shadow);
+            }
+
+        }
 
         protected void AddCenteredText(
             HtmlNode cntr,

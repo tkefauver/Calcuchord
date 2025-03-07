@@ -89,16 +89,26 @@ namespace Calcuchord {
             double header_h = fh + 0.25;
             double curx = min_fret_x;
             double cury = header_h;
+            double title_height = 0;
+
             if(WithTitle) {
                 rows++;
-                cury += fh * 2;
+                title_height = fh; //(fh / 2);
+                cury += title_height;
             }
 
             double tw = fw * cols;
             double th = fh * rows;
 
             if(WithTitle) {
-                AddCenteredText(bg_g,ng.FullName,6,Bg,0,0,tw,fh * 2,classes: "match-title");
+                AddTitleText(
+                    bg_g,
+                    ng.Name,
+                    ng.Position == 0 ? string.Empty : ng.Position.ToString(),
+                    ng.SubPosition == 0 ? string.Empty : ng.SubPosition.ToString(),
+                    TitleFontSize,Fg,tw,
+                    classes: "match-title",
+                    isBold: true);
             }
 
             // fret labels
@@ -142,7 +152,7 @@ namespace Calcuchord {
 
             if(show_header_labels) {
                 double header_x = min_fret_x;
-                double header_y = fh + (WithTitle ? fh * 2 : 0); //-1;
+                double header_y = title_height + fh; //-1;
                 for(int i = 0; i < str_count; i++) {
                     if(notes.FirstOrDefault(x => x.RowNum == i) is { } str_fret &&
                        str_fret.ColNum <= 0) {
@@ -177,7 +187,7 @@ namespace Calcuchord {
                 double fs = BodyFontSize;
                 double offset_x = fs / 2;
                 double cur_x = min_fret_x - offset_x;
-                double cur_y = th - (fh / 2d);
+                double cur_y = th - (fh / 2d); // - (title_height/2);
                 HtmlNode tuning_g = CreateG(bg_g,"string-tuning");
 
                 for(int i = 0; i < str_count; i++) {
@@ -346,6 +356,7 @@ namespace Calcuchord {
             svg.Attributes.Add("width",tw);
             svg.Attributes.Add("height",th);
 
+            FinishBuild(args);
             return svg;
         }
     }

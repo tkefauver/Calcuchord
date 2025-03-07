@@ -88,6 +88,10 @@ namespace Calcuchord {
                     score += 1;
                     continue;
                 }
+
+                if(MainViewModel.Instance.IsExactMatchOnly) {
+                    return 0;
+                }
                 // find all notes in pattern with a matching tone,
                 // then the closest one of those on the instrument
 
@@ -97,10 +101,6 @@ namespace Calcuchord {
                        .OrderBy(x => x.Distance(mn.InstrumentNote))
                        .FirstOrDefault() is { } closest_pattern_match) {
                     double dist = closest_pattern_match.Distance(mn.InstrumentNote);
-                    if(MainViewModel.Instance.IsExactMatchOnly && dist > 0) {
-                        // inexact match
-                        return 0;
-                    }
 
                     score += 1 / (dist + 1d);
                     continue;

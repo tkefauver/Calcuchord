@@ -1,12 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Avalonia.Controls;
 using HtmlAgilityPack;
 
 namespace Calcuchord {
     public static class Extensions {
+        public static string RemoveInvalidPathChars(this string originalString) {
+            // from https://stackoverflow.com/a/66053014/105028
+            string finalString = string.Empty;
+            if(!string.IsNullOrEmpty(originalString)) {
+                return string.Concat(originalString.Split(Path.GetInvalidFileNameChars()));
+            }
+
+            return finalString;
+        }
+
         public static void CloseFlyout(object args) {
             if(args is not Button b ||
                b.Flyout is not { } fo) {

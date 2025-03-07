@@ -34,7 +34,7 @@ namespace Calcuchord {
     }
 
     public interface IUriNavigator {
-        void NavigateTo(string uri);
+        void NavigateTo(string uri,object args);
     }
 
     public interface IPlatformInfo {

@@ -4,7 +4,7 @@ using Xamarin.Essentials;
 namespace Calcuchord.Android {
     public class UriNav_ad : IUriNavigator {
 
-        public void NavigateTo(string uri) {
+        public void NavigateTo(string uri,object args) {
             Launcher.OpenAsync(new Uri(uri));
         }
     }

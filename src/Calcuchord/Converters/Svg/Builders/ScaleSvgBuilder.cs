@@ -7,9 +7,8 @@ namespace Calcuchord {
             HtmlNode svg = InitBuild(args);
 
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
+            bg_g.Attributes.Add("transform","translate(3,0)");
             svg.AppendChild(bg_g);
-
-            //SvgOptionType flags = MainViewModel.Instance.SelectedSvgOptionType;
 
             int vfc = 5;
 
@@ -50,6 +49,7 @@ namespace Calcuchord {
 
             double min_fret_x = fhw;
             double min_fret_y = DotRadius;
+            double y0 = 0;
 
             // +1 fret label
             int rows = str_count + 1;
@@ -57,15 +57,31 @@ namespace Calcuchord {
             // +1 strings label
             int cols = vfc + 1;
 
+            if(WithTitle) {
+                rows++;
+                y0 += sh;
+            }
+
             double tw = fw * cols;
             double th = sh * rows;
+
+            if(WithTitle) {
+                AddTitleText(
+                    bg_g,
+                    ng.Name,
+                    ng.Position == 0 ? string.Empty : ng.Position.ToString(),
+                    ng.SubPosition == 0 ? string.Empty : ng.SubPosition.ToString(),
+                    TitleFontSize,Fg,tw,
+                    oy: -TitleFontSize,
+                    classes: "match-title");
+            }
 
             // tuning
             {
                 var open_notes = ng.Parent.Parent.OpenNotes;
                 double fs = bfs;
                 double tuning_text_x = 0;
-                double tuning_text_y = (min_fret_y + bfhs) - 1;
+                double tuning_text_y = (y0 + (min_fret_y + bfhs)) - 1;
 
                 for(int i = 0; i < str_count; i++) {
                     string label_text = open_notes[i].FullName;
@@ -102,7 +118,7 @@ namespace Calcuchord {
                 for(int vis_fret_num = 0; vis_fret_num < vfc; vis_fret_num++) {
                     int fret_num = min_fret + vis_fret_num;
                     double curx = min_fret_x + (fw * vis_fret_num);
-                    double cury = min_fret_y + (str_num * sh);
+                    double cury = y0 + min_fret_y + (str_num * sh);
 
                     if(fret_num > 0 && str_num < str_count - 1) {
                         // fret/string cell
@@ -182,7 +198,7 @@ namespace Calcuchord {
 
             svg.Attributes.Add("width",tw);
             svg.Attributes.Add("height",th);
-
+            FinishBuild(args);
             return svg;
         }
     }

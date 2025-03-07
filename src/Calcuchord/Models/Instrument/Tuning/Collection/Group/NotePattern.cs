@@ -61,7 +61,7 @@ namespace Calcuchord {
 
         [JsonIgnore]
         public string FullName =>
-            $"{Name} {Position + 1}.{SubPosition}";
+            $"{Name}_{Position}_{SubPosition}";
 
         #endregion
 

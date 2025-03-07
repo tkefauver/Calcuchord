@@ -58,20 +58,24 @@
             <Setter Property="Cursor"
                     Value="Hand" />
             <Setter Property="MinHeight"
-                    Value="48" />
+                    Value="64" />
             <Setter Property="VerticalContentAlignment"
                     Value="Center" />
             <Setter Property="HorizontalContentAlignment"
                     Value="Left" />
-            <!-- <Setter Property="ContextMenu"> -->
-            <!--     <Setter.Value> -->
-            <!--         <ContextMenu> -->
-            <!--             <MenuItem Header="Delete" -->
-            <!--                       Command="{Binding RemoveInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}" -->
-            <!--                       CommandParameter="{Binding .}" /> -->
-            <!--         </ContextMenu> -->
-            <!--     </Setter.Value> -->
-            <!-- </Setter> -->
+            <Setter Property="BorderThickness"
+                    Value="0,0,0,0.5" />
+            <Setter Property="BorderBrush">
+                <Setter.Value>
+                    <SolidColorBrush Color="{DynamicResource FgColor}"
+                                     Opacity="0.1" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="ListBox#InstrumentListBox ListBoxItem:nth-last-child(1)">
+            <Setter Property="BorderThickness"
+                    Value="0" />
         </Style>
     </UserControl.Styles>
 
@@ -141,53 +145,16 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="local:InstrumentViewModel">
-                        <Grid Width="{Binding $parent[ListBoxItem].Bounds.Width}"
-                              ColumnDefinitions="Auto,*,Auto"
-                              RowDefinitions="*,Auto">
-
-                            <avalonia:MaterialIcon Margin="5,0"
-                                                   Kind="{Binding Icon}" />
-                            <TextBlock Grid.Row="0"
-                                       Grid.Column="1"
-                                       Classes="Headline5"
+                        <StackPanel Margin="3"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Spacing="7">
+                            <avalonia:MaterialIcon Kind="{Binding Icon}" />
+                            <TextBlock Classes="Headline5"
                                        VerticalAlignment="Center"
                                        Text="{Binding Title}" />
-
-                            <TextBlock Grid.Row="1"
-                                       Grid.Column="1"
-                                       Margin="3,0,0,0"
-                                       Classes="Body2"
-                                       IsVisible="False"
-                                       Text="{Binding Subtitle}">
-                                <TextBlock.Foreground>
-                                    <SolidColorBrush Color="{DynamicResource FgColor}"
-                                                     Opacity="0.7" />
-                                </TextBlock.Foreground>
-                            </TextBlock>
-
-
-                            <!-- <StackPanel Orientation="Horizontal" -->
-                            <!--             Grid.RowSpan="2" -->
-                            <!--             Grid.Column="2" -->
-                            <!--             Spacing="5" -->
-                            <!--             Margin="0,0,5,0" -->
-                            <!--             HorizontalAlignment="Right" -->
-                            <!--             VerticalAlignment="Center"> -->
-                            <!--     <StackPanel.IsVisible> -->
-                            <!--         <MultiBinding Converter="{x:Static BoolConverters.And}"> -->
-                            <!--             <Binding Path="IsSelected" /> -->
-                            <!--             <Binding Path="CanEdit" /> -->
-                            <!--         </MultiBinding> -->
-                            <!--     </StackPanel.IsVisible> -->
-                            <!--     <Button Classes="float" -->
-                            <!--             Command="{Binding ForwardCommand, Source={x:Static local:MainViewModel.Instance}}" -->
-                            <!--             CommandParameter="{Binding .}"> -->
-                            <!--         <avalonia:MaterialIcon Kind="ChevronRight" /> -->
-                            <!--     </Button> -->
-                            <!-- -->
-                            <!-- </StackPanel> -->
-
-                        </Grid>
+                        </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

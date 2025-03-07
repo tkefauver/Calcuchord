@@ -288,7 +288,7 @@
 
                 <!-- TITLE -->
 
-                <StackPanel>
+                <StackPanel Spacing="-7">
                     <TextBlock FontSize="18"
                                TextAlignment="Center"
                                Text="{Binding Title}" />

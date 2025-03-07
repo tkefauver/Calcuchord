@@ -5,13 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using MonkeyPaste.Common;
-using MonkeyPaste.Common.Avalonia;
 using SkiaSharp;
 using Svg.Skia;
 
 namespace Calcuchord {
-    public class Share_default : IShareMidi,ISharePdf {
+    public class Share_default : IShareMidi,ISharePdf,IShareHtml {
         protected IStorageFolder LastFolder { get; set; }
         protected MidiFileBuilder Builder { get; } = new MidiFileBuilder();
 
@@ -27,7 +27,7 @@ namespace Calcuchord {
                 await Builder.CreateMidiChordAsync(toneSets,fp);
             }
 
-            PlatformWrapper.Services.UriNavigator.NavigateTo(Path.GetDirectoryName(fp));
+            PlatformWrapper.Services.UriNavigator.NavigateTo(Path.GetDirectoryName(fp),fp);
 
         }
 
@@ -38,29 +38,49 @@ namespace Calcuchord {
             }
 
             svg.Picture.ToPdf(fp,ThemeViewModel.Instance.IsDark ? SKColors.Black : SKColors.White,1f,1f);
-            PlatformWrapper.Services.UriNavigator.NavigateTo(Path.GetDirectoryName(fp));
+            PlatformWrapper.Services.UriNavigator.NavigateTo(Path.GetDirectoryName(fp),fp);
+        }
+
+        public virtual void ShareHtml(string html,string title) {
+            Dispatcher.UIThread.Post(
+                async () => {
+                    string fp = await ShowFileBrowserAsync(title,["html"]);
+                    if(fp is null) {
+                        return;
+                    }
+
+                    await File.WriteAllTextAsync(fp,html);
+                    PlatformWrapper.Services.UriNavigator.NavigateTo(Path.GetDirectoryName(fp),fp);
+                });
         }
 
         protected async Task<string> ShowFileBrowserAsync(string title,string[] extTypes) {
-            if(TopLevel.GetTopLevel(MainView.Instance) is not { } topLevel) {
+            if(TopLevel.GetTopLevel(MainView.Instance) is not { } topLevel ||
+               !topLevel.StorageProvider.CanSave) {
                 return null;
             }
 
-            if(LastFolder is null) {
-                LastFolder = await Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
-                    .ToFileOrFolderStorageItemAsync() as IStorageFolder;
-            }
+            IStorageFile file = null;
 
-            // Start async operation to open the dialog.
-            IStorageFile file = await topLevel.StorageProvider.SaveFilePickerAsync(
-                new FilePickerSaveOptions
-                {
-                    Title = $"Save '{title}'",
-                    DefaultExtension = extTypes.FirstOrDefault(),
-                    FileTypeChoices = extTypes.Select(x => new FilePickerFileType(x)).ToList(),
-                    SuggestedFileName = $"{title}.{extTypes.FirstOrDefault()}",
-                    SuggestedStartLocation = LastFolder,
+            await Dispatcher.UIThread.InvokeAsync(
+                async () => {
+                    if(LastFolder is null) {
+                        LastFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(
+                            Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+                    }
+
+                    // Start async operation to open the dialog.
+                    file = await topLevel.StorageProvider.SaveFilePickerAsync(
+                        new FilePickerSaveOptions
+                        {
+                            Title = $"Save '{title}'",
+                            DefaultExtension = extTypes.FirstOrDefault(),
+                            FileTypeChoices = extTypes.Select(x => new FilePickerFileType(x)).ToList(),
+                            SuggestedFileName = $"{title}.{extTypes.FirstOrDefault()}",
+                            SuggestedStartLocation = LastFolder,
+                        });
                 });
+
 
             if(file is null ||
                file.Path.AbsoluteUri.ToPathFromUri() is not { } fp) {
@@ -68,7 +88,7 @@ namespace Calcuchord {
             }
 
             string fp_dir = Path.GetDirectoryName(fp);
-            LastFolder = await fp_dir.ToFileOrFolderStorageItemAsync() as IStorageFolder;
+            LastFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(fp_dir);
 
             return fp;
             ;

@@ -50,22 +50,24 @@
 
         <Style Selector="HyperlinkButton :is(TextBlock)">
             <Setter Property="Foreground"
-                    Value="Blue" />
+                    Value="Orange" />
         </Style>
         <Style Selector="HyperlinkButton.donate :is(TextBlock)">
             <Setter Property="Foreground"
-                    Value="Yellow" />
+                    Value="Lime" />
         </Style>
         <Style Selector="HyperlinkButton:pointerover :is(TextBlock)">
             <Setter Property="Foreground"
                     Value="Red" />
         </Style>
+
+
     </UserControl.Styles>
     <controls:ColorZone x:Name="PopupZone"
                         Loaded="PopupZone_OnLoaded"
                         MinWidth="325"
-                        Padding="20"
-                        Mode="PrimaryMid"
+                        Mode="Accent"
+                        Padding="0"
                         BorderBrush="{DynamicResource OuterGradientBrush}"
                         Foreground="{DynamicResource Bg}"
                         Classes="popup-cntr">
@@ -75,50 +77,59 @@
                                  Duration="0:0:10" />
             </Transitions>
         </controls:ColorZone.Transitions>
-        <StackPanel Spacing="3">
-            <StackPanel Orientation="Horizontal"
-                        Spacing="5">
-                <Border Padding="10"
-                        Width="42"
-                        Height="42"
-                        BorderThickness="1"
-                        BorderBrush="{DynamicResource Bg}"
-                        CornerRadius="7">
-                    <Image Width="36"
-                           Height="36"
-                           Stretch="UniformToFill"
-                           Source="avares://Calcuchord/Assets/Images/logo.png" />
-                </Border>
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal"
-                                Spacing="10">
-                        <SelectableTextBlock FontSize="32"
-                                             Classes="theme-drop-shadow"
-                                             Text="Calcuchord" />
-                        <TextBlock IsVisible="{Binding IsDebug, Source={x:Static local:ThemeViewModel.Instance}}"
-                                   Text="[DEBUG]"
-                                   VerticalAlignment="Center" />
+        <Border BoxShadow="inset 5 5 10 0 black"
+                CornerRadius="10"
+                Margin="0"
+                Padding="20">
+            <StackPanel Spacing="3">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="5">
+                    <Border Padding="10"
+                            Width="42"
+                            Height="42"
+                            BorderThickness="1"
+                            BorderBrush="{DynamicResource Bg}"
+                            CornerRadius="7">
+                        <Image Width="36"
+                               Height="36"
+                               Stretch="UniformToFill"
+                               Source="avares://Calcuchord/Assets/Images/logo.png" />
+                    </Border>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="10">
+                            <SelectableTextBlock FontSize="32"
+                                                 Classes="theme-drop-shadow"
+                                                 Text="Calcuchord" />
+                            <TextBlock IsVisible="{Binding IsDebug, Source={x:Static local:ThemeViewModel.Instance}}"
+                                       Text="[DEBUG]"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                        <SelectableTextBlock FontSize="10"
+                                             VerticalAlignment="Top"
+                                             TextAlignment="Right"
+                                             Text="{Binding AppVersion}" />
                     </StackPanel>
-                    <SelectableTextBlock FontSize="10"
-                                         VerticalAlignment="Top"
-                                         TextAlignment="Right"
-                                         Text="{Binding AppVersion}" />
+
                 </StackPanel>
 
+                <SelectableTextBlock Text="© 2025 Thomas Kefauver" />
+                <HyperlinkButton Cursor="Hand"
+                                 Command="{Binding OpenLinkCommand}"
+                                 CommandParameter="https://github.com/tkefauver/Calcuchord">
+                    <TextBlock Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
+                </HyperlinkButton>
+                <HyperlinkButton Cursor="Hand"
+                                 HorizontalAlignment="Left"
+                                 Classes="donate shake"
+                                 Command="{Binding OpenLinkCommand}"
+                                 CommandParameter="https://buymeacoffee.com/tkefauver">
+                    <HyperlinkButton.RenderTransform>
+                        <RotateTransform />
+                    </HyperlinkButton.RenderTransform>
+                    <TextBlock Text="Donate Here!" />
+                </HyperlinkButton>
             </StackPanel>
-
-            <SelectableTextBlock Text="© 2025 Thomas Kefauver" />
-            <HyperlinkButton Cursor="Hand"
-                             Command="{Binding OpenLinkCommand}"
-                             CommandParameter="https://github.com/tkefauver/Calcuchord">
-                <TextBlock Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
-            </HyperlinkButton>
-            <HyperlinkButton Cursor="Hand"
-                             Classes="donate"
-                             Command="{Binding OpenLinkCommand}"
-                             CommandParameter="https://buymeacoffee.com/tkefauver">
-                <TextBlock Text="Donate Here!" />
-            </HyperlinkButton>
-        </StackPanel>
+        </Border>
     </controls:ColorZone>
 </UserControl>

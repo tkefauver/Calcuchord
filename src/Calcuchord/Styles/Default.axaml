@@ -1,6 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sys="clr-namespace:System;assembly=netstandard"
+        xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
@@ -352,6 +353,37 @@
                 Value="24" />
         <Setter Property="Height"
                 Value="24" />
+    </Style>
+
+    <Style Selector="FlyoutPresenter /template/ controls|Card">
+        <Setter Property="assists:ShadowAssist.ShadowDepth"
+                Value="Depth0" />
+    </Style>
+
+    <!-- SHAKE -->
+    <Style Selector=":is(TemplatedControl).shake">
+        <Style.Animations>
+            <Animation Duration="0:0:0.5"
+                       FillMode="Backward"
+                       IterationCount="Infinite">
+                <KeyFrame Cue="0%">
+                    <Setter Property="RotateTransform.Angle"
+                            Value="0" />
+                </KeyFrame>
+                <KeyFrame Cue="33%">
+                    <Setter Property="RotateTransform.Angle"
+                            Value="3" />
+                </KeyFrame>
+                <KeyFrame Cue="66%">
+                    <Setter Property="RotateTransform.Angle"
+                            Value="-3" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="RotateTransform.Angle"
+                            Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
     </Style>
 
 
