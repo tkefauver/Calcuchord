@@ -1,14 +1,16 @@
 async function shareFileAsync(b64, mimeType, fileName, title) {
-    const blob = new Blob([base64ToArrayBuffer(b64)], {type: mimeType});
-    const file = new File([blob], fileName, {type: mimeType});
+    if (isMobile()) {
+        const blob = new Blob([base64ToArrayBuffer(b64)], {type: mimeType});
+        const file = new File([blob], fileName, {type: mimeType});
 
-    if (navigator.share && navigator.canShare({files: [file]})) {
-        await navigator.share({
-            title: title,
-            files: [file],
-        });
-        console.log(`${fileName} shared successfully`);
-        return true;
+        if (navigator.share && navigator.canShare({files: [file]})) {
+            await navigator.share({
+                title: title,
+                files: [file],
+            });
+            console.log(`${fileName} shared successfully`);
+            return true;
+        }
     }
 
     const uri = `data:${mimeType};base64,${b64}`;
