@@ -1410,6 +1410,7 @@ namespace Calcuchord {
                         batch_cts.Cancel();
                         is_done = true;
                     });
+                busy_view.WasmWarningBorder.IsVisible = OperatingSystem.IsBrowser();
 
                 DialogHost.Show(busy_view,MainDialogHostName).FireAndForgetSafeAsync();
 

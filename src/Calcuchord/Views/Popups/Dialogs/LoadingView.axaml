@@ -16,6 +16,31 @@
         <StackPanel Spacing="10"
                     Margin="10"
                     MaxWidth="280">
+
+            <Border x:Name="WasmWarningBorder"
+                    Background="Orange"
+                    IsVisible="False"
+                    CornerRadius="10"
+                    Padding="5">
+                <StackPanel Spacing="5">
+
+                    <TextBlock FontSize="12"
+                               Foreground="Black">
+                        <TextBlock.Inlines>
+                            <Run Text="This window" />
+                            <Run Text="must remain active"
+                                 Classes="bold" />
+                            <Run Text="or it won't process." />
+                        </TextBlock.Inlines>
+                    </TextBlock>
+
+                    <TextBlock FontSize="10"
+                               TextAlignment="Center"
+                               Foreground="Black"
+                               Classes="bold"
+                               Text="(Browser mode only)" />
+                </StackPanel>
+            </Border>
             <TextBlock x:Name="MessageTextBlock"
                        TextAlignment="Center"
                        FontSize="18"
