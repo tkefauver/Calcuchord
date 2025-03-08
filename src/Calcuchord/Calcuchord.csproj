@@ -64,10 +64,6 @@
 
     <ItemGroup>
         <Compile Remove="Util\Platform\Services\Midi\sugarwv\**"/>
-        <Compile Update="Views\Popups\Dialogs\ProgressView.axaml.cs">
-            <DependentUpon>ProgressView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
     </ItemGroup>
 
 

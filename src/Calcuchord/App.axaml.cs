@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -44,6 +45,10 @@ namespace Calcuchord {
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        private void NativeMenuItem_OnClick(object sender, EventArgs e) {
+            MainViewModel.Instance.ShowAboutCommand.Execute("NATIVEMENU");
         }
     }
 }

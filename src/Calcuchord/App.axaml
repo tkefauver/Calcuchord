@@ -3,8 +3,16 @@
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
              x:Class="Calcuchord.App"
+             Name="Calcuchord"
              RequestedThemeVariant="Default">
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="About Calcuchord"
+                            Click="NativeMenuItem_OnClick"/>
+        </NativeMenu>
+    </NativeMenu.Menu>
     <Application.Styles>
         <themes:CustomMaterialTheme>
             <themes:CustomMaterialTheme.Palettes>

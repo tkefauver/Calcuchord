@@ -22,18 +22,31 @@ namespace Calcuchord {
                     Process.Start(
                         "dbus-send",
                         $"--session --print-reply --dest=org.freedesktop.FileManager1 --type=method_call /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"file://{fp}\" string:\"\"");
-                } else if(args is string[] fpl) {
+                    return;
+                } 
+                if(args is string[] fpl) {
                     Process.Start(
                         "dbus-send",
                         $"dbus-send --session --print-reply --dest=org.freedesktop.FileManager1 --type=method_call /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:{string.Join(",",fpl.Select(x => $"\"{x.ToFileSystemUriFromPath()}\""))} string:\"\"");
-                } else {
-                    Process.Start("xdg-open",url);
-                }
-
-                return;
+                    return;
+                } 
+                
+                Process.Start("xdg-open",url);
             }
 
             if(OperatingSystem.IsMacOS()) {
+                if(args is string fp) {
+                    Process.Start(
+                        "open",
+                        $"-R {fp}");
+                    return;
+                } 
+                if(args is string[] fpl) {
+                    Process.Start(
+                        "open",
+                        $"-R {fpl.Last()}");
+                    return;
+                }
                 Process.Start("open",url);
             }
         }

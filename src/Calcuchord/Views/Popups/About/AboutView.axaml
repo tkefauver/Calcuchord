@@ -120,6 +120,7 @@
                     <TextBlock Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
                 </HyperlinkButton>
                 <HyperlinkButton Cursor="Hand"
+                                 IsVisible="False"
                                  HorizontalAlignment="Left"
                                  Classes="donate shake"
                                  Command="{Binding OpenLinkCommand}"

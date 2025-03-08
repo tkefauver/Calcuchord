@@ -1709,8 +1709,10 @@ namespace Calcuchord {
                 return SelectedTuning != null;
             });
 
-        public ICommand ShowAboutCommand => new MpCommand(
-            () => {
+        public ICommand ShowAboutCommand => new MpCommand<object>(
+            (args) =>
+            {
+                bool needs_window = args is not null;
                 if(TopLevel.GetTopLevel(MainView.Instance) is not { } tl) {
                     return;
                 }
@@ -1724,7 +1726,6 @@ namespace Calcuchord {
                     e2.Handled = true;
 
                     tl.RemoveHandler(InputElement.PointerPressedEvent,TopLevel_OnPointerPressed);
-                    //tl.RemoveHandler(InputElement.PointerPressedEvent,TopLevel_OnPointerPressed);
                     try {
                         DialogHost.Close(Instance.MainDialogHostName);
                     } catch(Exception ex) {
@@ -1732,13 +1733,25 @@ namespace Calcuchord {
                     }
                 }
 
-                tl.AddHandler(InputElement.PointerPressedEvent,TopLevel_OnPointerPressed,RoutingStrategies.Tunnel,true);
-                //tl.AddHandler(InputElement.PointerPressedEvent,TopLevel_OnPointerPressed,RoutingStrategies.Bubble,true);
-                DialogHost.Show(
-                    new AboutView
+                var about_view = new AboutView
+                {
+                    DataContext = new AboutViewModel(),
+                };
+
+                if (needs_window)
+                {
+                    // mac only
+                    var about_win = new Window()
                     {
-                        DataContext = new AboutViewModel(),
-                    },Instance.MainDialogHostName).FireAndForgetSafeAsync();
+                        Content = about_view,
+                        SizeToContent = SizeToContent.WidthAndHeight
+                    };
+                    about_win.Show();
+                    return;
+                }
+                
+                tl.AddHandler(InputElement.PointerPressedEvent,TopLevel_OnPointerPressed,RoutingStrategies.Tunnel,true);
+                DialogHost.Show(about_view,Instance.MainDialogHostName).FireAndForgetSafeAsync();
 
             });
 
