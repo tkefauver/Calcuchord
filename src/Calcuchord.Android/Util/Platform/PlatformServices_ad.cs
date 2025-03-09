@@ -2,19 +2,19 @@ using Android.Content;
 
 namespace Calcuchord.Android {
     public class PlatformServices_ad : PlatformServies_default {
+        Share_ad ShareObj { get; }
 
         public PlatformServices_ad(Context context) {
-            StorageHelper = new StorageHelper_ad(context);
             PlatformInfo = new PlatformInfo_ad(context);
+            UriNavigator = new UriNav_ad(context);
+            ShareObj = new Share_ad(context);
         }
 
-        public override IStorageHelper StorageHelper { get; }
-
+        public override IShareMidi ShareMidi => ShareObj;
+        public override ISharePdf SharePdf => ShareObj;
+        public override IShareHtml ShareHtml => ShareObj;
         public override IPlatformInfo PlatformInfo { get; }
-
-        //public override IMidiPlayer MidiPlayer { get; } = new MidiPlayer_ad_sugarwv();
-
+        public override IUriNavigator UriNavigator { get; }
         public override IMidiPlayer MidiPlayer { get; } = new MidiPlayer_fluid_ad();
-        public override IUriNavigator UriNavigator { get; } = new UriNav_ad();
     }
 }
