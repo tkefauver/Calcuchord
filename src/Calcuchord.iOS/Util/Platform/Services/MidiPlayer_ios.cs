@@ -44,6 +44,7 @@ namespace Calcuchord.iOS {
             var mp = new AVMidiPlayer(midiFileUrl,sf2Url,out NSError error);
             mp.PrepareToPlay();
             await mp.PlayAsync();
+            await Task.Delay(10_000);
         }
 
     }
