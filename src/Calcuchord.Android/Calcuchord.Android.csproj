@@ -29,7 +29,6 @@
         <!--        <PackageReference Include="HarfBuzzSharp.NativeAssets.Android" />-->
         <!--        <PackageReference Include="SkiaSharp.NativeAssets.Android"/>-->
         <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"/>
-        <PackageReference Include="Melanchall.DryWetMidi"/>
     </ItemGroup>
 
     <ItemGroup>

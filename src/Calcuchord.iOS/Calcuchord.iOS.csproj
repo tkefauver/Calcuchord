@@ -24,9 +24,11 @@
         
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
       <PublishAot>false</PublishAot>
-      <MtouchLink>SdkOnly</MtouchLink>
+      <MtouchLink>None</MtouchLink>
       <MtouchDebug>true</MtouchDebug>
       <IOSDebugOverWiFi>true</IOSDebugOverWiFi>
+      <MtouchNoSymbolStrip>false</MtouchNoSymbolStrip>
+      <DeviceSpecificBuild>false</DeviceSpecificBuild>
     </PropertyGroup>
     
     <ItemGroup>

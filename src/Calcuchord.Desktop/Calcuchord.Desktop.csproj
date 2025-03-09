@@ -23,7 +23,6 @@
         <PackageReference Include="Avalonia.ReactiveUI" />
         <PackageReference Include="MonoMac.NetStandard" />
         <PackageReference Include="SpaceWizards.NFluidsynth" />
-        <PackageReference Include="Melanchall.DryWetMidi" />
     </ItemGroup>
 
 
