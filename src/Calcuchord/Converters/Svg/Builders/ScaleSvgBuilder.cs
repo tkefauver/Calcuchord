@@ -94,7 +94,7 @@ namespace Calcuchord {
             {
                 double fret_marker_fs = bfs;
                 double fret_marker_x = min_fret_x;
-                double fret_marker_y = th - (sh * 1.5);
+                double fret_marker_y = (th - (sh * 1.5)) + 1;
                 for(int i = 0; i < vfc; i++) {
                     // fret num label
                     int fret_num = min_fret + i;
@@ -190,11 +190,11 @@ namespace Calcuchord {
                 }
             }
 
-            // if(show_fret_marker) {
-            //     th -= 5;
-            // } else {
-            //     th -= sh;
-            // }
+            if(MainViewModel.Instance.SelectedSvgOptionTypes.Contains(SvgOptionType.Frets)) {
+                th -= 7;
+            } else {
+                th -= 11;
+            }
 
             svg.Attributes.Add("width",tw);
             svg.Attributes.Add("height",th);
