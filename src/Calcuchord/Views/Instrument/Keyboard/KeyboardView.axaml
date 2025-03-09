@@ -111,7 +111,7 @@
                         <local:KeyView Classes="note-btn input"
                                        Classes.altered="{Binding IsAltered}"
                                        Classes.selected="{Binding IsSelected}"
-                                       Classes.desired-root="{Binding IsDesiredRoot}"
+                                       Classes.desired-root="{Binding IsSelectedKey}"
                                        Classes.hover="{Binding IsHovering}"
                                        Loaded="KeyView_Loaded"
                                        Unloaded="KeyView_Unloaded" />

@@ -213,8 +213,8 @@ namespace Calcuchord {
 
         #region Appearance
 
-        public string DesiredRootDisplayName =>
-            DesiredRoot.HasValue ? DesiredRoot.Value.ToDisplayValue() : string.Empty;
+        public string SelectedKeyDisplayName =>
+            SelectedKey.HasValue ? SelectedKey.Value.ToDisplayValue() : string.Empty;
 
         public string MatchSvgCss { get; private set; } = string.Empty;
 
@@ -353,8 +353,8 @@ namespace Calcuchord {
         public bool IsPianoSelected =>
             SelectedInstrumentType == InstrumentType.Piano;
 
-        public NoteType? LastDesiredRoot { get; private set; }
-        public NoteType? DesiredRoot { get; set; }
+        // public NoteType? LastDesiredRoot { get; private set; }
+        // public NoteType? DesiredRoot { get; set; }
 
         ChordKeyDegreeType LastKeyDegree { get; set; } = ChordKeyDegreeType.I;
         ChordKeyDegreeType SelectedKeyDegree { get; set; } = ChordKeyDegreeType.I;
@@ -374,7 +374,7 @@ namespace Calcuchord {
 
         NoteType? LastSelectedKey { get; set; }
 
-        NoteType? SelectedKey { get; set; }
+        public NoteType? SelectedKey { get; private set; }
 
         IEnumerable<string> AvailableSuffixes { get; } = [];
 
@@ -415,7 +415,7 @@ namespace Calcuchord {
                     return true;
                 }
 
-                if(DesiredRoot != LastDesiredRoot) {
+                if(SelectedKey != LastSelectedKey) {
                     return true;
                 }
 
@@ -464,22 +464,13 @@ namespace Calcuchord {
             return unique_name;
         }
 
-        public void SetDesiredRoot(NoteType? nt) {
-            //var last_dr = DesiredRoot;
-            DesiredRoot = nt;
-            if(SelectedKey == DesiredRoot) {
+        public void SetSelectedKey(NoteType? nt) {
+            if(SelectedKey == nt) {
                 return;
             }
 
-            object[] args = ["dummy",null];
-            if(DesiredRoot == null) {
-                // deselect key
-                args[1] = KeyOptions.FirstOrDefault(x => x.OptionValue == SelectedKey.Value.ToString());
-            } else {
-                // set selected key to desired root
-                args[1] = KeyOptions.FirstOrDefault(x => x.OptionValue == DesiredRoot.Value.ToString());
-            }
-
+            NoteType key = nt ?? SelectedKey.Value;
+            object[] args = ["dummy",KeyOptions.FirstOrDefault(x => x.OptionValue == key.ToString())];
             SelectOptionCommand.Execute(args);
         }
 
@@ -493,6 +484,13 @@ namespace Calcuchord {
 
         void MainViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
+                case nameof(SelectedKey):
+                    if(SelectedTuning is { } st &&
+                       st.SelectedNotes is { } sn) {
+                        sn.ForEach(x => x.RaisePropertyChanged(nameof(x.IsSelectedKey)));
+                    }
+
+                    break;
                 case nameof(MatchColCount):
                     OnPropertyChanged(nameof(CanDecreaseMatchColumnCount));
                     OnPropertyChanged(nameof(CanIncreaseMatchColumnCount));
@@ -758,13 +756,7 @@ namespace Calcuchord {
 
         IEnumerable<MatchViewModel> GetMatchResults(bool byFilter,NoteViewModel[] sel_notes) {
             // prefer desired root over key?
-            NoteType? target_key = null;
-            if(IsSearchModeSelected &&
-               DesiredRoot is { } dr) {
-                target_key = dr;
-            } else if(SelectedKey is { } sk) {
-                target_key = sk;
-            }
+            var target_key = SelectedKey;
 
             if(IsChordsSelected &&
                target_key is { } tk &&
@@ -856,7 +848,6 @@ namespace Calcuchord {
 
             var sel_notes = SelectedTuning.SelectedNotes.ToArray();
             LastNotes = sel_notes.ToList();
-            LastDesiredRoot = DesiredRoot;
             LastKeyDegree = SelectedKeyDegree;
             LastSelectedKey = SelectedKey;
 
@@ -1424,7 +1415,7 @@ namespace Calcuchord {
                             if(exp_type == "HTML" && PlatformWrapper.Services.ShareHtml is { } shtml) {
                                 string html = builder.GetBatchHtml(
                                     SelectedTuning.Tuning,npl.Select(x => x.NotePattern));
-                                await shtml.ShareHtmlAsync(html,title);
+                                shtml.ShareHtmlAsync(html,title);
                             } else if(exp_type == "FULLPDF" && PlatformWrapper.Services.SharePdf is { } spdf) {
                                 string svg_html = builder.GetBatchSvg(
                                     SelectedTuning.Tuning,npl.Select(x => x.NotePattern),MatchColCount);
@@ -1625,7 +1616,7 @@ namespace Calcuchord {
 
         public ICommand ResetInstrumentCommand => new MpCommand(
             () => {
-                DesiredRoot = null;
+                SelectedKey = null;
                 SelectedTuning.ResetSelection();
                 LastNotes = [];
 
@@ -1743,6 +1734,10 @@ namespace Calcuchord {
                     {
                         Content = about_view,
                         SizeToContent = SizeToContent.WidthAndHeight,
+                        ShowInTaskbar = false,
+                        SystemDecorations = SystemDecorations.BorderOnly,
+                        CanResize = false,
+                        WindowStartupLocation = WindowStartupLocation.CenterScreen,
                     };
                     about_win.Show();
                     return;
@@ -1819,6 +1814,7 @@ namespace Calcuchord {
                             SelectedKey = null;
                         }
 
+
                         break;
                     case OptionType.Degree:
                         if(ovm.IsChecked) {
@@ -1876,6 +1872,8 @@ namespace Calcuchord {
                 }
 
                 if(suppress_action) {
+                    PlatformWrapper.Services.Logger.WriteLine("query suppressed");
+                    UpdateMatchOverlays();
                     return;
                 }
 
@@ -2004,6 +2002,18 @@ namespace Calcuchord {
             () => {
                 if(ThemeViewModel.Instance.IsDesktop) {
                 }
+            });
+
+        public ICommand ToggleSearchTypeCommand => new MpCommand<object>(
+            (args) => {
+                if((IsExactMatchOnly && args.ToString() == "EXACT") ||
+                   (!IsExactMatchOnly && args.ToString() == "VOICE")) {
+                    // ignore
+                    return;
+                }
+
+                IsExactMatchOnly = !IsExactMatchOnly;
+                UpdateMatchesAsync(MatchUpdateSource.FilterToggle).FireAndForgetSafeAsync();
             });
 
         #endregion

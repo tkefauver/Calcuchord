@@ -88,7 +88,6 @@
                                         <DataTemplate x:DataType="local:NoteViewModel">
                                             <local:FretView Classes="note-btn"
                                                             Classes.input="{Binding IsEnabled}"
-                                                            Classes.env-shadow="{Binding IsRealNote}"
                                                             Classes.muted="{Binding IsRowMuted}"
                                                             Classes.nut="{Binding IsNutFret}"
                                                             Classes.str-label="{Binding IsRowKeyLabel}"

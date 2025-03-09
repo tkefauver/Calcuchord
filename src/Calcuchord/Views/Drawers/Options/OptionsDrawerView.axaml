@@ -206,35 +206,6 @@
                     Value="False" />
         </Style>
 
-        <!-- KEY DESIRED ROOT -->
-        <Style Selector="controls|Card.key ToggleButton">
-            <Setter Property="ToolTip.Tip"
-                    Value="{x:Null}" />
-        </Style>
-        <Style Selector="StackPanel.options.search-mode.has-desired-root controls|Card.key">
-            <Setter Property="ToolTip.Tip">
-                <Setter.Value>
-                    <Template>
-                        <controls:ColorZone Classes="tt">
-                            <TextBlock TextWrapping="Wrap"
-                                       MaxWidth="200">
-                                <TextBlock.Inlines>
-                                    <Run Text="Desired root '" />
-                                    <Run
-                                        Text="{Binding DesiredRootDisplayName, Source={x:Static local:MainViewModel.Instance}}" />
-                                    <Run Text="' is set on instrument. Deselect it to change the key." />
-                                </TextBlock.Inlines>
-                            </TextBlock>
-                        </controls:ColorZone>
-                    </Template>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style Selector="StackPanel.options.search-mode.has-desired-root controls|Card.key ToggleButton">
-            <Setter Property="IsEnabled"
-                    Value="False" />
-        </Style>
-
         <!-- RESETABLE HEADER -->
         <Style Selector="TextBlock.resettable">
             <Setter Property="Cursor"
@@ -294,7 +265,8 @@
                                Text="{Binding Title}" />
                     <TextBlock FontSize="14"
                                TextAlignment="Center"
-                               Opacity="0.6"
+                               Opacity="0.5"
+                               FontStyle="Italic"
                                Text="{Binding Subtitle}" />
                 </StackPanel>
 
@@ -307,7 +279,6 @@
                             Classes.chords="{Binding IsChordsSelected}"
                             Classes.has-key="{Binding IsKeySelected}"
                             Classes.search-mode="{Binding IsSearchModeSelected}"
-                            Classes.has-desired-root="{Binding DesiredRoot, Converter={x:Static ObjectConverters.IsNotNull}}"
                             Margin="10"
                             Spacing="10">
 

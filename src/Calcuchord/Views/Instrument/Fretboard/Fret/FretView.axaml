@@ -444,7 +444,7 @@
 
         <Border x:Name="FretMarker"
                 Classes="note-marker"
-                Classes.desired-root="{Binding IsDesiredRoot}"
+                Classes.desired-root="{Binding IsSelectedKey}"
                 Classes.nut="{Binding IsNutFret}"
                 Width="{Binding $self.Bounds.Height}"
                 HorizontalAlignment="Center"

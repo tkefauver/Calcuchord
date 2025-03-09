@@ -64,6 +64,9 @@ namespace Calcuchord {
         public string InstrumentNoteName =>
             IsKeyboard ? "key" : "fret";
 
+        public string InstrumentNoteNamePlural =>
+            IsKeyboard ? "keys" : "frets";
+
         public string Icon =>
             InstrumentType.ToIconName();
 

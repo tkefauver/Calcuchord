@@ -111,32 +111,7 @@
             <Setter Property="Margin"
                     Value="0,0,60,0" />
         </Style>
-        <Style Selector="Border.sep">
-            <Setter Property="Margin"
-                    Value="0,10,0,20" />
-            <Setter Property="Height"
-                    Value="1" />
-            <Setter Property="Opacity"
-                    Value="0.5" />
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0%,0%"
-                                         EndPoint="100%,0%"
-                                         SpreadMethod="Reflect">
-                        <GradientStops>
-                            <GradientStop Color="Transparent"
-                                          Offset="0" />
-                            <GradientStop Color="{DynamicResource BgColor}"
-                                          Offset="0.25" />
-                            <GradientStop Color="{DynamicResource BgColor}"
-                                          Offset="0.75" />
-                            <GradientStop Color="Transparent"
-                                          Offset="1" />
-                        </GradientStops>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-        </Style>
+
         <Style Selector=":is(Control).fretted-only"
                x:DataType="local:InstrumentViewModel">
             <Setter Property="IsVisible"

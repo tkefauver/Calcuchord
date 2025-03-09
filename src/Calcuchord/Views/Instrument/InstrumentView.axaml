@@ -82,9 +82,44 @@
                     Value="0.875" />
         </Style>
 
+        <!-- FILTER OP BTNS -->
+
+        <Style Selector="RadioButton.filter-op"
+               x:DataType="local:MainViewModel">
+            <Setter Property="GroupName"
+                    Value="SearchTypeGroup" />
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Fg}" />
+            <Setter Property="Padding"
+                    Value="8,4" />
+        </Style>
+        <Style Selector="RadioButton.filter-op TextBlock"
+               x:DataType="local:MainViewModel">
+            <Setter Property="FontFamily"
+                    Value="{StaticResource NunitoFont}" />
+            <Setter Property="FontSize"
+                    Value="12" />
+            <Setter Property="FontWeight"
+                    Value="Bold" />
+        </Style>
+
+        <Style Selector="RadioButton.filter-op:unchecked"
+               x:DataType="local:MainViewModel">
+            <Setter Property="Cursor"
+                    Value="Hand" />
+            <Setter Property="Opacity"
+                    Value="0.3" />
+        </Style>
+        <Style Selector="RadioButton.filter-op:unchecked:pointerover"
+               x:DataType="local:MainViewModel">
+            <Setter Property="Opacity"
+                    Value="1" />
+        </Style>
+
     </UserControl.Styles>
-    <Grid>
+    <Grid RowDefinitions="Auto,*">
         <TransitioningContentControl x:Name="InstrumentContentControl"
+                                     Grid.Row="1"
                                      Content="{Binding SelectedTuning}">
             <TransitioningContentControl.PageTransition>
                 <CrossFade Duration="0:0:1.0" />
@@ -95,7 +130,7 @@
                         <local:KeyboardView />
                     </DataTemplate>
                     <DataTemplate x:Key="FretboardViewTemplate">
-                        <local:FretboardView Margin="10,0" />
+                        <local:FretboardView />
                     </DataTemplate>
                     <DataTemplate x:Key="EmptyTemplate">
                         <Border />
@@ -105,29 +140,31 @@
         </TransitioningContentControl>
 
         <!-- BUG Tooltip flickers on browser only -->
-        <local:HintView Margin="12,10"
+        <local:HintView Margin="10,10,0,0"
                         ToolTip.ServiceEnabled="{Binding !IsBrowser, Source={x:Static local:ThemeViewModel.Instance}}"
                         HorizontalAlignment="Left"
-                        VerticalAlignment="Top">
+                        VerticalAlignment="Center">
             <ToolTip.Tip>
                 <controls:ColorZone Classes="tt"
                                     Mode="Accent">
                     <StackPanel Spacing="10">
+                        <TextBlock Text="Search Hints"
+                                   FontSize="26" />
                         <StackPanel Orientation="Horizontal"
                                     Spacing="7">
+
                             <TextBlock>
                                 <TextBlock.Inlines>
                                     <Run Text="◦ " />
                                     <Run Classes="subject2"
-                                         Text="Long-press" />
+                                         Text="Hold" />
                                     <Run Text="or" />
                                     <Run Classes="subject2"
-                                         Text="right-click" />
+                                         Text="right-click a" />
                                     <Run Text="{Binding InstrumentNoteName}" />
-                                    <Run Text="to toggle" />
-                                    <Run Text="desired root"
-                                         FontStyle="Italic"
-                                         Classes="subject2" />
+                                    <Run Text="to filter by it's" />
+                                    <Run Text="key"
+                                         Classes="bold" />
                                 </TextBlock.Inlines>
                             </TextBlock>
                             <Border Width="12"
@@ -143,15 +180,9 @@
                             <TextBlock.Inlines>
                                 <Run Text="◦ " />
                                 <Run Classes="subject2"
-                                     Text="Click" />
-                                <Run Text="or" />
-                                <Run Classes="subject2"
-                                     Text="tap" />
-                                <Run Text="nut" />
-                                <Run Text="to select " />
-                                <Run Text="open fret"
-                                     FontStyle="Italic"
-                                     Classes="subject2" />
+                                     Text="Tap nut to select the" />
+                                <Run Text="open string"
+                                     Classes="bold" />
 
                             </TextBlock.Inlines>
                         </TextBlock>
@@ -160,26 +191,96 @@
                             <TextBlock.Inlines>
                                 <Run Text="◦ " />
                                 <Run Classes="subject2"
-                                     Text="Click" />
-                                <Run Text="or" />
-                                <Run Classes="subject2"
-                                     Text="tap" />
-                                <Run Text="nut" />
+                                     Text="Tap nut" />
                                 <Run Text="twice"
-                                     Classes="bold" />
+                                     FontStyle="Italic" />
                                 <Run Text="to" />
                                 <Run Text="mute"
-                                     FontStyle="Italic"
-                                     Classes="subject2" />
+                                     Classes="bold" />
                                 <Run Text="that string" />
 
                             </TextBlock.Inlines>
                         </TextBlock>
 
+                        <StackPanel Orientation="Horizontal">
+
+                            <TextBlock x:Name="Bullet"
+                                       Text="◦ " />
+                            <Border CornerRadius="5"
+                                    Margin="3,0"
+                                    Height="{Binding Bounds.Height, ElementName=Bullet}"
+                                    Background="Silver">
+                                <TextBlock Margin="3"
+                                           FontSize="10"
+                                           Foreground="{DynamicResource Fg}"
+                                           FontFamily="{StaticResource NunitoFont}"
+                                           Text="EXACT" />
+                            </Border>
+                            <TextBlock>
+                                <TextBlock.Inlines>
+                                    <Run Text="searches by the" />
+                                    <Run Classes="bold"
+                                         Text="position" />
+                                    <Run Text="of the selected" />
+                                    <Run Text="{Binding InstrumentNoteNamePlural}" />
+                                </TextBlock.Inlines>
+                            </TextBlock>
+
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <TextBlock x:Name="Bullet2"
+                                       Text="◦ " />
+                            <Border CornerRadius="5"
+                                    Margin="3,0"
+                                    Height="{Binding Bounds.Height, ElementName=Bullet2}"
+                                    Background="Silver">
+                                <TextBlock Margin="3"
+                                           FontSize="10"
+                                           Foreground="{DynamicResource Fg}"
+                                           FontFamily="{StaticResource NunitoFont}"
+                                           Text="VOICE" />
+                            </Border>
+                            <TextBlock>
+                                <TextBlock.Inlines>
+                                    <Run Text="searches by the" />
+                                    <Run Classes="bold"
+                                         Text="sound" />
+                                    <Run Text="of the selected" />
+                                    <Run Text="{Binding InstrumentNoteNamePlural}" />
+                                </TextBlock.Inlines>
+                            </TextBlock>
+
+                        </StackPanel>
                     </StackPanel>
 
                 </controls:ColorZone>
             </ToolTip.Tip>
         </local:HintView>
+
+        <controls:Card Classes="button-group pattern"
+                       Margin="10,5,10,0"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       x:DataType="local:MainViewModel"
+                       DataContext="{x:Static local:MainViewModel.Instance}">
+            <UniformGrid Columns="2">
+                <RadioButton Classes="filter-op"
+                             Command="{Binding ToggleSearchTypeCommand}"
+                             CommandParameter="EXACT"
+                             IsChecked="{Binding IsExactMatchOnly, Mode=OneWay}">
+                    <TextBlock Classes=""
+                               Text="EXACT" />
+                </RadioButton>
+                <RadioButton Classes="filter-op"
+                             Command="{Binding ToggleSearchTypeCommand}"
+                             CommandParameter="VOICE"
+                             IsChecked="{Binding !IsExactMatchOnly, Mode=OneWay}">
+                    <TextBlock Classes=""
+                               Text="VOICE" />
+                </RadioButton>
+            </UniformGrid>
+        </controls:Card>
     </Grid>
 </UserControl>

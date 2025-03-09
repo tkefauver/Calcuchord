@@ -275,24 +275,24 @@
                             Padding="8"
                             Classes="float">
 
-                        <ToolTip.Tip>
-                            <controls:Card Classes="tt">
-                                <TextBlock Text="Open in new tab..." />
-                            </controls:Card>
-                        </ToolTip.Tip>
+                        <!-- <ToolTip.Tip> -->
+                        <!--     <controls:Card Classes="tt"> -->
+                        <!--         <TextBlock Text="Open in new tab..." /> -->
+                        <!--     </controls:Card> -->
+                        <!-- </ToolTip.Tip> -->
                         <Button.Flyout>
                             <Flyout>
                                 <ContextMenu Placement="AnchorAndGravity"
                                              PlacementAnchor="TopRight"
                                              PlacementGravity="BottomRight">
-                                    <MenuItem Header="Save as html..."
+                                    <MenuItem Header="Export html..."
                                               Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
                                               CommandParameter="HTML">
                                         <MenuItem.Icon>
                                             <avalonia:MaterialIcon Kind="CodeBlockTags" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="Save as pdf..."
+                                    <MenuItem Header="Export to pdf..."
                                               Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
                                               CommandParameter="FULLPDF">
                                         <MenuItem.Icon>

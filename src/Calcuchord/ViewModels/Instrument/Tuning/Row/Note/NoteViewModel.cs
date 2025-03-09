@@ -117,9 +117,9 @@ namespace Calcuchord {
         public bool IsSelected { get; set; }
         public bool IsHovering { get; set; }
 
-        public bool IsDesiredRoot =>
-            MainViewModel.Instance.DesiredRoot.HasValue &&
-            MainViewModel.Instance.DesiredRoot.Value == InstrumentNote.Key;
+        public bool IsSelectedKey =>
+            MainViewModel.Instance.SelectedKey.HasValue &&
+            MainViewModel.Instance.SelectedKey.Value == InstrumentNote.Key;
 
         public bool IsEnabled =>
             RowNum >= 0 &&
@@ -339,7 +339,7 @@ namespace Calcuchord {
 
         public void Reset() {
             _workingFretNum = null;
-            OnPropertyChanged(nameof(IsDesiredRoot));
+            OnPropertyChanged(nameof(IsSelectedKey));
         }
 
         #endregion

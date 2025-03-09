@@ -5,6 +5,7 @@
              mc:Ignorable="d"
              d:DesignWidth="800"
              d:DesignHeight="450"
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
              xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Avalonia.Svg"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
@@ -120,6 +121,9 @@
                          Css="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}"
                          Source="{Binding NotePattern, Converter={x:Static local:PatternToSvgConverter.Instance}}"
                          Stretch="Uniform" />
+                    <!-- <Image Source="/Assets/Images/logo.png" -->
+                    <!--        Grid.Row="1" -->
+                    <!--        Stretch="Uniform" /> -->
                     <UniformGrid x:Name="MatchButtonStripPanel"
                                  Grid.Row="2"
                                  Height="{Binding Bounds.Height, ElementName=MatchTitleTextBlock}"
@@ -136,10 +140,6 @@
                                         Value="Stretch" />
                             </Style>
                             <Style Selector="avalonia|MaterialIcon">
-                                <!-- <Setter Property="MinWidth" -->
-                                <!--         Value="36" /> -->
-                                <!-- <Setter Property="Height" -->
-                                <!--         Value="{Binding $self.Bounds.Width}" /> -->
                                 <Setter Property="HorizontalAlignment"
                                         Value="Center" />
                                 <Setter Property="VerticalAlignment"
@@ -169,7 +169,9 @@
                     <Button x:Name="ShareButton"
                             local:CloseFlyoutExtension.IsEnabled="False"
                             Margin="0"
+                            Padding="0"
                             Height="{Binding Bounds.Height, ElementName=MatchTitleTextBlock}"
+                            Width="{x:Static sys:Double.NaN}"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
                             Classes="float">
@@ -178,14 +180,14 @@
                                     PlacementAnchor="TopRight"
                                     PlacementGravity="BottomRight">
                                 <ContextMenu>
-                                    <MenuItem Header="Save as midi..."
+                                    <MenuItem Header="Export midi..."
                                               Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
                                               CommandParameter="MIDI">
                                         <MenuItem.Icon>
                                             <avalonia:MaterialIcon Kind="Midi" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="Save as pdf..."
+                                    <MenuItem Header="Export pdf..."
                                               Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
                                               CommandParameter="PDF">
                                         <MenuItem.Icon>
@@ -195,10 +197,10 @@
                                 </ContextMenu>
                             </Flyout>
                         </Button.Flyout>
-                        <avalonia:MaterialIcon
-                            Height="{local:MathBinding a={Binding $parent[Button].Bounds.Height}, exp=a*0.7}"
-                            Width="{Binding $self.Bounds.Height}"
-                            Kind="DotsVertical" />
+                        <avalonia:MaterialIcon Margin="10,0,0,0"
+                                               Height="{local:MathBinding a={Binding $parent[Button].Bounds.Height}, exp=a*0.7}"
+                                               Width="{Binding $self.Bounds.Height}"
+                                               Kind="DotsVertical" />
                     </Button>
 
                 </Grid>

@@ -30,7 +30,7 @@
         <Grid RowDefinitions="*,0.2*">
             <Border x:Name="KeyMarkerInnerContainer"
                     Grid.Row="1"
-                    Classes.desired-root="{Binding IsDesiredRoot}"
+                    Classes.desired-root="{Binding IsSelectedKey}"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Bottom"
                     CornerRadius="5">
