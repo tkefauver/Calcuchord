@@ -22,6 +22,14 @@ namespace Calcuchord {
                     Directory.CreateDirectory(storage_dir);
                 }
 
+                if(Directory.Exists(sh.ShareDir)) {
+                    // clear previous tmp
+                    Directory.Delete(sh.ShareDir,true);
+                }
+
+                // setup share dir
+                _ = sh.ShareDir;
+
                 if(ps.MidiPlayer is MidiSoundFontPlayerBase mpb &&
                    mpb.SoundFontDir is { } sound_dir &&
                    !sound_dir.IsDirectory()) {
@@ -37,7 +45,7 @@ namespace Calcuchord {
                         MpAvFileIo.ReadBytesFromResource("avares://Calcuchord/Assets/Sounds/piano.sf2");
                     string piano_path = Path.Combine(sound_dir,"piano.sf2");
                     File.WriteAllBytes(piano_path,piano_bytes);
-                } 
+                }
                 // else if(ps.MidiPlayer is MidiPlayer_sugarwv wvh &&
                 //           wvh.PlayerUrl is { } tone_target_url &&
                 //           tone_target_url.ToPathFromUri() is { } tone_target_path &&

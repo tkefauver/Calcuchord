@@ -37,9 +37,11 @@
     <ItemGroup>
         <AvaloniaResource Include="Resources\drawable\Icon.png"/>
     </ItemGroup>
-
+    
     <ItemGroup>
-        <Compile Remove="Util\Platform\Services\MidiPlayer_ad_sugarwv.cs"/>
+        <AndroidResource Include="Resources\values\xml\file_paths.xml">
+            <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+        </AndroidResource>
     </ItemGroup>
 
     <PropertyGroup>

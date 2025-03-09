@@ -3,6 +3,25 @@ using System.IO;
 
 namespace Calcuchord {
     public class StorageHelper_default : IStorageHelper {
+
+        public string ShareDir {
+            get {
+                string root_dir = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "Calcuchord");
+                if(!Directory.Exists(root_dir)) {
+                    Directory.CreateDirectory(root_dir);
+                }
+
+                string _shareDir = Path.Combine(root_dir,"Share");
+                if(!Directory.Exists(_shareDir)) {
+                    Directory.CreateDirectory(_shareDir);
+                }
+
+                return _shareDir;
+            }
+        }
+
         string _storageDir;
 
         public string StorageDir {
