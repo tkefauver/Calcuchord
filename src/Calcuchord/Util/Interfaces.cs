@@ -6,9 +6,10 @@ using Svg.Skia;
 namespace Calcuchord {
 
     public interface IPlatformServices {
+        IMidiPlayer MidiPlayer { get; }
+        IMidiFileBuilder MidiFileBuilder { get; }
         IUriNavigator UriNavigator { get; }
         IStorageHelper StorageHelper { get; }
-        IMidiPlayer MidiPlayer { get; }
         IPrefsIo PrefsIo { get; }
         IPlatformInfo PlatformInfo { get; }
         ILog Logger { get; }
@@ -17,8 +18,13 @@ namespace Calcuchord {
         ISharePdf SharePdf { get; }
     }
 
+    public interface IMidiFileBuilder {
+        Task CreateMidiScaleAsync(IEnumerable<IEnumerable<int>> toneSets,string filePath);
+        Task CreateMidiChordAsync(IEnumerable<IEnumerable<int>> toneSets,string filePath);
+    }
+
     public interface IShareHtml {
-        void ShareHtml(string html,string title);
+        Task ShareHtmlAsync(string html,string title);
     }
 
     public interface ISharePdf {

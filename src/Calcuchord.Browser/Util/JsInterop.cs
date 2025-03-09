@@ -54,11 +54,8 @@ namespace Calcuchord.Browser {
 
         #region Share
 
-        [JSImport("globalThis.window.shareHtml")]
-        public static partial void ShareHtml(string htmlStr,string title);
-
         [JSImport("globalThis.window.shareFileAsync")]
-        public static partial void ShareFile(string base64,string mimeType,string fileName,string title);
+        public static partial Task ShareFileAsync(string base64,string mimeType,string fileName);
 
         #endregion
 

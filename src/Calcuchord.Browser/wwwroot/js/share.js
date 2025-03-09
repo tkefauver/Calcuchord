@@ -1,15 +1,14 @@
-async function shareFileAsync(b64, mimeType, fileName, title) {
+async function shareFileAsync(b64, mimeType, fileName) {
     if (isMobile()) {
         const blob = new Blob([base64ToArrayBuffer(b64)], {type: mimeType});
         const file = new File([blob], fileName, {type: mimeType});
 
         if (navigator.share && navigator.canShare({files: [file]})) {
             await navigator.share({
-                title: title,
+                title: fileName,
                 files: [file],
             });
-            console.log(`${fileName} shared successfully`);
-            return true;
+            return;
         }
     }
 
@@ -18,9 +17,6 @@ async function shareFileAsync(b64, mimeType, fileName, title) {
     link.href = uri;
     link.download = fileName;
     link.click();
-
-    console.log(`${fileName} share unsuccessfull`);
-    return false;
 }
 
 function base64ToArrayBuffer(base64) {
@@ -30,10 +26,4 @@ function base64ToArrayBuffer(base64) {
         bytes[i] = binaryString.charCodeAt(i);
     }
     return bytes.buffer;
-}
-
-function closeShare() {
-    if (document.body.lastChild.tagName === 'IFRAME') {
-        document.body.lastChild.remove();
-    }
 }

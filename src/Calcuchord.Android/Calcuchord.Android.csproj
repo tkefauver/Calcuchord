@@ -9,6 +9,7 @@
         <ApplicationVersion>1</ApplicationVersion>
         <ApplicationDisplayVersion>1.0.0.2</ApplicationDisplayVersion>
         <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+        <AndroidSdkDirectory>/home/tkefauver/android-sdk</AndroidSdkDirectory>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
@@ -24,11 +25,10 @@
     <ItemGroup>
         <PackageReference Include="Avalonia.Android"/>
         <PackageReference Include="Avalonia.ReactiveUI"/>
-        <PackageReference Include="HarfBuzzSharp" />
-        <PackageReference Include="HarfBuzzSharp.NativeAssets.Android" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Android" />
+        <!--        <PackageReference Include="HarfBuzzSharp" />-->
+        <!--        <PackageReference Include="HarfBuzzSharp.NativeAssets.Android" />-->
+        <!--        <PackageReference Include="SkiaSharp.NativeAssets.Android"/>-->
         <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"/>
-        <PackageReference Include="Xamarin.Essentials"/>
         <PackageReference Include="Melanchall.DryWetMidi"/>
     </ItemGroup>
 

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using HtmlAgilityPack;
 using MonkeyPaste.Common;
@@ -253,10 +252,10 @@ namespace Calcuchord {
             footer_label_elm.InnerHtml = "Created With: ";
             footer_elm.AppendChild(footer_label_elm);
             HtmlNode footer_link_elm = doc.CreateElement("a");
-            footer_link_elm.SetAttributeValue("href","https://github.com/tkefauver/Calcuchord");
+            footer_link_elm.SetAttributeValue("href",AppInfo.WebsiteUrl);
             footer_elm.AppendChild(footer_link_elm);
             HtmlNode footer_link_label_elm = doc.CreateElement("span");
-            footer_link_label_elm.InnerHtml = "Calcuchord";
+            footer_link_label_elm.InnerHtml = AppInfo.Name;
             footer_link_elm.AppendChild(footer_link_label_elm);
 
             return doc.DocumentNode.OuterHtml;
@@ -311,35 +310,13 @@ namespace Calcuchord {
             logo_y += logo_h;
             double ox = 0; //800d / tw;
             AddTitleText(
-                svg_elm,"https://tkefauver.github.io/Calcuchord",string.Empty,string.Empty,logo_fs,Fg,tw,ox: ox,oy: th);
+                svg_elm,AppInfo.WebsiteUrl,string.Empty,string.Empty,logo_fs,Fg,tw,ox: ox,oy: th);
             th += logo_h + 4;
 
             svg_elm.Attributes.Add("width",tw);
             svg_elm.Attributes.Add("height",th);
 
             return svg_elm.OuterHtml;
-        }
-
-        public void BatchToBrowser(Tuning tuning,IEnumerable<NotePattern> ngl) {
-            string result = GetBatchHtml(tuning,ngl);
-            try {
-                if(PlatformWrapper.Services.ShareHtml is { } share_service &&
-                   ngl.FirstOrDefault() is { } first_item) {
-                    string title =
-                        $"{tuning.Parent.Name}_{tuning.Name}_{MainViewModel.Instance.SelectedDisplayMode}";
-                    share_service.ShareHtml(result,title);
-                    return;
-                }
-
-                string fp = Path.Combine(
-                    Path.GetTempPath(),
-                    Path.GetRandomFileName().SplitNoEmpty(".")[0] + ".html");
-                File.WriteAllText(fp,result);
-                PlatformWrapper.Services.UriNavigator.NavigateTo(
-                    fp.ToFileSystemUriFromPath(),null);
-            } catch(Exception ex) {
-                ex.Dump();
-            }
         }
 
         #endregion
