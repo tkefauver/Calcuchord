@@ -265,7 +265,6 @@
 
                 <!-- SHARE -->
                 <controls:Card Grid.Row="0"
-                               IsVisible="{Binding !IsMobileOs, Source={x:Static local:ThemeViewModel.Instance}}"
                                Classes="button-group"
                                Margin="10"
                                HorizontalAlignment="Left"

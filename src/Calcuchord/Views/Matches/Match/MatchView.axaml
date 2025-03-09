@@ -56,12 +56,12 @@
 
         <!-- MATCH BTNS -->
 
-        <Style Selector="StackPanel#MatchButtonStripPanel, Button#ShareButton">
+        <Style Selector="UniformGrid#MatchButtonStripPanel, Button#ShareButton">
             <Setter Property="Opacity"
                     Value="0" />
         </Style>
         <Style
-            Selector="Border#MatchContainerBorder:pointerover StackPanel#MatchButtonStripPanel, Border#MatchContainerBorder.selected StackPanel#MatchButtonStripPanel, Border#MatchContainerBorder:pointerover Button#ShareButton, Border#MatchContainerBorder.selected Button#ShareButton">
+            Selector="Border#MatchContainerBorder:pointerover UniformGrid#MatchButtonStripPanel, Border#MatchContainerBorder.selected UniformGrid#MatchButtonStripPanel, Border#MatchContainerBorder:pointerover Button#ShareButton, Border#MatchContainerBorder.selected Button#ShareButton">
             <Setter Property="Opacity"
                     Value="1" />
         </Style>
@@ -120,31 +120,34 @@
                          Css="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}"
                          Source="{Binding NotePattern, Converter={x:Static local:PatternToSvgConverter.Instance}}"
                          Stretch="Uniform" />
-                    <StackPanel x:Name="MatchButtonStripPanel"
-                                Grid.Row="2"
-                                Margin="10"
-                                Spacing="20"
-                                Classes="fade"
-                                HorizontalAlignment="Center"
-                                Orientation="Horizontal">
-                        <StackPanel.Styles>
+                    <UniformGrid x:Name="MatchButtonStripPanel"
+                                 Grid.Row="2"
+                                 Height="{Binding Bounds.Height, ElementName=MatchTitleTextBlock}"
+                                 Classes="fade"
+                                 Columns="3">
+                        <UniformGrid.Styles>
                             <Style Selector="Button">
                                 <Setter Property="Theme"
                                         Value="{StaticResource MaterialFlatButton}" />
-                                <Setter Property="Padding"
-                                        Value="3" />
-                                <Setter Property="MinWidth"
-                                        Value="48" />
-                                <Setter Property="Height"
-                                        Value="{Binding $self.Bounds.Width}" />
+
+                                <Setter Property="HorizontalAlignment"
+                                        Value="Stretch" />
+                                <Setter Property="VerticalAlignment"
+                                        Value="Stretch" />
                             </Style>
                             <Style Selector="avalonia|MaterialIcon">
-                                <Setter Property="MinWidth"
-                                        Value="36" />
-                                <Setter Property="Height"
-                                        Value="{Binding $self.Bounds.Width}" />
+                                <!-- <Setter Property="MinWidth" -->
+                                <!--         Value="36" /> -->
+                                <!-- <Setter Property="Height" -->
+                                <!--         Value="{Binding $self.Bounds.Width}" /> -->
+                                <Setter Property="HorizontalAlignment"
+                                        Value="Center" />
+                                <Setter Property="VerticalAlignment"
+                                        Value="Stretch" />
+                                <Setter Property="Margin"
+                                        Value="5" />
                             </Style>
-                        </StackPanel.Styles>
+                        </UniformGrid.Styles>
 
                         <!-- SET NECK BTN -->
                         <Button Command="{Binding SetMatchToInstrumentCommand}">
@@ -160,12 +163,13 @@
                         <Button Command="{Binding ToggleBookmarkCommand}">
                             <avalonia:MaterialIcon Kind="{Binding BookmarkIcon}" />
                         </Button>
-                    </StackPanel>
+                    </UniformGrid>
 
 
                     <Button x:Name="ShareButton"
                             local:CloseFlyoutExtension.IsEnabled="False"
-                            Margin="15"
+                            Margin="0"
+                            Height="{Binding Bounds.Height, ElementName=MatchTitleTextBlock}"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
                             Classes="float">
@@ -191,7 +195,10 @@
                                 </ContextMenu>
                             </Flyout>
                         </Button.Flyout>
-                        <avalonia:MaterialIcon Kind="DotsVertical" />
+                        <avalonia:MaterialIcon
+                            Height="{local:MathBinding a={Binding $parent[Button].Bounds.Height}, exp=a*0.7}"
+                            Width="{Binding $self.Bounds.Height}"
+                            Kind="DotsVertical" />
                     </Button>
 
                 </Grid>

@@ -288,7 +288,7 @@ namespace Calcuchord {
 
         IEnumerable<SvgOptionType> LastSelectedSvgOptionTypes { get; set; } = [];
 
-        IEnumerable<SvgOptionType> SelectedSvgOptionTypes =>
+        public IEnumerable<SvgOptionType> SelectedSvgOptionTypes =>
             SvgOptions.Where(x => x.IsChecked).Select(x => x.OptionValue.ToEnum<SvgOptionType>());
 
         public MusicPatternType SelectedPatternType =>
@@ -1185,8 +1185,8 @@ namespace Calcuchord {
             }
 
             if(OptionLookup.Values.SelectMany(x => x).None()) {
-                if(!VerifyOptions(all_opts)) {
-                    // out of date
+                if(!VerifyOptions(all_opts) && !string.IsNullOrEmpty(Prefs.Instance.LastPrefsVersion)) {
+                    // out of date (and not initial startup)
 #if DEBUG
                     Debugger.Break();
 #endif
@@ -1424,7 +1424,7 @@ namespace Calcuchord {
                             if(exp_type == "HTML" && PlatformWrapper.Services.ShareHtml is { } shtml) {
                                 string html = builder.GetBatchHtml(
                                     SelectedTuning.Tuning,npl.Select(x => x.NotePattern));
-                                shtml.ShareHtml(html,title);
+                                shtml.ShareHtmlAsync(html,title);
                             } else if(exp_type == "FULLPDF" && PlatformWrapper.Services.SharePdf is { } spdf) {
                                 string svg_html = builder.GetBatchSvg(
                                     SelectedTuning.Tuning,npl.Select(x => x.NotePattern),MatchColCount);
@@ -1710,8 +1710,7 @@ namespace Calcuchord {
             });
 
         public ICommand ShowAboutCommand => new MpCommand<object>(
-            (args) =>
-            {
+            (args) => {
                 bool needs_window = args is not null;
                 if(TopLevel.GetTopLevel(MainView.Instance) is not { } tl) {
                     return;
@@ -1733,23 +1732,22 @@ namespace Calcuchord {
                     }
                 }
 
-                var about_view = new AboutView
+                AboutView about_view = new AboutView
                 {
                     DataContext = new AboutViewModel(),
                 };
 
-                if (needs_window)
-                {
+                if(needs_window) {
                     // mac only
-                    var about_win = new Window()
+                    Window about_win = new Window
                     {
                         Content = about_view,
-                        SizeToContent = SizeToContent.WidthAndHeight
+                        SizeToContent = SizeToContent.WidthAndHeight,
                     };
                     about_win.Show();
                     return;
                 }
-                
+
                 tl.AddHandler(InputElement.PointerPressedEvent,TopLevel_OnPointerPressed,RoutingStrategies.Tunnel,true);
                 DialogHost.Show(about_view,Instance.MainDialogHostName).FireAndForgetSafeAsync();
 

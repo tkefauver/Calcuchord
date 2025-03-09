@@ -116,7 +116,7 @@
                 <SelectableTextBlock Text="© 2025 Thomas Kefauver" />
                 <HyperlinkButton Cursor="Hand"
                                  Command="{Binding OpenLinkCommand}"
-                                 CommandParameter="https://github.com/tkefauver/Calcuchord">
+                                 CommandParameter="{x:Static local:AppInfo.WebsiteUrl}">
                     <TextBlock Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
                 </HyperlinkButton>
                 <HyperlinkButton Cursor="Hand"
