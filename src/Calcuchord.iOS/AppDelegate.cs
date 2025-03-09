@@ -1,33 +1,20 @@
 using Avalonia;
 using Avalonia.iOS;
 using Foundation;
-//using Microsoft.Maui.ApplicationModel;
-using UIKit;
 
 namespace Calcuchord.iOS {
-    // The UIApplicationDelegate for the application. This class is responsible for launching the 
-// User Interface of the application, as well as listening (and optionally responding) to 
-// application events from iOS.
     [Register("AppDelegate")]
     #pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public partial class AppDelegate : AvaloniaAppDelegate<App>
     #pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
-        
         protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) {
             return base.CustomizeAppBuilder(builder)
                 .WithInterFont()
-                // .AfterSetup(_ =>
-                // {
-                //     if (Platform.GetCurrentUIViewController()  is {} rvc)
-                //     {
-                //         Platform.Init(()=>rvc);
-                //     }
-                // })
                 .With(new iOSPlatformOptions() {})
                 .AfterPlatformServicesSetup(
                     _ => {
-                        PlatformWrapper.Init(new PlatformServices_ios());
+                        PlatformWrapper.Init(new PlatformServices_ios(this));
                     });
         }
     }

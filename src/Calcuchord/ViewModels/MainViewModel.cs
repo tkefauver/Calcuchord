@@ -1424,7 +1424,7 @@ namespace Calcuchord {
                             if(exp_type == "HTML" && PlatformWrapper.Services.ShareHtml is { } shtml) {
                                 string html = builder.GetBatchHtml(
                                     SelectedTuning.Tuning,npl.Select(x => x.NotePattern));
-                                shtml.ShareHtmlAsync(html,title);
+                                await shtml.ShareHtmlAsync(html,title);
                             } else if(exp_type == "FULLPDF" && PlatformWrapper.Services.SharePdf is { } spdf) {
                                 string svg_html = builder.GetBatchSvg(
                                     SelectedTuning.Tuning,npl.Select(x => x.NotePattern),MatchColCount);

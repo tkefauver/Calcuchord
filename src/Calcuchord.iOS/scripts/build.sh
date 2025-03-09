@@ -39,7 +39,7 @@ rm -fr obj
 rm -fr bin
 rm -f *.csproj.user
 
-if [ "$1" = "man" ] || [ "$2" = "man" ] || [ "$3" = "man" ]; then
+#if [ "$1" = "man" ] || [ "$2" = "man" ] || [ "$3" = "man" ]; then
 	dotnet publish -c ${CONFIG} -f ${FRAMEWORK} ${PUB_PROP_ARG} -p:RuntimeIdentifier=${RUNTIME} ${DEVICE_ARG}${DEVICE_ID}
 	
 	cd "bin/${CONFIG}/${FRAMEWORK}/${RUNTIME}/publish"
@@ -56,6 +56,6 @@ if [ "$1" = "man" ] || [ "$2" = "man" ] || [ "$3" = "man" ]; then
 	# run ios-deploy to install the app into iOS device
 	#ios-deploy -r -b ./tmp/Payload/*.app -O "/Users/tkefauver/Desktop/output.log" -E "/Users/tkefauver/Desktop/error.log"
 	rm -r ./tmp
-else
-	dotnet build -t:Run -c ${CONFIG} -f ${FRAMEWORK} ${PUB_PROP_ARG} -p:Platform=${PLATFORM} ${DEVICE_ARG}${DEVICE_ID} -p:RuntimeIdentifier=${RUNTIME}
-fi
+#else
+	#dotnet build -t:Run -c ${CONFIG} -f ${FRAMEWORK} ${PUB_PROP_ARG} -p:Platform=${PLATFORM} ${DEVICE_ARG}${DEVICE_ID} -p:RuntimeIdentifier=${RUNTIME}
+#fi

@@ -1,6 +1,5 @@
 using System;
 using Foundation;
-using MonkeyPaste.Common;
 using UIKit;
 
 namespace Calcuchord.iOS {

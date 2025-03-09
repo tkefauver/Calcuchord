@@ -1,18 +1,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-#if !IOS
+//#if !IOS
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
-#endif
+//#endif
 
 namespace Calcuchord {
     public class MidiFileBuilder_default : IMidiFileBuilder {
 
-        public async Task CreateMidiScaleAsync(IEnumerable<IEnumerable<int>> toneSets,string fp) {
-#if IOS
-            await Task.Delay(1);
-#else
+        public virtual async Task CreateMidiScaleAsync(IEnumerable<IEnumerable<int>> toneSets,string fp) {
+// #if IOS
+//             await Task.Delay(1);
+// #else
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
@@ -43,14 +43,14 @@ namespace Calcuchord {
 
                     midiFile.Write(fp);
                 });
-#endif
+//#endif
 
         }
 
-        public async Task CreateMidiChordAsync(IEnumerable<IEnumerable<int>> toneSets,string fp) {
-#if IOS
-            await Task.Delay(1);
-#else
+        public virtual async Task CreateMidiChordAsync(IEnumerable<IEnumerable<int>> toneSets,string fp) {
+// #if IOS
+//             await Task.Delay(1);
+// #else
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
@@ -88,7 +88,7 @@ namespace Calcuchord {
 
                     midiFile.Write(fp);
                 });
-#endif
+//#endif
         }
     }
 }
