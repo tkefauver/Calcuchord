@@ -22,7 +22,7 @@ namespace Calcuchord.Browser {
         protected override async Task<string> ShowSaveFilePickerAsync(string title,string[] extTypes) {
             await Task.Delay(1);
             string fileName = $"{title}.{extTypes[0]}";
-            return Path.Combine(PlatformWrapper.Services.StorageHelper.StorageDir,fileName);
+            return Path.Combine(PlatformWrapper.Services.StorageHelper.ShareDir,fileName);
         }
     }
 }

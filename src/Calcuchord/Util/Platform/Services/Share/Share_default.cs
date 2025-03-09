@@ -68,8 +68,7 @@ namespace Calcuchord {
 
             await Dispatcher.UIThread.InvokeAsync(
                 async () => {
-                    if(LastFolder is null &&
-                       ThemeViewModel.Instance.IsDesktop) {
+                    if(LastFolder is null) {
                         // note supported on mobile or browser in av 11.2.4
                         // see https://docs.avaloniaui.net/docs/concepts/services/storage-provider/#platform-compatibility
                         LastFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(
@@ -93,12 +92,10 @@ namespace Calcuchord {
                 return null;
             }
 
-            if(ThemeViewModel.Instance.IsDesktop) {
-                // note supported on mobile or browser in av 11.2.4
-                // see https://docs.avaloniaui.net/docs/concepts/services/storage-provider/#platform-compatibility
-                string fp_dir = Path.GetDirectoryName(fp);
-                LastFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(fp_dir);
-            }
+            // note supported on mobile or browser in av 11.2.4
+            // see https://docs.avaloniaui.net/docs/concepts/services/storage-provider/#platform-compatibility
+            string fp_dir = Path.GetDirectoryName(fp);
+            LastFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(fp_dir);
 
             return fp;
         }

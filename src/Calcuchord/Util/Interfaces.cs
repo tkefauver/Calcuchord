@@ -54,6 +54,7 @@ namespace Calcuchord {
     }
 
     public interface IStorageHelper {
+        string ShareDir { get; }
         string StorageDir { get; }
         bool IsExternalWriteEnabled();
         event EventHandler ExternalWriteEnabled;
