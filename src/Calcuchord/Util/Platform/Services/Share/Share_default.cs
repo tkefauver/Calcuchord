@@ -13,48 +13,52 @@ using Svg.Skia;
 namespace Calcuchord {
     public class Share_default : IShareMidi,ISharePdf,IShareHtml {
         protected IStorageFolder LastFolder { get; set; }
-        protected MidiFileBuilder Builder { get; } = new MidiFileBuilder();
 
         public virtual async Task ShareMidiAsync(IEnumerable<IEnumerable<int>> toneSets,bool isScale,string title) {
-            string fp = await ShowFileBrowserAsync(title,["mid","midi"]);
+            if(PlatformWrapper.Services.MidiFileBuilder is not { } mfb) {
+                return;
+            }
+
+            string fp = await ShowSaveFilePickerAsync(title,["mid","midi"]);
             if(fp is null) {
                 return;
             }
 
             if(isScale) {
-                await Builder.CreateMidiScaleAsync(toneSets,fp);
+                await mfb.CreateMidiScaleAsync(toneSets,fp);
             } else {
-                await Builder.CreateMidiChordAsync(toneSets,fp);
+                await mfb.CreateMidiChordAsync(toneSets,fp);
             }
 
-            PlatformWrapper.Services.UriNavigator.NavigateTo(Path.GetDirectoryName(fp),fp);
-
+            FinishShare(fp,"audio/midi");
         }
 
         public virtual async Task SharePdfAsync(SKSvg svg,string title) {
-            string fp = await ShowFileBrowserAsync(title,["pdf"]);
+            string fp = await ShowSaveFilePickerAsync(title,["pdf"]);
             if(fp is null) {
                 return;
             }
 
             svg.Picture.ToPdf(fp,ThemeViewModel.Instance.IsDark ? SKColors.Black : SKColors.White,1f,1f);
-            PlatformWrapper.Services.UriNavigator.NavigateTo(Path.GetDirectoryName(fp),fp);
+
+            FinishShare(fp,"application/pdf");
         }
 
-        public virtual void ShareHtml(string html,string title) {
-            Dispatcher.UIThread.Post(
-                async () => {
-                    string fp = await ShowFileBrowserAsync(title,["html"]);
-                    if(fp is null) {
-                        return;
-                    }
+        public virtual async Task ShareHtmlAsync(string html,string title) {
+            string fp = await ShowSaveFilePickerAsync(title,["html"]);
+            if(fp is null) {
+                return;
+            }
 
-                    await File.WriteAllTextAsync(fp,html);
-                    PlatformWrapper.Services.UriNavigator.NavigateTo(Path.GetDirectoryName(fp),fp);
-                });
+            await File.WriteAllTextAsync(fp,html);
+            FinishShare(fp,"text/html");
         }
 
-        protected async Task<string> ShowFileBrowserAsync(string title,string[] extTypes) {
+        protected virtual void FinishShare(string filePath,string mimeType) {
+            PlatformWrapper.Services.UriNavigator.NavigateTo(Path.GetDirectoryName(filePath),filePath);
+        }
+
+        protected virtual async Task<string> ShowSaveFilePickerAsync(string title,string[] extTypes) {
             if(TopLevel.GetTopLevel(MainView.Instance) is not { } topLevel ||
                !topLevel.StorageProvider.CanSave) {
                 return null;
@@ -64,7 +68,10 @@ namespace Calcuchord {
 
             await Dispatcher.UIThread.InvokeAsync(
                 async () => {
-                    if(LastFolder is null) {
+                    if(LastFolder is null &&
+                       ThemeViewModel.Instance.IsDesktop) {
+                        // note supported on mobile or browser in av 11.2.4
+                        // see https://docs.avaloniaui.net/docs/concepts/services/storage-provider/#platform-compatibility
                         LastFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(
                             Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
                     }
@@ -82,16 +89,18 @@ namespace Calcuchord {
                 });
 
 
-            if(file is null ||
-               file.Path.AbsoluteUri.ToPathFromUri() is not { } fp) {
+            if(file?.Path.AbsoluteUri.ToPathFromUri() is not { } fp) {
                 return null;
             }
 
-            string fp_dir = Path.GetDirectoryName(fp);
-            LastFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(fp_dir);
+            if(ThemeViewModel.Instance.IsDesktop) {
+                // note supported on mobile or browser in av 11.2.4
+                // see https://docs.avaloniaui.net/docs/concepts/services/storage-provider/#platform-compatibility
+                string fp_dir = Path.GetDirectoryName(fp);
+                LastFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(fp_dir);
+            }
 
             return fp;
-            ;
         }
 
     }
