@@ -28,10 +28,12 @@ dotnet publish ../Calcuchord.Mac.csproj -r "$RUNTIME_ID" -f "$FRAMEWORK_ID" -c "
 BUNDLE_PATH="$BUILD_DIR/$APP_HOST_NAME.app"
 ICON_FILE="$PROJ_DIR/logo.icns"
 INFO_PLIST="$PROJ_DIR/Info.plist"
+PROV_PROFILE="$PROJ_DIR/scripts/cc_mac_dist.provisionprofile"
 
 mkdir -p "$BUNDLE_PATH/Contents/Resources"
 cp "$ICON_FILE" "$BUNDLE_PATH/Contents/Resources/logo.icns"
 cp "$INFO_PLIST" "$BUNDLE_PATH/Contents/Info.plist"
+cp "$PROV_PROFILE" "$BUNDLE_PATH/Contents/embedded.provisionprofile"
 
 chmod +x "$BUNDLE_PATH/Contents/MacOS/$APP_EXE_NAME"
 
@@ -43,17 +45,34 @@ ENTITLEMENTS="$PROJ_DIR/Entitlements.plist"
 SIGNING_ID="Apple Development: thomas kefauver (MY7R67BXWM)"
 
 if [ "$1" = "store" ] || [ "$2" = "store" ] || [ "$1" = "adhoc" ] || [ "$2" = "adhoc" ]; then
-	SIGNING_ID="Developer ID Installer: thomas kefauver (3382GDS46D)"
+  SIGNING_ID="Apple Distribution: thomas kefauver (3382GDS46D)"
+  
+  #codesign --force --deep --sign "$SIGNING_ID" --entitlements "$ENTITLEMENTS" "$BUNDLE_PATH"
+  find "$BUNDLE_PATH/Contents/MacOS/"|while read fname; do
+      if [[ -f $fname ]]; then
+          echo "[INFO] Signing $fname"
+          codesign --force --timestamp --options=runtime --entitlements "$ENTITLEMENTS" --sign "$SIGNING_ID" "$fname"
+      fi
+  done  
+  find "$BUNDLE_PATH/Contents/MonoBundle/"|while read fname; do
+      if [[ -f $fname ]]; then
+          echo "[INFO] Signing $fname"
+          codesign --force --timestamp --options=runtime --entitlements "$ENTITLEMENTS" --sign "$SIGNING_ID" "$fname"
+      fi
+  done  
+  codesign --force --timestamp --options=runtime --entitlements "$ENTITLEMENTS" --sign "$SIGNING_ID" "$BUNDLE_PATH"
+  
+	PACKING_ID="Developer ID Installer: thomas kefauver (3382GDS46D)"
 	PACKING_TYPE="adhoc"
 	if [ "$1" = "store" ] || [ "$2" = "store" ]; then
-	  SIGNING_ID="3rd Party Mac Developer Installer: thomas kefauver (3382GDS46D)"
+	  PACKING_ID="3rd Party Mac Developer Installer: thomas kefauver (3382GDS46D)"
 	  PACKING_TYPE="store"
 	fi
 	PACKAGE_DIR="$PROJ_DIR/packages/$PACKING_TYPE/$RUNTIME_ID"
 	rm -fr "$PACKAGE_DIR"
 	mkdir -p "$PACKAGE_DIR"
 	PACKAGE_PATH="$PACKAGE_DIR/$DESIRED_APP_HOST_NAME-$VERSION-$RUNTIME_ID.pkg"
-	productbuild --sign "$SIGNING_ID" --component "$BUNDLE_PATH" /Applications "$PACKAGE_PATH"
+	productbuild --sign "$PACKING_ID" --component "$BUNDLE_PATH" /Applications "$PACKAGE_PATH"
 	open -R "$PACKAGE_PATH"
 else
   codesign --force --deep --sign "$SIGNING_ID" --entitlements "$ENTITLEMENTS" "$BUNDLE_PATH"

@@ -462,3 +462,5 @@ src/Calcuchord.Android/scripts/publish2.sh
 /src/Calcuchord/Assets/Text/midi/fonts/banjo.js
 /PRIVACY
 /lib
+*.mobileprovision
+*.provisionprofile
