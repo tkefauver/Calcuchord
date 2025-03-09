@@ -6,7 +6,3 @@ find "$1/"|while read fname; do
         codesign --force --timestamp --options=runtime --entitlements "$2" --sign "$3" "$fname"
     fi
 done
-
-echo "[INFO] Signing app file"
-
-codesign --force --timestamp --options=runtime --entitlements "$2" --sign "$3" "$4"
