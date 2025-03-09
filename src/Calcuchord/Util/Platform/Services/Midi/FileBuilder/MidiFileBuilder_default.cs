@@ -7,7 +7,7 @@ using Melanchall.DryWetMidi.Core;
 #endif
 
 namespace Calcuchord {
-    public class MidiFileBuilder {
+    public class MidiFileBuilder_default : IMidiFileBuilder {
 
         public async Task CreateMidiScaleAsync(IEnumerable<IEnumerable<int>> toneSets,string fp) {
 #if IOS

@@ -3,21 +3,28 @@ using System.Threading.Tasks;
 
 namespace Calcuchord {
     public abstract class MidiFluidPlayerBase : MidiSoundFontPlayerBase {
-        MidiFileBuilder Builder { get; } = new MidiFileBuilder();
 
         public override void PlayChord(IEnumerable<IEnumerable<int>> tone_sets) {
+            if(PlatformWrapper.Services.MidiFileBuilder is not { } mfb) {
+                return;
+            }
+
             Task.Run(
                 async () => {
-                    await Builder.CreateMidiChordAsync(tone_sets,MidiFilePath);
+                    await mfb.CreateMidiChordAsync(tone_sets,MidiFilePath);
                     PlayFile(GetInstrumentSoundFontPath(null));
 
                 });
         }
 
         public override void PlayScale(IEnumerable<IEnumerable<int>> tone_sets) {
+            if(PlatformWrapper.Services.MidiFileBuilder is not { } mfb) {
+                return;
+            }
+
             Task.Run(
                 async () => {
-                    await Builder.CreateMidiScaleAsync(tone_sets,MidiFilePath);
+                    await mfb.CreateMidiScaleAsync(tone_sets,MidiFilePath);
                     PlayFile(GetInstrumentSoundFontPath(null));
 
                 });
