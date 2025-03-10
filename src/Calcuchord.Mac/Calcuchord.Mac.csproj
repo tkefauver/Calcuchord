@@ -14,7 +14,8 @@
     </PropertyGroup>
     
     <PropertyGroup>
-        <UseAppHost>true</UseAppHost>
+        <UseAppHost>true</UseAppHost>        
+<!--        <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>-->
     </PropertyGroup>
     
     <ItemGroup>

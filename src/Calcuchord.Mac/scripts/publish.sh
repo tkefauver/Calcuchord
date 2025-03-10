@@ -49,8 +49,18 @@ if [ "$1" = "store" ] || [ "$2" = "store" ] || [ "$1" = "adhoc" ] || [ "$2" = "a
   SIGNING_ID="Apple Distribution: thomas kefauver (3382GDS46D)"
 fi
 
-sign "$BUNDLE_PATH/Contents/MacOS/" "$ENTITLEMENTS" "$SIGNING_ID"
-sign "$BUNDLE_PATH/Contents/MonoBundle/" "$ENTITLEMENTS" "$SIGNING_ID"
+find "$BUNDLE_PATH/Contents/MacOS/"|while read fname; do
+    if [[ -f $fname ]]; then
+        echo "[INFO] Signing $fname"
+        codesign --force --timestamp --options=runtime --entitlements "$ENTITLEMENTS" --sign "$SIGNING_ID" "$fname"
+    fi
+done  
+find "$BUNDLE_PATH/Contents/MonoBundle/"|while read fname; do
+    if [[ -f $fname ]]; then
+        echo "[INFO] Signing $fname"
+        codesign --force --timestamp --options=runtime --entitlements "$ENTITLEMENTS" --sign "$SIGNING_ID" "$fname"
+    fi
+done  
 echo "[INFO] Signing app file"
 codesign --force --timestamp --options=runtime --entitlements "$ENTITLEMENTS" --sign "$SIGNING_ID" "$BUNDLE_PATH"
 
