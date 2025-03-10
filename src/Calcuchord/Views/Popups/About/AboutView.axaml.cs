@@ -18,7 +18,7 @@ namespace Calcuchord {
         void PopupZone_OnLoaded(object sender,RoutedEventArgs e) {
             dt = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(20)
+                Interval = TimeSpan.FromMilliseconds(20),
             };
             dt.Tick += DtOnTick;
             dt.Start();
@@ -47,6 +47,14 @@ namespace Calcuchord {
             dt.Tick -= DtOnTick;
             dt = null;
 
+        }
+
+        void Button_OnClick(object sender,RoutedEventArgs e) {
+            if(TopLevel.GetTopLevel(this) is not Window w) {
+                return;
+            }
+
+            w.Close();
         }
     }
 }

@@ -37,7 +37,7 @@
     <ItemGroup>
         <AvaloniaResource Include="Resources\drawable\Icon.png"/>
     </ItemGroup>
-    
+
     <ItemGroup>
         <AndroidResource Include="Resources\values\xml\file_paths.xml">
             <Generator>MSBuild:UpdateGeneratedFiles</Generator>

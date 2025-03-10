@@ -67,7 +67,7 @@ namespace Calcuchord {
             InstrumentNote inn = new InstrumentNote
             {
                 ColNum = colNum,
-                RowNum = rowNum
+                RowNum = rowNum,
             };
             if(nt is null || register is null) {
                 inn.IsMute = true;
@@ -86,7 +86,7 @@ namespace Calcuchord {
 
         public override void Adjust(int offset) {
             base.Adjust(offset);
-            //ColNum -= offset;
+            ColNum += offset;
         }
 
         // public new InstrumentNote Offset(int offset) {

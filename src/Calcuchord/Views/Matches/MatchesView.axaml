@@ -249,8 +249,8 @@
                                        Classes.can-resize="true"
                                        ItemsSource="{Binding Matches}">
                             <ItemsRepeater.Layout>
-                                <WrapLayout Orientation="Horizontal" />
-                                <!-- <UniformGridLayout MaximumRowsOrColumns="{Binding MatchColCount}" /> -->
+                                <!-- <WrapLayout Orientation="Horizontal" /> -->
+                                <UniformGridLayout MaximumRowsOrColumns="{Binding MatchColCount}" />
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="local:MatchViewModel">

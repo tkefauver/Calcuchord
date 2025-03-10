@@ -44,8 +44,8 @@
                 <Setter.Value>
                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                         <Binding Path="IsEnabled" />
-                        <Binding Path="!IsSearchInitiating"
-                                 Source="{x:Static local:MainViewModel.Instance}" />
+                        <!-- <Binding Path="!IsSearchInitiating" -->
+                        <!--          Source="{x:Static local:MainViewModel.Instance}" /> -->
                     </MultiBinding>
                 </Setter.Value>
             </Setter>
@@ -214,81 +214,74 @@
     </UserControl.Styles>
     <controls:ColorZone Mode="Accent"
                         Foreground="{DynamicResource Fg}">
-        <DockPanel Margin="5">
-            <DockPanel DockPanel.Dock="Top">
+        <Grid RowDefinitions="Auto,Auto,*"
+              Margin="5">
+            <!-- BACK BTN -->
 
-                <!-- BACK BTN -->
+            <Button x:Name="BackButton"
+                    Command="{Binding BackCommand, Source={x:Static local:MainViewModel.Instance}}"
+                    HorizontalAlignment="Left"
+                    Classes="float">
+                <avalonia:MaterialIcon Kind="ArrowLeft" />
+            </Button>
 
-                <Button x:Name="BackButton"
-                        DockPanel.Dock="Left"
-                        Command="{Binding BackCommand, Source={x:Static local:MainViewModel.Instance}}"
-                        HorizontalAlignment="Left"
-                        Classes="float">
-                    <avalonia:MaterialIcon Kind="ArrowLeft" />
-                </Button>
+            <!-- OPT BTN -->
+            <Button x:Name="InstrumentOptionsButton"
+                    HorizontalAlignment="Right"
+                    Classes="float">
+                <Button.Flyout>
+                    <Flyout>
+                        <ContextMenu HorizontalAlignment="Right"
+                                     VerticalAlignment="Top">
+                            <MenuItem Header="Edit..."
+                                      Command="{Binding BeginEditInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                      CommandParameter="{Binding ElementName=InstrumentOptionsButton}">
+                                <MenuItem.Icon>
+                                    <avalonia:MaterialIcon Kind="Cog" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem StaysOpenOnClick="False"
+                                      Header="Remove"
+                                      Command="{Binding RemoveInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                      CommandParameter="{Binding ElementName=InstrumentOptionsButton}">
+                                <MenuItem.Icon>
+                                    <avalonia:MaterialIcon Kind="TrashCan" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </Flyout>
+                </Button.Flyout>
+                <avalonia:MaterialIcon Kind="DotsVertical" />
+            </Button>
 
-                <!-- OPT BTN -->
-                <Button x:Name="InstrumentOptionsButton"
-                        DockPanel.Dock="Right"
-                        HorizontalAlignment="Right"
-                        Classes="float">
-                    <Button.Flyout>
-                        <Flyout>
-                            <ContextMenu HorizontalAlignment="Right"
-                                         VerticalAlignment="Top">
-                                <MenuItem Header="Edit..."
-                                          Command="{Binding BeginEditInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                          CommandParameter="{Binding ElementName=InstrumentOptionsButton}">
-                                    <MenuItem.Icon>
-                                        <avalonia:MaterialIcon Kind="Cog" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <MenuItem StaysOpenOnClick="False"
-                                          Header="Remove"
-                                          Command="{Binding RemoveInstrumentCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                          CommandParameter="{Binding ElementName=InstrumentOptionsButton}">
-                                    <MenuItem.Icon>
-                                        <avalonia:MaterialIcon Kind="TrashCan" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                            </ContextMenu>
-                        </Flyout>
-                    </Button.Flyout>
-                    <avalonia:MaterialIcon Kind="DotsVertical" />
-                </Button>
+            <!-- TITLE -->
 
-                <!-- TITLE -->
+            <StackPanel Spacing="-7"
+                        Grid.RowSpan="2">
+                <TextBlock FontSize="32"
+                           TextAlignment="Center"
+                           Text="{Binding Title}" />
+                <TextBlock FontSize="18"
+                           TextAlignment="Center"
+                           Foreground="{DynamicResource Bg}"
+                           Text="{Binding Subtitle}" />
+            </StackPanel>
 
-                <StackPanel Spacing="-7">
-                    <TextBlock FontSize="18"
-                               TextAlignment="Center"
-                               Text="{Binding Title}" />
-                    <TextBlock FontSize="14"
-                               TextAlignment="Center"
-                               Opacity="0.5"
-                               FontStyle="Italic"
-                               Text="{Binding Subtitle}" />
-                </StackPanel>
-
-            </DockPanel>
-
-            <ScrollViewer>
+            <ScrollViewer Grid.Row="2">
                 <StackPanel Classes="options"
                             DataContext="{x:Static local:MainViewModel.Instance}"
                             x:DataType="local:MainViewModel"
                             Classes.chords="{Binding IsChordsSelected}"
                             Classes.has-key="{Binding IsKeySelected}"
                             Classes.search-mode="{Binding IsSearchModeSelected}"
-                            Margin="10"
+                            Margin="10,0,10,10"
                             Spacing="10">
 
                     <!-- PATTERN -->
                     <TextBlock Classes="header"
                                Text="Type" />
                     <controls:Card Classes="button-group pattern">
-                        <ScrollViewer>
-                            <ItemsControl ItemsSource="{Binding PatternOptions}" />
-                        </ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding PatternOptions}" />
                     </controls:Card>
 
 
@@ -297,9 +290,7 @@
                                PointerReleased="InputElement_OnPointerReleased"
                                Text="Key" />
                     <controls:Card Classes="button-group key">
-                        <ScrollViewer>
-                            <ItemsControl ItemsSource="{Binding KeyOptions}" />
-                        </ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding KeyOptions}" />
                     </controls:Card>
 
                     <!-- DEGREE -->
@@ -307,9 +298,7 @@
                                PointerReleased="InputElement_OnPointerReleased"
                                Text="Degree" />
                     <controls:Card Classes="button-group degree chord-only">
-                        <ScrollViewer>
-                            <ItemsControl ItemsSource="{Binding DegreeOptions}" />
-                        </ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding DegreeOptions}" />
                     </controls:Card>
 
 
@@ -386,15 +375,13 @@
                     </StackPanel>
 
                     <controls:Card Classes="button-group svg">
-                        <ScrollViewer>
-                            <ItemsControl ItemsSource="{Binding SvgOptions}" />
-                        </ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding SvgOptions}" />
                     </controls:Card>
 
 
                 </StackPanel>
             </ScrollViewer>
-        </DockPanel>
+        </Grid>
 
     </controls:ColorZone>
 </UserControl>

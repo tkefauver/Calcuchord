@@ -386,17 +386,17 @@ namespace Calcuchord {
             bool is_parallel = false) {
             int min_fret_num = 0;
             int max_min_fret_num = FretCount - PatternOpenFretSpan - 1;
+            //int cut_off_fret_num = Math.Min(min_fret_num + 11,max_min_fret_num);
+            int cut_off_fret_num = max_min_fret_num;
+
             var pattern = GenPattern(cur_key,suffix);
             var pattern_inst_notes = GenNotes(pattern);
-            var valid_patterns = new List<IEnumerable<InstrumentNote>>();
+            var valid_combos = new List<IEnumerable<InstrumentNote>>();
             PatternKeyCollection ngc = PatternKeyCollection.Create(PatternType,cur_key,suffix);
 
-            for(; min_fret_num <= max_min_fret_num; min_fret_num++) {
+            // find all patterns in minimum octave range
+            for(; min_fret_num <= cut_off_fret_num; min_fret_num++) {
                 int max_fret_num = (min_fret_num + PatternOpenFretSpan) - 1;
-                // if(min_fret_num > 0) {
-                //     // block of 4 on open, then 3
-                //     max_fret_num--;
-                // }
 
                 var block_notes = pattern_inst_notes.Where(
                     x => x.ColNum >= min_fret_num && x.ColNum <= max_fret_num);
@@ -404,12 +404,12 @@ namespace Calcuchord {
                 var combos = block_notes.PowerSet().Where(x => x.Length >= pattern.Length);
                 foreach(var combo in combos) {
                     if(!IsValidCombo(combo,pattern) ||
-                       RejectExists(combo,valid_patterns) ||
+                       RejectExists(combo,valid_combos) ||
                        AddChordFingerings(combo) is not { } fingered_pattern) {
                         continue;
                     }
 
-                    valid_patterns.Add(combo);
+                    valid_combos.Add(combo);
                     ngc.Patterns.Add(
                         new NotePattern(ngc,0,fingered_pattern.OrderBy(x => x.RowNum).ThenBy(x => x.ColNum)));
                     CurItemCount++;
@@ -418,8 +418,53 @@ namespace Calcuchord {
                 if(is_parallel) {
                     await Task.Delay(5,Ct);
                 }
-
             }
+
+            // clone,shift and trim base octave patterns into higher available intervals
+            // int octave_offset = 12;
+            // while(true) {
+            //     bool found_pattern = false;
+            //
+            //     foreach(var base_combo in valid_combos) {
+            //         var octave_combo = base_combo.Select(x => x.Clone());
+            //         bool is_valid = true;
+            //         foreach(InstrumentNote inn in octave_combo) {
+            //             if(inn.IsMute) {
+            //                 continue;
+            //             }
+            //
+            //             inn.Adjust(octave_offset);
+            //             if(inn.ColNum >= FretCount) {
+            //                 is_valid = false;
+            //                 break;
+            //             }
+            //         }
+            //
+            //         if(is_valid) {
+            //             if(!IsValidCombo(octave_combo,pattern) ||
+            //                RejectExists(octave_combo,valid_combos) ||
+            //                AddChordFingerings(octave_combo) is not { } octave_pattern) {
+            //                 continue;
+            //             }
+            //
+            //             found_pattern = true;
+            //             ngc.Patterns.Add(
+            //                 new NotePattern(ngc,0,octave_pattern.OrderBy(x => x.RowNum).ThenBy(x => x.ColNum)));
+            //             CurItemCount++;
+            //         }
+            //     }
+            //
+            //     if(found_pattern) {
+            //         octave_offset += 12;
+            //         if(octave_offset >= FretCount) {
+            //             break;
+            //         }
+            //
+            //         continue;
+            //     }
+            //
+            //     break;
+            // }
 
             // set pattern position by lowest note
             ngc.SetPositions();
@@ -428,7 +473,9 @@ namespace Calcuchord {
         }
 
 
-        IEnumerable<PatternNote> AddChordFingerings(IEnumerable<InstrumentNote> notes,int initialFinger = 1,
+        IEnumerable<PatternNote> AddChordFingerings(
+            IEnumerable<InstrumentNote> notes,
+            int initialFinger = 1,
             bool fingerPerFretMode = true) {
             /*
              1. Go from lowest to highest fret and lowest

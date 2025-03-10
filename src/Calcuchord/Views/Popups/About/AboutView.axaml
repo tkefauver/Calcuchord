@@ -81,55 +81,69 @@
                 CornerRadius="10"
                 Margin="0"
                 Padding="20">
-            <StackPanel Spacing="3">
-                <StackPanel Orientation="Horizontal"
-                            Spacing="5">
-                    <Border Padding="10"
-                            Width="42"
-                            Height="42"
-                            BorderThickness="1"
-                            BorderBrush="{DynamicResource Bg}"
-                            CornerRadius="7">
-                        <Image Width="36"
-                               Height="36"
-                               Stretch="UniformToFill"
-                               Source="avares://Calcuchord/Assets/Images/logo.png" />
-                    </Border>
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal"
-                                    Spacing="10">
-                            <SelectableTextBlock FontSize="32"
-                                                 Classes="theme-drop-shadow"
-                                                 Text="Calcuchord" />
-                            <TextBlock IsVisible="{Binding IsDebug, Source={x:Static local:ThemeViewModel.Instance}}"
-                                       Text="[DEBUG]"
-                                       VerticalAlignment="Center" />
+            <Grid>
+                <StackPanel Spacing="3">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="5">
+                        <Border Padding="10"
+                                Width="42"
+                                Height="42"
+                                BorderThickness="1"
+                                BorderBrush="{DynamicResource Bg}"
+                                CornerRadius="7">
+                            <Image Width="36"
+                                   Height="36"
+                                   Stretch="UniformToFill"
+                                   Source="avares://Calcuchord/Assets/Images/logo.png" />
+                        </Border>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="10">
+                                <SelectableTextBlock FontSize="32"
+                                                     Classes="theme-drop-shadow"
+                                                     Text="Calcuchord" />
+                                <TextBlock
+                                    IsVisible="{Binding IsDebug, Source={x:Static local:ThemeViewModel.Instance}}"
+                                    Text="[DEBUG]"
+                                    VerticalAlignment="Center" />
+                            </StackPanel>
+                            <SelectableTextBlock FontSize="10"
+                                                 VerticalAlignment="Top"
+                                                 TextAlignment="Right"
+                                                 Text="{Binding AppVersion}" />
                         </StackPanel>
-                        <SelectableTextBlock FontSize="10"
-                                             VerticalAlignment="Top"
-                                             TextAlignment="Right"
-                                             Text="{Binding AppVersion}" />
+
                     </StackPanel>
 
+                    <SelectableTextBlock Text="© 2025 Thomas Kefauver" />
+                    <HyperlinkButton Cursor="Hand"
+                                     Command="{Binding OpenLinkCommand}"
+                                     CommandParameter="{x:Static local:AppInfo.WebsiteUrl}">
+                        <TextBlock Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
+                    </HyperlinkButton>
+                    <HyperlinkButton Cursor="Hand"
+                                     Padding="0,10,0,0"
+                                     Background="{DynamicResource HttTransparent}"
+                                     HorizontalAlignment="Right"
+                                     Classes="donate shake"
+                                     Command="{Binding OpenLinkCommand}"
+                                     CommandParameter="https://buymeacoffee.com/tkefauver">
+                        <HyperlinkButton.RenderTransform>
+                            <RotateTransform />
+                        </HyperlinkButton.RenderTransform>
+                        <TextBlock Text="Donate Here!" />
+                    </HyperlinkButton>
                 </StackPanel>
-
-                <SelectableTextBlock Text="© 2025 Thomas Kefauver" />
-                <HyperlinkButton Cursor="Hand"
-                                 Command="{Binding OpenLinkCommand}"
-                                 CommandParameter="{x:Static local:AppInfo.WebsiteUrl}">
-                    <TextBlock Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
-                </HyperlinkButton>
-                <HyperlinkButton Cursor="Hand"
-                                 HorizontalAlignment="Left"
-                                 Classes="donate shake"
-                                 Command="{Binding OpenLinkCommand}"
-                                 CommandParameter="https://buymeacoffee.com/tkefauver">
-                    <HyperlinkButton.RenderTransform>
-                        <RotateTransform />
-                    </HyperlinkButton.RenderTransform>
-                    <TextBlock Text="Donate Here!" />
-                </HyperlinkButton>
-            </StackPanel>
+                <Button x:Name="CloseButton"
+                        IsVisible="True"
+                        RenderTransform="translate(20px,-20px)"
+                        Classes="float"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Click="Button_OnClick">
+                    <avalonia:MaterialIcon Kind="Close" />
+                </Button>
+            </Grid>
         </Border>
     </controls:ColorZone>
 </UserControl>

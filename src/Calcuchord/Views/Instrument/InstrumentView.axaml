@@ -117,6 +117,7 @@
         </Style>
 
     </UserControl.Styles>
+    <!-- NOTE top row 25 needs to match fretboard height exp -->
     <Grid RowDefinitions="Auto,*">
         <TransitioningContentControl x:Name="InstrumentContentControl"
                                      Grid.Row="1"

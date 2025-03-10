@@ -43,9 +43,10 @@
 
     </UserControl.Resources>
     <UserControl.Styles>
+
         <Style Selector="local|KeyView">
             <Setter Property="BorderThickness"
-                    Value="2" />
+                    Value="3" />
             <Setter Property="BorderBrush"
                     Value="{DynamicResource PianoWhiteKeyFg}" />
             <Setter Property="Background"
@@ -53,13 +54,21 @@
         </Style>
 
         <Style Selector="local|KeyView.altered">
-            <Setter Property="BorderThickness"
-                    Value="1" />
             <Setter Property="BorderBrush"
                     Value="{DynamicResource PianoBlackKeyFg}" />
             <Setter Property="Background"
                     Value="{StaticResource BlackKeyBgBrush}" />
         </Style>
+
+        <!-- <Style Selector="Border#KeyMarker"> -->
+        <!--     <Setter Property="BorderBrush" -->
+        <!--             Value="{DynamicResource PianoWhiteKeyFg}" /> -->
+        <!-- </Style> -->
+        <!-- -->
+        <!-- <Style Selector="local|KeyView.altered Border#KeyMarker"> -->
+        <!--     <Setter Property="BorderBrush" -->
+        <!--             Value="{DynamicResource PianoBlackKeyFg}" /> -->
+        <!-- </Style> -->
 
         <Style Selector="Border#KeyMarkerInnerContainer">
             <Setter Property="Width"
@@ -108,7 +117,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="local:NoteViewModel">
-                        <local:KeyView Classes="note-btn input"
+                        <local:KeyView Classes="note-btn input note-marker"
                                        Classes.altered="{Binding IsAltered}"
                                        Classes.selected="{Binding IsSelected}"
                                        Classes.desired-root="{Binding IsSelectedKey}"

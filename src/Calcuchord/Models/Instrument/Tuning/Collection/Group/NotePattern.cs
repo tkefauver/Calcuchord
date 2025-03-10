@@ -95,6 +95,10 @@ namespace Calcuchord {
             }
         }
 
+        public string GetSignature() {
+            return string.Join(" ",Notes.OrderBy(x => x.RowNum).Select(x => x.ColNum.ToString()));
+        }
+
         public override string ToString() {
             return FullName;
         }
