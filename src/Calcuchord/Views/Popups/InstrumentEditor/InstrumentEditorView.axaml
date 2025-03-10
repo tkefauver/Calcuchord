@@ -57,7 +57,7 @@
 
                 <controls:ColorZone x:Name="PopupZone"
                                     MinWidth="300"
-                                    Height="500"
+                                    MaxHeight="500"
                                     Classes="popup-cntr">
                     <Grid>
                         <DockPanel x:Name="InstDockPanel">

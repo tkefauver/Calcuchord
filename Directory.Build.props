@@ -10,7 +10,8 @@
         <!--        <BuildOs>BROWSER</BuildOs>-->
         <!--        <BuildOs>IOS</BuildOs>-->
         <!--        <BuildOs>MAC</BuildOs>-->
-        <BuildOs>IOS</BuildOs>
+        <!--        <BuildOs>IOS</BuildOs>-->
+        <BuildOs>ANDROID</BuildOs>
         <UseSugarWv>true</UseSugarWv>
     </PropertyGroup>
 

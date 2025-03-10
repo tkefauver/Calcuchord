@@ -93,6 +93,15 @@ namespace Calcuchord {
 
         #region Public Methods
 
+        public void Disable() {
+            IsEnabled = false;
+            //IsChecked = false;
+        }
+
+        public void Enable() {
+            IsEnabled = true;
+        }
+
         public override string ToString() {
             return Label;
         }

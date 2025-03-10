@@ -465,6 +465,7 @@ namespace Calcuchord {
                 if(args is not Tuning new_tuning) {
                     Instrument temp_inst = Instrument.CreateByType(InstrumentType);
                     new_tuning = temp_inst.Tunings.First();
+                    new_tuning.IsSelected = false;
                     new_tuning.Name = GetUniqueTuningName(
                         new_tuning.Name,
                         []);
@@ -473,12 +474,12 @@ namespace Calcuchord {
                 new_tuning.SetParent(Instrument);
                 Instrument.Tunings.Add(new_tuning);
 
-                TuningViewModel tvm = await CreateTuningViewModelAsync(new_tuning);
-                Tunings.Add(tvm);
+                TuningViewModel new_tvm = await CreateTuningViewModelAsync(new_tuning);
+                Tunings.Add(new_tvm);
 
-                SelectedTuning = Tunings.Last();
+                //SelectedTuning = Tunings.Last();
                 if(IsEditModeEnabled) {
-                    SelectedTuning.IsExpanded = true;
+                    new_tvm.IsExpanded = true;
                 }
             });
 

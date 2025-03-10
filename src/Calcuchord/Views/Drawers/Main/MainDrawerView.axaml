@@ -192,6 +192,7 @@
             <DockPanel LastChildFill="False">
                 <Button DockPanel.Dock="Left"
                         Classes="float"
+                        CommandParameter="dum"
                         Command="{Binding ShowAboutCommand}">
 
                     <avalonia:MaterialIcon Kind="About" />
