@@ -1,5 +1,6 @@
 function isMobile() {
-    return !window.matchMedia('(hover: hover)').matches;
+    //return !window.matchMedia('(hover: hover)').matches;
+    return Math.min(window.screen.width, window.screen.height) < 768 || navigator.userAgent.indexOf("Mobi") > -1;
 }
 
 function isTablet() {
