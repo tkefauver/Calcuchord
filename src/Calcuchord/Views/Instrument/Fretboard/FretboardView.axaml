@@ -56,58 +56,57 @@
                       Classes.drawer-test="false"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Hidden">
-            <!-- <Viewbox Stretch="UniformToFill" -->
-            <!--          MinHeight="{local:MathBinding a={Binding $parent[local:FretboardView].Bounds.Width}, b={Binding Bounds.Width, ElementName=FretboardContainerGrid}, c={Binding Bounds.Height, ElementName=FretboardContainerGrid}, exp=50+a*(c/(b+0.001))}" -->
-            <!--          MinWidth="{local:MathBinding a={Binding $parent[local:FretboardView].Bounds.Width}, b={Binding Bounds.Width, ElementName=FretboardContainerGrid}, exp='30+(a*MIN((a/(b+0.001)),(b/(a+0.001))))'}"> -->
-            <Grid x:Name="FretboardContainerGrid"
-                  Margin="0,0,10,0">
-                <Image x:Name="FretboardBgImage"
-                       Classes.fretless="{Binding Parent.IsFretless}"
-                       Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Top"
-                       Stretch="UniformToFill" />
+            <Viewbox Stretch="UniformToFill"
+                     MinHeight="{local:MathBinding a={Binding $parent[local:FretboardView].Bounds.Width}, b={Binding Bounds.Width, ElementName=FretboardContainerGrid}, c={Binding Bounds.Height, ElementName=FretboardContainerGrid}, exp=25+a*(c/(b+0.001))}"
+                     MinWidth="{Binding $parent[local:FretboardView].Bounds.Width}">
+                <Grid x:Name="FretboardContainerGrid">
+                    <Image x:Name="FretboardBgImage"
+                           Classes.fretless="{Binding Parent.IsFretless}"
+                           Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top"
+                           Stretch="UniformToFill" />
 
-                <ItemsControl x:Name="StringsItemsControl"
-                              ItemsSource="{Binding SortedRows}"
-                              Margin="0,0,0,20">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Vertical" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="local:NoteRowViewModel">
-                            <ItemsControl x:Name="FretsItemsControl"
-                                          ItemsSource="{Binding Notes}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="local:NoteViewModel">
-                                        <local:FretView Classes="note-btn"
-                                                        Classes.input="{Binding IsEnabled}"
-                                                        Classes.muted="{Binding IsRowMuted}"
-                                                        Classes.nut="{Binding IsNutFret}"
-                                                        Classes.str-label="{Binding IsRowKeyLabel}"
-                                                        Classes.num-label="{Binding IsNoteNumLabel}"
-                                                        Classes.selected="{Binding IsSelected}"
-                                                        Classes.hover="{Binding IsHovering}"
-                                                        Background="{DynamicResource HttTransparent}"
-                                                        Loaded="FretView_Loaded"
-                                                        Unloaded="FretView_Unloaded" />
+                    <ItemsControl x:Name="StringsItemsControl"
+                                  ItemsSource="{Binding SortedRows}"
+                                  Margin="0,0,0,20">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="local:NoteRowViewModel">
+                                <ItemsControl x:Name="FretsItemsControl"
+                                              ItemsSource="{Binding Notes}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="local:NoteViewModel">
+                                            <local:FretView Classes="note-btn"
+                                                            Classes.input="{Binding IsEnabled}"
+                                                            Classes.muted="{Binding IsRowMuted}"
+                                                            Classes.nut="{Binding IsNutFret}"
+                                                            Classes.str-label="{Binding IsRowKeyLabel}"
+                                                            Classes.num-label="{Binding IsNoteNumLabel}"
+                                                            Classes.selected="{Binding IsSelected}"
+                                                            Classes.hover="{Binding IsHovering}"
+                                                            Background="{DynamicResource HttTransparent}"
+                                                            Loaded="FretView_Loaded"
+                                                            Unloaded="FretView_Unloaded" />
 
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-            </Grid>
-            <!-- </Viewbox> -->
+                </Grid>
+            </Viewbox>
         </ScrollViewer>
     </Grid>
 </UserControl>

@@ -46,42 +46,14 @@ namespace Calcuchord {
                 return;
             }
 
-            DockPanel ref_c = MainView.Instance.MainPanel;
             ItemsControl cntr = StringsItemsControl;
-            // guitar
-            // tw 1600
-            // th 188
-
-            double label_width = 30;
+// guitar
+// tw 1600
+// th 188
             double def_fret_w = 69d;
             double def_fret_h = 31d;
-            double pad = 20;
-            double toolbar_row_h = 30;
-
-            double tox = 0;
-            double tw = tvm.TotalFretCount * def_fret_w;
-            double th = tvm.Parent.RowCount * def_fret_h;
-            double ar = th / tw;
-            if(tw < ref_c.Bounds.Width - pad) {
-                tw = ref_c.Bounds.Width - pad;
-                th = tw * ar;
-            }
-
-            if(!ThemeViewModel.Instance.IsLandscape &&
-               MainView.Instance.InstrumentView.MaxHeight.IsNumber() &&
-               th > MainView.Instance.InstrumentView.MaxHeight - toolbar_row_h) {
-                double nth = MainView.Instance.InstrumentView.MaxHeight - pad - toolbar_row_h;
-                tw *= nth / th;
-                th = nth;
-                tox = (ref_c.Bounds.Width - tw) / 2d;
-            } else if(ThemeViewModel.Instance.IsLandscape &&
-                      MainView.Instance.InstrumentView.MaxWidth.IsNumber() &&
-                      tw > MainView.Instance.InstrumentView.MaxWidth) {
-                double ntw = MainView.Instance.InstrumentView.MaxWidth - pad;
-                th *= ntw / tw;
-                tw = ntw;
-                tox = (ref_c.Bounds.Width - tw) / 2d;
-            }
+            double tw = tvm.TotalFretCount * def_fret_w; //Math.Max(1000,tvm.TotalFretCount * (1600 / 23d));
+            double th = tvm.Parent.RowCount * def_fret_h; //tw * (0.117521368 * 1);//(tvm.Parent.RowCount / 6d));
 
             var fvl = StringsItemsControl.GetVisualDescendants<FretView>();
             if(!fvl.Any()) {
@@ -89,7 +61,6 @@ namespace Calcuchord {
             }
 
             double GetDistToNut(int fretNum) {
-                // from https://www.liutaiomottola.com/formulae/fret.htm
                 double d = tw - (tw / Math.Pow(2,fretNum / 12d));
                 return d;
             }
@@ -102,17 +73,7 @@ namespace Calcuchord {
                 ll = l;
             }
 
-            double frets_width = fret_widths.Sum();
-            if(frets_width < tw) {
-                double fret_pad = (tw - frets_width) / fret_widths.Length;
-                for(int i = 0; i < fret_widths.Length; i++) {
-                    fret_widths[i] += fret_pad;
-                }
-
-                frets_width = fret_widths.Sum();
-            }
-
-
+            double label_width = 30; //Math.Max(30,fret_widths.Max() * 0.25);
             double str_h = th / tvm.Parent.VisualRowCount;
             double dot_d = Math.Min((tvm.Parent.RowCount * 3) + 2,fret_widths.Min());
             double nut_width = Math.Min(str_h,dot_d);
@@ -143,19 +104,12 @@ namespace Calcuchord {
 
                     }
                 });
+            double frets_width = fret_widths.Sum();
 
             cntr.Width = frets_width + nut_width + label_width;
             cntr.Height = th;
 
             double lt = label_width + nut_width;
-
-            if(tox > 0) {
-                // needs to be centered...
-                lt -= nut_width;
-                lt += tox;
-                lt -= toolbar_row_h;
-            }
-
             double tt = str_h;
             FretboardBgImage.Width = frets_width;
             FretboardBgImage.Height = th - str_h - 1;
