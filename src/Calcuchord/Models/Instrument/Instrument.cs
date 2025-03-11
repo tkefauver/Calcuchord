@@ -22,7 +22,7 @@ namespace Calcuchord {
             bool readOnlyTuning = false,
             string name = null,
             int capoNum = 0,
-            double? neckLen = null,
+            double? scale_len = null,
             string id = null,
             bool chordsFromFile = false,
             bool isInstrumentSelected = false,
@@ -33,41 +33,51 @@ namespace Calcuchord {
                 default:
                 case InstrumentType.Guitar:
                     tuning_str = "E2 A2 D3 G3 B3 E4";
+                    scale_len = 25.5;
                     break;
                 case InstrumentType.Mandolin:
                     tuning_str = "G3 D4 A4 E5";
+                    scale_len = 13.875;
                     break;
                 case InstrumentType.Ukulele:
                     tuning_str = "G4 C4 E4 A4";
                     fret_count = 15;
+                    scale_len = 15;
                     break;
                 case InstrumentType.Banjo:
                     //tuning_str = "G3 D2 G2 B2 D3";
                     tuning_str = "D2 G2 B2 D3";
                     fret_count = 22;
+                    scale_len = 26.5;
                     break;
                 case InstrumentType.Bass:
                     tuning_str = "E1 A1 D2 G2";
+                    scale_len = 34;
                     break;
                 case InstrumentType.Balalaika:
                     tuning_str = "E4 E4 A4";
                     fret_count = 16;
+                    scale_len = 17;
                     break;
                 case InstrumentType.Lute:
                     tuning_str = "G2 C3 F3 A3 D4 G4";
                     fret_count = 26;
+                    scale_len = 21;
                     break;
                 case InstrumentType.Violin:
                     tuning_str = "G3 D4 A4 E5";
                     fret_count = 29;
+                    scale_len = 14;
                     break;
                 case InstrumentType.Viola:
                     tuning_str = "C3 G3 D4 A4";
                     fret_count = 29;
+                    scale_len = 17;
                     break;
                 case InstrumentType.Cello:
                     tuning_str = "C2 G2 D3 A3";
                     fret_count = 29;
+                    scale_len = 27.4;
                     break;
                 case InstrumentType.Piano:
                     tuning_str = "C3";
@@ -86,7 +96,7 @@ namespace Calcuchord {
                 it,
                 fret_count,
                 open_notes.Length,
-                neckLen);
+                scale_len);
             inst.IsSelected = isInstrumentSelected;
 
             Tuning tuning = new Tuning(

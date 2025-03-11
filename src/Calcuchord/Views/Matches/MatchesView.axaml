@@ -31,19 +31,19 @@
                     Value="Center" />
         </Style>
 
-        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl">
-            <Setter Property="Content">
-                <Setter.Value>
-                    <Template>
-                        <TextBlock Classes="empty-label">
-                            <TextBlock.Inlines>
-                                <Run Text="" />
-                            </TextBlock.Inlines>
-                        </TextBlock>
-                    </Template>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <!-- <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl"> -->
+        <!--     <Setter Property="Content"> -->
+        <!--         <Setter.Value> -->
+        <!--             <Template> -->
+        <!--                 <TextBlock Classes="empty-label"> -->
+        <!--                     <TextBlock.Inlines> -->
+        <!--                         <Run Text="" /> -->
+        <!--                     </TextBlock.Inlines> -->
+        <!--                 </TextBlock> -->
+        <!--             </Template> -->
+        <!--         </Setter.Value> -->
+        <!--     </Setter> -->
+        <!-- </Style> -->
 
         <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.init">
             <Setter Property="Content">
@@ -59,7 +59,8 @@
             </Setter>
         </Style>
 
-        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.empty-inst:not(.init)">
+        <Style
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.no-tuning-sel.no-inst-sel.empty-inst:not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -75,7 +76,8 @@
             </Setter>
         </Style>
 
-        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.no-inst-sel:not(.init)">
+        <Style
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.no-sel.no-tuning-sel.no-inst-sel:not(.empty-inst)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -90,7 +92,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.no-tuning-sel:not(.init)">
+        <Style
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.no-tuning-sel:not(.no-inst-sel):not(.empty-tuning)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -107,14 +110,15 @@
         </Style>
 
         <Style
-            Selector="TransitioningContentControl#EmptyTextCntrContentControl.empty-tuning:not(.empty-inst):not(.init)">
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.no-tuning-sel.empty-tuning:not(.empty-inst)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
                         <TextBlock Classes="empty-label">
                             <TextBlock.Inlines>
                                 <Run Text="{Binding SelectedInstrument.Title}"
-                                     Classes="article" />
+                                     FontStyle="Oblique"
+                                     Classes="article2" />
                                 <Run Text="needs a" />
                                 <Run Text="tuning."
                                      Classes="subject2" />
@@ -125,23 +129,9 @@
             </Setter>
         </Style>
 
-        <Style
-            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode:not(.no-sel):not(.empty-tuning):not(.empty-inst):not(.init)">
-            <Setter Property="Content">
-                <Setter.Value>
-                    <Template>
-                        <TextBlock Classes="empty-label">
-                            <TextBlock.Inlines>
-                                <Run Text="No results." />
-                            </TextBlock.Inlines>
-                        </TextBlock>
-                    </Template>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
         <Style
-            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode.no-sel:not(.empty-tuning):not(.empty-inst):not(.init)">
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode.no-sel:not(.no-inst-sel):not(.empty-tuning):not(.empty-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -158,7 +148,7 @@
         </Style>
 
         <Style
-            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode.no-sel.piano:not(.empty-tuning):not(.empty-inst):not(.init)">
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.search-mode.no-sel.piano:not(.empty-tuning):not(.no-inst-sel):not(.empty-inst):not(.init)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -174,7 +164,8 @@
             </Setter>
         </Style>
 
-        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.bookmark-mode:not(.init)">
+        <Style
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.bookmark-mode:not(.init):not(.no-tuning-sel)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -193,7 +184,8 @@
             </Setter>
         </Style>
 
-        <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.index-mode:not(.init)">
+        <Style
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.index-mode:not(.init):not(.no-tuning-sel)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>

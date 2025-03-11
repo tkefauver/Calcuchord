@@ -47,7 +47,7 @@ namespace Calcuchord {
         public bool IsLandscape {
             get {
 
-                if(!IsPhone ||
+                if((!IsPhone && !IsForcedOrientation) ||
                    MainView.Instance is not { } mv ||
                    TopLevel.GetTopLevel(mv) is not { } tl) {
                     return false;
@@ -164,7 +164,7 @@ namespace Calcuchord {
                         },
                         {
                             PaletteColorType.NutBg,
-                            ("#FFDEAD","#FFDEAD")
+                            ("#DEB887","#DEB887")
                         },
                         {
                             PaletteColorType.NutFg,
@@ -349,7 +349,7 @@ namespace Calcuchord {
                     return;
                 }
 
-                IsForcedOrientation = true;
+                IsForcedOrientation = !IsForcedOrientation;
 
                 bool was_landscape = IsLandscape;
 
