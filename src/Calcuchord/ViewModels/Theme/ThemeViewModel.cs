@@ -164,7 +164,7 @@ namespace Calcuchord {
                         },
                         {
                             PaletteColorType.NutBg,
-                            ("#FFDEAD","#FFDEAD")
+                            ("#DEB887","#DEB887")
                         },
                         {
                             PaletteColorType.NutFg,

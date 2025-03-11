@@ -18,6 +18,19 @@
                     Source="/Assets/Images/stringchunk_10x6.png"
                     DestinationRect="0 0 3 3"
                     TileMode="Tile" />
+        <!-- NUT -->
+        <LinearGradientBrush x:Key="NutBrush"
+                             StartPoint="0%,0%"
+                             EndPoint="50%,0%"
+                             SpreadMethod="Reflect">
+            <GradientStops>
+                <GradientStop Color="BurlyWood"
+                              Offset="0" />
+                <GradientStop Color="NavajoWhite"
+                              Offset="0.77" />
+            </GradientStops>
+        </LinearGradientBrush>
+
         <!-- STEEL -->
         <LinearGradientBrush x:Key="SteelBrush"
                              StartPoint="0%,0%"
@@ -214,6 +227,51 @@
                     Value="0.5" />
         </Style>
 
+        <!-- INST EDGES -->
+        <Style Selector="Border#Edge">
+            <Setter Property="IsVisible"
+                    Value="False" />
+        </Style>
+        <Style Selector="Border#Edge:not(.nut).real.top">
+            <Setter Property="IsVisible"
+                    Value="True" />
+            <Setter Property="BorderThickness"
+                    Value="0,2,0,0" />
+        </Style>
+        <Style Selector="Border#Edge:not(.nut).real.bottom">
+            <Setter Property="IsVisible"
+                    Value="True" />
+            <Setter Property="BorderThickness"
+                    Value="0,0,0,2" />
+        </Style>
+        <Style Selector="Border#Edge:not(.nut).real.right">
+            <Setter Property="IsVisible"
+                    Value="True" />
+            <Setter Property="BorderThickness"
+                    Value="0,0,2,0" />
+        </Style>
+        <Style Selector="Border#Edge:not(.nut).real.right.top">
+            <Setter Property="IsVisible"
+                    Value="True" />
+            <Setter Property="BorderThickness"
+                    Value="0,2,2,0" />
+        </Style>
+        <Style Selector="Border#Edge:not(.nut).real.right.bottom">
+            <Setter Property="IsVisible"
+                    Value="True" />
+            <Setter Property="BorderThickness"
+                    Value="0,0,2,2" />
+        </Style>
+
+        <Style Selector="Border#Nut.top">
+            <Setter Property="CornerRadius"
+                    Value="7,1,0,0" />
+        </Style>
+        <Style Selector="Border#Nut.bottom">
+            <Setter Property="CornerRadius"
+                    Value="0,0,1,7" />
+        </Style>
+
 
     </UserControl.Styles>
     <Grid Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
@@ -299,6 +357,7 @@
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="IsRealNote" />
                     <Binding Path="!IsFirstFret" />
+                    <Binding Path="!IsNutFret" />
                 </MultiBinding>
             </Border.IsVisible>
         </Border>
@@ -313,53 +372,22 @@
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Path="IsRealNote" />
                     <Binding Path="!IsLastFret" />
+                    <Binding Path="!IsNutFret" />
                 </MultiBinding>
             </Border.IsVisible>
         </Border>
 
-        <!-- EDGE (TOP) -->
-        <Border x:Name="TopEdge"
-                Background="{DynamicResource NutBg}"
+
+        <!-- EDGE -->
+        <Border x:Name="Edge"
+                Classes.real="{Binding IsRealNote}"
+                Classes.bottom="{Binding IsBottomFret}"
+                Classes.right="{Binding IsLastFret}"
+                Classes.top="{Binding IsTopFret}"
+                Classes.nut="{Binding IsNutFret}"
+                BorderBrush="{DynamicResource NutBg}"
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Top"
-                Height="2">
-            <Border.IsVisible>
-                <MultiBinding Converter="{x:Static BoolConverters.And}">
-                    <Binding Path="IsRealNote" />
-                    <Binding Path="IsTopFret" />
-                </MultiBinding>
-            </Border.IsVisible>
-        </Border>
-
-        <!-- EDGE (BOTTOM) -->
-        <Border x:Name="BottomEdge"
-                Background="{DynamicResource NutBg}"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Bottom"
-                Margin="0,0,0,2"
-                Height="2">
-            <Border.IsVisible>
-                <MultiBinding Converter="{x:Static BoolConverters.And}">
-                    <Binding Path="IsRealNote" />
-                    <Binding Path="IsBottomFret" />
-                </MultiBinding>
-            </Border.IsVisible>
-        </Border>
-
-        <!-- EDGE (RIGHT) -->
-        <Border x:Name="RightEdge"
-                Background="{DynamicResource NutBg}"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Stretch"
-                Margin="0,0,2,0"
-                Width="2">
-            <Border.IsVisible>
-                <MultiBinding Converter="{x:Static BoolConverters.And}">
-                    <Binding Path="IsRealNote" />
-                    <Binding Path="IsLastFret" />
-                </MultiBinding>
-            </Border.IsVisible>
-        </Border>
+                VerticalAlignment="Stretch" />
 
         <!-- CAPO -->
 
@@ -374,9 +402,10 @@
         <!-- NUT -->
 
         <Border x:Name="Nut"
-                Margin="0,-2"
                 IsVisible="{Binding IsNutFret}"
-                Background="{DynamicResource NutBg}"
+                Classes.top="{Binding IsTopFret}"
+                Classes.bottom="{Binding IsBottomFret}"
+                Background="{StaticResource NutBrush}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch" />
 

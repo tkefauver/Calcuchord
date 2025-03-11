@@ -48,10 +48,10 @@
             <Setter Property="Grid.Column"
                     Value="0" />
 
-            <Setter Property="MaxWidth"
-                    Value="{x:Static sys:Double.PositiveInfinity}" />
-            <Setter Property="MaxHeight"
-                    Value="{local:MathBinding a={Binding $parent[DockPanel].Bounds.Height}, exp=a*0.35}" />
+            <Setter Property="Width"
+                    Value="{x:Static sys:Double.NaN}" />
+            <Setter Property="Height"
+                    Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Height}, exp=a*0.35}" />
         </Style>
 
         <Style Selector="Grid#MainContainerGrid local|MatchesView">
@@ -79,10 +79,10 @@
             <Setter Property="Grid.Column"
                     Value="0" />
 
-            <Setter Property="MaxWidth"
-                    Value="{local:MathBinding a={Binding $parent[DockPanel].Bounds.Width}, exp=a*0.5}" />
-            <Setter Property="MaxHeight"
-                    Value="{x:Static sys:Double.PositiveInfinity}" />
+            <Setter Property="Width"
+                    Value="{local:MathBinding a={Binding $parent[Grid].Bounds.Width}, exp=a*0.5}" />
+            <Setter Property="Height"
+                    Value="{x:Static sys:Double.NaN}" />
         </Style>
 
         <Style Selector="Grid#MainContainerGrid.landscape local|MatchesView">
@@ -119,7 +119,8 @@
                     <controls:NavigationDrawer.RightDrawerContent>
                         <!-- <local:OptionsDrawerView x:Name="RightDrawerView" /> -->
                     </controls:NavigationDrawer.RightDrawerContent>
-                    <DockPanel x:Name="MainPanel" LastChildFill="true">
+                    <DockPanel x:Name="MainPanel"
+                               LastChildFill="true">
                         <!-- HEADER MENU -->
                         <local:MainHeaderView x:Name="HeaderView"
                                               IsEnabled="{Binding !IsOpen, ElementName=DlgHost}"

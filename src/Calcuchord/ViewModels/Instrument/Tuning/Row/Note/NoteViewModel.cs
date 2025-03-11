@@ -220,13 +220,13 @@ namespace Calcuchord {
                         break;
                     case 6:
                         single_top_str_num = 2;
-                        dbl_top_str_num1 = 1;
-                        dbl_top_str_num2 = 3;
+                        dbl_top_str_num1 = 0;
+                        dbl_top_str_num2 = 4;
                         break;
                     case 7:
                         single_top_str_num = 3;
-                        dbl_top_str_num1 = 1;
-                        dbl_top_str_num2 = 4;
+                        dbl_top_str_num1 = 0;
+                        dbl_top_str_num2 = 5;
                         break;
                 }
 
@@ -264,13 +264,13 @@ namespace Calcuchord {
                         break;
                     case 6:
                         single_bottom_str_num = 3;
-                        dbl_bottom_str_num1 = 2;
-                        dbl_bottom_str_num2 = 4;
+                        dbl_bottom_str_num1 = 1;
+                        dbl_bottom_str_num2 = 5;
                         break;
                     case 7:
                         single_bottom_str_num = 3;
-                        dbl_bottom_str_num1 = 2;
-                        dbl_bottom_str_num2 = 5;
+                        dbl_bottom_str_num1 = 1;
+                        dbl_bottom_str_num2 = 6;
                         break;
                 }
 

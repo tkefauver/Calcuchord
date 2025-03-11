@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
@@ -46,14 +47,21 @@ namespace Calcuchord {
                 return;
             }
 
+            FretboardView outer_cntr = this;
+
             ItemsControl cntr = StringsItemsControl;
-// guitar
-// tw 1600
-// th 188
+            // guitar
+            // tw 1600
+            // th 188
+
+            double scale_len = tvm.Tuning.Parent.NeckLengthInInches ?? 25.5;
+
             double def_fret_w = 69d;
-            double def_fret_h = 31d;
+            double str_h = 27d; //th / tvm.Parent.VisualRowCount;
+            double label_width = 30; //Math.Max(30,fret_widths.Max() * 0.25);
+            double nut_width = 20; //Math.Min(str_h,dot_d);
             double tw = tvm.TotalFretCount * def_fret_w; //Math.Max(1000,tvm.TotalFretCount * (1600 / 23d));
-            double th = tvm.Parent.RowCount * def_fret_h; //tw * (0.117521368 * 1);//(tvm.Parent.RowCount / 6d));
+            double th = tvm.Parent.RowCount * str_h; //tw * (0.117521368 * 1);//(tvm.Parent.RowCount / 6d));
 
             var fvl = StringsItemsControl.GetVisualDescendants<FretView>();
             if(!fvl.Any()) {
@@ -65,18 +73,23 @@ namespace Calcuchord {
                 return d;
             }
 
-            double[] fret_widths = new double[tvm.TotalFretCount];
-            double ll = 0;
-            for(int i = 1; i <= fret_widths.Length; i++) {
-                double l = GetDistToNut(i);
-                fret_widths[i - 1] = l - ll;
-                ll = l;
+            // +2 for label and nut
+            double[] fret_widths = new double[tvm.TotalFretCount + 2];
+            double last_len_to_nut = 0;
+            for(int i = 0; i < fret_widths.Length; i++) {
+                if(i == 0) {
+                    fret_widths[i] = label_width;
+                } else if(i == 1) {
+                    fret_widths[i] = nut_width;
+                } else {
+                    double l = GetDistToNut(i - 1);
+                    fret_widths[i] = l - last_len_to_nut;
+                    last_len_to_nut = l;
+                }
             }
 
-            double label_width = 30; //Math.Max(30,fret_widths.Max() * 0.25);
-            double str_h = th / tvm.Parent.VisualRowCount;
-            double dot_d = Math.Min((tvm.Parent.RowCount * 3) + 2,fret_widths.Min());
-            double nut_width = Math.Min(str_h,dot_d);
+            double min_fret_w = fret_widths.Skip(2).Min();
+            double dot_d = min_fret_w / 2d;
 
             fvl.ForEach(
                 fv => {
@@ -84,15 +97,17 @@ namespace Calcuchord {
                         return;
                     }
 
-                    int fn = fv.BindingContext.NoteNum;
-                    cp.Width =
-                        fn < 0 ?
-                            label_width :
-                            fn == 0 ?
-                                nut_width :
-                                fn <= fret_widths.Length ?
-                                    fret_widths[fn - 1] :
-                                    0;
+                    // int fn = fv.BindingContext.NoteNum;
+                    // cp.Width =
+                    //     fn < 0 ?
+                    //         label_width :
+                    //         fn == 0 ?
+                    //             nut_width :
+                    //             fn <= fret_widths.Length ?
+                    //                 fret_widths[fn - 1] :
+                    //                 0;
+
+                    cp.Width = fret_widths[fv.BindingContext.NoteNum + 1];
                     cp.Height = str_h;
                     if(fv.GetVisualDescendants<Ellipse>().Where(x => x.IsVisible && x.Classes.Contains("dot")) is
                        { } dots) {
@@ -104,16 +119,35 @@ namespace Calcuchord {
 
                     }
                 });
-            double frets_width = fret_widths.Sum();
 
-            cntr.Width = frets_width + nut_width + label_width;
-            cntr.Height = th;
+            cntr.Width = fret_widths.Sum(); // + nut_width + label_width;
+            cntr.Height = th + str_h;
+            double inner_ar = 6.7; //cntr.Width / cntr.Height;
+            if(TopLevel.GetTopLevel(this) is Window w &&
+               w.WindowState == WindowState.Maximized) {
+                FretboardViewbox.HorizontalAlignment = HorizontalAlignment.Center;
+            } else {
+                FretboardViewbox.HorizontalAlignment = HorizontalAlignment.Left;
+            }
 
-            double lt = label_width + nut_width;
-            double tt = str_h;
-            FretboardBgImage.Width = frets_width;
-            FretboardBgImage.Height = th - str_h - 1;
-            FretboardBgImage.Margin = new(lt,tt + 1,0,0);
+            double outer_w = outer_cntr.Bounds.Width;
+            double outer_h = outer_cntr.Bounds.Height;
+            double pad_h = FretboardScrollViewer.Padding.Top + FretboardScrollViewer.Padding.Bottom;
+
+            if(cntr.Width > outer_w) {
+                FretboardViewbox.Width = outer_h * inner_ar;
+                FretboardViewbox.Height = FretboardViewbox.Width / inner_ar;
+            } else {
+                FretboardViewbox.Width = outer_w;
+                FretboardViewbox.Height = FretboardViewbox.Width / inner_ar;
+            }
+
+            if(FretboardViewbox.Height > outer_h - pad_h) {
+                FretboardViewbox.Height = outer_h - pad_h;
+                FretboardViewbox.Width = FretboardViewbox.Height * inner_ar;
+            }
+
+
         }
 
         void FretView_Loaded(object sender,RoutedEventArgs e) {
