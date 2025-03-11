@@ -1463,6 +1463,7 @@ namespace Calcuchord {
                 SelectedInstrument.RaisePropertyChanged(nameof(SelectedInstrument.SelectedTuning));
                 OnPropertyChanged(nameof(SelectedTuning));
                 InitInstrumentAsync(InstrumentInitSource.EditorDone).FireAndForgetSafeAsync();
+                ForwardCommand.Execute(null);
             });
 
         public MpIAsyncCommand<object> BeginEditInstrumentCommand => new MpAsyncCommand<object>(
