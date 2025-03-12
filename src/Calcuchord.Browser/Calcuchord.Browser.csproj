@@ -12,6 +12,15 @@
         <RunAOTCompilation>true</RunAOTCompilation>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
+        <TrimMode>link</TrimMode>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+        <TrimmerRootDescriptor Include="../Calcuchord/TrimmerRoots.xml"/>
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser"/>
         <PackageReference Include="PublishSPAforGitHubPages.Build"/>

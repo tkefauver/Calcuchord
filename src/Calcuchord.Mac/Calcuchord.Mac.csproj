@@ -12,24 +12,34 @@
         <ApplicationId>com.thomaskefauver.calcuchord</ApplicationId>
         <ApplicationTitle>Calcuchord</ApplicationTitle>
     </PropertyGroup>
-    
+
     <PropertyGroup>
-        <UseAppHost>true</UseAppHost>        
-<!--        <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>-->
+        <UseAppHost>true</UseAppHost>
+        <!--        <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>-->
     </PropertyGroup>
-    
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <PublishAot>true</PublishAot>
+        <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
+        <TrimMode>link</TrimMode>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+        <TrimmerRootDescriptor Include="../Calcuchord/TrimmerRoots.xml"/>
+    </ItemGroup>
+
     <ItemGroup>
-        <PackageReference Include="Avalonia.Desktop" />
+        <PackageReference Include="Avalonia.Desktop"/>
         <PackageReference Include="Avalonia.Diagnostics">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Avalonia.ReactiveUI" />
+        <PackageReference Include="Avalonia.ReactiveUI"/>
     </ItemGroup>
 
 
     <ItemGroup>
-        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj" />
+        <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -37,5 +47,5 @@
             <HintPath>..\..\..\..\..\..\usr\local\share\dotnet\packs\Microsoft.macOS.Ref.net9.0_15.2\15.2.9180\ref\net9.0\Microsoft.macOS.dll</HintPath>
         </Reference>
     </ItemGroup>
-    
+
 </Project>
