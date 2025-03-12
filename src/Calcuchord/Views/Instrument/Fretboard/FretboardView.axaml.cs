@@ -111,7 +111,7 @@ namespace Calcuchord {
 
             cntr.Width = fret_widths.Sum();
             cntr.Height = th + str_h;
-            double inner_ar = cntr.Width / cntr.Height;
+            double inner_ar = Math.Min(6.44,cntr.Width / cntr.Height);
             if(ThemeViewModel.Instance.IsExpandedLayout) {
                 FretboardViewbox.HorizontalAlignment = HorizontalAlignment.Center;
                 FretboardViewbox.Stretch = Stretch.UniformToFill;

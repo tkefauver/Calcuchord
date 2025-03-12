@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -218,14 +217,7 @@ namespace Calcuchord {
 
         #region Appearance
 
-        public string SelectedKeyDisplayName =>
-            SelectedKey.HasValue ? SelectedKey.Value.ToDisplayValue() : string.Empty;
-
-        public string MatchSvgCss =>
-            IsMatchesScrolling ? TextlessMatchSvgCss : TextMatchSvgCss;
-
-        public string TextMatchSvgCss { get; private set; } = string.Empty;
-        public string TextlessMatchSvgCss { get; private set; } = string.Empty;
+        public string MatchSvgCss { get; private set; } = string.Empty;
 
         public string PatternName =>
             SelectedPatternType.ToString();
@@ -246,7 +238,6 @@ namespace Calcuchord {
 
         #region UI
 
-        public bool IsMatchesScrolling { get; set; }
         public DrawerPageType CurrentDrawerPage { get; set; } = DrawerPageType.Main;
 
         public string MainDialogHostName => "MainDialogHost";
@@ -334,12 +325,6 @@ namespace Calcuchord {
         public bool CanFinishEdit =>
             EditModeInstrument != null &&
             EditModeInstrument.Tunings.Any();
-
-        public bool IsInstrumentVisible =>
-            !IsInstrumentChanging &&
-            SelectedTuning != null &&
-            SelectedDisplayMode == DisplayModeType.Search &&
-            EditModeInstrument == null;
 
         bool IsInstrumentChanging { get; set; }
 
@@ -486,10 +471,6 @@ namespace Calcuchord {
 
         void MainViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
-                case nameof(IsMatchesScrolling):
-                    Debug.WriteLine($"scrolling: {IsMatchesScrolling}");
-                    OnPropertyChanged(nameof(MatchSvgCss));
-                    break;
                 case nameof(SelectedKey):
                     if(SelectedTuning is { } st &&
                        st.SelectedNotes is { } sn) {
@@ -507,8 +488,6 @@ namespace Calcuchord {
                     if(EditModeInstrument is { } em_ivm) {
                         em_ivm.RaisePropertyChanged(nameof(em_ivm.IsEditModeEnabled));
                     }
-
-                    OnPropertyChanged(nameof(IsInstrumentVisible));
 
                     break;
                 case nameof(IsDrawerOpen):
@@ -717,8 +696,6 @@ namespace Calcuchord {
             OnPropertyChanged(nameof(SelectedInstrument));
             OnPropertyChanged(nameof(SelectedTuning));
             OnPropertyChanged(nameof(IsDefaultSelection));
-            OnPropertyChanged(nameof(IsInstrumentVisible));
-
             OnPropertyChanged(nameof(PatternSingularName));
 
             OnPropertyChanged(nameof(IsSearchButtonVisible));
@@ -1029,11 +1006,7 @@ namespace Calcuchord {
                 sb.AppendLine(".barre-elm { display:none; }");
             }
 
-            TextMatchSvgCss = sb.ToString();
-            sb.AppendLine("text { display: none; }");
-            TextlessMatchSvgCss = sb.ToString();
-
-            OnPropertyChanged(nameof(MatchSvgCss));
+            MatchSvgCss = sb.ToString();
         }
 
         public void ResetMatchSvg() {
@@ -1254,33 +1227,33 @@ namespace Calcuchord {
 
             UpdateMatchesAsync(MatchUpdateSource.InstrumentInit).FireAndForgetSafeAsync();
 
-            // wait for search to initiate...
-            await Task.Delay(200);
-
-            //  },DispatcherPriority.ApplicationIdle);
-
-
-            while(IsSearchInitiating) {
-                await Task.Delay(100);
-            }
-
-            if(InstrumentView.Instance is { } iv) {
-                if(IsInstrumentChanging) {
-                    IsInstrumentChanging = false;
-                    if(IsSearchModeSelected) {
-                        // wait for inst to unhide...
-                        await Task.Delay(500);
-                        // while(true) {
-                        //     if(iv.IsArrangeValid && iv.IsVisible) {
-                        //         break;
-                        //     }
-                        //     await Task.Delay(100);
-                        // }
-                    }
-                }
-
-                iv.MeasureInstrument();
-            }
+            // // wait for search to initiate...
+            // await Task.Delay(200);
+            //
+            // //  },DispatcherPriority.ApplicationIdle);
+            //
+            //
+            // while(IsSearchInitiating) {
+            //     await Task.Delay(100);
+            // }
+            //
+            // if(InstrumentView.Instance is { } iv) {
+            //     if(IsInstrumentChanging) {
+            //         IsInstrumentChanging = false;
+            //         if(IsSearchModeSelected) {
+            //             // wait for inst to unhide...
+            //             await Task.Delay(500);
+            //             // while(true) {
+            //             //     if(iv.IsArrangeValid && iv.IsVisible) {
+            //             //         break;
+            //             //     }
+            //             //     await Task.Delay(100);
+            //             // }
+            //         }
+            //     }
+            //
+            //     iv.MeasureInstrument();
+            // }
 
             IsBusy = false;
         }
@@ -1456,10 +1429,15 @@ namespace Calcuchord {
             if(canceled && _editInstrumentInitialStateJson != null) {
                 Instrument inst_to_restore =
                     JsonConvert.DeserializeObject<Instrument>(_editInstrumentInitialStateJson);
+                inst_to_restore.RefreshModelTree();
                 int inst_idx = Instruments.IndexOf(emi);
                 if(inst_idx >= 0) {
                     Instruments[inst_idx] = await CreateInstrumentAsync(inst_to_restore);
                     OnPropertyChanged(nameof(SelectedInstrument));
+                    emi = Instruments[inst_idx];
+                } else {
+                    // new inst cancel
+                    emi = null;
                 }
             }
 
@@ -1467,7 +1445,10 @@ namespace Calcuchord {
             _editInstrumentInitialStateJson = null;
 
             EditModeInstrument = null;
-            //SelectedInstrument = emi;
+            if(emi != null && SelectedInstrument != emi) {
+                SelectedInstrument = emi;
+            }
+
             SelectedInstrument.RaisePropertyChanged(nameof(SelectedInstrument.SelectedTuning));
             OnPropertyChanged(nameof(SelectedTuning));
             InitInstrumentAsync(InstrumentInitSource.EditorDone).FireAndForgetSafeAsync();
@@ -1708,9 +1689,6 @@ namespace Calcuchord {
                         CanResize = false,
                         WindowStartupLocation = WindowStartupLocation.CenterScreen,
                     };
-#if DEBUG
-                    about_win.AttachDevTools();
-#endif
                     about_win.Show();
                     MoveWindowExtension.SetIsEnabled(about_win,true);
                     return;
@@ -1858,6 +1836,29 @@ namespace Calcuchord {
         public ICommand ResetToDefaultsCommand => new MpCommand(
             async () => {
                 LoadingView lv = new LoadingView();
+
+                void FallbackReset(Exception ex) {
+                    lv.MessageTextBlock.Text = ex.ToString();
+                    lv.MessageTextBlock.FontSize = 5;
+                    ex.Dump();
+                    // Task.Run(
+                    //     async () => {
+                    //         var instl = await DefaultDataBuilder.BuildAsync(false);
+                    //         Dispatcher.UIThread.Post(
+                    //             async () => {
+                    //                 try {
+                    //
+                    //                     lv.MessageTextBlock.Text = "Yikes!!!";
+                    //                     await InitAsync(instl);
+                    //                     DialogHost.Close(MainDialogHostName);
+                    //                 } catch(Exception ex2) {
+                    //                     FallbackReset(ex2);
+                    //                 }
+                    //             },DispatcherPriority.Background);
+                    //     });
+
+                }
+
                 try {
                     while(true) {
                         if(MainView.Instance is not { } mv ||
@@ -1870,7 +1871,6 @@ namespace Calcuchord {
 
                     DialogHost.Show(lv,MainDialogHostName).FireAndForgetSafeAsync();
                     await Task.Delay(1_000);
-                    //await DefaultDataBuilder.BuildAsync();
                     PlatformWrapper.Services.Logger.WriteLine("Clearing instruments");
                     Instruments.Clear();
 
@@ -1888,30 +1888,22 @@ namespace Calcuchord {
                                             await InitAsync(instl);
                                             DialogHost.Close(MainDialogHostName);
                                         } catch(Exception ex) {
-                                            lv.MessageTextBlock.Text = ex.ToString();
-                                            lv.MessageTextBlock.FontSize = 5;
-                                            ex.Dump();
+                                            FallbackReset(ex);
                                         }
                                     },DispatcherPriority.Background);
                             } catch(Exception ex) {
                                 Dispatcher.UIThread.Post(
                                     () => {
-                                        lv.MessageTextBlock.Text = ex.ToString();
-                                        lv.MessageTextBlock.FontSize = 5;
+                                        FallbackReset(ex);
                                     });
-                                ex.Dump();
                             }
                         });
 
                 } catch(Exception ex) {
                     Dispatcher.UIThread.Post(
                         () => {
-
-                            lv.MessageTextBlock.Text = ex.ToString();
-                            lv.MessageTextBlock.FontSize = 5;
-
+                            FallbackReset(ex);
                         });
-                    ex.Dump();
                 }
             });
 

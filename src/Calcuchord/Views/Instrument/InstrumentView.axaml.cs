@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using MonkeyPaste.Common.Avalonia;
@@ -14,6 +16,7 @@ namespace Calcuchord {
         public InstrumentView() {
             Instance = this;
             InitializeComponent();
+            this.GetObservable(IsVisibleProperty).Subscribe(value => MeasureInstrument());
         }
 
         public void ScrollSelectionIntoView() {

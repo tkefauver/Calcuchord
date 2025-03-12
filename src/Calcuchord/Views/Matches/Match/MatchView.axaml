@@ -73,10 +73,10 @@
         </Style>
 
         <!-- SVG CSS-->
-        <Style Selector="Svg">
-            <Setter Property="Css"
-                    Value="{Binding TextMatchSvgCss, Source={x:Static local:MainViewModel.Instance}}" />
-        </Style>
+        <!-- <Style Selector="Svg"> -->
+        <!--     <Setter Property="Css" -->
+        <!--             Value="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}" /> -->
+        <!-- </Style> -->
         <!-- <Style Selector="Svg"> -->
         <!--     <Setter Property="Css" -->
         <!--             Value="{Binding TextlessMatchSvgCss, Source={x:Static local:MainViewModel.Instance}}" /> -->
@@ -132,6 +132,7 @@
 
                     <Svg x:Name="MatchSvg"
                          Grid.Row="1"
+                         Css="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}"
                          Source="{Binding NotePattern, Converter={x:Static local:PatternToSvgConverter.Instance}}"
                          Stretch="Uniform" />
                     <!-- <Image Source="/Assets/Images/logo.png" -->

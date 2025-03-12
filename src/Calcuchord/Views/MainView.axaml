@@ -146,7 +146,7 @@
 
                             <!-- INSTRUMENT VIEW -->
                             <local:InstrumentView x:Name="InstrumentView"
-                                                  IsVisible="{Binding IsInstrumentVisible, Source={x:Static local:MainViewModel.Instance}}"
+                                                  IsVisible="{Binding IsSearchModeSelected, Source={x:Static local:MainViewModel.Instance}}"
                                                   DataContext="{Binding SelectedInstrument}" />
 
                             <!-- MATCHES VIEW -->

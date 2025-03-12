@@ -291,9 +291,18 @@ namespace Calcuchord {
             }
 
             PatternGen pg = new PatternGen(this);
-            DialogHost.Show(
-                    new TuningGenProgressView { DataContext = pg },MainViewModel.Instance.MainDialogHostName)
-                .FireAndForgetSafeAsync();
+            Dispatcher.UIThread.Post(
+                () => {
+                    if(!MainViewModel.Instance.IsLoaded) {
+                        // initial startup gen
+                        DialogHost.Close(MainViewModel.Instance.MainDialogHostName);
+                    }
+
+                    DialogHost.Show(
+                            new TuningGenProgressView { DataContext = pg },MainViewModel.Instance.MainDialogHostName)
+                        .FireAndForgetSafeAsync();
+                });
+
 
             PatternGenCts = new CancellationTokenSource();
             try {

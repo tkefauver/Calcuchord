@@ -340,6 +340,7 @@ namespace Calcuchord {
         }
 
         public void LogState() {
+#if DEBUG
             if(PlatformWrapper.Services is { } ps &&
                ps.Logger is { } logger) {
                 logger.WriteLine($"IsMobile: {IsMobile}");
@@ -350,6 +351,7 @@ namespace Calcuchord {
                 logger.WriteLine($"IsLandscape: {IsLandscape}");
                 logger.WriteLine($"IsExpandedLayout: {IsExpandedLayout}");
             }
+#endif
         }
 
         #endregion

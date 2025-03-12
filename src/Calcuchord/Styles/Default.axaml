@@ -31,6 +31,8 @@
         <Setter Property="SizeToContent"
                 Value="Manual" />
     </Style>
+    
+    <!-- MOBILE SS -->
     <!-- <Style Selector="Window.debug"> -->
     <!--     <Setter Property="SystemDecorations" -->
     <!--             Value="None" /> -->
