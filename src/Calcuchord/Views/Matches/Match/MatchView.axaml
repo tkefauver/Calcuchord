@@ -71,6 +71,20 @@
             <Setter Property="ToolTip.IsOpen"
                     Value="True" />
         </Style>
+
+        <!-- SVG CSS-->
+        <!-- <Style Selector="Svg"> -->
+        <!--     <Setter Property="Css" -->
+        <!--             Value="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}" /> -->
+        <!-- </Style> -->
+        <!-- <Style Selector="Svg"> -->
+        <!--     <Setter Property="Css" -->
+        <!--             Value="{Binding TextlessMatchSvgCss, Source={x:Static local:MainViewModel.Instance}}" /> -->
+        <!-- </Style> -->
+        <!-- <Style Selector="Grid#OuterContainer.selected Svg"> -->
+        <!--     <Setter Property="Css" -->
+        <!--             Value="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}" /> -->
+        <!-- </Style> -->
     </UserControl.Styles>
     <Grid x:Name="OuterContainer"
           Background="Transparent"
@@ -124,6 +138,7 @@
                     <!-- <Image Source="/Assets/Images/logo.png" -->
                     <!--        Grid.Row="1" -->
                     <!--        Stretch="Uniform" /> -->
+                    <!-- <local:ChordView Grid.Row="1" /> -->
                     <UniformGrid x:Name="MatchButtonStripPanel"
                                  Grid.Row="2"
                                  Height="{Binding Bounds.Height, ElementName=MatchTitleTextBlock}"

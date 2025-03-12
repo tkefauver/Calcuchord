@@ -27,7 +27,7 @@
         <PackageReference Include="Material.Avalonia"/>
         <PackageReference Include="Material.Avalonia.Dialogs"/>
         <PackageReference Include="Material.Icons.Avalonia"/>
-        <PackageReference Include="Melanchall.DryWetMidi.Nativeless" />
+        <PackageReference Include="Melanchall.DryWetMidi.Nativeless"/>
         <PackageReference Include="MonkeyPaste.Common.Avalonia"/>
         <PackageReference Include="org.matheval"/>
 
@@ -46,5 +46,10 @@
         <PackageReference Include="System.Formats.Nrbf"/>
         <PackageReference Include="Material.Avalonia.DataGrid"/>
         <PackageReference Include="Avalonia.Controls.DataGrid"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <ReferencePathWithRefAssemblies Update="\home\tkefauver\.nuget\packages\newtonsoft.json\13.0.3\lib\net6.0\Newtonsoft.Json.dll"/>
     </ItemGroup>
 </Project>

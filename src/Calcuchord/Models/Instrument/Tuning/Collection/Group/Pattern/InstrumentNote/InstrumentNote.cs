@@ -84,7 +84,7 @@ namespace Calcuchord {
 
         #region Public Methods
 
-        public override void Adjust(int offset) {
+        public void Move(int offset) {
             base.Adjust(offset);
             ColNum += offset;
         }

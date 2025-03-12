@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+    <assembly fullname="Calcuchord">
+        <type fullname="Calcuchord.ModelBase" preserve="all"/>
+        <type fullname="Calcuchord.Note" preserve="all"/>
+        <type fullname="Calcuchord.InstrumentNote" preserve="all"/>
+        <type fullname="Calcuchord.PatternNote" preserve="all"/>
+        <type fullname="Calcuchord.NotePattern" preserve="all"/>
+        <type fullname="Calcuchord.PatternKeyCollection" preserve="all"/>
+        <type fullname="Calcuchord.Tuning" preserve="all"/>
+        <type fullname="Calcuchord.Instrument" preserve="all"/>
+        <type fullname="Calcuchord.OptionViewModel" preserve="all"/>
+        <type fullname="Calcuchord.Prefs" preserve="all"/>
+    </assembly>
+</linker>

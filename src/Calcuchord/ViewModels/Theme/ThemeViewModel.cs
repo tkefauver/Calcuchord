@@ -44,6 +44,12 @@ namespace Calcuchord {
 
         bool? LastCheckWasLandscape { get; set; }
 
+        public bool IsExpandedLayout =>
+            !IsPhone &&
+            MainView.Instance != null &&
+            MainView.Instance.Bounds.Width > 639 &&
+            MainView.Instance.Bounds.Height > 639;
+
         public bool IsLandscape {
             get {
 
@@ -288,6 +294,8 @@ namespace Calcuchord {
             OnPropertyChanged(nameof(P));
             InitResoures();
             OnPropertyChanged(nameof(IsDark));
+
+            LogState();
         }
 
         public void DoOrientationCheck() {
@@ -299,6 +307,7 @@ namespace Calcuchord {
             }
 
             LastCheckWasLandscape = IsLandscape;
+            LogState();
         }
 
         #endregion
@@ -328,6 +337,21 @@ namespace Calcuchord {
                     res.Add(color_name,color);
                 }
             }
+        }
+
+        public void LogState() {
+#if DEBUG
+            if(PlatformWrapper.Services is { } ps &&
+               ps.Logger is { } logger) {
+                logger.WriteLine($"IsMobile: {IsMobile}");
+                logger.WriteLine($"IsPhone: {IsPhone}");
+                logger.WriteLine($"IsTablet: {IsTablet}");
+                logger.WriteLine($"IsDesktop: {IsDesktop}");
+                logger.WriteLine($"IsBrowser: {IsBrowser}");
+                logger.WriteLine($"IsLandscape: {IsLandscape}");
+                logger.WriteLine($"IsExpandedLayout: {IsExpandedLayout}");
+            }
+#endif
         }
 
         #endregion

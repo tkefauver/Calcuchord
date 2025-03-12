@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace Calcuchord {
     public static class DefaultDataBuilder {
-        public static async Task BuildAsync() {
+        public static async Task<List<Instrument>> BuildAsync(bool saveOnComplete) {
             var instl = new List<Instrument>();
             var itl = new[] { InstrumentType.Guitar,InstrumentType.Ukulele,InstrumentType.Piano };
             foreach(InstrumentType it in itl) {
@@ -22,6 +22,7 @@ namespace Calcuchord {
                 if(inst_vm.Tunings.FirstOrDefault() is { } def_tun) {
                     inst_vm.CurGenTuning = def_tun;
                     await def_tun.InitAsync(def_tun.Tuning);
+                    inst_vm.CurGenTuning = null;
 
                     if(it != InstrumentType.Piano) {
                         var chords = BuildChordsFromFile(it);
@@ -39,9 +40,13 @@ namespace Calcuchord {
                 instl.Add(inst);
             }
 
-            await File.WriteAllTextAsync(
-                "/home/tkefauver/dev/projects/Calcuchord/src/Calcuchord/Assets/Text/appstate.json",
-                JsonConvert.SerializeObject(instl));
+            if(saveOnComplete) {
+                await File.WriteAllTextAsync(
+                    "/home/tkefauver/dev/projects/Calcuchord/src/Calcuchord/Assets/Text/appstate.json",
+                    JsonConvert.SerializeObject(instl));
+            }
+
+            return instl;
 
         }
 

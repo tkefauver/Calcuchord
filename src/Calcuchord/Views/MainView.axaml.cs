@@ -1,12 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Threading;
 using MonkeyPaste.Common.Avalonia;
 using PropertyChanged;
 
@@ -54,7 +52,6 @@ namespace Calcuchord {
 
         protected override void OnLoaded(RoutedEventArgs e) {
             if(MainViewModel.Instance is not { } mvm) {
-                return;
             }
 
             //SetupDrawers();
@@ -103,12 +100,14 @@ namespace Calcuchord {
             }
 
             if(e.Key == Key.OemMinus && e.KeyModifiers.HasFlag(KeyModifiers.Control)) {
-                mvm.IncreaseMatchColumnsCommand.Execute(null);
+                //mvm.IncreaseMatchColumnsCommand.Execute(null);
+                mvm.ChangeMatchColumnsCommand.Execute(null);
                 return;
             }
 
             if(e.Key == Key.OemPlus && e.KeyModifiers.HasFlag(KeyModifiers.Control)) {
-                mvm.DecreaseMatchColumnsCommand.Execute(null);
+                //mvm.DecreaseMatchColumnsCommand.Execute(null);
+                mvm.ChangeMatchColumnsCommand.Execute(1);
                 return;
             }
 

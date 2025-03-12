@@ -27,7 +27,7 @@ namespace Calcuchord.Desktop {
                     {
                         // EnableMultiTouch = true,
                         UseDBusMenu = false,
-                        EnableIme = false
+                        EnableIme = false,
                     })
                 .WithInterFont()
                 .LogToTrace()

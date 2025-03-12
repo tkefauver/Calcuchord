@@ -74,6 +74,7 @@ namespace Calcuchord {
         InstrumentInit,
         BookmarkToggle,
         SortToggle,
+        TabChanged,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

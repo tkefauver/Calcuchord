@@ -118,19 +118,21 @@
 
     </UserControl.Styles>
     <!-- NOTE top row 25 needs to match fretboard height exp -->
-    <Grid RowDefinitions="Auto,*">
+    <Grid x:Name="InstrumentContainer"
+          RowDefinitions="Auto,*"
+          DataContext="{Binding SelectedTuning}">
         <local:KeyboardView Grid.Row="1"
-                            IsVisible="{Binding IsPianoSelected, Source={x:Static local:MainViewModel.Instance}}"
-                            DataContext="{Binding SelectedTuning}" />
+                            IsVisible="{Binding IsPianoSelected, Source={x:Static local:MainViewModel.Instance}}" />
         <local:FretboardView Grid.Row="1"
-                             IsVisible="{Binding !IsPianoSelected, Source={x:Static local:MainViewModel.Instance}}"
-                             DataContext="{Binding SelectedTuning}" />
+                             IsVisible="{Binding !IsPianoSelected, Source={x:Static local:MainViewModel.Instance}}" />
 
         <DockPanel x:Name="InstToolbar"
+                   x:DataType="local:TuningViewModel"
                    LastChildFill="False">
             <!-- BUG Tooltip flickers on browser only -->
             <local:HintView DockPanel.Dock="Left"
                             Margin="10,10,0,0"
+                            DataContext="{Binding Parent}"
                             ToolTip.ServiceEnabled="{Binding !IsBrowser, Source={x:Static local:ThemeViewModel.Instance}}"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center">

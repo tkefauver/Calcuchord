@@ -17,7 +17,10 @@ namespace Calcuchord {
 
         #region Constants
 
+        public const int PATTERN_FRET_SPAN = 4;
+
         #endregion
+
 
         #region Interfaces
 
@@ -149,7 +152,7 @@ namespace Calcuchord {
 
         public PatternGen(TuningViewModel tuning) {
             TuningVm = tuning;
-            PatternOpenFretSpan = GuessRealisticFretSpan(Tuning);
+            PatternOpenFretSpan = PATTERN_FRET_SPAN; //GuessRealisticFretSpan(Tuning);
         }
 
         #endregion

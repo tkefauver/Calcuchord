@@ -3,7 +3,6 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using PropertyChanged;
-using MonkeyPaste.Common;
 
 namespace Calcuchord {
     [DoNotNotify]
@@ -33,13 +32,16 @@ namespace Calcuchord {
                 case IClassicDesktopStyleApplicationLifetime desktop:
                     desktop.MainWindow = new MainWindow
                     {
-                        DataContext = MainViewModel.Instance
+                        DataContext = MainViewModel.Instance,
                     };
+#if DEBUG
+                    this.AttachDevTools();
+#endif
                     break;
                 case ISingleViewApplicationLifetime singleViewPlatform:
                     singleViewPlatform.MainView = new MainView
                     {
-                        DataContext = MainViewModel.Instance
+                        DataContext = MainViewModel.Instance,
                     };
                     break;
             }
@@ -47,7 +49,7 @@ namespace Calcuchord {
             base.OnFrameworkInitializationCompleted();
         }
 
-        private void NativeMenuItem_OnClick(object sender, EventArgs e) {
+        void NativeMenuItem_OnClick(object sender,EventArgs e) {
             MainViewModel.Instance.ShowAboutCommand.Execute("NATIVEMENU");
         }
     }

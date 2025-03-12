@@ -19,12 +19,12 @@ namespace Calcuchord {
 
         public static SvgOptionType[] DefaultSvgOptionType { get; } =
         [
-            SvgOptionType.Fingers,
+            //SvgOptionType.Fingers,
             SvgOptionType.Barres,
-            SvgOptionType.Tuning,
+            //SvgOptionType.Tuning,
             SvgOptionType.Roots,
             SvgOptionType.Matches,
-            SvgOptionType.Frets,
+            //SvgOptionType.Frets,
             SvgOptionType.Colors,
             SvgOptionType.Shadows,
         ];
@@ -460,7 +460,6 @@ namespace Calcuchord {
 
             HtmlNode text_elm = CurrentDoc.CreateElement("text");
             text_elm.Attributes.Add("font-size",fs);
-            text_elm.Attributes.Add("font-family",DefaultFontFamily);
             if(isBold) {
                 text_elm.Attributes.Add("font-weight","bold");
             }

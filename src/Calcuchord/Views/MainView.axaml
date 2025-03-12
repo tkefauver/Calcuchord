@@ -146,8 +146,7 @@
 
                             <!-- INSTRUMENT VIEW -->
                             <local:InstrumentView x:Name="InstrumentView"
-                                                  Classes="fade fade-collapse"
-                                                  Opacity="{Binding IsInstrumentVisible, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}, Source={x:Static local:MainViewModel.Instance}}"
+                                                  IsVisible="{Binding IsSearchModeSelected, Source={x:Static local:MainViewModel.Instance}}"
                                                   DataContext="{Binding SelectedInstrument}" />
 
                             <!-- MATCHES VIEW -->

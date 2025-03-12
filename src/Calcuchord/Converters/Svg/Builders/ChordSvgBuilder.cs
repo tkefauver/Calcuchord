@@ -348,11 +348,13 @@ namespace Calcuchord {
 
             double tox = 0;
             double toy = 0;
-            th = th - fh;
+            th -= fh;
             toy = -(fh / 2d);
+            if(!MainViewModel.Instance.SelectedSvgOptionTypes.Contains(SvgOptionType.Tuning)) {
+                th -= 5;
+            }
 
             cntr_g.Attributes.Add("transform",$"translate({tox},{toy})");
-
             svg.Attributes.Add("width",tw);
             svg.Attributes.Add("height",th);
 

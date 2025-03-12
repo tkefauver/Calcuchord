@@ -55,6 +55,17 @@ namespace Calcuchord {
         public string Label4 =>
             NotePattern.SubPosition == 0 ? string.Empty : NotePattern.SubPosition.ToString();
 
+
+        public int DiagramColCount =>
+            PatternType == MusicPatternType.Chords
+                ? NotePattern.Parent.Parent.Parent.RowCount + 1
+                : PatternGen.PATTERN_FRET_SPAN + 2;
+
+        public int DiagramRowCount =>
+            PatternType == MusicPatternType.Chords
+                ? PatternGen.PATTERN_FRET_SPAN + 2
+                : NotePattern.Parent.Parent.Parent.RowCount + 1;
+
         #endregion
 
         #region Layout
@@ -195,48 +206,34 @@ namespace Calcuchord {
                     return;
                 }
 
-
-                void MvmOnInstrumentInitialized(object sender,EventArgs e) {
-                    mvm.InstrumentInitialized -= MvmOnInstrumentInitialized;
-                    FinishSetNeckAsync(true).FireAndForgetSafeAsync();
-                }
-
                 if(!mvm.IsSearchModeSelected) {
                     // switch to search mode
-                    mvm.InstrumentInitialized += MvmOnInstrumentInitialized;
                     mvm.SelectOptionCommand.Execute(mvm.SearchOptionViewModel);
-                    return;
+
+                    // wait for inst to load...
+                    await Task.Delay(500);
                 }
 
-                await FinishSetNeckAsync(false);
+                stvm.ResetSelection();
+                await Task.Delay(300);
 
-                async Task FinishSetNeckAsync(bool fromEvent) {
-                    if(fromEvent) {
-                        // wait for inst to load...
-                        await Task.Delay(500);
+                foreach(NoteViewModel nvm in stvm.AllNotes.Where(x => x.IsRealNote)) {
+                    if(NotePattern.Notes.FirstOrDefault(
+                           x => x.RowNum == nvm.RowNum && Math.Max(0,x.ColNum) == nvm.NoteNum) is not
+                       { } ng_match) {
+                        continue;
                     }
 
-                    stvm.ResetSelection();
-                    await Task.Delay(300);
-
-                    foreach(NoteViewModel nvm in stvm.AllNotes.Where(x => x.IsRealNote)) {
-                        if(NotePattern.Notes.FirstOrDefault(
-                               x => x.RowNum == nvm.RowNum && Math.Max(0,x.ColNum) == nvm.NoteNum) is not
-                           { } ng_match) {
-                            continue;
-                        }
-
+                    nvm.Parent.ToggleNoteSelectedCommand.Execute(nvm);
+                    if(ng_match.IsMute) {
+                        // toggle to mute
                         nvm.Parent.ToggleNoteSelectedCommand.Execute(nvm);
-                        if(ng_match.IsMute) {
-                            // toggle to mute
-                            nvm.Parent.ToggleNoteSelectedCommand.Execute(nvm);
-                        }
                     }
-
-                    await Task.Delay(250);
-
-                    InstrumentView.Instance.ScrollSelectionIntoView();
                 }
+
+                await Task.Delay(250);
+
+                InstrumentView.Instance.ScrollSelectionIntoView();
 
             });
 

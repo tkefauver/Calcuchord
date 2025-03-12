@@ -57,18 +57,8 @@
             <Setter Property="BorderBrush"
                     Value="{DynamicResource PianoBlackKeyFg}" />
             <Setter Property="Background"
-                    Value="{StaticResource BlackKeyBgBrush}" />
+                    Value="{DynamicResource BlackKeyBgBrush}" />
         </Style>
-
-        <!-- <Style Selector="Border#KeyMarker"> -->
-        <!--     <Setter Property="BorderBrush" -->
-        <!--             Value="{DynamicResource PianoWhiteKeyFg}" /> -->
-        <!-- </Style> -->
-        <!-- -->
-        <!-- <Style Selector="local|KeyView.altered Border#KeyMarker"> -->
-        <!--     <Setter Property="BorderBrush" -->
-        <!--             Value="{DynamicResource PianoBlackKeyFg}" /> -->
-        <!-- </Style> -->
 
         <Style Selector="Border#KeyMarkerInnerContainer">
             <Setter Property="Width"

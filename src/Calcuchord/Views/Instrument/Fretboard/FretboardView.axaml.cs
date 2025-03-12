@@ -53,13 +53,12 @@ namespace Calcuchord {
             // guitar
             // tw 1600
             // th 188
+            double SCALE = 1.0d;
 
-            double scale_len = tvm.Tuning.Parent.NeckLengthInInches ?? 25.5;
-
-            double def_fret_w = 69d;
-            double str_h = 27d; //th / tvm.Parent.VisualRowCount;
-            double label_width = 30; //Math.Max(30,fret_widths.Max() * 0.25);
-            double nut_width = 20; //Math.Min(str_h,dot_d);
+            double def_fret_w = 69d * SCALE;
+            double str_h = 27d * SCALE; //th / tvm.Parent.VisualRowCount;
+            double label_width = 30 * SCALE; //Math.Max(30,fret_widths.Max() * 0.25);
+            double nut_width = 20 * SCALE; //Math.Min(str_h,dot_d);
             double tw = tvm.TotalFretCount * def_fret_w; //Math.Max(1000,tvm.TotalFretCount * (1600 / 23d));
             double th = tvm.Parent.RowCount * str_h; //tw * (0.117521368 * 1);//(tvm.Parent.RowCount / 6d));
 
@@ -97,16 +96,6 @@ namespace Calcuchord {
                         return;
                     }
 
-                    // int fn = fv.BindingContext.NoteNum;
-                    // cp.Width =
-                    //     fn < 0 ?
-                    //         label_width :
-                    //         fn == 0 ?
-                    //             nut_width :
-                    //             fn <= fret_widths.Length ?
-                    //                 fret_widths[fn - 1] :
-                    //                 0;
-
                     cp.Width = fret_widths[fv.BindingContext.NoteNum + 1];
                     cp.Height = str_h;
                     if(fv.GetVisualDescendants<Ellipse>().Where(x => x.IsVisible && x.Classes.Contains("dot")) is
@@ -120,19 +109,21 @@ namespace Calcuchord {
                     }
                 });
 
-            cntr.Width = fret_widths.Sum(); // + nut_width + label_width;
+            cntr.Width = fret_widths.Sum();
             cntr.Height = th + str_h;
-            double inner_ar = 6.7; //cntr.Width / cntr.Height;
-            if(TopLevel.GetTopLevel(this) is Window w &&
-               w.WindowState == WindowState.Maximized) {
+            double inner_ar = Math.Min(6.44,cntr.Width / cntr.Height);
+            if(ThemeViewModel.Instance.IsExpandedLayout) {
                 FretboardViewbox.HorizontalAlignment = HorizontalAlignment.Center;
+                FretboardViewbox.Stretch = Stretch.UniformToFill;
             } else {
                 FretboardViewbox.HorizontalAlignment = HorizontalAlignment.Left;
+                FretboardViewbox.Stretch = Stretch.Uniform;
             }
 
-            double outer_w = outer_cntr.Bounds.Width;
-            double outer_h = outer_cntr.Bounds.Height;
+            double pad_w = FretboardScrollViewer.Padding.Left + FretboardScrollViewer.Padding.Right;
             double pad_h = FretboardScrollViewer.Padding.Top + FretboardScrollViewer.Padding.Bottom;
+            double outer_w = Math.Max(0,outer_cntr.Bounds.Width - pad_w);
+            double outer_h = Math.Max(0,outer_cntr.Bounds.Height - pad_h);
 
             if(cntr.Width > outer_w) {
                 FretboardViewbox.Width = outer_h * inner_ar;
@@ -142,8 +133,8 @@ namespace Calcuchord {
                 FretboardViewbox.Height = FretboardViewbox.Width / inner_ar;
             }
 
-            if(FretboardViewbox.Height > outer_h - pad_h) {
-                FretboardViewbox.Height = outer_h - pad_h;
+            if(FretboardViewbox.Height > outer_h) {
+                FretboardViewbox.Height = outer_h;
                 FretboardViewbox.Width = FretboardViewbox.Height * inner_ar;
             }
 

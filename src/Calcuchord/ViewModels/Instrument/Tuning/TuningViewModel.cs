@@ -242,34 +242,28 @@ namespace Calcuchord {
                     break;
                 case nameof(IsSelected):
                     if(IsSelected) {
-                        if(Parent.SelectedTuning != this) {
-                            Parent.SelectedTuning = this;
-                        }
+                        Dispatcher.UIThread.Invoke(
+                            () => {
+                                if(Parent.SelectedTuning != this) {
+                                    Parent.SelectedTuning = this;
+                                }
 
-                        ResetSelection();
-                        if(!Parent.IsSelected ||
-                           Parent.IsEditModeEnabled ||
-                           Parent.Parent.LastSelectedTuning == this) {
-                            break;
-                        }
+                                //ResetSelection();
+                                if(!Parent.IsSelected ||
+                                   Parent.IsEditModeEnabled ||
+                                   Parent.Parent.LastSelectedTuning == this) {
+                                    return;
+                                }
 
-                        MainViewModel.Instance.RaisePropertyChanged(nameof(MainViewModel.Instance.SelectedTuning));
+                                MainViewModel.Instance.RaisePropertyChanged(
+                                    nameof(MainViewModel.Instance.SelectedTuning));
 
-                        if(Design.IsDesignMode) {
-                            break;
-                        }
-
-                        Dispatcher.UIThread.Post(
-                            async () => {
-                                while(true) {
-                                    if(MainView.Instance is { } mv &&
-                                       mv.DlgHost is { } mdh &&
-                                       mdh.IsLoaded) {
-                                        break;
-                                    }
-
-                                    // wait until load to prevent showing snackbar on startup
-                                    await Task.Delay(100);
+                                if(Design.IsDesignMode ||
+                                   !MainViewModel.Instance.IsLoaded ||
+                                   MainView.Instance is not { } mv ||
+                                   mv.DlgHost is not { } mdh ||
+                                   !mdh.IsLoaded) {
+                                    return;
                                 }
 
                                 string sel_msg = $"{FullName} selected";
@@ -277,8 +271,7 @@ namespace Calcuchord {
                                     sel_msg,
                                     MainView.SnackbarHostName,
                                     DispatcherPriority.Background);
-
-                            });
+                            },DispatcherPriority.Background);
                     }
 
                     break;
@@ -298,9 +291,18 @@ namespace Calcuchord {
             }
 
             PatternGen pg = new PatternGen(this);
-            DialogHost.Show(
-                    new TuningGenProgressView { DataContext = pg },MainViewModel.Instance.MainDialogHostName)
-                .FireAndForgetSafeAsync();
+            Dispatcher.UIThread.Post(
+                () => {
+                    if(!MainViewModel.Instance.IsLoaded) {
+                        // initial startup gen
+                        DialogHost.Close(MainViewModel.Instance.MainDialogHostName);
+                    }
+
+                    DialogHost.Show(
+                            new TuningGenProgressView { DataContext = pg },MainViewModel.Instance.MainDialogHostName)
+                        .FireAndForgetSafeAsync();
+                });
+
 
             PatternGenCts = new CancellationTokenSource();
             try {
