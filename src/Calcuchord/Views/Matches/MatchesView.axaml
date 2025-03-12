@@ -232,7 +232,6 @@
             <Grid RowDefinitions="Auto,*">
 
                 <ScrollViewer x:Name="MatchesScrollViewer"
-                              Classes.drawer-test="false"
                               Grid.Row="1">
                     <Viewbox VerticalAlignment="Top">
                         <!-- NOTE no margin/padding on repeater to get accurate bounds -->
@@ -241,8 +240,8 @@
                                        Classes.can-resize="true"
                                        ItemsSource="{Binding Matches}">
                             <ItemsRepeater.Layout>
-                                <!-- <WrapLayout Orientation="Horizontal" /> -->
-                                <UniformGridLayout MaximumRowsOrColumns="{Binding MatchColCount}" />
+                                <WrapLayout Orientation="Horizontal" />
+                                <!-- <UniformGridLayout MaximumRowsOrColumns="{Binding MatchColCount}" /> -->
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="local:MatchViewModel">
@@ -328,13 +327,14 @@
                         <!-- ZOOM OUT (COLS+1) -->
                         <Button x:Name="ZoomMinusButton"
                                 Classes="float"
-                                Command="{Binding IncreaseMatchColumnsCommand}">
+                                Command="{Binding ChangeMatchColumnsCommand}">
                             <avalonia:MaterialIcon Kind="Minus" />
                         </Button>
                         <!-- ZOOM IN (COLS-1) -->
                         <Button x:Name="ZoomPlusButton"
                                 Classes="float"
-                                Command="{Binding DecreaseMatchColumnsCommand}">
+                                Command="{Binding ChangeMatchColumnsCommand}"
+                                CommandParameter="1">
                             <avalonia:MaterialIcon Kind="Plus" />
                         </Button>
                     </StackPanel>
@@ -351,7 +351,7 @@
             <!-- SEARCH BUTTON -->
 
             <Button x:Name="SearchButton"
-                    Classes="accent fade fade-collapse"
+                    Classes="accent fade fade-hide"
                     Padding="16"
                     MinWidth="64"
                     HorizontalAlignment="Center"
@@ -394,7 +394,7 @@
 
             <!-- RESET -->
             <HyperlinkButton x:Name="ResetInstrumentLinkBUtton"
-                             Classes="fade fade-collapse"
+                             Classes="fade fade-hide"
                              Cursor="Hand"
                              HorizontalAlignment="Center"
                              VerticalAlignment="Center"

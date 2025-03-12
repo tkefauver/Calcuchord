@@ -50,4 +50,5 @@
     <Target Name="FixObj" BeforeTargets="_ResolveAssemblies">
         <Exec Command="$(ProjectDir)scripts\fix_obj.sh $(FixSourceDir)"/>
     </Target>
+
 </Project>

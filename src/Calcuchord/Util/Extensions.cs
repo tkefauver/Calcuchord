@@ -3,11 +3,32 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using HtmlAgilityPack;
 
 namespace Calcuchord {
     public static class Extensions {
+        public static async void FireAndForgetSafeAsync(this Task task) {
+            try {
+                await task;
+            } catch(Exception ex) {
+                ex.Dump();
+            }
+        }
+
+        public static async void FireAndForgetSafeAsync(this Task task,DispatcherPriority dp) {
+            await Dispatcher.UIThread.InvokeAsync(
+                async () => {
+                    try {
+                        await task;
+                    } catch(Exception ex) {
+                        ex.Dump();
+                    }
+                },dp);
+        }
+
         public static string RemoveInvalidPathChars(this string originalString) {
             // from https://stackoverflow.com/a/66053014/105028
             string finalString = string.Empty;

@@ -53,7 +53,6 @@
     <Grid>
         <ScrollViewer x:Name="FretboardScrollViewer"
                       Classes="inst-scroll"
-                      Classes.drawer-test="false"
                       Padding="0,0,5,30"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Hidden">

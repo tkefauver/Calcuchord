@@ -20,8 +20,12 @@
 
     <!-- WINDOW -->
     <Style Selector="Window.debug">
+        <!-- <Setter Property="Width" -->
+        <!--         Value="360" /> -->
+        <!-- <Setter Property="Height" -->
+        <!--         Value="740" /> -->
         <Setter Property="Width"
-                Value="360" />
+                Value="1075" />
         <Setter Property="Height"
                 Value="740" />
         <Setter Property="SizeToContent"
@@ -191,7 +195,11 @@
         </Setter>
     </Style>
 
-    <Style Selector=":is(Control).fade.fade-collapse[Opacity=0]">
+    <Style Selector=":is(Control).fade.fade-hide[Opacity=0]">
+        <Setter Property="IsVisible"
+                Value="False" />
+    </Style>
+    <Style Selector=":is(Control).fade.fade-collapse">
         <Setter Property="IsVisible"
                 Value="False" />
     </Style>
@@ -361,13 +369,6 @@
     <Style Selector="controls|NavigationDrawer[RightDrawerOpened=True] :is(Control).right-drawer-float">
         <Setter Property="RenderTransform"
                 Value="translate(-320px,0)" />
-    </Style>
-
-    <Style Selector="ScrollViewer.drawer-test">
-        <Setter Property="HorizontalAlignment"
-                Value="Left" />
-        <Setter Property="VerticalAlignment"
-                Value="Top" />
     </Style>
 
     <!-- FLYOUTS -->
