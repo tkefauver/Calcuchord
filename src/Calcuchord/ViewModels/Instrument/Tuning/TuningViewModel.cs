@@ -80,6 +80,8 @@ namespace Calcuchord {
 
         #region State
 
+        public MusicPatternType LastNotePatternType { get; set; }
+
         public bool CanDelete =>
             !IsReadOnly; // && Parent.Tunings.Count > 1;
 

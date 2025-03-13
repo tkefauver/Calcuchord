@@ -42,9 +42,9 @@ namespace Calcuchord {
         }
 
 
-        public void MeasureFretboard() {
+        public bool MeasureFretboard() {
             if(DataContext is not TuningViewModel tvm) {
-                return;
+                return false;
             }
 
             FretboardView outer_cntr = this;
@@ -64,7 +64,7 @@ namespace Calcuchord {
 
             var fvl = StringsItemsControl.GetVisualDescendants<FretView>();
             if(!fvl.Any()) {
-                return;
+                return false;
             }
 
             double GetDistToNut(int fretNum) {
@@ -138,7 +138,7 @@ namespace Calcuchord {
                 FretboardViewbox.Width = FretboardViewbox.Height * inner_ar;
             }
 
-
+            return true;
         }
 
         void FretView_Loaded(object sender,RoutedEventArgs e) {

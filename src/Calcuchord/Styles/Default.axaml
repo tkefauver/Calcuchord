@@ -33,13 +33,25 @@
     <!-- </Style> -->
 
     <!-- MOBILE SS -->
+    <!-- <Style Selector="Window.debug"> -->
+    <!--     <Setter Property="SystemDecorations" -->
+    <!--             Value="None" /> -->
+    <!--     <Setter Property="Width" -->
+    <!--             Value="417" /> -->
+    <!--     <Setter Property="Height" -->
+    <!--             Value="904.5" /> -->
+    <!--     <Setter Property="SizeToContent" -->
+    <!--             Value="Manual" /> -->
+    <!-- </Style> -->
+
+    <!-- TABLET SS -->
     <Style Selector="Window.debug">
         <Setter Property="SystemDecorations"
                 Value="None" />
         <Setter Property="Width"
-                Value="417" />
+                Value="1032" />
         <Setter Property="Height"
-                Value="904.5" />
+                Value="1376" />
         <Setter Property="SizeToContent"
                 Value="Manual" />
     </Style>
@@ -396,7 +408,8 @@
                 Value="0,0,0,0.5" />
         <Setter Property="BorderBrush">
             <Setter.Value>
-                <SolidColorBrush Color="{DynamicResource BgColor}" Opacity="0.3"/>
+                <SolidColorBrush Color="{DynamicResource BgColor}"
+                                 Opacity="0.3" />
             </Setter.Value>
         </Setter>
     </Style>

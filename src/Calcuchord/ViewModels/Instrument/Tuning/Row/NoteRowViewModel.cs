@@ -273,6 +273,11 @@ namespace Calcuchord {
             if(root || was_root) {
                 Parent.AllNotes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsSelectedKey)));
             }
+
+            if(MainViewModel.Instance.SelectedTuning == Parent) {
+                Parent.LastNotePatternType = MainViewModel.Instance.SelectedPatternType;
+            }
+
         }
 
         #endregion

@@ -16,7 +16,7 @@ namespace Calcuchord {
             InitializeComponent();
         }
 
-        public void MeasureKeyboard() {
+        public bool MeasureKeyboard() {
 
             double wkw = 100;
             double bkw = wkw * WHITE_TO_BLACK_WIDTH_RATIO;
@@ -25,7 +25,7 @@ namespace Calcuchord {
             double bkh = wkh * WHITE_TO_BLACK_HEIGHT_RATIO;
 
             if(DataContext is not TuningViewModel tvm) {
-                return;
+                return false;
             }
 
             double wx = 0;
@@ -48,6 +48,7 @@ namespace Calcuchord {
             KeyboardItemsControl.Width = tvm.AllNotes.Count(x => !x.IsAltered) * wkw;
             KeyboardItemsControl.Height = wkh;
             KeyboardItemsControl.InvalidateAll();
+            return wx > 0;
         }
 
         protected override void OnLoaded(RoutedEventArgs e) {

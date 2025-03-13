@@ -60,14 +60,21 @@ namespace Calcuchord {
             Gestures.SetIsHoldWithMouseEnabled(c,false);
         }
 
-        public void MeasureInstrument() {
-            if(this.GetVisualDescendant<KeyboardView>() is { } kbv) {
-                kbv.MeasureKeyboard();
+        public bool MeasureInstrument() {
+            bool success = false;
+            if(this.GetVisualDescendant<KeyboardView>() is { } kbv &&
+               kbv.IsVisible) {
+                success = kbv.MeasureKeyboard();
+            } else if(this.GetVisualDescendant<FretboardView>() is { } fbv &&
+               fbv.IsVisible) {
+                success = fbv.MeasureFretboard();
+            } else {
+                success = true;
             }
 
-            if(this.GetVisualDescendant<FretboardView>() is { } fbv) {
-                fbv.MeasureFretboard();
-            }
+
+            InvalidateMeasure();
+            return success;
         }
 
         void NoteView_OnPointerPressed(object sender,PointerPressedEventArgs e) {

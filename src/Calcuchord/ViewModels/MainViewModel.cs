@@ -509,7 +509,7 @@ namespace Calcuchord {
                     }
 
                     InitInstrumentAsync(InstrumentInitSource.TuningChanged)
-                        .FireAndForgetSafeAsync(DispatcherPriority.Background);
+                        .FireAndForgetSafeAsync();
                     break;
                 case nameof(SelectedInstrumentIndex):
                     OnPropertyChanged(nameof(SelectedInstrument));
@@ -1189,82 +1189,55 @@ namespace Calcuchord {
             // NOTE isStartupReset prevents double spinners on initial startup...
             PlatformWrapper.Services.Logger.WriteLine($"Init instrument. Source: {source}");
             IsBusy = !(isStartupReset && source == InstrumentInitSource.Startup);
-            //await Task.Delay(300);
+            await Task.Delay(500);
 
-            // await Dispatcher.UIThread.InvokeAsync(
-            //     async () => {
-            if(source == InstrumentInitSource.Startup && IsIndexModeSelected) {
-                //await Task.Delay(3_000);
-            }
+            await Dispatcher.UIThread.Invoke(
+                async () => {
+                    Matches.Clear();
 
+                    if(SelectedTuning is { } sel_tvm &&
+                       sel_tvm.LastNotePatternType != SelectedPatternType) {
+                        // only reset selection if different than current pattern
+                        sel_tvm.ResetSelection();
+                    }
 
-            Matches.Clear();
+                    if(SelectedInstrument != LastSelectedInstrument &&
+                       LastSelectedInstrument != null &&
+                       SelectedInstrument != null) {
+                        IsInstrumentChanging = true;
+                    }
 
-            bool do_sel_reset =
-                SelectedTuning != LastSelectedTuning;
-            if(SelectedTuning is { } sel_tvm && do_sel_reset) {
-                sel_tvm.ResetSelection();
-            }
+                    LastSelectedInstrument = SelectedInstrument;
+                    LastSelectedTuning = SelectedTuning;
 
-            if(SelectedInstrument != LastSelectedInstrument &&
-               LastSelectedInstrument != null &&
-               SelectedInstrument != null) {
-                IsInstrumentChanging = true;
-            }
+                    bool reset_opts = source == InstrumentInitSource.Startup &&
+                                      SelectedDisplayMode == DisplayModeType.Search;
 
-            LastSelectedInstrument = SelectedInstrument;
-            LastSelectedTuning = SelectedTuning;
+                    if(SelectedTuning != null) {
+                        InitOptions(reset_opts);
+                        Task.Run(InitMatchProvider).FireAndForgetSafeAsync();
+                    }
 
-            bool reset_opts = source == InstrumentInitSource.Startup &&
-                              SelectedDisplayMode == DisplayModeType.Search;
+                    UpdateViewProps();
 
-            if(SelectedTuning != null) {
-                InitOptions(reset_opts);
-                Task.Run(InitMatchProvider).FireAndForgetSafeAsync();
-            }
+                    if(IsInstrumentChanging) {
+                        // wait for inst to fade out...
+                        //await Task.Delay(500);
+                    }
 
-            UpdateViewProps();
+                    if(IsSearchModeSelected) {
+                        while(!InstrumentView.Instance.MeasureInstrument()) {
+                            await Task.Delay(300);
+                        }
+                    }
 
-            if(IsInstrumentChanging) {
-                // wait for inst to fade out...
-                await Task.Delay(500);
-            }
+                    if(SelectedTuning is { } st) {
+                        st.RaisePropertyChanged(nameof(st.IsSelected));
+                    }
 
-            if(SelectedTuning is { } st) {
-                st.RaisePropertyChanged(nameof(st.IsSelected));
-            }
-
-            UpdateMatchesAsync(MatchUpdateSource.InstrumentInit).FireAndForgetSafeAsync();
-
-            // // wait for search to initiate...
-            // await Task.Delay(200);
-            //
-            // //  },DispatcherPriority.ApplicationIdle);
-            //
-            //
-            // while(IsSearchInitiating) {
-            //     await Task.Delay(100);
-            // }
-            //
-            // if(InstrumentView.Instance is { } iv) {
-            //     if(IsInstrumentChanging) {
-            //         IsInstrumentChanging = false;
-            //         if(IsSearchModeSelected) {
-            //             // wait for inst to unhide...
-            //             await Task.Delay(500);
-            //             // while(true) {
-            //             //     if(iv.IsArrangeValid && iv.IsVisible) {
-            //             //         break;
-            //             //     }
-            //             //     await Task.Delay(100);
-            //             // }
-            //         }
-            //     }
-            //
-            //     iv.MeasureInstrument();
-            // }
-
-            IsBusy = false;
+                    UpdateMatchesAsync(MatchUpdateSource.InstrumentInit).FireAndForgetSafeAsync();
+                    IsBusy = false;
+                },DispatcherPriority.Background);
         }
 
         #endregion
@@ -1743,14 +1716,39 @@ namespace Calcuchord {
                 switch(optionType) {
                     case OptionType.DisplayMode:
                         OptionLookup[optionType].ForEach(x => x.IsChecked = x == ovm);
-                        UpdateViewProps();
-                        UpdateMatchesAsync(MatchUpdateSource.TabChanged)
-                            .FireAndForgetSafeAsync();
+                        IsBusy = true;
+                        Task.Run(
+                            () => {
+                                CancelMatchFilter();
+                                Dispatcher.UIThread.Invoke(
+                                    async () => {
+                                        UpdateViewProps();
+                                        await Task.Delay(100);
+                                        InstrumentView.Instance.MeasureInstrument();
+                                        IsBusy = false;
+                                        UpdateMatchesAsync(MatchUpdateSource.TabChanged)
+                                            .FireAndForgetSafeAsync();
+                                    },DispatcherPriority.Background);
+                            });
+
                         break;
                     case OptionType.Pattern:
                         OptionLookup[optionType].ForEach(x => x.IsChecked = x == ovm);
-                        UpdateMatchesAsync(MatchUpdateSource.FilterToggle)
-                            .FireAndForgetSafeAsync();
+                        IsBusy = true;
+                        Task.Run(
+                            () => {
+                                CancelMatchFilter();
+                                InitMatchProvider();
+                                Dispatcher.UIThread.Invoke(
+                                    () => {
+                                        Matches.Clear();
+                                        InitOptions(false);
+                                        UpdateViewProps();
+                                        IsBusy = false;
+                                        UpdateMatchesAsync(MatchUpdateSource.PatternChanged).FireAndForgetSafeAsync();
+                                    },DispatcherPriority.Background);
+                            });
+
                         break;
                     case OptionType.Key:
                         if(ovm.IsChecked) {
