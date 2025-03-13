@@ -661,8 +661,7 @@ namespace Calcuchord {
                    MatchUpdateSource.RootToggle ||
                (source is MatchUpdateSource.FilterToggle &&
                 IsSearchModeSelected &&
-                SelectedTuning != null &&
-                SelectedTuning.SelectedNotes.None())) {
+                (IsDefaultSelection || IsSearchButtonVisible))) {
                 // dont search when notes clicked or
                 // toggling options when instrument has empty selection
                 UpdateViewProps();
@@ -738,6 +737,7 @@ namespace Calcuchord {
 
             var unavail_keyl = KeyOptions.ToList();
             var unavail_suffl = SuffixOptions.ToList();
+            var mrl = new List<MatchViewModel>();
             foreach(var kvp in MatchProvider.PatternLookup) {
                 bool omitted_key = target_key is { } tk2 && tk2 != kvp.Key;
 
@@ -767,7 +767,8 @@ namespace Calcuchord {
                         if(!omitted_key &&
                            !omitted_suff &&
                            (!IsSearchModeSelected || mvm.Score > 0)) {
-                            yield return mvm;
+                            //yield return mvm;
+                            mrl.Add(mvm);
                         }
 
                     }
@@ -780,6 +781,7 @@ namespace Calcuchord {
                     SuffixOptions.ForEach(x => x.IsEnabled = !unavail_suffl.Contains(x));
                 },DispatcherPriority.Normal,MatchCts.Token);
 
+            return mrl;
         }
 
         void LoadMatches(MatchUpdateSource source) {
@@ -1007,10 +1009,17 @@ namespace Calcuchord {
             }
 
             MatchSvgCss = sb.ToString();
+            //ResetMatchSvg();
         }
 
         public void ResetMatchSvg() {
-            Matches.ForEach(x => x.RefreshSvg());
+            if(MatchesView.Instance is { } mv &&
+               mv.MatchItemsRepeater is { } mir &&
+               mir.GetVisualDescendants<MatchView>() is { } mvl &&
+               mvl.Select(x => x.DataContext).OfType<MatchViewModel>() is { } mtvml) {
+                mtvml.ForEach(x => x.RefreshSvg());
+            }
+            //Matches.ForEach(x => x.RefreshSvg());
         }
 
         IEnumerable<OptionViewModel> CreateOptions() {
@@ -1426,31 +1435,37 @@ namespace Calcuchord {
                 return;
             }
 
-            if(canceled && _editInstrumentInitialStateJson != null) {
-                Instrument inst_to_restore =
-                    JsonConvert.DeserializeObject<Instrument>(_editInstrumentInitialStateJson);
-                inst_to_restore.RefreshModelTree();
-                int inst_idx = Instruments.IndexOf(emi);
-                if(inst_idx >= 0) {
-                    Instruments[inst_idx] = await CreateInstrumentAsync(inst_to_restore);
-                    OnPropertyChanged(nameof(SelectedInstrument));
-                    emi = Instruments[inst_idx];
+            if(canceled) {
+                if(_editInstrumentInitialStateJson != null) {
+                    Instrument inst_to_restore =
+                        JsonConvert.DeserializeObject<Instrument>(_editInstrumentInitialStateJson);
+                    inst_to_restore.RefreshModelTree();
+                    int inst_idx = Instruments.IndexOf(emi);
+                    if(inst_idx >= 0) {
+                        Instruments[inst_idx] = await CreateInstrumentAsync(inst_to_restore);
+                        OnPropertyChanged(nameof(SelectedInstrument));
+                        emi = Instruments[inst_idx];
+                    } else {
+                        // shouldn't really happen
+                        emi = null;
+                    }
                 } else {
                     // new inst cancel
                     emi = null;
                 }
+
             }
 
             Prefs.Instance.Save();
             _editInstrumentInitialStateJson = null;
 
             EditModeInstrument = null;
-            if(emi != null && SelectedInstrument != emi) {
+            if(emi != null) {
                 SelectedInstrument = emi;
+                SelectedInstrument.RaisePropertyChanged(nameof(SelectedInstrument.SelectedTuning));
+                OnPropertyChanged(nameof(SelectedTuning));
             }
 
-            SelectedInstrument.RaisePropertyChanged(nameof(SelectedInstrument.SelectedTuning));
-            OnPropertyChanged(nameof(SelectedTuning));
             InitInstrumentAsync(InstrumentInitSource.EditorDone).FireAndForgetSafeAsync();
             ForwardCommand.Execute(null);
         }
@@ -1736,10 +1751,6 @@ namespace Calcuchord {
                         OptionLookup[optionType].ForEach(x => x.IsChecked = x == ovm);
                         UpdateMatchesAsync(MatchUpdateSource.FilterToggle)
                             .FireAndForgetSafeAsync();
-                        // InitInstrumentAsync(
-                        //     optionType == OptionType.Pattern
-                        //         ? InstrumentInitSource.PatternChanged
-                        //         : InstrumentInitSource.TabChanged).FireAndForgetSafeAsync();
                         break;
                     case OptionType.Key:
                         if(ovm.IsChecked) {
@@ -1801,7 +1812,22 @@ namespace Calcuchord {
                             }
                         }
 
-                        UpdateMatchCss();
+                        Dispatcher.UIThread.Invoke(
+                            () => {
+                                UpdateMatchCss();
+                                if((SelectedInstrument != null &&
+                                    !SelectedInstrument.IsKeyboard &&
+                                    IsChordsSelected &&
+                                    ovm.OptionValue == SvgOptionType.Tuning.ToString()) ||
+                                   (!IsChordsSelected && ovm.OptionValue == SvgOptionType.Frets.ToString())) {
+                                    // requires reset it changes svg size
+                                    ResetMatchSvg();
+                                }
+
+                                MatchesView.Instance.DoBusyCheckAsync(500).FireAndForgetSafeAsync();
+
+                            },DispatcherPriority.Background);
+
 
                         break;
                     case OptionType.ChordSort:

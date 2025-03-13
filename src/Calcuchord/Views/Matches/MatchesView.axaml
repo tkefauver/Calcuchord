@@ -237,7 +237,6 @@
                         <!-- NOTE no margin/padding on repeater to get accurate bounds -->
                         <ItemsRepeater x:Name="MatchItemsRepeater"
                                        Width="{Binding MatchesViewFixedWidth}"
-                                       Classes.can-resize="true"
                                        ItemsSource="{Binding Matches}">
                             <ItemsRepeater.Layout>
                                 <WrapLayout Orientation="Horizontal" />
@@ -246,7 +245,7 @@
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="local:MatchViewModel">
                                     <local:MatchView Background="{DynamicResource HttTransparent}"
-                                                     MaxWidth="{local:MathBinding a={Binding $parent[ItemsRepeater].Bounds.Width}, b={Binding MatchColCount, Source={x:Static local:MainViewModel.Instance}}, exp=(a/b)-10}"
+                                                     MaxWidth="{local:MathBinding a={Binding $parent[ItemsRepeater].Bounds.Width}, b={Binding MatchColCount, Source={x:Static local:MainViewModel.Instance}}, exp=(a/(b+0.001))-10}"
                                                      Focusable="True" />
                                 </DataTemplate>
                             </ItemsRepeater.ItemTemplate>

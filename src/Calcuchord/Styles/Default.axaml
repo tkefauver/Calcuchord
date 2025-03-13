@@ -19,30 +19,30 @@
     </Styles.Resources>
 
     <!-- WINDOW -->
-    <Style Selector="Window.debug">
-        <!-- <Setter Property="Width" -->
-        <!--         Value="360" /> -->
-        <!-- <Setter Property="Height" -->
-        <!--         Value="740" /> -->
-        <Setter Property="Width"
-                Value="1075" />
-        <Setter Property="Height"
-                Value="740" />
-        <Setter Property="SizeToContent"
-                Value="Manual" />
-    </Style>
-    
-    <!-- MOBILE SS -->
     <!-- <Style Selector="Window.debug"> -->
-    <!--     <Setter Property="SystemDecorations" -->
-    <!--             Value="None" /> -->
+    <!--     ~1~ <Setter Property="Width" @1@ -->
+    <!--     ~1~         Value="360" /> @1@ -->
+    <!--     ~1~ <Setter Property="Height" @1@ -->
+    <!--     ~1~         Value="740" /> @1@ -->
     <!--     <Setter Property="Width" -->
-    <!--             Value="417" /> -->
+    <!--             Value="1075" /> -->
     <!--     <Setter Property="Height" -->
-    <!--             Value="904.5" /> -->
+    <!--             Value="740" /> -->
     <!--     <Setter Property="SizeToContent" -->
     <!--             Value="Manual" /> -->
     <!-- </Style> -->
+
+    <!-- MOBILE SS -->
+    <Style Selector="Window.debug">
+        <Setter Property="SystemDecorations"
+                Value="None" />
+        <Setter Property="Width"
+                Value="417" />
+        <Setter Property="Height"
+                Value="904.5" />
+        <Setter Property="SizeToContent"
+                Value="Manual" />
+    </Style>
 
     <!-- TOOLTIPS -->
     <Style Selector=":is(ToolTip)">
@@ -391,11 +391,14 @@
                 Value="24" />
     </Style>
 
-    <Style Selector="ContextMenu MenuItem">
+    <Style Selector="ContextMenu MenuItem:not(:nth-last-child(1))">
         <Setter Property="BorderThickness"
                 Value="0,0,0,0.5" />
-        <Setter Property="BorderBrush"
-                Value="{DynamicResource Bg}" />
+        <Setter Property="BorderBrush">
+            <Setter.Value>
+                <SolidColorBrush Color="{DynamicResource BgColor}" Opacity="0.3"/>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style Selector="FlyoutPresenter /template/ controls|Card">

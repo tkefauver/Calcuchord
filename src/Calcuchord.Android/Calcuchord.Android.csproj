@@ -9,7 +9,6 @@
         <ApplicationVersion>1</ApplicationVersion>
         <ApplicationDisplayVersion>1.0.0.2</ApplicationDisplayVersion>
         <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
-        <AndroidSdkDirectory>/home/tkefauver/android-sdk</AndroidSdkDirectory>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
@@ -17,33 +16,36 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <AndroidEnableMarshalMethods>true</AndroidEnableMarshalMethods>
         <RunAOTCompilation>true</RunAOTCompilation>
         <EnableLLVM>true</EnableLLVM>
         <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <PublishAot>true</PublishAot>
-        <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
-        <TrimMode>link</TrimMode>
+        <!--        <BuiltInComInteropSupport>false</BuiltInComInteropSupport>-->
+        <!--        <TrimMode>link</TrimMode>-->
     </PropertyGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Release'">
         <TrimmerRootDescriptor Include="../Calcuchord/TrimmerRoots.xml"/>
     </ItemGroup>
 
+    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+        <!--        <AndroidEnvironment Include="AndroidEnv.txt"/>-->
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Avalonia.Android"/>
         <PackageReference Include="Avalonia.ReactiveUI"/>
-        <!--        <PackageReference Include="HarfBuzzSharp" />-->
-        <!--        <PackageReference Include="HarfBuzzSharp.NativeAssets.Android" />-->
-        <!--        <PackageReference Include="SkiaSharp.NativeAssets.Android"/>-->
+        <PackageReference Include="Mono.AotProfiler.Android"/>
         <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Calcuchord\Calcuchord.csproj"/>
     </ItemGroup>
+
     <ItemGroup>
         <AvaloniaResource Include="Resources\drawable\Icon.png"/>
     </ItemGroup>
@@ -52,6 +54,11 @@
         <AndroidResource Include="Resources\values\xml\file_paths.xml">
             <Generator>MSBuild:UpdateGeneratedFiles</Generator>
         </AndroidResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="environment.conf"/>
+        <AndroidEnvironment Include="environment.conf"/>
     </ItemGroup>
 
     <PropertyGroup>

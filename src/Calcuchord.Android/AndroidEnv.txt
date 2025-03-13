@@ -1,0 +1,2 @@
+debug.mono.log=mono_log_level=debug,mono_log_mask=all
+MONO_SDB_ENV_OPTIONS=loglevel=10    # only needed if you're debugging the managed debugger
