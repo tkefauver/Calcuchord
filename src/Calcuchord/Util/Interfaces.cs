@@ -36,6 +36,7 @@ namespace Calcuchord {
     }
 
     public interface ILog {
+        string LogPath { get; set; }
         void WriteLine(string message);
     }
 

@@ -152,7 +152,7 @@ namespace Calcuchord {
 
             if(show_header_labels) {
                 double header_x = min_fret_x;
-                double header_y = title_height + fh; //-1;
+                double header_y = title_height + fh;
                 for(int i = 0; i < str_count; i++) {
                     if(notes.FirstOrDefault(x => x.RowNum == i) is { } str_fret &&
                        str_fret.ColNum <= 0) {
@@ -205,7 +205,7 @@ namespace Calcuchord {
                 curx = min_fret_x;
                 for(int str_num = 0; str_num < str_count; str_num++) {
                     double cx = curx;
-                    double cy = cury + (fh / 2d); //(fh + cury) - (fh / 2d);
+                    double cy = cury + (fh / 2d);
                     double bar_y = cy - (BarHeight / 2d);
                     double dot_r = DotRadius;
                     PatternNote fret_note = notes.Where(x => x.ColNum > 0)
@@ -215,8 +215,6 @@ namespace Calcuchord {
 
                     PatternNote primary_note = fret_note ?? last_barre_note;
                     if(primary_note != null) {
-                        // fret_bg = flags.HasFlag(SvgOptionType.Colors) ? FingerBg[primary_note.FingerNum] : Fg;
-                        // fret_fg = flags.HasFlag(SvgOptionType.Colors) ? FingerFg[primary_note.FingerNum] : Bg;
                         fret_bg = FingerBg[primary_note.FingerNum];
                         fret_fg = FingerFg[primary_note.FingerNum];
                     }

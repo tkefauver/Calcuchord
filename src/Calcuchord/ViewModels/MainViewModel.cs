@@ -661,8 +661,7 @@ namespace Calcuchord {
                    MatchUpdateSource.RootToggle ||
                (source is MatchUpdateSource.FilterToggle &&
                 IsSearchModeSelected &&
-                SelectedTuning != null &&
-                SelectedTuning.SelectedNotes.None())) {
+                (IsDefaultSelection || IsSearchButtonVisible))) {
                 // dont search when notes clicked or
                 // toggling options when instrument has empty selection
                 UpdateViewProps();
@@ -738,6 +737,7 @@ namespace Calcuchord {
 
             var unavail_keyl = KeyOptions.ToList();
             var unavail_suffl = SuffixOptions.ToList();
+            var mrl = new List<MatchViewModel>();
             foreach(var kvp in MatchProvider.PatternLookup) {
                 bool omitted_key = target_key is { } tk2 && tk2 != kvp.Key;
 
@@ -767,7 +767,8 @@ namespace Calcuchord {
                         if(!omitted_key &&
                            !omitted_suff &&
                            (!IsSearchModeSelected || mvm.Score > 0)) {
-                            yield return mvm;
+                            //yield return mvm;
+                            mrl.Add(mvm);
                         }
 
                     }
@@ -780,6 +781,7 @@ namespace Calcuchord {
                     SuffixOptions.ForEach(x => x.IsEnabled = !unavail_suffl.Contains(x));
                 },DispatcherPriority.Normal,MatchCts.Token);
 
+            return mrl;
         }
 
         void LoadMatches(MatchUpdateSource source) {
@@ -1802,6 +1804,11 @@ namespace Calcuchord {
                         }
 
                         UpdateMatchCss();
+                        if(IsChordsSelected && ovm.OptionValue == SvgOptionType.Tuning.ToString()) {
+                            // requires reset it changes svg size
+                            ResetMatchSvg();
+                        }
+
 
                         break;
                     case OptionType.ChordSort:
