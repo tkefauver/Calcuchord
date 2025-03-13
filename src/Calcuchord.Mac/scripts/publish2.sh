@@ -79,5 +79,7 @@ else
   open -R "$BUNDLE_PATH"
 fi
 
+# budnle help https://developer.apple.com/forums/thread/701514
+
 
 

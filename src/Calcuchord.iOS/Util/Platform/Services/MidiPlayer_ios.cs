@@ -42,9 +42,13 @@ namespace Calcuchord.iOS {
             NSUrl midiFileUrl = NSUrl.FromFilename(midiFilePath);
             NSUrl sf2Url = NSUrl.FromFilename(GetInstrumentSoundFontPath(null));
             var mp = new AVMidiPlayer(midiFileUrl,sf2Url,out NSError error);
+            
             mp.PrepareToPlay();
-            await mp.PlayAsync();
-            await Task.Delay(10_000);
+            mp.Play(null);
+            while (mp.Playing)
+            {
+                await Task.Delay(10);
+            }
         }
 
     }

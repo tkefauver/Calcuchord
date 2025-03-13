@@ -10,6 +10,7 @@ PUB_PROP_ARG="-p:IsPublishMode=false"
 BUNDLE_ID="com.thomaskefauver.calcuchord"
 
 clear
+date
 
 if [ "$1" = "sim" ] || [ "$2" = "sim" ] || [ "$3" = "sim" ]; then
 	RUNTIME="iossimulator-x64"

@@ -10,9 +10,6 @@ namespace Calcuchord {
     public class MidiFileBuilder_default : IMidiFileBuilder {
 
         public virtual async Task CreateMidiScaleAsync(IEnumerable<IEnumerable<int>> toneSets,string fp) {
-// #if IOS
-//             await Task.Delay(1);
-// #else
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
@@ -43,19 +40,14 @@ namespace Calcuchord {
 
                     midiFile.Write(fp);
                 });
-//#endif
-
         }
 
         public virtual async Task CreateMidiChordAsync(IEnumerable<IEnumerable<int>> toneSets,string fp) {
-// #if IOS
-//             await Task.Delay(1);
-// #else
             MidiFile midiFile = new MidiFile();
             TrackChunk trackChunk = new TrackChunk();
             midiFile.Chunks.Add(trackChunk);
             int delta = 0;
-            int sus = 200;
+            int sus = 75;
             int vel = 127;
 
             foreach(var tone_set in toneSets) {
@@ -88,7 +80,6 @@ namespace Calcuchord {
 
                     midiFile.Write(fp);
                 });
-//#endif
         }
     }
 }
