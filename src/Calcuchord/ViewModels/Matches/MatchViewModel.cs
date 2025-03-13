@@ -1,8 +1,9 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Avalonia.Controls;
+using Avalonia.Svg.Skia;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
 
@@ -74,6 +75,21 @@ namespace Calcuchord {
 
         #region State
 
+        SvgSource _svgSource;
+
+        public SvgSource SvgSource {
+            get {
+
+                if(_svgSource == null &&
+                   PatternToSvgConverter.Instance.Convert(
+                       NotePattern,typeof(string),"styled",CultureInfo.CurrentCulture) is string svg_xml) {
+                    _svgSource = SvgSource.LoadFromSvg(svg_xml);
+                }
+
+                return _svgSource;
+            }
+        }
+
         public string ShareTitle =>
             NotePattern.FullName.Replace("#","Sharp").Replace(" ",string.Empty);
 
@@ -128,6 +144,8 @@ namespace Calcuchord {
 
         public void RefreshSvg() {
             OnPropertyChanged(nameof(NotePattern));
+            // _svgSource = null;
+            // OnPropertyChanged(nameof(SvgSource));
         }
 
         #endregion
@@ -183,7 +201,7 @@ namespace Calcuchord {
 
 #if DEBUG
                 if(ThemeViewModel.Instance.IsDesktop &&
-                   TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
+                   Avalonia.Controls.TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
                    tl.Clipboard is { } cb &&
                    PatternToSvgConverter.Instance.Convert(NotePattern,null,"styled",null) is string svg) {
                     cb.SetTextAsync(svg.ToPrettyPrintXml()).FireAndForgetSafeAsync();

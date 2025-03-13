@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
+using DialogHostAvalonia;
 using PropertyChanged;
 
 namespace Calcuchord {
@@ -51,6 +52,7 @@ namespace Calcuchord {
 
         void Button_OnClick(object sender,RoutedEventArgs e) {
             if(TopLevel.GetTopLevel(this) is not Window w) {
+                DialogHost.Close(MainViewModel.Instance.MainDialogHostName);
                 return;
             }
 

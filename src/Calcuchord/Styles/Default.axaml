@@ -391,11 +391,14 @@
                 Value="24" />
     </Style>
 
-    <Style Selector="ContextMenu MenuItem">
+    <Style Selector="ContextMenu MenuItem:not(:nth-last-child(1))">
         <Setter Property="BorderThickness"
                 Value="0,0,0,0.5" />
-        <Setter Property="BorderBrush"
-                Value="{DynamicResource Bg}" />
+        <Setter Property="BorderBrush">
+            <Setter.Value>
+                <SolidColorBrush Color="{DynamicResource BgColor}" Opacity="0.3"/>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style Selector="FlyoutPresenter /template/ controls|Card">

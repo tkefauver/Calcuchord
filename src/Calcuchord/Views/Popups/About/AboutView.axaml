@@ -135,7 +135,7 @@
                     </HyperlinkButton>
                 </StackPanel>
                 <Button x:Name="CloseButton"
-                        IsVisible="True"
+                        IsVisible="False"
                         RenderTransform="translate(28px,-28px) scale(0.7)"
                         Classes="float"
                         HorizontalAlignment="Right"

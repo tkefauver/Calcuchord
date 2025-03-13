@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using MonkeyPaste.Common.Avalonia;
@@ -19,17 +20,6 @@ namespace Calcuchord {
 
             Instance = this;
             InitializeComponent();
-
-            // MatchItemsRepeater.Loaded += async (sender,args) => {
-            //     if(MainViewModel.Instance is not { } mvm) {
-            //         return;
-            //     }
-            //
-            //     await mvm.CancelMatchZoomAsync();
-            //     mvm.SetMatchColumnCountAsync(mvm.MatchColCount,mvm.ZoomCts.Token)
-            //         .FireAndForgetSafeAsync();
-            //
-            // };
         }
 
         public void ScrollItemIntoView(MatchViewModel mtvm) {
@@ -49,6 +39,20 @@ namespace Calcuchord {
             }
 
             return 1;
+        }
+
+        public async Task DoBusyCheckAsync(int delay = 300) {
+            if(MatchesBusyOverlay.IsVisible) {
+                return;
+            }
+
+            MatchesBusyOverlay.IsVisible = true;
+            await Task.Delay(delay);
+            while(!MatchItemsRepeater.IsArrangeValid) {
+                await Task.Delay(100);
+            }
+
+            MatchesBusyOverlay.IsVisible = false;
         }
     }
 }
