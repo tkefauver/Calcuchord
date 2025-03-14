@@ -19,7 +19,6 @@ namespace Calcuchord.Mac {
             return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .UseReactiveUI()
-                //.UseDesktopWebView()
                 .WithInterFont()
                 .LogToTrace()
                 .AfterPlatformServicesSetup(
