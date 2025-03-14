@@ -96,7 +96,8 @@
         </Style>
 
     </UserControl.Styles>
-    <Viewbox Margin="10">
+    <Viewbox x:Name="KeyboardViewbox"
+             Margin="10">
         <Grid>
             <ItemsControl x:Name="KeyboardItemsControl"
                           ItemsSource="{Binding AllNotes}">

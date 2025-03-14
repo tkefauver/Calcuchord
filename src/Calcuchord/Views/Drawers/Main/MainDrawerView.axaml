@@ -186,6 +186,7 @@
         <!-- ABOUT BTN -->
         <controls:ColorZone Grid.Row="3"
                             Mode="Accent"
+                            Height="{StaticResource SlotHeight}"
                             VerticalContentAlignment="Center"
                             HorizontalContentAlignment="Left"
                             Padding="0,10">

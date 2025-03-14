@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Android.App;
 using Android.Content.PM;
 using Android.Runtime;
@@ -23,8 +22,9 @@ namespace Calcuchord.Android {
                 .AfterPlatformServicesSetup(
                     _ => {
                         PlatformWrapper.Init(new PlatformServices_ad(this));
-                        PlatformWrapper.Services.Logger.LogPath =
-                            Path.Combine(PlatformWrapper.Services.StorageHelper.StorageDir,$"{DateTime.Now.Ticks}.log");
+
+                        // PlatformWrapper.Services.Logger.LogPath =
+                        //     Path.Combine(PlatformWrapper.Services.StorageHelper.StorageDir,$"{DateTime.Now.Ticks}.log");
                         AppDomain.CurrentDomain.UnhandledException += (_,e) => {
                             PlatformWrapper.Services.Logger.WriteLine(
                                 $"AppDomain.CurrentDomain.UnhandledException: {e.ExceptionObject}. IsTerminating: {e.IsTerminating}");

@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
@@ -15,7 +14,7 @@ namespace Calcuchord {
         public MatchesView() {
             if(Instance != null) {
                 // singleton error
-                Debugger.Break();
+                //Debugger.Break();
             }
 
             Instance = this;

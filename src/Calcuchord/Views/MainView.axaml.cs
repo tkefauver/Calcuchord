@@ -1,7 +1,5 @@
-using System;
 using System.Diagnostics;
 using System.Linq;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -27,55 +25,9 @@ namespace Calcuchord {
         }
 
 
-        void SetupDrawers() {
-            if(MainNavDrawer.GetVisualDescendant<Border>(name: "PART_RightDrawerBorder") is not { } rdb ||
-               MainNavDrawer.GetVisualDescendant<Border>(name: "PART_LeftDrawerBorder") is not { } ldb) {
-                return;
-            }
-
-            void OnDrawerOpenChanged(bool right) {
-                //var mtsv = MatchesView.MatchesScrollViewer.Viewport
-                double lm = ldb.Bounds.Width + ldb.Margin.Left;
-                double rm = rdb.Bounds.Width + rdb.Margin.Right;
-
-                MatchesView.MatchesScrollViewer.Width = MainContainerGrid.Bounds.Width - rm;
-                if(InstrumentView.GetVisualDescendant<FretboardView>() is { } fbv) {
-                    fbv.FretboardScrollViewer.Width = MainContainerGrid.Bounds.Width - rm;
-                }
-            }
-
-            EffectiveViewportChanged += (_,_) => OnDrawerOpenChanged(false);
-
-            ldb.GetObservable(MarginProperty).Subscribe(value => OnDrawerOpenChanged(false));
-            rdb.GetObservable(MarginProperty).Subscribe(value => OnDrawerOpenChanged(true));
-        }
-
         protected override void OnLoaded(RoutedEventArgs e) {
             if(MainViewModel.Instance is not { } mvm) {
             }
-
-            //SetupDrawers();
-
-
-            // BUG right drawer opens automatically when threshold width == 0
-            //mvm.IsRightDrawerOpen = false;
-
-            // if(PlatformWrapper.Services is { } ps &&
-            //    ps.MidiPlayer is MidiPlayer_sugarwv mp) {
-            //     Dispatcher.UIThread.Post(
-            //         async () => {
-            //             // wait for load
-            //             while(!mvm.IsLoaded) {
-            //                 await Task.Delay(100);
-            //             }
-            //
-            //             // wait for asset move
-            //             await Task.Delay(500);
-            //
-            //             // only handled by sugarwv
-            //             mp.Init(MainContainerGrid);
-            //         });
-            // }
         }
 
         void OnMainContainerSizeChanged() {
@@ -89,8 +41,9 @@ namespace Calcuchord {
 
             //mvm.SetMatchColumnCount(mvm.MatchColCount);
 
-            InstrumentView.MeasureInstrument();
-
+            if(InstrumentView.Instance is { } iv) {
+                //iv.MeasureInstrument();
+            }
         }
 
         protected override void OnKeyUp(KeyEventArgs e) {

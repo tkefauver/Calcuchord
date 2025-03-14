@@ -28,7 +28,7 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Release'">
-        <TrimmerRootDescriptor Include="../Calcuchord/TrimmerRoots.xml"/>
+        <!--        <TrimmerRootDescriptor Include="../Calcuchord/TrimmerRoots.xml"/>-->
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Release'">
@@ -58,7 +58,6 @@
 
     <ItemGroup>
         <None Remove="environment.conf"/>
-        <AndroidEnvironment Include="environment.conf"/>
     </ItemGroup>
 
     <PropertyGroup>

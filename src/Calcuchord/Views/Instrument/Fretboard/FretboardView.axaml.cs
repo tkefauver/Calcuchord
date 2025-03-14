@@ -6,7 +6,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
-using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
@@ -111,32 +110,37 @@ namespace Calcuchord {
 
             cntr.Width = fret_widths.Sum();
             cntr.Height = th + str_h;
-            double inner_ar = Math.Min(6.44,cntr.Width / cntr.Height);
-            if(ThemeViewModel.Instance.IsExpandedLayout) {
-                FretboardViewbox.HorizontalAlignment = HorizontalAlignment.Center;
-                FretboardViewbox.Stretch = Stretch.UniformToFill;
-            } else {
-                FretboardViewbox.HorizontalAlignment = HorizontalAlignment.Left;
-                FretboardViewbox.Stretch = Stretch.Uniform;
-            }
-
-            double pad_w = FretboardScrollViewer.Padding.Left + FretboardScrollViewer.Padding.Right;
-            double pad_h = FretboardScrollViewer.Padding.Top + FretboardScrollViewer.Padding.Bottom;
-            double outer_w = Math.Max(0,outer_cntr.Bounds.Width - pad_w);
-            double outer_h = Math.Max(0,outer_cntr.Bounds.Height - pad_h);
-
-            if(cntr.Width > outer_w) {
-                FretboardViewbox.Width = outer_h * inner_ar;
-                FretboardViewbox.Height = FretboardViewbox.Width / inner_ar;
-            } else {
-                FretboardViewbox.Width = outer_w;
-                FretboardViewbox.Height = FretboardViewbox.Width / inner_ar;
-            }
-
-            if(FretboardViewbox.Height > outer_h) {
-                FretboardViewbox.Height = outer_h;
-                FretboardViewbox.Width = FretboardViewbox.Height * inner_ar;
-            }
+            MainView.Instance.MainContentView.FitInstrument(cntr,FretboardViewbox,false);
+            // double pad_w = FretboardScrollViewer.Padding.Left + FretboardScrollViewer.Padding.Right;
+            // double pad_h = FretboardScrollViewer.Padding.Top + FretboardScrollViewer.Padding.Bottom;
+            // double outer_w = Math.Max(0,outer_cntr.Bounds.Width - pad_w);
+            // double outer_h = Math.Max(0,outer_cntr.Bounds.Height - pad_h);
+            //
+            // double inner_ar = Math.Min(6.44,cntr.Width / cntr.Height);
+            // if(ThemeViewModel.Instance.IsExpandedLayout) {
+            //     FretboardViewbox.HorizontalAlignment = HorizontalAlignment.Center;
+            //     FretboardViewbox.Stretch = Stretch.UniformToFill;
+            // } else {
+            //     FretboardViewbox.HorizontalAlignment = HorizontalAlignment.Left;
+            //     FretboardViewbox.Stretch = Stretch.Uniform;
+            // }
+            //
+            //
+            // double max_outer_h =
+            //     MainView.Instance.MainContentView.Bounds.Height * (ThemeViewModel.Instance.IsLandscape ? 1 : 0.45d);
+            //
+            // if(cntr.Width > outer_w) {
+            //     FretboardViewbox.Width = outer_h * inner_ar;
+            //     FretboardViewbox.Height = FretboardViewbox.Width / inner_ar;
+            // } else {
+            //     FretboardViewbox.Width = outer_w;
+            //     FretboardViewbox.Height = FretboardViewbox.Width / inner_ar;
+            // }
+            //
+            // if(FretboardViewbox.Height > max_outer_h) {
+            //     FretboardViewbox.Height = max_outer_h;
+            //     FretboardViewbox.Width = FretboardViewbox.Height * inner_ar;
+            // }
 
             return true;
         }

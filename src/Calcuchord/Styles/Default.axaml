@@ -15,22 +15,24 @@
                 <MergeResourceInclude Source="avares://Calcuchord/Styles/Themes/MaterialButtonlikeToggleButton.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+        <sys:Double x:Key="SlotHeight">56</sys:Double>
+        <sys:Double x:Key="MatchesViewFixedWidth">1050</sys:Double>
 
     </Styles.Resources>
 
     <!-- WINDOW -->
-    <!-- <Style Selector="Window.debug"> -->
-    <!--     ~1~ <Setter Property="Width" @1@ -->
-    <!--     ~1~         Value="360" /> @1@ -->
-    <!--     ~1~ <Setter Property="Height" @1@ -->
-    <!--     ~1~         Value="740" /> @1@ -->
-    <!--     <Setter Property="Width" -->
-    <!--             Value="1075" /> -->
-    <!--     <Setter Property="Height" -->
-    <!--             Value="740" /> -->
-    <!--     <Setter Property="SizeToContent" -->
-    <!--             Value="Manual" /> -->
-    <!-- </Style> -->
+    <Style Selector="Window.debug">
+        <Setter Property="Width"
+                Value="360" />
+        <Setter Property="Height"
+                Value="740" />
+        <!-- <Setter Property="Width" -->
+        <!--         Value="1075" /> -->
+        <!-- <Setter Property="Height" -->
+        <!--         Value="740" /> -->
+        <Setter Property="SizeToContent"
+                Value="Manual" />
+    </Style>
 
     <!-- MOBILE SS -->
     <!-- <Style Selector="Window.debug"> -->
@@ -45,16 +47,16 @@
     <!-- </Style> -->
 
     <!-- TABLET SS -->
-    <Style Selector="Window.debug">
-        <Setter Property="SystemDecorations"
-                Value="None" />
-        <Setter Property="Width"
-                Value="1032" />
-        <Setter Property="Height"
-                Value="1376" />
-        <Setter Property="SizeToContent"
-                Value="Manual" />
-    </Style>
+    <!-- <Style Selector="Window.debug"> -->
+    <!--     <Setter Property="SystemDecorations" -->
+    <!--             Value="None" /> -->
+    <!--     <Setter Property="Width" -->
+    <!--             Value="1032" /> -->
+    <!--     <Setter Property="Height" -->
+    <!--             Value="1376" /> -->
+    <!--     <Setter Property="SizeToContent" -->
+    <!--             Value="Manual" /> -->
+    <!-- </Style> -->
 
     <!-- TOOLTIPS -->
     <Style Selector=":is(ToolTip)">
@@ -254,43 +256,6 @@
                 Value="0" />
         <Setter Property="InsideClipping"
                 Value="True" />
-    </Style>
-
-    <!-- BUSY -->
-    <Style Selector="Border.busy-cntr">
-        <Setter Property="IsHitTestVisible"
-                Value="False" />
-        <Setter Property="Background">
-            <Setter.Value>
-                <SolidColorBrush Color="Black"
-                                 Opacity="0.5" />
-
-            </Setter.Value>
-        </Setter>
-        <Setter Property="Child">
-            <Setter.Value>
-                <!-- ReSharper disable once Xaml.InvalidType -->
-                <Template>
-                    <controls:Card CornerRadius="24"
-                                   Padding="4"
-                                   Margin="4"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center">
-                        <ProgressBar Classes="circular"
-                                     IsIndeterminate="True" />
-                    </controls:Card>
-                    <!-- ReSharper disable once Xaml.InvalidType -->
-                </Template>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <!-- ORIENTATION -->
-    <Style Selector="Grid.oriented">
-        <Setter Property="common:MpAvOrientedGridExtension.IsEnabled"
-                Value="True" />
-        <Setter Property="common:MpAvOrientedGridExtension.Orientation"
-                Value="{Binding Orientation, Source={x:Static local:ThemeViewModel.Instance}}" />
     </Style>
 
 

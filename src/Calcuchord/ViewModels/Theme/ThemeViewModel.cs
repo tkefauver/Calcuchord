@@ -295,7 +295,7 @@ namespace Calcuchord {
             InitResoures();
             OnPropertyChanged(nameof(IsDark));
 
-            LogState();
+            //LogState();
         }
 
         public void DoOrientationCheck() {
@@ -307,7 +307,7 @@ namespace Calcuchord {
             }
 
             LastCheckWasLandscape = IsLandscape;
-            LogState();
+            //LogState();
         }
 
         #endregion

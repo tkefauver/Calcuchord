@@ -272,7 +272,7 @@
                             DataContext="{x:Static local:MainViewModel.Instance}"
                             x:DataType="local:MainViewModel"
                             Classes.chords="{Binding IsChordsSelected}"
-                            Classes.has-key="{Binding IsKeySelected}"
+                            Classes.has-key="{Binding SelectedKey, Converter={x:Static ObjectConverters.IsNotNull}}"
                             Classes.search-mode="{Binding IsSearchModeSelected}"
                             Margin="10,0,10,10"
                             Spacing="10">

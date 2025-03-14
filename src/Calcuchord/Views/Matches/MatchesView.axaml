@@ -239,13 +239,13 @@
                                        Width="{Binding MatchesViewFixedWidth}"
                                        ItemsSource="{Binding Matches}">
                             <ItemsRepeater.Layout>
-                                <WrapLayout Orientation="Horizontal" />
-                                <!-- <UniformGridLayout MaximumRowsOrColumns="{Binding MatchColCount}" /> -->
+                                <!-- <WrapLayout Orientation="Horizontal" /> -->
+                                <UniformGridLayout MaximumRowsOrColumns="{Binding MatchColCount}" />
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="local:MatchViewModel">
                                     <local:MatchView Background="{DynamicResource HttTransparent}"
-                                                     MaxWidth="{local:MathBinding a={Binding $parent[ItemsRepeater].Bounds.Width}, b={Binding MatchColCount, Source={x:Static local:MainViewModel.Instance}}, exp=(a/(b+0.001))-10}"
+                                                     Width="{Binding MatchWidth, Source={x:Static local:MainViewModel.Instance}}"
                                                      Focusable="True" />
                                 </DataTemplate>
                             </ItemsRepeater.ItemTemplate>
@@ -298,11 +298,9 @@
                 </controls:Card>
 
                 <!-- BUSY OVERLAY -->
-
-                <Border x:Name="MatchesBusyOverlay"
-                        Grid.RowSpan="2"
-                        Classes="busy-cntr">
-                    <Border.IsVisible>
+                <local:BusyOverlayView x:Name="MatchesBusyOverlay"
+                                       Grid.RowSpan="2">
+                    <local:BusyOverlayView.IsVisible>
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="!IsBusy" />
                             <MultiBinding Converter="{x:Static BoolConverters.Or}">
@@ -310,9 +308,8 @@
                                 <Binding Path="IsMatchZoomChanging" />
                             </MultiBinding>
                         </MultiBinding>
-                    </Border.IsVisible>
-                </Border>
-
+                    </local:BusyOverlayView.IsVisible>
+                </local:BusyOverlayView>
 
                 <!-- ZOOM BTNS -->
                 <controls:Card Grid.Row="0"

@@ -53,16 +53,16 @@
     <Grid>
         <ScrollViewer x:Name="FretboardScrollViewer"
                       Classes="inst-scroll"
-                      Padding="0,0,5,30"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Hidden">
             <Viewbox x:Name="FretboardViewbox"
                      HorizontalAlignment="Left"
                      VerticalAlignment="Center"
+                     Margin="0,0,5,30"
                      Stretch="Uniform">
                 <Grid x:Name="FretboardContainerGrid">
                     <Image x:Name="FretboardBgImage"
-                           Classes.fretless="{Binding Parent.IsFretless}"
+                           Classes.fretless="{Binding IsFretless}"
                            Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"
                            Width="{local:MathBinding a={Binding Bounds.Width, ElementName=StringsItemsControl}, exp=a-50}"
                            Height="{local:MathBinding a={Binding Bounds.Height, ElementName=StringsItemsControl}, exp=a-31}"

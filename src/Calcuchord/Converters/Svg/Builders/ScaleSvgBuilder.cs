@@ -7,10 +7,15 @@ namespace Calcuchord {
             HtmlNode svg = InitBuild(args);
 
             HtmlNode bg_g = CurrentDoc.CreateElement("g");
-            bg_g.Attributes.Add("transform","translate(3,0)");
+            if(MainViewModel.Instance.SelectedSvgOptionTypes.Contains(SvgOptionType.Tuning)) {
+                bg_g.Attributes.Add("transform","translate(3,1)");
+            } else {
+                bg_g.Attributes.Add("transform","translate(-5,1)");
+            }
+
             svg.AppendChild(bg_g);
 
-            int vfc = 5;
+            int vfc = PatternGen.PATTERN_FRET_SPAN;
 
             double lw = FretLineFixedAxisSize;
             double fw = StringFixedAxisLength;
@@ -65,16 +70,6 @@ namespace Calcuchord {
             double tw = fw * cols;
             double th = sh * rows;
 
-            if(WithTitle) {
-                AddTitleText(
-                    bg_g,
-                    ng.Name,
-                    ng.Position == 0 ? string.Empty : ng.Position.ToString(),
-                    ng.SubPosition == 0 ? string.Empty : ng.SubPosition.ToString(),
-                    TitleFontSize,Fg,tw,
-                    oy: -TitleFontSize,
-                    classes: "match-title");
-            }
 
             // tuning
             {
@@ -191,9 +186,24 @@ namespace Calcuchord {
             }
 
             if(MainViewModel.Instance.SelectedSvgOptionTypes.Contains(SvgOptionType.Frets)) {
-                th -= 7;
+                th -= 5;
             } else {
-                th -= 11;
+                th -= 10;
+            }
+
+            if(!MainViewModel.Instance.SelectedSvgOptionTypes.Contains(SvgOptionType.Tuning)) {
+                tw = 50;
+            }
+
+            if(WithTitle) {
+                AddTitleText(
+                    bg_g,
+                    ng.Name,
+                    ng.Position == 0 ? string.Empty : ng.Position.ToString(),
+                    ng.SubPosition == 0 ? string.Empty : ng.SubPosition.ToString(),
+                    TitleFontSize,Fg,tw,
+                    oy: -TitleFontSize,
+                    classes: "match-title");
             }
 
             svg.Attributes.Add("width",tw);

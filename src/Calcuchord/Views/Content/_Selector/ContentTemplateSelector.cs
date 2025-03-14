@@ -4,16 +4,20 @@ using Avalonia.Controls.Templates;
 using Avalonia.Metadata;
 
 namespace Calcuchord {
-    public class InstrumentTemplateSelector : IDataTemplate {
+    public class ContentTemplateSelector : IDataTemplate {
         [Content]
         public Dictionary<string,IDataTemplate> AvailableTemplates { get; } = new Dictionary<string,IDataTemplate>();
 
         public Control Build(object param) {
-            string key = null;
-            if(param is bool is_piano) {
-                key = is_piano ? "KeyboardViewTemplate" : "FretboardViewTemplate";
-            } else {
-                key = "EmptyTemplate";
+            string key = "DefaultTemplate";
+            if(param is MainContentFlags mcf) {
+                if(mcf.HasFlag(MainContentFlags.Search)) {
+                    if(mcf.HasFlag(MainContentFlags.Landscape)) {
+                        key = "SearchLandscapeTemplate";
+                    } else {
+                        key = "SearchTemplate";
+                    }
+                }
             }
 
             return AvailableTemplates[key].Build(param);

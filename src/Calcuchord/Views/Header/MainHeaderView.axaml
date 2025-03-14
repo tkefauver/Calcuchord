@@ -12,7 +12,7 @@
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:MainViewModel"
              x:Class="Calcuchord.MainHeaderView">
-    <controls:ColorZone Height="56"
+    <controls:ColorZone Height="{StaticResource SlotHeight}"
                         Mode="PrimaryMid">
         <DockPanel Margin="4">
             <ToggleButton x:Name="NavDrawerSwitch"

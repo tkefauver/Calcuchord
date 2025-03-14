@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
+             x:DataType="local:MainViewModel"
+             x:Class="Calcuchord.ContentView">
+    <UserControl.Background>
+        <ImageBrush Source="/Assets/Images/parchment.jpg"
+                    Opacity="0.3"
+                    Stretch="UniformToFill" />
+    </UserControl.Background>
+    <ContentControl x:Name="MainContentControl"
+                    Content="{Binding ContentFlags}">
+        <ContentControl.ContentTemplate>
+            <local:ContentTemplateSelector>
+                <DataTemplate x:Key="SearchTemplate">
+                    <Grid RowDefinitions="Auto,*"
+                          x:DataType="local:MainViewModel"
+                          DataContext="{x:Static local:MainViewModel.Instance}">
+                        <local:InstrumentView />
+                        <local:MatchesView Grid.Row="1" />
+                    </Grid>
+                </DataTemplate>
+                <DataTemplate x:Key="SearchLandscapeTemplate">
+                    <Grid ColumnDefinitions="0.5*,0.5*"
+                          x:DataType="local:MainViewModel"
+                          DataContext="{x:Static local:MainViewModel.Instance}">
+                        <local:InstrumentView />
+                        <local:MatchesView Grid.Column="1" />
+                    </Grid>
+                </DataTemplate>
+                <DataTemplate x:Key="DefaultTemplate">
+                    <local:MatchesView x:DataType="local:MainViewModel"
+                                       DataContext="{x:Static local:MainViewModel.Instance}" />
+                </DataTemplate>
+            </local:ContentTemplateSelector>
+        </ContentControl.ContentTemplate>
+    </ContentControl>
+
+</UserControl>

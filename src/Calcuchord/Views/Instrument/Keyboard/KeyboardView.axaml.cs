@@ -1,7 +1,6 @@
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using MonkeyPaste.Common.Avalonia;
 using PropertyChanged;
 
 namespace Calcuchord {
@@ -47,7 +46,12 @@ namespace Calcuchord {
 
             KeyboardItemsControl.Width = tvm.AllNotes.Count(x => !x.IsAltered) * wkw;
             KeyboardItemsControl.Height = wkh;
-            KeyboardItemsControl.InvalidateAll();
+
+            MainView.Instance.MainContentView.FitInstrument(
+                KeyboardItemsControl,
+                KeyboardViewbox,
+                true);
+
             return wx > 0;
         }
 

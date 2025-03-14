@@ -52,4 +52,12 @@
     <ItemGroup>
         <ReferencePathWithRefAssemblies Update="\home\tkefauver\.nuget\packages\newtonsoft.json\13.0.3\lib\net6.0\Newtonsoft.Json.dll"/>
     </ItemGroup>
+
+
+    <ItemGroup>
+        <Compile Update="Views\Popups\Overlays\BusyOverlayView.axaml.cs">
+            <DependentUpon>BusyOverlayView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+    </ItemGroup>
 </Project>

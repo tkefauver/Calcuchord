@@ -77,8 +77,28 @@ namespace Calcuchord {
             return !source.Any(predicate);
         }
 
+        public static bool RequiresReset(this SvgOptionType optionType,InstrumentType it,MusicPatternType mpt) {
+            if(it == InstrumentType.Piano) {
+                return false;
+            }
 
-        public static bool IsFlagEnabled(this SvgOptionType optionType,InstrumentType it,MusicPatternType pt,
+            if(mpt == MusicPatternType.Chords) {
+                if(optionType == SvgOptionType.Tuning) {
+                    return true;
+                }
+            } else {
+                if(optionType is SvgOptionType.Frets or SvgOptionType.Tuning) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool IsFlagEnabled(
+            this SvgOptionType optionType,
+            InstrumentType it,
+            MusicPatternType pt,
             DisplayModeType dmt) {
             if(dmt != DisplayModeType.Search) {
                 if(optionType == SvgOptionType.Matches) {
@@ -87,8 +107,11 @@ namespace Calcuchord {
             }
 
             if(it != InstrumentType.Piano) {
-                if(pt != MusicPatternType.Chords && optionType == SvgOptionType.Barres) {
-                    return false;
+                if(pt != MusicPatternType.Chords) {
+                    if(optionType is SvgOptionType.Barres or SvgOptionType.Frets) {
+                        return false;
+                    }
+
                 }
 
                 return true;

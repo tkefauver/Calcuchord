@@ -10,7 +10,7 @@
              xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
-             x:DataType="local:InstrumentViewModel"
+             x:DataType="local:MainViewModel"
              x:Class="Calcuchord.InstrumentView">
     <UserControl.Styles>
 
@@ -119,15 +119,34 @@
     </UserControl.Styles>
     <!-- NOTE top row 25 needs to match fretboard height exp -->
     <Grid x:Name="InstrumentContainer"
-          RowDefinitions="Auto,*"
-          DataContext="{Binding SelectedTuning}">
-        <local:KeyboardView Grid.Row="1"
-                            IsVisible="{Binding IsPianoSelected, Source={x:Static local:MainViewModel.Instance}}" />
-        <local:FretboardView Grid.Row="1"
-                             IsVisible="{Binding !IsPianoSelected, Source={x:Static local:MainViewModel.Instance}}" />
+          RowDefinitions="Auto,*">
+        <TransitioningContentControl x:Name="InstrumentContentControl"
+                                     Grid.Row="1"
+                                     IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}"
+                                     DataContext="{Binding SelectedInstrument}"
+                                     Content="{Binding IsPianoSelected, Source={x:Static local:MainViewModel.Instance}}">
+            <TransitioningContentControl.PageTransition>
+                <CrossFade Duration="0:0:1.0" />
+            </TransitioningContentControl.PageTransition>
+            <TransitioningContentControl.DataTemplates>
+                <local:InstrumentTemplateSelector>
+                    <DataTemplate x:Key="KeyboardViewTemplate">
+                        <local:KeyboardView
+                            DataContext="{Binding $parent[TransitioningContentControl].((local:InstrumentViewModel)DataContext).SelectedTuning}" />
+                    </DataTemplate>
+                    <DataTemplate x:Key="FretboardViewTemplate">
+                        <local:FretboardView
+                            DataContext="{Binding $parent[TransitioningContentControl].((local:InstrumentViewModel)DataContext).SelectedTuning}" />
+                    </DataTemplate>
+                    <DataTemplate x:Key="EmptyTemplate">
+                        <Border />
+                    </DataTemplate>
+                </local:InstrumentTemplateSelector>
+            </TransitioningContentControl.DataTemplates>
+        </TransitioningContentControl>
 
         <DockPanel x:Name="InstToolbar"
-                   x:DataType="local:TuningViewModel"
+                   DataContext="{Binding SelectedTuning}"
                    LastChildFill="False">
             <!-- BUG Tooltip flickers on browser only -->
             <local:HintView DockPanel.Dock="Left"

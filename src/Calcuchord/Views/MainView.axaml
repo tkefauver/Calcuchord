@@ -116,9 +116,6 @@
                     <controls:NavigationDrawer.LeftDrawerContent>
                         <local:DrawerHostView />
                     </controls:NavigationDrawer.LeftDrawerContent>
-                    <controls:NavigationDrawer.RightDrawerContent>
-                        <!-- <local:OptionsDrawerView x:Name="RightDrawerView" /> -->
-                    </controls:NavigationDrawer.RightDrawerContent>
                     <DockPanel x:Name="MainPanel"
                                LastChildFill="true">
                         <!-- HEADER MENU -->
@@ -129,40 +126,38 @@
                         <local:MainFooterView x:Name="FooterView"
                                               DockPanel.Dock="Bottom" />
 
-                        <Grid x:Name="MainContainerGrid"
-                              RowDefinitions="Auto,*"
-                              ColumnDefinitions="Auto,*"
-                              Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"
-                              Classes.landscape="{Binding IsLandscape, Source={x:Static local:ThemeViewModel.Instance}}">
-                            <!-- BG IMAGE -->
-                            <Image x:Name="MainBgImage"
-                                   Grid.RowSpan="2"
-                                   Grid.ColumnSpan="2"
-                                   Source="/Assets/Images/parchment.jpg"
-                                   HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch"
-                                   Opacity="0.5"
-                                   Stretch="None" />
+                        <local:ContentView x:Name="MainContentView" />
 
-                            <!-- INSTRUMENT VIEW -->
-                            <local:InstrumentView x:Name="InstrumentView"
-                                                  IsVisible="{Binding IsSearchModeSelected, Source={x:Static local:MainViewModel.Instance}}"
-                                                  DataContext="{Binding SelectedInstrument}" />
-
-                            <!-- MATCHES VIEW -->
-
-                            <local:MatchesView x:Name="MatchesView" />
-                        </Grid>
+                        <!-- <Grid x:Name="MainContainerGrid" -->
+                        <!--       RowDefinitions="Auto,*" -->
+                        <!--       ColumnDefinitions="Auto,*" -->
+                        <!--       Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}" -->
+                        <!--       Classes.landscape="{Binding IsLandscape, Source={x:Static local:ThemeViewModel.Instance}}"> -->
+                        <!--     ~1~ BG IMAGE @1@ -->
+                        <!--     <Image x:Name="MainBgImage" -->
+                        <!--            Grid.RowSpan="2" -->
+                        <!--            Grid.ColumnSpan="2" -->
+                        <!--            Source="/Assets/Images/parchment.jpg" -->
+                        <!--            HorizontalAlignment="Stretch" -->
+                        <!--            VerticalAlignment="Stretch" -->
+                        <!--            Opacity="0.5" -->
+                        <!--            Stretch="None" /> -->
+                        <!-- -->
+                        <!--     ~1~ INSTRUMENT VIEW @1@ -->
+                        <!--     <local:InstrumentView x:Name="InstrumentView" -->
+                        <!--                           IsVisible="{Binding IsSearchModeSelected, Source={x:Static local:MainViewModel.Instance}}" -->
+                        <!--                           DataContext="{Binding SelectedInstrument}" /> -->
+                        <!-- -->
+                        <!--     ~1~ MATCHES VIEW @1@ -->
+                        <!-- -->
+                        <!--     <local:MatchesView x:Name="MatchesView" /> -->
+                        <!-- </Grid> -->
                     </DockPanel>
                 </controls:NavigationDrawer>
             </controls:SnackbarHost>
         </dlg:DialogHost>
 
-        <Border x:Name="MainContainerBusyOverlay"
-                Classes="busy-cntr"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                IsVisible="{Binding IsBusy, Source={x:Static local:MainViewModel.Instance}, Mode=OneWay}" />
-
+        <local:BusyOverlayView x:Name="MainBusyOverlay"
+                               IsVisible="{Binding IsBusy, Source={x:Static local:MainViewModel.Instance}, Mode=OneWay}" />
     </Grid>
 </UserControl>

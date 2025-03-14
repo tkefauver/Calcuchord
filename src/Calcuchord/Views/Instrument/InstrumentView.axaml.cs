@@ -17,6 +17,7 @@ namespace Calcuchord {
             Instance = this;
             InitializeComponent();
             this.GetObservable(IsVisibleProperty).Subscribe(value => MeasureInstrument());
+            this.GetObservable(BoundsProperty).Subscribe(value => MeasureInstrument());
         }
 
         public void ScrollSelectionIntoView() {
@@ -43,6 +44,7 @@ namespace Calcuchord {
             hi_note_v.BringIntoView();
         }
 
+
         public void AttachHandlers(Control c) {
             c.PointerPressed += NoteView_OnPointerPressed;
             c.PointerReleased += NoteView_OnPointerReleased;
@@ -66,14 +68,14 @@ namespace Calcuchord {
                kbv.IsVisible) {
                 success = kbv.MeasureKeyboard();
             } else if(this.GetVisualDescendant<FretboardView>() is { } fbv &&
-               fbv.IsVisible) {
+                      fbv.IsVisible) {
                 success = fbv.MeasureFretboard();
             } else {
                 success = true;
             }
 
-
             InvalidateMeasure();
+
             return success;
         }
 

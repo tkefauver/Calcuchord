@@ -1,7 +1,18 @@
+using System;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json.Converters;
 
 namespace Calcuchord {
+    [JsonConverter(typeof(StringEnumConverter))]
+    [Flags]
+    public enum MainContentFlags {
+        None = 0,
+        Search = 1,
+        Bookmarks = 2,
+        Index = 4,
+        Landscape = 8,
+    }
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum MatchScoreMethodType {
         Exact,

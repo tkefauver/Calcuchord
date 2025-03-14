@@ -80,6 +80,9 @@ namespace Calcuchord {
 
         #region State
 
+        public bool IsFretless =>
+            Parent.IsFretless;
+
         public MusicPatternType LastNotePatternType { get; set; }
 
         public bool CanDelete =>
