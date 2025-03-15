@@ -22,8 +22,9 @@ namespace Calcuchord {
                 vb.Stretch = Stretch.Uniform;
             }
 
+            double toolbar_h = InstrumentView.Instance.InstToolbar.Bounds.Height;
             double outer_w = Bounds.Width - vb.Margin.Left - vb.Margin.Right;
-            double outer_h = Bounds.Height - vb.Margin.Top - vb.Margin.Bottom;
+            double outer_h = Bounds.Height - toolbar_h - vb.Margin.Top - vb.Margin.Bottom;
             if(ThemeViewModel.Instance.IsLandscape) {
                 outer_w *= 0.5;
             } else {
@@ -39,7 +40,9 @@ namespace Calcuchord {
             }
 
             double max_outer_h =
-                MainView.Instance.MainContentView.Bounds.Height * (ThemeViewModel.Instance.IsLandscape ? 1 : 0.45d);
+                (MainView.Instance.MainContentView.Bounds.Height *
+                 (ThemeViewModel.Instance.IsLandscape ? 1 : 0.45d)) -
+                toolbar_h;
 
             if(vb.Height > max_outer_h) {
                 vb.Height = max_outer_h;

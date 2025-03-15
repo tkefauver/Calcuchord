@@ -41,6 +41,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="PdfSharp"/>
         <PackageReference Include="PropertyChanged.Fody" PrivateAssets="All"/>
         <PackageReference Include="ReactiveUI"/>
         <PackageReference Include="System.Formats.Nrbf"/>
@@ -57,6 +58,10 @@
     <ItemGroup>
         <Compile Update="Views\Popups\Overlays\BusyOverlayView.axaml.cs">
             <DependentUpon>BusyOverlayView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Popups\Dialogs\ProgressView.axaml.cs">
+            <DependentUpon>ProgressView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
     </ItemGroup>

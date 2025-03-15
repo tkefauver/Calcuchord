@@ -31,20 +31,6 @@
                     Value="Center" />
         </Style>
 
-        <!-- <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl"> -->
-        <!--     <Setter Property="Content"> -->
-        <!--         <Setter.Value> -->
-        <!--             <Template> -->
-        <!--                 <TextBlock Classes="empty-label"> -->
-        <!--                     <TextBlock.Inlines> -->
-        <!--                         <Run Text="" /> -->
-        <!--                     </TextBlock.Inlines> -->
-        <!--                 </TextBlock> -->
-        <!--             </Template> -->
-        <!--         </Setter.Value> -->
-        <!--     </Setter> -->
-        <!-- </Style> -->
-
         <Style Selector="TransitioningContentControl#EmptyTextCntrContentControl.init">
             <Setter Property="Content">
                 <Setter.Value>
@@ -232,25 +218,69 @@
             <Grid RowDefinitions="Auto,*">
 
                 <ScrollViewer x:Name="MatchesScrollViewer"
+                              Bounds="{Binding MatchesContainerRect,Mode=OneWayToSource}"
                               Grid.Row="1">
-                    <Viewbox VerticalAlignment="Top">
-                        <!-- NOTE no margin/padding on repeater to get accurate bounds -->
-                        <ItemsRepeater x:Name="MatchItemsRepeater"
-                                       Width="{Binding MatchesViewFixedWidth}"
-                                       ItemsSource="{Binding Matches}">
-                            <ItemsRepeater.Layout>
-                                <!-- <WrapLayout Orientation="Horizontal" /> -->
-                                <UniformGridLayout MaximumRowsOrColumns="{Binding MatchColCount}" />
-                            </ItemsRepeater.Layout>
-                            <ItemsRepeater.ItemTemplate>
-                                <DataTemplate x:DataType="local:MatchViewModel">
-                                    <local:MatchView Background="{DynamicResource HttTransparent}"
-                                                     Width="{Binding MatchWidth, Source={x:Static local:MainViewModel.Instance}}"
-                                                     Focusable="True" />
-                                </DataTemplate>
-                            </ItemsRepeater.ItemTemplate>
-                        </ItemsRepeater>
-                    </Viewbox>
+                    <StackPanel>
+                        <Viewbox VerticalAlignment="Top">
+                            <!-- NOTE no margin/padding on repeater to get accurate bounds -->
+                            <!-- <ItemsRepeater x:Name="MatchItemsRepeater" -->
+                            <!--                Width="{Binding MatchesViewFixedWidth}" -->
+                            <!--                ItemsSource="{Binding Matches}"> -->
+                            <!--     <ItemsRepeater.Layout> -->
+                            <!--         <WrapLayout Orientation="Horizontal" /> -->
+                            <!--     </ItemsRepeater.Layout> -->
+                            <!--     <ItemsRepeater.ItemTemplate> -->
+                            <!--         <DataTemplate x:DataType="local:MatchViewModel"> -->
+                            <!--             <local:MatchView Background="{DynamicResource HttTransparent}" -->
+                            <!--                              Width="{Binding MatchWidth, Source={x:Static local:MainViewModel.Instance}}" -->
+                            <!--                              Focusable="True" /> -->
+                            <!--         </DataTemplate> -->
+                            <!--     </ItemsRepeater.ItemTemplate> -->
+                            <!-- </ItemsRepeater> -->
+                            <ItemsControl x:Name="MatchItemsRepeater"
+                                          Width="{Binding MatchesViewFixedWidth}"
+                                          ItemsSource="{Binding Matches}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="local:MatchViewModel">
+                                        <local:MatchView Background="{DynamicResource HttTransparent}"
+                                                         Width="{Binding MatchWidth, Source={x:Static local:MainViewModel.Instance}}"
+                                                         Focusable="True" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                        </Viewbox>
+                        <Button x:Name="LoadMoreButton"
+                                Width="{Binding Bounds.Width, ElementName=MatchItemsRepeater}"
+                                Height="64"
+                                Command="{Binding LoadMoreCommand}">
+                            <Button.Background>
+                                <SolidColorBrush Color="{DynamicResource FgColor}"
+                                                 Opacity="0.3" />
+                            </Button.Background>
+                            <Button.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="CanLoadMore" />
+                                    <Binding Path="!IsLoadingMore" />
+                                    <Binding Path="!IsSearchInitiating" />
+                                </MultiBinding>
+                            </Button.IsVisible>
+                            <avalonia:MaterialIcon Width="48"
+                                                   Height="48"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Kind="ArrowDownCircle" />
+                        </Button>
+                        <local:BusyOverlayView x:Name="LoadMoreBusyOverlay"
+                                               IsVisible="{Binding IsLoadingMore}"
+                                               Width="{Binding Bounds.Width, ElementName=MatchItemsRepeater}"
+                                               Height="64" />
+                    </StackPanel>
                 </ScrollViewer>
 
                 <!-- SHARE -->
@@ -303,10 +333,7 @@
                     <local:BusyOverlayView.IsVisible>
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="!IsBusy" />
-                            <MultiBinding Converter="{x:Static BoolConverters.Or}">
-                                <Binding Path="IsSearchInitiating" />
-                                <Binding Path="IsMatchZoomChanging" />
-                            </MultiBinding>
+                            <Binding Path="IsSearchInitiating" />
                         </MultiBinding>
                     </local:BusyOverlayView.IsVisible>
                 </local:BusyOverlayView>

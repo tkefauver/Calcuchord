@@ -69,139 +69,148 @@
 
     </UserControl.Styles>
 
-    <Border x:Name="MatchContainerBorder"
-            Background="Transparent"
-            BorderThickness="1"
-            Margin="10"
-            Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"
-            Classes.selected="{Binding IsSelected}"
-            Classes.bookmarked="{Binding IsBookmarked}"
-            Classes.bookmark-mode="{Binding IsBookmarkModeSelected, Source={x:Static local:MainViewModel.Instance}}"
-            PointerReleased="MatchContainerBorder_OnPointerReleased">
+    <Viewbox>
+        <Border x:Name="MatchContainerBorder"
+                Background="Transparent"
+                BorderThickness="1"
+                Margin="10"
+                MaxWidth="{Binding MatchFixedWidth, Source={x:Static local:MainViewModel.Instance}}"
+                MaxHeight="{Binding MatchFixedHeight, Source={x:Static local:MainViewModel.Instance}}"
+                Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"
+                Classes.selected="{Binding IsSelected}"
+                Classes.bookmarked="{Binding IsBookmarked}"
+                Classes.bookmark-mode="{Binding IsBookmarkModeSelected, Source={x:Static local:MainViewModel.Instance}}"
+                PointerReleased="MatchContainerBorder_OnPointerReleased">
 
-        <Grid RowDefinitions="Auto,*,Auto">
-            <!-- TITLE -->
-            <TextBlock x:Name="MatchTitleTextBlock"
-                       HorizontalAlignment="Center"
-                       TextAlignment="Center"
-                       VerticalAlignment="Center">
-                <TextBlock.Inlines>
-                    <Run Text="{Binding Label1}"
-                         Classes="bold"
-                         FontSize="42" />
-                    <Run Text="{Binding Label2}"
-                         FontSize="30" />
-                    <Run Text="{Binding Label3}"
-                         FontSize="18"
-                         BaselineAlignment="TextBottom" />
-                    <Run Text="{Binding Label4}"
-                         FontSize="18"
-                         BaselineAlignment="TextTop" />
-                </TextBlock.Inlines>
-            </TextBlock>
+            <Grid RowDefinitions="Auto,*,Auto">
+                <!-- TITLE -->
+                <TextBlock x:Name="MatchTitleTextBlock"
+                           HorizontalAlignment="Center"
+                           TextAlignment="Center"
+                           VerticalAlignment="Center">
+                    <TextBlock.Inlines>
+                        <Run Text="{Binding Label1}"
+                             Classes="bold"
+                             FontSize="48" />
+                        <Run Text="{Binding Label2}"
+                             FontSize="36" />
+                        <Run Text="{Binding Label3}"
+                             FontSize="24"
+                             BaselineAlignment="TextBottom" />
+                        <Run Text="{Binding Label4}"
+                             FontSize="24"
+                             BaselineAlignment="TextTop" />
+                    </TextBlock.Inlines>
+                </TextBlock>
 
-            <!-- SCORE -->
-            <!-- <TextBlock x:Name="ScoreTextBlock" -->
-            <!--            IsVisible="{Binding IsSearchModeSelected, Source={x:Static local:MainViewModel.Instance}}" -->
-            <!--            HorizontalAlignment="Right" -->
-            <!--            VerticalAlignment="Center" -->
-            <!--            TextAlignment="Right" -->
-            <!--            Text="{Binding Score, StringFormat={}{0:N2}}" /> -->
+                <!-- SCORE -->
+                <!-- <TextBlock x:Name="ScoreTextBlock" -->
+                <!--            IsVisible="{Binding IsSearchModeSelected, Source={x:Static local:MainViewModel.Instance}}" -->
+                <!--            HorizontalAlignment="Right" -->
+                <!--            VerticalAlignment="Center" -->
+                <!--            TextAlignment="Right" -->
+                <!--            Text="{Binding Score, StringFormat={}{0:N2}}" /> -->
 
-            <Svg x:Name="MatchSvg"
-                 Grid.Row="1"
-                 Css="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}"
-                 Source="{Binding NotePattern, Converter={x:Static local:PatternToSvgConverter.Instance}}"
-                 Stretch="Uniform" />
-            <!-- <Image Source="/Assets/Images/logo.png" -->
-            <!--        Grid.Row="1" -->
-            <!--        Stretch="Uniform" /> -->
-            <!-- <Image Grid.Row="1" -->
-            <!--        Stretch="Uniform"> -->
-            <!--     <Image.Source> -->
-            <!--         <SvgImage Source="{Binding SvgSource}" -->
-            <!--                   Css="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}" /> -->
-            <!--     </Image.Source> -->
-            <!-- </Image> -->
-            <!-- <local:ChordView Grid.Row="1" /> -->
-            <UniformGrid x:Name="MatchButtonStripPanel"
-                         Grid.Row="2"
-                         Height="{Binding Bounds.Height, ElementName=MatchTitleTextBlock}"
-                         Classes="fade"
-                         Columns="3">
-                <UniformGrid.Styles>
-                    <Style Selector="Button">
-                        <Setter Property="Theme"
-                                Value="{StaticResource MaterialFlatButton}" />
+                <Svg x:Name="MatchSvg"
+                     Grid.Row="1"
+                     Css="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}"
+                     Source="{Binding NotePattern, Converter={x:Static local:PatternToSvgConverter.Instance}}"
+                     Stretch="Uniform" />
+                <!-- <Image Source="/Assets/Images/logo.png" -->
+                <!--        Grid.Row="1" -->
+                <!--        Stretch="Uniform" /> -->
+                <!-- <Image Grid.Row="1" -->
+                <!--        Stretch="Uniform"> -->
+                <!--     <Image.Source> -->
+                <!--         <SvgImage Source="{Binding SvgSource}" -->
+                <!--                   Css="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}" /> -->
+                <!--     </Image.Source> -->
+                <!-- </Image> -->
+                <!-- <local:ChordView Grid.Row="1" /> -->
+                <UniformGrid x:Name="MatchButtonStripPanel"
+                             Grid.Row="2"
+                             Height="{Binding Bounds.Height, ElementName=MatchTitleTextBlock}"
+                             Classes="fade"
+                             Columns="3">
+                    <UniformGrid.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="Theme"
+                                    Value="{StaticResource MaterialFlatButton}" />
 
-                        <Setter Property="HorizontalAlignment"
-                                Value="Stretch" />
-                        <Setter Property="VerticalAlignment"
-                                Value="Stretch" />
-                    </Style>
-                    <Style Selector="avalonia|MaterialIcon">
-                        <Setter Property="HorizontalAlignment"
-                                Value="Center" />
-                        <Setter Property="VerticalAlignment"
-                                Value="Stretch" />
-                        <Setter Property="Margin"
-                                Value="5" />
-                    </Style>
-                </UniformGrid.Styles>
+                            <Setter Property="HorizontalAlignment"
+                                    Value="Stretch" />
+                            <Setter Property="VerticalAlignment"
+                                    Value="Stretch" />
+                        </Style>
+                        <Style Selector="avalonia|MaterialIcon">
+                            <Setter Property="HorizontalAlignment"
+                                    Value="Center" />
+                            <Setter Property="VerticalAlignment"
+                                    Value="Stretch" />
+                            <Setter Property="Margin"
+                                    Value="5" />
+                        </Style>
+                    </UniformGrid.Styles>
 
-                <!-- SET NECK BTN -->
-                <Button Command="{Binding SetMatchToInstrumentCommand}">
-                    <avalonia:MaterialIcon Kind="ContentCopy" />
+                    <!-- SET NECK BTN -->
+                    <Button Command="{Binding SetMatchToInstrumentCommand}">
+                        <avalonia:MaterialIcon Kind="ContentCopy" />
+                    </Button>
+
+                    <!-- PLAY SAMPLE BTN -->
+                    <Button Command="{Binding ToggleMatchPlaybackCommand}">
+                        <avalonia:MaterialIcon Kind="{Binding PlaybackIcon}" />
+                    </Button>
+
+                    <!-- BOOKMARK BTN  -->
+                    <Button Command="{Binding ToggleBookmarkCommand}">
+                        <avalonia:MaterialIcon Kind="{Binding BookmarkIcon}" />
+                    </Button>
+                </UniformGrid>
+
+
+                <Button x:Name="ShareButton"
+                        local:CloseFlyoutExtension.IsEnabled="False"
+                        Margin="0"
+                        Padding="0"
+                        Height="63"
+                        Width="63"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Classes="float">
+                    <Button.Flyout>
+                        <Flyout Placement="AnchorAndGravity"
+                                PlacementAnchor="TopRight"
+                                PlacementGravity="BottomRight">
+                            <ContextMenu>
+                                <MenuItem Header="Export midi..."
+                                          Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                          CommandParameter="MIDI">
+                                    <MenuItem.Icon>
+                                        <avalonia:MaterialIcon Kind="Midi" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="Export pdf..."
+                                          Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                          CommandParameter="PDF">
+                                    <MenuItem.Icon>
+                                        <avalonia:MaterialIcon Kind="FilePdfBox" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </Flyout>
+                    </Button.Flyout>
+                    <Grid Height="63"
+                          Width="63">
+                        <avalonia:MaterialIcon Width="{x:Static sys:Double.NaN}"
+                                               Height="{x:Static sys:Double.NaN}"
+                                               Margin="0,3"
+                                               HorizontalAlignment="Right"
+                                               Kind="DotsVertical" />
+                    </Grid>
                 </Button>
 
-                <!-- PLAY SAMPLE BTN -->
-                <Button Command="{Binding ToggleMatchPlaybackCommand}">
-                    <avalonia:MaterialIcon Kind="{Binding PlaybackIcon}" />
-                </Button>
-
-                <!-- BOOKMARK BTN  -->
-                <Button Command="{Binding ToggleBookmarkCommand}">
-                    <avalonia:MaterialIcon Kind="{Binding BookmarkIcon}" />
-                </Button>
-            </UniformGrid>
-
-
-            <Button x:Name="ShareButton"
-                    local:CloseFlyoutExtension.IsEnabled="False"
-                    Margin="0"
-                    Padding="0"
-                    Width="48"
-                    Height="48"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    Classes="float">
-                <Button.Flyout>
-                    <Flyout Placement="AnchorAndGravity"
-                            PlacementAnchor="TopRight"
-                            PlacementGravity="BottomRight">
-                        <ContextMenu>
-                            <MenuItem Header="Export midi..."
-                                      Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                      CommandParameter="MIDI">
-                                <MenuItem.Icon>
-                                    <avalonia:MaterialIcon Kind="Midi" />
-                                </MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="Export pdf..."
-                                      Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                      CommandParameter="PDF">
-                                <MenuItem.Icon>
-                                    <avalonia:MaterialIcon Kind="FilePdfBox" />
-                                </MenuItem.Icon>
-                            </MenuItem>
-                        </ContextMenu>
-                    </Flyout>
-                </Button.Flyout>
-                <avalonia:MaterialIcon Width="32"
-                                       Height="32"
-                                       Kind="DotsVertical" />
-            </Button>
-
-        </Grid>
-    </Border>
+            </Grid>
+        </Border>
+    </Viewbox>
 </UserControl>

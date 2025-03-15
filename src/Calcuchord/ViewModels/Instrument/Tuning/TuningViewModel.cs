@@ -303,8 +303,9 @@ namespace Calcuchord {
                         DialogHost.Close(MainViewModel.Instance.MainDialogHostName);
                     }
 
+                    TuningGenProgressView pv = new TuningGenProgressView { DataContext = pg };
                     DialogHost.Show(
-                            new TuningGenProgressView { DataContext = pg },MainViewModel.Instance.MainDialogHostName)
+                            pv,MainViewModel.Instance.MainDialogHostName)
                         .FireAndForgetSafeAsync();
                 });
 

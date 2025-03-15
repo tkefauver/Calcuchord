@@ -126,32 +126,9 @@
                         <local:MainFooterView x:Name="FooterView"
                                               DockPanel.Dock="Bottom" />
 
-                        <local:ContentView x:Name="MainContentView" />
-
-                        <!-- <Grid x:Name="MainContainerGrid" -->
-                        <!--       RowDefinitions="Auto,*" -->
-                        <!--       ColumnDefinitions="Auto,*" -->
-                        <!--       Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}" -->
-                        <!--       Classes.landscape="{Binding IsLandscape, Source={x:Static local:ThemeViewModel.Instance}}"> -->
-                        <!--     ~1~ BG IMAGE @1@ -->
-                        <!--     <Image x:Name="MainBgImage" -->
-                        <!--            Grid.RowSpan="2" -->
-                        <!--            Grid.ColumnSpan="2" -->
-                        <!--            Source="/Assets/Images/parchment.jpg" -->
-                        <!--            HorizontalAlignment="Stretch" -->
-                        <!--            VerticalAlignment="Stretch" -->
-                        <!--            Opacity="0.5" -->
-                        <!--            Stretch="None" /> -->
-                        <!-- -->
-                        <!--     ~1~ INSTRUMENT VIEW @1@ -->
-                        <!--     <local:InstrumentView x:Name="InstrumentView" -->
-                        <!--                           IsVisible="{Binding IsSearchModeSelected, Source={x:Static local:MainViewModel.Instance}}" -->
-                        <!--                           DataContext="{Binding SelectedInstrument}" /> -->
-                        <!-- -->
-                        <!--     ~1~ MATCHES VIEW @1@ -->
-                        <!-- -->
-                        <!--     <local:MatchesView x:Name="MatchesView" /> -->
-                        <!-- </Grid> -->
+                        <local:ContentView Classes="fade"
+                                           Opacity="{Binding IsLoaded, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
+                                           x:Name="MainContentView" />
                     </DockPanel>
                 </controls:NavigationDrawer>
             </controls:SnackbarHost>

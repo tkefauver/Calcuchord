@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Input;
 using PropertyChanged;
 
@@ -11,20 +12,13 @@ namespace Calcuchord {
         }
 
         void MatchContainerBorder_OnPointerReleased(object sender,PointerReleasedEventArgs e) {
-            if(DataContext is not MatchViewModel mtvm) {
+            if(DataContext is not MatchViewModel mtvm ||
+               Parent is not ContentPresenter presenter) {
                 return;
             }
 
             mtvm.SelectMatchCommand.Execute(null);
-        }
-
-        protected override void OnPointerReleased(PointerReleasedEventArgs e) {
-            if(DataContext is not MatchViewModel mtvm) {
-                return;
-            }
-
-            mtvm.SelectMatchCommand.Execute(null);
-            this.BringIntoView();
+            presenter.BringIntoView();
         }
     }
 }

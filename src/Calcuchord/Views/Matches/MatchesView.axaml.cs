@@ -40,6 +40,24 @@ namespace Calcuchord {
             return 1;
         }
 
+        public int GetVisualMatchCount() {
+            var mvl = this.GetVisualDescendants<MatchView>().OrderBy(x => x.Bounds.Top).ThenBy(x => x.Bounds.Left);
+            int count = 0;
+            foreach(MatchView mv in mvl) {
+                if(mv.TranslatePoint(mv.Bounds.BottomRight,MatchesScrollViewer) is not { } mv_sv_br_p) {
+                    continue;
+                }
+
+                if(!MatchesScrollViewer.Bounds.Contains(mv_sv_br_p)) {
+                    break;
+                }
+
+                count++;
+            }
+
+            return count;
+        }
+
         public async Task DoBusyCheckAsync(int delay = 300) {
             if(MatchesBusyOverlay.IsVisible) {
                 return;

@@ -1,3 +1,4 @@
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -14,15 +15,14 @@ namespace Calcuchord {
 
 
         void InstrumentListBox_OnPointerReleased(object sender,PointerReleasedEventArgs e) {
-            if(e.Source is not Control source ||
-               source.GetVisualAncestor<ListBoxItem>() is not { } lbi ||
-               lbi.DataContext is not InstrumentViewModel ivm ||
-               !e.IsLeftRelease(e.Source as Visual) ||
-               MainViewModel.Instance is not { } mvm) {
+            if(!Enumerable.Range(0,InstrumentListBox.ItemCount).Select(x => InstrumentListBox.ContainerFromIndex(x))
+                   .Where(x => x != null)
+                   .Any(x => x.Bounds.Contains(e.GetPosition(x))) ||
+               !e.IsLeftRelease(e.Source as Visual)) {
                 return;
             }
 
-            mvm.ForwardCommand.Execute(mvm.Instruments.IndexOf(ivm));
+            MainViewModel.Instance.ForwardCommand.Execute(null);
 
         }
     }
