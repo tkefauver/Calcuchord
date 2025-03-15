@@ -10,6 +10,7 @@
     <PackageVersion Include="MonkeyPaste.Common.Avalonia" Version="1.0.3.32" />
     <PackageVersion Include="Mono.AotProfiler.Android" Version="7.0.0" />
     <PackageVersion Include="MonoMac.NetStandard" Version="0.0.4" />
+    <PackageVersion Include="PdfSharp" Version="6.1.1" />
     <PackageVersion Include="PublishSPAforGitHubPages.Build" Version="3.0.0" />
     <PackageVersion Include="org.matheval" Version="1.0.0.3" />
     <PackageVersion Include="Material.Avalonia" Version="$(MaterialAvaloniaVersion)" />

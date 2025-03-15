@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using HtmlAgilityPack;
 using MonkeyPaste.Common;
 
@@ -40,7 +41,7 @@ namespace Calcuchord {
         protected bool WithTitle { get; set; }
 
         protected HtmlDocument CurrentDoc { get; private set; }
-        protected string DefaultFontFamily => "Mono";
+        protected string DefaultFontFamily { get; set; } = "Mono";
 
 
         #region Colors
@@ -133,7 +134,8 @@ namespace Calcuchord {
 
         public abstract HtmlNode Build(NotePattern ng,object args);
 
-        public string GetBatchHtml(Tuning tuning,IEnumerable<NotePattern> ngl) {
+
+        public string GetBatchHtml(Tuning tuning,NotePattern[] ngl) {
             HtmlDocument doc = new HtmlDocument();
 
             HtmlNode head = doc.CreateElement("head");
@@ -145,46 +147,33 @@ namespace Calcuchord {
                 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
                 """;
             HtmlNode main_style = doc.CreateElement("style");
-            main_style.InnerHtml =
+            MainViewModel mvm = MainViewModel.Instance;
+            int col_count = mvm.MatchColCount;
+            int row_count = (int)Math.Ceiling(ngl.Length / (double)col_count);
+            string def_css =
                 """
-                body {
-                   margin: 0;
-                   padding: 0;
-                   width: 100%;                                        
-                   height: 100%;                   
-                }
-                .container {
-                    min-width:100%;
-                    min-height:100%;
-                    padding: 0;
-                    margin: 0;
+
+                div.container {
                     display: grid;
-                    grid-template-columns: auto auto auto;
                     gap: 10px;
                 }
-
                 p, span {
-                    font-family: "EB Garamond", serif;
-                    font-optical-sizing: auto;
-                    font-weight: 1;
-                    font-style: normal;
+                    font-family: "EB Garamond";
                 }
 
                 p.title {
-                    margin: 0;
+                    margin: 0 0 100 0;
                     text-align: center;
-                    font-size: 24px;
+                    font-size: 5rem;
+                    text-decoration: underline;
                 }
 
                 div.item {
-                    display: block;
-                    width: 90%;
+                    overflow: hidden;
+                    height: auto;
+                    width: 100%;
+                    margin: 10 10 100 10;
                     text-align: center;
-                    padding: 10px;
-                    margin-bottom: 100px;
-                }
-                svg {
-                    transform: scale(2) translate(0px,20px);
                 }
                 body {
                     background-color: white;
@@ -198,20 +187,17 @@ namespace Calcuchord {
 
                 .footer {
                     width: 100%;
-                    font-size: 16px;
+                    font-size: 2em;
                     display: inline-block;
                     text-align: center;
-                    margin-top: 30px;
-                }
-
-                .close-btn {
-                    position: fixed;
-                    font-size: 8px;
-                    left: 0;
-                    top: 0;
-                    cursor: pointer;
                 }
                 """;
+            StringBuilder def_css_sb = new StringBuilder(def_css);
+            def_css_sb.AppendLine(mvm.MatchSvgCss);
+            def_css_sb.AppendLine("text.match-title { font-family: EB Garamond; }");
+            def_css_sb.AppendLine($"div.container {{ grid-template-rows: repeat({row_count},auto); }}");
+            def_css_sb.AppendLine($"div.container {{ grid-template-columns: repeat({col_count},auto); }}");
+            main_style.InnerHtml = def_css_sb.ToString();
             head.AppendChild(main_style);
 
             HtmlNode body_elm = doc.CreateElement("body");
@@ -224,6 +210,11 @@ namespace Calcuchord {
             svg_style.InnerHtml = MainViewModel.Instance.MatchSvgCss;
             body_elm.AppendChild(svg_style);
 
+            HtmlNode title_elm = doc.CreateElement("p");
+            title_elm.SetAttributeValue("class","title");
+            title_elm.InnerHtml = tuning.FullName;
+            body_elm.AppendChild(title_elm);
+
             HtmlNode cont_elm = doc.CreateElement("div");
             cont_elm.SetAttributeValue("class","container");
             body_elm.AppendChild(cont_elm);
@@ -233,16 +224,19 @@ namespace Calcuchord {
                 item_elm.SetAttributeValue("class","item");
                 cont_elm.AppendChild(item_elm);
 
-                HtmlNode title_elm = doc.CreateElement("p");
-                title_elm.SetAttributeValue("class","title");
-                title_elm.InnerHtml = ng.ToString();
-                item_elm.AppendChild(title_elm);
+                double w = svg.GetAttributeValue("width",0d);
+                double h = svg.GetAttributeValue("height",0d);
+
+                svg.SetAttributeValue("width","100%");
+                svg.Attributes.Remove("height");
+                svg.SetAttributeValue("viewBox",$"0 0 {w} {h}");
+                svg.SetAttributeValue("preserveAspectRatio","xMidYMid meet");
 
                 item_elm.AppendChild(svg);
             }
 
             foreach(NotePattern ng in ngl) {
-                AddSvg(Build(ng,null),ng);
+                AddSvg(Build(ng,"titled"),ng);
             }
 
             HtmlNode footer_elm = doc.CreateElement("p");
@@ -261,7 +255,8 @@ namespace Calcuchord {
             return doc.DocumentNode.OuterHtml;
         }
 
-        public string GetBatchSvg(Tuning tuning,IEnumerable<NotePattern> ngl,int colCount) {
+        public string GetBatchSvg(Tuning tuning,IEnumerable<NotePattern> ngl,int colCount,bool showTitle,
+            bool showFooter) {
             object args = "styled|titled";
             var sub_svg_elml = ngl.Select(x => Build(x,args)).ToArray();
             colCount = Math.Min(sub_svg_elml.Length,colCount);
@@ -275,12 +270,15 @@ namespace Calcuchord {
             double tw = item_w * colCount;
             double th = item_h * Math.Ceiling(sub_svg_elml.Length / (double)colCount);
 
-            double title_fs = 12;
-            double title_h = title_fs * 1d;
-            AddTitleText(svg_elm,tuning.FullName,string.Empty,string.Empty,title_fs,Fg,tw,oy: -title_fs);
-            double title_pad = 15;
-            double content_y = title_h + title_pad;
-            th += title_h + title_pad;
+            double content_y = 0;
+            if(showTitle) {
+                double title_fs = 12;
+                double title_h = title_fs * 1d;
+                AddTitleText(svg_elm,tuning.FullName,string.Empty,string.Empty,title_fs,Fg,tw,oy: -title_fs);
+                double title_pad = 15;
+                content_y = title_h + title_pad;
+                th += title_h + title_pad;
+            }
 
             for(int i = 0; i < sub_svg_elml.Length; i++) {
                 HtmlNode sub_svg_elm = sub_svg_elml[i];
@@ -300,18 +298,21 @@ namespace Calcuchord {
                 svg_elm.AppendChild(wrapper_g);
             }
 
-            double logo_fs = 3;
-            double logo_h = logo_fs * 1.5;
-            double logo_y = th;
-            AddTitleText(
-                svg_elm,$"Created with Calcuchord ©{DateTime.Now.Year}",string.Empty,string.Empty,logo_fs,Fg,tw,oy: th);
-            th += logo_h;
+            if(showFooter) {
+                double logo_fs = 3;
+                double logo_h = logo_fs * 1.5;
+                double logo_y = th;
+                AddTitleText(
+                    svg_elm,$"Created with Calcuchord ©{DateTime.Now.Year}",string.Empty,string.Empty,logo_fs,Fg,tw,
+                    oy: th);
+                th += logo_h;
 
-            logo_y += logo_h;
-            double ox = 0; //800d / tw;
-            AddTitleText(
-                svg_elm,AppInfo.WebsiteUrl,string.Empty,string.Empty,logo_fs,Fg,tw,ox: ox,oy: th);
-            th += logo_h + 4;
+                logo_y += logo_h;
+                double ox = 0; //800d / tw;
+                AddTitleText(
+                    svg_elm,AppInfo.WebsiteUrl,string.Empty,string.Empty,logo_fs,Fg,tw,ox: ox,oy: th);
+                th += logo_h + 4;
+            }
 
             svg_elm.Attributes.Add("width",tw);
             svg_elm.Attributes.Add("height",th);
@@ -453,7 +454,9 @@ namespace Calcuchord {
             string classes = null,
             bool shadow = false) {
             if(shadow) {
-                string shadow_fill = fill == "#FFFFFF" ? "#000000" : "#FFFFFF";
+                string shadow_fill = fill == "#FFFFFF" ?
+                    "#000000" :
+                    "#FFFFFF";
                 double offset = 0.25; //fs / 16d;
                 AddText(cntr,text,fs,shadow_fill,x + offset,y + offset,isBold,classes + " shadow-elm");
             }
@@ -489,7 +492,9 @@ namespace Calcuchord {
             bool shadow = false,
             double fillOpacity = 1) {
             if(shadow) {
-                string shadow_fill = fill == Fg ? Bg : "#000000";
+                string shadow_fill = fill == Fg ?
+                    Bg :
+                    "#000000";
                 double offset = 0.25; //fs / 16d;
                 AddCircle(cntr,shadow_fill,stroke,x + offset,y + offset,r,sw,classes + " shadow-elm");
             }
@@ -522,7 +527,9 @@ namespace Calcuchord {
             bool shadow = false,
             double fillOpacity = 1) {
             if(shadow) {
-                string shadow_fill = fill == Fg ? Bg : "#000000";
+                string shadow_fill = fill == Fg ?
+                    Bg :
+                    "#000000";
                 double offset = 0.25; //fs / 16d;
                 AddDiamond(cntr,shadow_fill,stroke,x + offset,y + offset,w,h,sw,classes + " shadow-elm");
             }
@@ -581,7 +588,9 @@ namespace Calcuchord {
             bool shadow = false,
             double fillOpacity = 1) {
             if(shadow) {
-                string shadow_fill = fill == Fg ? Bg : "#000000";
+                string shadow_fill = fill == Fg ?
+                    Bg :
+                    "#000000";
                 double offset = 0.25; //fs / 16d;
                 AddRect(cntr,shadow_fill,stroke,x + offset,y + offset,w,h,sw,classes + " shadow-elm");
             }

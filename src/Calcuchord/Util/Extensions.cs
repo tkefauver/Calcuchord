@@ -7,9 +7,47 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using HtmlAgilityPack;
+using MonkeyPaste.Common;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.IO;
+using SkiaSharp;
+using Svg.Skia;
 
 namespace Calcuchord {
     public static class Extensions {
+        public static string GetTempFile(string ext) {
+            return Path.Combine(
+                Path.GetTempPath(),
+                Path.GetRandomFileName().SplitNoEmpty(".")[0] + "." + ext);
+        }
+
+        public static byte[] ToPdfBytes(string svgXml,SKColor bg,float scale) {
+            using SKSvg svg = new SKSvg();
+            if(svg.FromSvg(svgXml) is null) {
+                return null;
+            }
+
+            using MemoryStream ms = new MemoryStream();
+            svg.Picture.ToPdf(ms,bg,scale,scale);
+            return ms.ToArray();
+        }
+
+        public static byte[] MergePdf(IEnumerable<byte[]> pdfs) {
+            using PdfDocument outPdf = new PdfDocument();
+            foreach(byte[] pdf in pdfs) {
+                PdfDocument doc = PdfReader.Open(new MemoryStream(pdf),PdfDocumentOpenMode.Import);
+                foreach(PdfPage page in doc.Pages) {
+                    outPdf.AddPage(page);
+                }
+            }
+
+            MemoryStream stream = new MemoryStream();
+            outPdf.Save(stream,false);
+            byte[] bytes = stream.ToArray();
+
+            return bytes;
+        }
+
         public static async void FireAndForgetSafeAsync(this Task task) {
             try {
                 await task;
@@ -164,7 +202,11 @@ namespace Calcuchord {
         public static void Dump(this Exception ex) {
             if(PlatformWrapper.Services is not { } ps ||
                ps.Logger is not { } logger) {
+#if DEBUG
                 Debug.WriteLine($"[{DateTime.Now}]{ex}");
+#else
+                Console.WriteLine($"[{DateTime.Now}]{ex}");
+#endif
                 return;
             }
 

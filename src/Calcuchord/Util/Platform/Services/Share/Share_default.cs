@@ -7,8 +7,6 @@ using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
-using SkiaSharp;
-using Svg.Skia;
 
 namespace Calcuchord {
     public class Share_default : IShareMidi,ISharePdf,IShareHtml {
@@ -33,13 +31,13 @@ namespace Calcuchord {
             FinishShare(fp,"audio/midi");
         }
 
-        public virtual async Task SharePdfAsync(SKSvg svg,string title) {
+        public virtual async Task SharePdfAsync(byte[] pdfBytes,string title) {
             string fp = await ShowSaveFilePickerAsync(title,["pdf"]);
             if(fp is null) {
                 return;
             }
 
-            svg.Picture.ToPdf(fp,ThemeViewModel.Instance.IsDark ? SKColors.Black : SKColors.White,1f,1f);
+            await File.WriteAllBytesAsync(fp,pdfBytes);
 
             FinishShare(fp,"application/pdf");
         }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Svg.Skia;
 
 namespace Calcuchord {
 
@@ -28,7 +27,7 @@ namespace Calcuchord {
     }
 
     public interface ISharePdf {
-        Task SharePdfAsync(SKSvg svg,string title);
+        Task SharePdfAsync(byte[] pdfBytes,string title);
     }
 
     public interface IShareMidi {
