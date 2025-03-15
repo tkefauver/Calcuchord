@@ -456,7 +456,6 @@ $RECYCLE.BIN/
 artwork/
 *.keystore
 src/Calcuchord.Android/scripts/publish.sh
-src/Calcuchord.Android/scripts/publish.sh
 src/Calcuchord.Android/scripts/publish2.sh
 /src/Calcuchord.Browser/wwwroot/js/midi/
 /src/Calcuchord/Assets/Text/midi/fonts/banjo.js
@@ -464,3 +463,6 @@ src/Calcuchord.Android/scripts/publish2.sh
 /lib
 *.mobileprovision
 *.provisionprofile
+src/Calcuchord.Desktop/scripts/linux/out
+src/Calcuchord.Desktop/scripts/linux/staging_folder
+*.deb

@@ -1,0 +1,11 @@
+Package: Calcuchord
+Version: 1.0.0
+Section: devel
+Priority: optional
+Architecture: amd64
+Installed-Size: 68279
+Depends: libx11-6, libice6, libsm6, libfontconfig1, fluidsynth
+Maintainer: Thomas Kefauver <tkefauver@gmail.com>
+Homepage: https://github.com/tkefauver/Calcuchord
+Description: Reverse search for musicians
+Copyright: 2022-2024 Thomas Kefauver <tkefauver@gmail.com>

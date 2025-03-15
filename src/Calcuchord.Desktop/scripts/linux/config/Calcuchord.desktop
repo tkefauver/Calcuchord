@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Calcuchord
+Comment=Reverse search for musicians
+Icon=Calcuchord
+Exec=Calcuchord
+StartupWMClass=Calcuchord
+Terminal=false
+Type=Application
+Categories=Development
+GenericName=Calcuchord
+Keywords=calcuchord; guitar; music theory; chord; scale; mode; piano; music; tablature; chord chart; scale chart; alternate tunings
