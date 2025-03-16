@@ -93,8 +93,7 @@
             </Setter>
         </Style>
 
-        <Style
-            Selector="controls|Card.sort:not(.fuzzy) :is(Control).is-score, controls|Card.sort:not(.scored) :is(Control).is-score">
+        <Style Selector="controls|Card.sort:not(.search-mode) :is(Control).is-score">
             <Setter Property="IsVisible"
                     Value="False" />
         </Style>
@@ -154,11 +153,11 @@
             <Setter Property="Columns"
                     Value="3" />
         </Style>
-        <Style Selector="controls|Card.sort.scored.fuzzy UniformGrid.sort-panel">
+        <Style Selector="controls|Card.sort.search-mode UniformGrid.sort-panel">
             <Setter Property="Columns"
                     Value="4" />
         </Style>
-        <Style Selector="controls|Card.sort.scored.fuzzy Button.opt-btn.key">
+        <Style Selector="controls|Card.sort.search-mode Button.opt-btn.key">
             <Setter Property="Padding"
                     Value="6" />
         </Style>
@@ -320,8 +319,7 @@
                                PointerReleased="InputElement_OnPointerReleased"
                                Text="Sort" />
                     <controls:Card Classes="button-group sort"
-                                   Classes.fuzzy="{Binding !IsExactMatchOnly}"
-                                   Classes.scored="{Binding IsSearchModeSelected}">
+                                   Classes.search-mode="{Binding IsSearchModeSelected}">
                         <ListBox SelectedItem="{x:Null}">
                             <ListBox.ItemsPanel>
                                 <ItemsPanelTemplate>

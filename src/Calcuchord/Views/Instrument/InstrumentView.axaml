@@ -148,127 +148,153 @@
         <DockPanel x:Name="InstToolbar"
                    DataContext="{Binding SelectedTuning}"
                    LastChildFill="False">
-            <!-- BUG Tooltip flickers on browser only -->
-            <local:HintView DockPanel.Dock="Left"
-                            Margin="10,10,0,0"
-                            DataContext="{Binding Parent}"
-                            ToolTip.ServiceEnabled="{Binding !IsBrowser, Source={x:Static local:ThemeViewModel.Instance}}"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center">
-                <ToolTip.Tip>
-                    <controls:ColorZone Classes="tt"
-                                        Mode="Accent">
-                        <StackPanel Spacing="10">
-                            <TextBlock Text="Search Hints"
-                                       FontSize="26" />
-                            <StackPanel Orientation="Horizontal"
-                                        Spacing="7">
+            <StackPanel Orientation="Horizontal"
+                        DockPanel.Dock="Left"
+                        Spacing="10"
+                        Margin="10,10,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center">
 
-                                <TextBlock>
+                <!-- BUG Tooltip flickers on browser only -->
+                <local:HintView IsVisible="{Binding !IsVisible, ElementName=TranslateBackButton}"
+                                DataContext="{Binding Parent}"
+                                ToolTip.ServiceEnabled="{Binding !IsBrowser, Source={x:Static local:ThemeViewModel.Instance}}">
+                    <ToolTip.Tip>
+                        <controls:ColorZone Classes="tt"
+                                            Mode="Accent">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Search Hints"
+                                           FontSize="26" />
+                                <StackPanel Orientation="Horizontal"
+                                            Spacing="7">
+
+                                    <TextBlock>
+                                        <TextBlock.Inlines>
+                                            <Run Text="◦ " />
+                                            <Run Classes="subject2"
+                                                 Text="Hold" />
+                                            <Run Text="or" />
+                                            <Run Classes="subject2"
+                                                 Text="right-click a" />
+                                            <Run Text="{Binding InstrumentNoteName}" />
+                                            <Run Text="to filter by it's" />
+                                            <Run Text="key"
+                                                 Classes="bold" />
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
+                                    <Border Width="12"
+                                            Height="12"
+                                            RenderTransform="rotate(45deg)"
+                                            Background="Black"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center" />
+
+                                </StackPanel>
+
+                                <TextBlock IsVisible="{Binding !IsKeyboard}">
                                     <TextBlock.Inlines>
                                         <Run Text="◦ " />
                                         <Run Classes="subject2"
-                                             Text="Hold" />
-                                        <Run Text="or" />
-                                        <Run Classes="subject2"
-                                             Text="right-click a" />
-                                        <Run Text="{Binding InstrumentNoteName}" />
-                                        <Run Text="to filter by it's" />
-                                        <Run Text="key"
+                                             Text="Tap nut to select the" />
+                                        <Run Text="open string"
                                              Classes="bold" />
+
                                     </TextBlock.Inlines>
                                 </TextBlock>
-                                <Border Width="12"
-                                        Height="12"
-                                        RenderTransform="rotate(45deg)"
-                                        Background="Black"
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Center" />
 
-                            </StackPanel>
-
-                            <TextBlock IsVisible="{Binding !IsKeyboard}">
-                                <TextBlock.Inlines>
-                                    <Run Text="◦ " />
-                                    <Run Classes="subject2"
-                                         Text="Tap nut to select the" />
-                                    <Run Text="open string"
-                                         Classes="bold" />
-
-                                </TextBlock.Inlines>
-                            </TextBlock>
-
-                            <TextBlock IsVisible="{Binding !IsKeyboard}">
-                                <TextBlock.Inlines>
-                                    <Run Text="◦ " />
-                                    <Run Classes="subject2"
-                                         Text="Tap nut" />
-                                    <Run Text="twice"
-                                         FontStyle="Italic" />
-                                    <Run Text="to" />
-                                    <Run Text="mute"
-                                         Classes="bold" />
-                                    <Run Text="that string" />
-
-                                </TextBlock.Inlines>
-                            </TextBlock>
-
-                            <StackPanel Orientation="Horizontal">
-
-                                <TextBlock x:Name="Bullet"
-                                           Text="◦ " />
-                                <Border CornerRadius="5"
-                                        Margin="3,0"
-                                        Height="{Binding Bounds.Height, ElementName=Bullet}"
-                                        Background="Silver">
-                                    <TextBlock Margin="3"
-                                               FontSize="10"
-                                               Foreground="{DynamicResource Fg}"
-                                               FontFamily="{StaticResource NunitoFont}"
-                                               Text="EXACT" />
-                                </Border>
-                                <TextBlock>
+                                <TextBlock IsVisible="{Binding !IsKeyboard}">
                                     <TextBlock.Inlines>
-                                        <Run Text="searches by the" />
-                                        <Run Classes="bold"
-                                             Text="position" />
-                                        <Run Text="of the selected" />
-                                        <Run Text="{Binding InstrumentNoteNamePlural}" />
+                                        <Run Text="◦ " />
+                                        <Run Classes="subject2"
+                                             Text="Tap nut" />
+                                        <Run Text="twice"
+                                             FontStyle="Italic" />
+                                        <Run Text="to" />
+                                        <Run Text="mute"
+                                             Classes="bold" />
+                                        <Run Text="that string" />
+
                                     </TextBlock.Inlines>
                                 </TextBlock>
 
+                                <StackPanel Orientation="Horizontal">
+
+                                    <TextBlock x:Name="Bullet"
+                                               Text="◦ " />
+                                    <Border CornerRadius="5"
+                                            Margin="3,0"
+                                            Height="{Binding Bounds.Height, ElementName=Bullet}"
+                                            Background="Silver">
+                                        <TextBlock Margin="3"
+                                                   FontSize="10"
+                                                   Foreground="{DynamicResource Fg}"
+                                                   FontFamily="{StaticResource NunitoFont}"
+                                                   Text="EXACT" />
+                                    </Border>
+                                    <TextBlock>
+                                        <TextBlock.Inlines>
+                                            <Run Text="searches by the" />
+                                            <Run Classes="bold"
+                                                 Text="position" />
+                                            <Run Text="of the selected" />
+                                            <Run Text="{Binding InstrumentNoteNamePlural}" />
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
+
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal">
+
+                                    <TextBlock x:Name="Bullet2"
+                                               Text="◦ " />
+                                    <Border CornerRadius="5"
+                                            Margin="3,0"
+                                            Height="{Binding Bounds.Height, ElementName=Bullet2}"
+                                            Background="Silver">
+                                        <TextBlock Margin="3"
+                                                   FontSize="10"
+                                                   Foreground="{DynamicResource Fg}"
+                                                   FontFamily="{StaticResource NunitoFont}"
+                                                   Text="VOICE" />
+                                    </Border>
+                                    <TextBlock>
+                                        <TextBlock.Inlines>
+                                            <Run Text="searches by the" />
+                                            <Run Classes="bold"
+                                                 Text="sound" />
+                                            <Run Text="of the selected" />
+                                            <Run Text="{Binding InstrumentNoteNamePlural}" />
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
+
+                                </StackPanel>
                             </StackPanel>
 
-                            <StackPanel Orientation="Horizontal">
+                        </controls:ColorZone>
+                    </ToolTip.Tip>
+                </local:HintView>
+                <controls:FloatingButton x:Name="TranslateBackButton"
+                                         Classes="float-text light"
+                                         IsVisible="{Binding IsTranslateMode, Source={x:Static local:MainViewModel.Instance}}"
+                                         IsExtended="True"
+                                         Command="{Binding FinishTranslateCommand, Source={x:Static local:MainViewModel.Instance}}">
+                    <StackPanel Orientation="Horizontal"
+                                Height="24">
+                        <Viewbox Stretch="Fill"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Stretch">
+                            <avalonia:MaterialIcon Kind="ArrowLeft"
+                                                   Width="24"
+                                                   Height="24" />
+                        </Viewbox>
+                        <TextBlock Margin="8,0"
+                                   FontSize="18"
+                                   Text="Back"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </controls:FloatingButton>
 
-                                <TextBlock x:Name="Bullet2"
-                                           Text="◦ " />
-                                <Border CornerRadius="5"
-                                        Margin="3,0"
-                                        Height="{Binding Bounds.Height, ElementName=Bullet2}"
-                                        Background="Silver">
-                                    <TextBlock Margin="3"
-                                               FontSize="10"
-                                               Foreground="{DynamicResource Fg}"
-                                               FontFamily="{StaticResource NunitoFont}"
-                                               Text="VOICE" />
-                                </Border>
-                                <TextBlock>
-                                    <TextBlock.Inlines>
-                                        <Run Text="searches by the" />
-                                        <Run Classes="bold"
-                                             Text="sound" />
-                                        <Run Text="of the selected" />
-                                        <Run Text="{Binding InstrumentNoteNamePlural}" />
-                                    </TextBlock.Inlines>
-                                </TextBlock>
-
-                            </StackPanel>
-                        </StackPanel>
-
-                    </controls:ColorZone>
-                </ToolTip.Tip>
-            </local:HintView>
+            </StackPanel>
 
             <controls:Card DockPanel.Dock="Right"
                            Classes="button-group pattern"

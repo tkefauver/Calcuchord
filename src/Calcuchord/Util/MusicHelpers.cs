@@ -5,8 +5,25 @@ using MonkeyPaste.Common;
 
 namespace Calcuchord {
     public static class MusicHelpers {
-        public static double Distance(this InstrumentNote a,InstrumentNote b) {
-            return Math.Abs(a.RowNum - b.RowNum) + Math.Abs(a.ColNum - b.ColNum);
+        public static double Distance(this InstrumentNote a,InstrumentNote b,MatchScoreMethodType scoring) {
+            if(a.Key != b.Key ||
+               a.IsMute != b.IsMute) {
+                return 0;
+            }
+
+            switch(scoring) {
+                default:
+                case MatchScoreMethodType.Exact:
+                    return
+                        a.ColNum == b.ColNum && a.RowNum == b.RowNum ?
+                            1 :
+                            0;
+                case MatchScoreMethodType.Voicing:
+                    return 1d / (1 + Math.Abs(a.RowNum - b.RowNum) + Math.Abs(a.ColNum - b.ColNum));
+                case MatchScoreMethodType.Translation:
+                    return 1 / (1d + Math.Abs(a.Register - b.Register));
+            }
+
         }
 
         public static Note ToNote(this (NoteType,int) nt_tup) {

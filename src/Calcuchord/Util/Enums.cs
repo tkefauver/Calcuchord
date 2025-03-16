@@ -17,7 +17,7 @@ namespace Calcuchord {
     public enum MatchScoreMethodType {
         Exact,
         Voicing,
-
+        Translation,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

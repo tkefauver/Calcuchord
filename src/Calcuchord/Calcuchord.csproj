@@ -64,5 +64,9 @@
             <DependentUpon>ProgressView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Views\Popups\Dialogs\TextFieldDialogView.axaml.cs">
+            <DependentUpon>TextFieldDialogView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 </Project>

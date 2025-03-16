@@ -23,16 +23,17 @@ namespace Calcuchord.Android {
 
             Intent intent = new Intent(Intent.ActionSend);
             Uri uri = FileProvider.GetUriForFile(_context,_context.PackageName + ".fileprovider",new File(filePath));
-            intent.PutExtra(Intent.ExtraStream,uri);
             intent.SetType(mimeType);
-            _context.StartActivity(intent);
+            intent.PutExtra(Intent.ExtraStream,uri);
+            intent.AddFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.GrantWriteUriPermission);
+            _context.StartActivity(Intent.CreateChooser(intent,"Share Time!"));
 
             // Intent intent = new Intent(Intent.ActionView);
             // Uri Uri = FileProvider.GetUriForFile(_context,_context.PackageName + ".fileprovider",new File(filePath));
             // intent.SetDataAndType(Uri,mimeType);
             // intent.SetFlags(ActivityFlags.NewTask);
 
-            _context.StartActivity(intent);
+            // _context.StartActivity(intent);
         }
 
         protected override async Task<string> ShowSaveFilePickerAsync(string title,string[] extTypes) {

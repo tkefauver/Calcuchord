@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using MonkeyPaste.Common;
 
 namespace Calcuchord {
     public class Share_default : IShareMidi,ISharePdf,IShareHtml {
@@ -85,8 +84,7 @@ namespace Calcuchord {
                         });
                 });
 
-
-            if(file?.Path.AbsoluteUri.ToPathFromUri() is not { } fp) {
+            if(file?.Path.AbsolutePath is not { } fp) {
                 return null;
             }
 

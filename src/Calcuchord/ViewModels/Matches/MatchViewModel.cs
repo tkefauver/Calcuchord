@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Controls;
 using Avalonia.Svg.Skia;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
@@ -39,10 +40,14 @@ namespace Calcuchord {
         #region Appearance
 
         public string BookmarkIcon =>
-            IsBookmarked ? "Bookmark" : "BookmarkOutline";
+            IsBookmarked ?
+                "Bookmark" :
+                "BookmarkOutline";
 
         public string PlaybackIcon =>
-            IsMatchPlaying ? "Pause" : "Play";
+            IsMatchPlaying ?
+                "Pause" :
+                "Play";
 
         public string Label1 =>
             NotePattern.Key.ToDisplayValue();
@@ -51,21 +56,25 @@ namespace Calcuchord {
             NotePattern.SuffixDisplayValue;
 
         public string Label3 =>
-            NotePattern.Position == 0 ? string.Empty : NotePattern.Position.ToString();
+            NotePattern.Position == 0 ?
+                string.Empty :
+                NotePattern.Position.ToString();
 
         public string Label4 =>
-            NotePattern.SubPosition == 0 ? string.Empty : NotePattern.SubPosition.ToString();
+            NotePattern.SubPosition == 0 ?
+                string.Empty :
+                NotePattern.SubPosition.ToString();
 
 
         public int DiagramColCount =>
-            PatternType == MusicPatternType.Chords
-                ? NotePattern.Parent.Parent.Parent.RowCount + 1
-                : PatternGen.PATTERN_FRET_SPAN + 2;
+            PatternType == MusicPatternType.Chords ?
+                NotePattern.Parent.Parent.Parent.RowCount + 1 :
+                PatternGen.PATTERN_FRET_SPAN + 2;
 
         public int DiagramRowCount =>
-            PatternType == MusicPatternType.Chords
-                ? PatternGen.PATTERN_FRET_SPAN + 2
-                : NotePattern.Parent.Parent.Parent.RowCount + 1;
+            PatternType == MusicPatternType.Chords ?
+                PatternGen.PATTERN_FRET_SPAN + 2 :
+                NotePattern.Parent.Parent.Parent.RowCount + 1;
 
         #endregion
 
@@ -91,7 +100,7 @@ namespace Calcuchord {
         }
 
         public string ShareTitle =>
-            NotePattern.FullName.Replace("#","Sharp").Replace(" ",string.Empty);
+            NotePattern.FullName.Replace("#","Sharp").Replace(" ","_");
 
         public bool IsMatchPlaying { get; set; }
 
@@ -201,7 +210,7 @@ namespace Calcuchord {
 
 #if DEBUG
                 if(ThemeViewModel.Instance.IsDesktop &&
-                   Avalonia.Controls.TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
+                   TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
                    tl.Clipboard is { } cb &&
                    PatternToSvgConverter.Instance.Convert(NotePattern,null,"styled",null) is string svg) {
                     cb.SetTextAsync(svg.ToPrettyPrintXml()).FireAndForgetSafeAsync();
@@ -217,7 +226,7 @@ namespace Calcuchord {
                 PlayGroupMidi();
             });
 
-        public ICommand SetMatchToInstrumentCommand => new MpCommand(
+        public MpIAsyncCommand SetMatchToInstrumentCommand => new MpAsyncCommand(
             async () => {
                 if(MainViewModel.Instance is not { } mvm ||
                    mvm.SelectedTuning is not { } stvm) {

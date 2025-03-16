@@ -67,6 +67,60 @@
                     Value="1" />
         </Style>
 
+        <!-- SCORE ANIM -->
+        <Style Selector="ProgressBar">
+            <Setter Property="Theme"
+                    Value="{StaticResource MaterialCircularProgressBar}" />
+            <Setter Property="Width"
+                    Value="67" />
+            <Setter Property="Height"
+                    Value="67" />
+        </Style>
+        <Style Selector="ProgressBar /template/ TextBlock">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource Fg}" />
+        </Style>
+        <Style Selector="ProgressBar /template/ Viewbox#PART_ProgressText">
+            <Setter Property="Margin"
+                    Value="10" />
+        </Style>
+        <Style Selector="ProgressBar.score">
+            <Setter Property="Value"
+                    Value="0" />
+        </Style>
+        <Style Selector="Grid#ScoreContainer">
+            <Setter Property="IsVisible"
+                    Value="False" />
+        </Style>
+        <Style
+            Selector="Border#MatchContainerBorder.search-mode:not(.selected):pointerover Grid#ScoreContainer, Border#MatchContainerBorder.search-mode.selected Grid#ScoreContainer">
+            <Setter Property="IsVisible"
+                    Value="True" />
+            <Style.Animations>
+                <Animation FillMode="Forward"
+                           Duration="0:0:5">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity"
+                                Value="0.0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="33%">
+                        <Setter Property="Opacity"
+                                Value="1.0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity"
+                                Value="0.2" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <Style Selector="Grid#ScoreContainer[IsVisible=True] ProgressBar.score"
+               x:DataType="local:MatchViewModel">
+            <Setter Property="Value"
+                    Value="{Binding Score}" />
+        </Style>
+
     </UserControl.Styles>
 
     <Viewbox>
@@ -80,6 +134,7 @@
                 Classes.selected="{Binding IsSelected}"
                 Classes.bookmarked="{Binding IsBookmarked}"
                 Classes.bookmark-mode="{Binding IsBookmarkModeSelected, Source={x:Static local:MainViewModel.Instance}}"
+                Classes.search-mode="{Binding IsSearchModeSelected, Source={x:Static local:MainViewModel.Instance}}"
                 PointerReleased="MatchContainerBorder_OnPointerReleased">
 
             <Grid RowDefinitions="Auto,*,Auto">
@@ -103,13 +158,6 @@
                     </TextBlock.Inlines>
                 </TextBlock>
 
-                <!-- SCORE -->
-                <!-- <TextBlock x:Name="ScoreTextBlock" -->
-                <!--            IsVisible="{Binding IsSearchModeSelected, Source={x:Static local:MainViewModel.Instance}}" -->
-                <!--            HorizontalAlignment="Right" -->
-                <!--            VerticalAlignment="Center" -->
-                <!--            TextAlignment="Right" -->
-                <!--            Text="{Binding Score, StringFormat={}{0:N2}}" /> -->
 
                 <Svg x:Name="MatchSvg"
                      Grid.Row="1"
@@ -127,6 +175,40 @@
                 <!--     </Image.Source> -->
                 <!-- </Image> -->
                 <!-- <local:ChordView Grid.Row="1" /> -->
+
+                <!-- SCORE -->
+                <Grid x:Name="ScoreContainer"
+                      Grid.Row="1"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Margin="5">
+                    <!-- <Grid.Transitions> -->
+                    <!--     <Transitions> -->
+                    <!--         <DoubleTransition Property="Opacity" Duration="0:0:5" Easing="ExponentialEaseIn"/> -->
+                    <!--     </Transitions> -->
+                    <!-- </Grid.Transitions> -->
+                    <ProgressBar Classes="circular no-transitions"
+                                 Foreground="Crimson"
+                                 Value="1"
+                                 Minimum="0"
+                                 Maximum="1" />
+                    <ProgressBar x:Name="ScoreProgressBar"
+                                 Classes="circular score"
+                                 Foreground="Lime"
+                                 ShowProgressText="True"
+                                 ProgressTextFormat="{}{1:0}"
+                                 Minimum="0"
+                                 Maximum="1">
+                        <ProgressBar.Transitions>
+                            <Transitions>
+                                <DoubleTransition Property="Value"
+                                                  Duration="0:0:0.5"
+                                                  Easing="QuarticEaseInOut" />
+                            </Transitions>
+                        </ProgressBar.Transitions>
+                    </ProgressBar>
+                </Grid>
+
                 <UniformGrid x:Name="MatchButtonStripPanel"
                              Grid.Row="2"
                              Height="{Binding Bounds.Height, ElementName=MatchTitleTextBlock}"
@@ -179,7 +261,8 @@
                         VerticalAlignment="Top"
                         Classes="float">
                     <Button.Flyout>
-                        <Flyout Placement="AnchorAndGravity"
+                        <Flyout Opened="FlyoutBase_OnOpened"
+                                Placement="AnchorAndGravity"
                                 PlacementAnchor="TopRight"
                                 PlacementGravity="BottomRight">
                             <ContextMenu>

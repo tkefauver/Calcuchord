@@ -42,10 +42,16 @@ namespace Calcuchord {
         #region View Models
 
         public IEnumerable<NoteRowViewModel> PitchSortedRows =>
-            NoteRows.OrderBy(x => x.RowNum < 0 ? -1 : x.BaseNote.NoteId);
+            NoteRows.OrderBy(
+                x => x.RowNum < 0 ?
+                    -1 :
+                    x.BaseNote.NoteId);
 
         public IEnumerable<NoteRowViewModel> SortedRows =>
-            NoteRows.OrderBy(x => x.RowNum < 0 ? -1 : x.RowNum);
+            NoteRows.OrderBy(
+                x => x.RowNum < 0 ?
+                    -1 :
+                    x.RowNum);
 
         public ObservableCollection<NoteRowViewModel> NoteRows { get; } = [];
 
@@ -55,7 +61,10 @@ namespace Calcuchord {
         public IEnumerable<NoteViewModel> SelectedNotes {
             get => AllNotes.Where(x => x.IsSelected);
             set {
-                AllNotes.ForEach(x => x.IsSelected = value == null ? false : value.Contains(x));
+                AllNotes.ForEach(
+                    x => x.IsSelected = value == null ?
+                        false :
+                        value.Contains(x));
                 OnPropertyChanged();
             }
         }
@@ -165,7 +174,10 @@ namespace Calcuchord {
 
         // +2 for label and nut
         public int LogicalFretCount =>
-            TotalFretCount + (Parent.IsKeyboard ? 0 : 2);
+            TotalFretCount +
+            (Parent.IsKeyboard ?
+                0 :
+                2);
 
         public Tuning Tuning { get; set; }
 
@@ -206,7 +218,10 @@ namespace Calcuchord {
             OpenNotes.Clear();
             OpenNotes.AddRange(
                 NoteRows
-                    .Skip(HasFretNumRow ? 1 : 0)
+                    .Skip(
+                        HasFretNumRow ?
+                            1 :
+                            0)
                     .Select(x => x.OpenNote)
                     .OrderBy(x => x.RowNum));
 
@@ -226,7 +241,9 @@ namespace Calcuchord {
         }
 
         public override string ToString() {
-            return Tuning == null ? base.ToString() : Tuning.ToString();
+            return Tuning == null ?
+                base.ToString() :
+                Tuning.ToString();
         }
 
         #endregion

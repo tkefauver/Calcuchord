@@ -20,12 +20,12 @@ namespace Calcuchord {
 
         public static SvgOptionType[] DefaultSvgOptionType { get; } =
         [
-            //SvgOptionType.Fingers,
+            SvgOptionType.Fingers,
             SvgOptionType.Barres,
-            //SvgOptionType.Tuning,
+            SvgOptionType.Tuning,
             SvgOptionType.Roots,
             SvgOptionType.Matches,
-            //SvgOptionType.Frets,
+            SvgOptionType.Frets,
             SvgOptionType.Colors,
             SvgOptionType.Shadows,
         ];
@@ -135,7 +135,7 @@ namespace Calcuchord {
         public abstract HtmlNode Build(NotePattern ng,object args);
 
 
-        public string GetBatchHtml(Tuning tuning,NotePattern[] ngl) {
+        public string GetBatchHtml(string title,NotePattern[] ngl) {
             HtmlDocument doc = new HtmlDocument();
 
             HtmlNode head = doc.CreateElement("head");
@@ -212,7 +212,7 @@ namespace Calcuchord {
 
             HtmlNode title_elm = doc.CreateElement("p");
             title_elm.SetAttributeValue("class","title");
-            title_elm.InnerHtml = tuning.FullName;
+            title_elm.InnerHtml = title;
             body_elm.AppendChild(title_elm);
 
             HtmlNode cont_elm = doc.CreateElement("div");
@@ -255,8 +255,8 @@ namespace Calcuchord {
             return doc.DocumentNode.OuterHtml;
         }
 
-        public string GetBatchSvg(Tuning tuning,IEnumerable<NotePattern> ngl,int colCount,bool showTitle,
-            bool showFooter) {
+        public string GetBatchSvg(IEnumerable<NotePattern> ngl,int colCount,bool showTitle,
+            bool showFooter,string title) {
             object args = "styled|titled";
             var sub_svg_elml = ngl.Select(x => Build(x,args)).ToArray();
             colCount = Math.Min(sub_svg_elml.Length,colCount);
@@ -274,7 +274,7 @@ namespace Calcuchord {
             if(showTitle) {
                 double title_fs = 12;
                 double title_h = title_fs * 1d;
-                AddTitleText(svg_elm,tuning.FullName,string.Empty,string.Empty,title_fs,Fg,tw,oy: -title_fs);
+                AddTitleText(svg_elm,title,string.Empty,string.Empty,title_fs,Fg,tw,oy: -title_fs);
                 double title_pad = 15;
                 content_y = title_h + title_pad;
                 th += title_h + title_pad;

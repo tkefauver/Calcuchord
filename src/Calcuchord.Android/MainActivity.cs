@@ -19,6 +19,12 @@ namespace Calcuchord.Android {
                 .UseReactiveUI()
                 .WithInterFont()
                 .LogToTrace()
+                .With(
+                    new AndroidPlatformOptions
+                    {
+                        RenderingMode =
+                            [AndroidRenderingMode.Vulkan,AndroidRenderingMode.Egl,AndroidRenderingMode.Software],
+                    })
                 .AfterPlatformServicesSetup(
                     _ => {
                         PlatformWrapper.Init(new PlatformServices_ad(this));

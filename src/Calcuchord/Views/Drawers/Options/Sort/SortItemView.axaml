@@ -51,68 +51,115 @@
                         <avalonia:MaterialIcon HorizontalAlignment="Center"
                                                VerticalAlignment="Center" />
                     </ToggleButton>
-                    <Button x:Name="SortPropButton"
-                            Grid.Column="1"
-                            Classes="opt-btn key"
-                            Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}"
-                            CommandParameter="{Binding .}">
-                        <Viewbox StretchDirection="DownOnly">
-                            <TextBlock />
-                        </Viewbox>
-
-                    </Button>
-
                     <!-- <Button x:Name="SortPropButton" -->
                     <!--         Grid.Column="1" -->
-                    <!--         Classes="opt-btn key"> -->
-                    <!--     <Button.Flyout> -->
-                    <!--         <Flyout> -->
-                    <!--             <StackPanel x:DataType="local:MainViewModel" -->
-                    <!--                         Background="{DynamicResource Bg}" -->
-                    <!--                         DataContext="{x:Static local:MainViewModel.Instance}"> -->
-                    <!--                 <Button Classes="sub opt-btn key" -->
-                    <!--                         DataContext="{Binding SortOption1}" -->
-                    <!--                         Classes.is-score="{Binding ConverterParameter=0, Converter={x:Static local:IsScoreOptionConverter.Instance}}" -->
-                    <!--                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}" -->
-                    <!--                         CommandParameter="{Binding .}"> -->
-                    <!--                     <Viewbox StretchDirection="DownOnly"> -->
-                    <!--                         <TextBlock /> -->
-                    <!--                     </Viewbox> -->
-                    <!--                 </Button> -->
-                    <!--                 <Button Classes="sub opt-btn key" -->
-                    <!--                         DataContext="{Binding SortOption2, Source={x:Static local:MainViewModel.Instance}}" -->
-                    <!--                         Classes.is-score="{Binding ConverterParameter=0, Converter={x:Static local:IsScoreOptionConverter.Instance}}" -->
-                    <!--                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}" -->
-                    <!--                         CommandParameter="{Binding .}"> -->
-                    <!--                     <Viewbox StretchDirection="DownOnly"> -->
-                    <!--                         <TextBlock /> -->
-                    <!--                     </Viewbox> -->
-                    <!--                 </Button> -->
-                    <!--                 <Button Classes="sub opt-btn key" -->
-                    <!--                         DataContext="{Binding SortOption3, Source={x:Static local:MainViewModel.Instance}}" -->
-                    <!--                         Classes.is-score="{Binding ConverterParameter=0, Converter={x:Static local:IsScoreOptionConverter.Instance}}" -->
-                    <!--                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}" -->
-                    <!--                         CommandParameter="{Binding .}"> -->
-                    <!--                     <Viewbox StretchDirection="DownOnly"> -->
-                    <!--                         <TextBlock /> -->
-                    <!--                     </Viewbox> -->
-                    <!--                 </Button> -->
-                    <!--                 <Button Classes="sub opt-btn key" -->
-                    <!--                         DataContext="{Binding SortOption4, Source={x:Static local:MainViewModel.Instance}}" -->
-                    <!--                         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}" -->
-                    <!--                         CommandParameter="{Binding .}"> -->
-                    <!--                     <Viewbox StretchDirection="DownOnly"> -->
-                    <!--                         <TextBlock /> -->
-                    <!--                     </Viewbox> -->
-                    <!--                 </Button> -->
-                    <!--             </StackPanel> -->
-                    <!--         </Flyout> -->
-                    <!--     </Button.Flyout> -->
+                    <!--         Classes="opt-btn key" -->
+                    <!--         Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}" -->
+                    <!--         CommandParameter="{Binding .}"> -->
                     <!--     <Viewbox StretchDirection="DownOnly"> -->
                     <!--         <TextBlock /> -->
                     <!--     </Viewbox> -->
                     <!-- -->
                     <!-- </Button> -->
+
+                    <Button x:Name="SortPropButton"
+                            Grid.Column="1"
+                            local:CloseFlyoutExtension.IsEnabled="True"
+                            Classes="opt-btn key">
+                        <Button.Styles>
+                            <Style Selector="FlyoutPresenter">
+                                <Setter Property="Margin"
+                                        Value="0" />
+                                <Setter Property="Padding"
+                                        Value="0" />
+                                <Setter Property="CornerRadius"
+                                        Value="0,0,5,5" />
+                            </Style>
+                            <Style Selector="Button.sub">
+                                <Setter Property="Padding"
+                                        Value="15,6" />
+                            </Style>
+                        </Button.Styles>
+                        <Button.Flyout>
+                            <Flyout Opened="FlyoutBase_OnOpened">
+                                <controls:ColorZone Mode="Inverted"
+                                                    Foreground="{DynamicResource Bg}">
+                                    <StackPanel x:DataType="local:MainViewModel"
+                                                DataContext="{x:Static local:MainViewModel.Instance}">
+                                        <Button Classes="sub opt-btn key"
+                                                DataContext="{Binding SortOption1}"
+                                                Classes.is-score="{Binding ConverterParameter=0, Converter={x:Static local:IsScoreOptionConverter.Instance}}"
+                                                Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}">
+                                            <Button.CommandParameter>
+                                                <MultiBinding
+                                                    Converter="{x:Static local:MultiObjectConverter.Instance}">
+                                                    <Binding Path="DataContext"
+                                                             ElementName="SortPropButton" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </Button.CommandParameter>
+                                            <Viewbox StretchDirection="DownOnly">
+                                                <TextBlock />
+                                            </Viewbox>
+                                        </Button>
+                                        <Button Classes="sub opt-btn key"
+                                                DataContext="{Binding SortOption2, Source={x:Static local:MainViewModel.Instance}}"
+                                                Classes.is-score="{Binding ConverterParameter=1, Converter={x:Static local:IsScoreOptionConverter.Instance}}"
+                                                Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}">
+                                            <Button.CommandParameter>
+                                                <MultiBinding
+                                                    Converter="{x:Static local:MultiObjectConverter.Instance}">
+                                                    <Binding Path="DataContext"
+                                                             ElementName="SortPropButton" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </Button.CommandParameter>
+                                            <Viewbox StretchDirection="DownOnly">
+                                                <TextBlock />
+                                            </Viewbox>
+                                        </Button>
+                                        <Button Classes="sub opt-btn key"
+                                                DataContext="{Binding SortOption3, Source={x:Static local:MainViewModel.Instance}}"
+                                                Classes.is-score="{Binding ConverterParameter=2, Converter={x:Static local:IsScoreOptionConverter.Instance}}"
+                                                Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}">
+                                            <Button.CommandParameter>
+                                                <MultiBinding
+                                                    Converter="{x:Static local:MultiObjectConverter.Instance}">
+                                                    <Binding Path="DataContext"
+                                                             ElementName="SortPropButton" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </Button.CommandParameter>
+                                            <Viewbox StretchDirection="DownOnly">
+                                                <TextBlock />
+                                            </Viewbox>
+                                        </Button>
+                                        <Button Classes="sub opt-btn key"
+                                                DataContext="{Binding SortOption4, Source={x:Static local:MainViewModel.Instance}}"
+                                                Classes.is-score="{Binding ConverterParameter=3, Converter={x:Static local:IsScoreOptionConverter.Instance}}"
+                                                Command="{Binding SelectOptionCommand, Source={x:Static local:MainViewModel.Instance}}">
+                                            <Button.CommandParameter>
+                                                <MultiBinding
+                                                    Converter="{x:Static local:MultiObjectConverter.Instance}">
+                                                    <Binding Path="DataContext"
+                                                             ElementName="SortPropButton" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </Button.CommandParameter>
+                                            <Viewbox StretchDirection="DownOnly">
+                                                <TextBlock />
+                                            </Viewbox>
+                                        </Button>
+                                    </StackPanel>
+                                </controls:ColorZone>
+
+                            </Flyout>
+                        </Button.Flyout>
+                        <Viewbox StretchDirection="DownOnly">
+                            <TextBlock />
+                        </Viewbox>
+
+                    </Button>
 
                 </Grid>
 

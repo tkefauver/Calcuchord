@@ -59,6 +59,7 @@ namespace Calcuchord {
 
         #region Members
 
+        MatchProvider TranslateMatchProvider { get; set; }
         MatchProvider MatchProvider { get; set; }
 
         #endregion
@@ -67,11 +68,10 @@ namespace Calcuchord {
 
         #region Matches
 
+        MatchViewModel TranslateMatchViewModel { get; set; }
         public ObservableCollection<MatchViewModel> Matches { get; } = [];
         MatchViewModel[] AllResults { get; set; } = [];
         IEnumerable<NoteViewModel> LastNotes { get; set; } = [];
-        IEnumerable<MatchViewModel> LastMatches { get; } = [];
-        IEnumerable<OptionViewModel> LastOptions { get; } = [];
 
         public MatchViewModel SelectedMatch {
             get => Matches.FirstOrDefault(x => x.IsSelected);
@@ -85,6 +85,7 @@ namespace Calcuchord {
 
         #region Instrument
 
+        TuningViewModel TranslateModeTuning { get; set; }
         public InstrumentViewModel EditModeInstrument { get; private set; }
 
         public ObservableCollection<InstrumentViewModel> Instruments { get; } = [];
@@ -173,6 +174,18 @@ namespace Calcuchord {
             SortOptions.Any() ?
                 SortOptions[3] :
                 null;
+
+        public OptionViewModel SortOptionPosition =>
+            SortOptions.FirstOrDefault(x => x.OptionValue == MatchSortType.Position.ToString());
+
+        public OptionViewModel SortOptionSuffix =>
+            SortOptions.FirstOrDefault(x => x.OptionValue == MatchSortType.Suffix.ToString());
+
+        public OptionViewModel SortOptionKey =>
+            SortOptions.FirstOrDefault(x => x.OptionValue == MatchSortType.Key.ToString());
+
+        public OptionViewModel SortOptionScore =>
+            SortOptions.FirstOrDefault(x => x.OptionValue == MatchSortType.Score.ToString());
 
         #endregion
 
@@ -296,6 +309,7 @@ namespace Calcuchord {
             SelectedInstrument == EditModeInstrument;
 
         public bool IsExactMatchOnly { get; set; } = true;
+        public bool IsTranslateMode => TranslateModeTuning != null;
 
 
         public bool IsSearchModeSelected =>
@@ -660,8 +674,24 @@ namespace Calcuchord {
                 Prefs.Instance.Save();
             }
 
-            IsLoaded = true;
             IsBusy = false;
+
+            Dispatcher.UIThread.Post(
+                async () => {
+                    while(true) {
+                        if(MainView.Instance is not { } mv ||
+                           !mv.IsLoaded ||
+                           !mv.IsArrangeValid ||
+                           !mv.IsInitialized) {
+                            await Task.Delay(300);
+                        }
+
+                        break;
+                    }
+
+                    IsLoaded = true;
+
+                },DispatcherPriority.Background);
         }
 
         public MpIAsyncCommand DoIntroCommand => new MpAsyncCommand(
@@ -714,6 +744,10 @@ namespace Calcuchord {
 
         public async Task UpdateMatchesAsync(MatchUpdateSource source) {
             PlatformWrapper.Services.Logger.WriteLine($"Updating matches. Source: '{source}'");
+            if(IsTranslateMode && source != MatchUpdateSource.FindClick && source != MatchUpdateSource.FilterToggle) {
+                FinishTranslateCommand.Execute(null);
+            }
+
             if(SelectedTuning == null ||
                source is
                    MatchUpdateSource.NoteToggle or
@@ -723,6 +757,10 @@ namespace Calcuchord {
                 (IsDefaultSelection || IsSearchButtonVisible))) {
                 // dont search when notes clicked or
                 // toggling options when instrument has empty selection
+                if(source is not MatchUpdateSource.FilterToggle) {
+                    ResetOptAvailability();
+                }
+
                 UpdateViewProps();
                 IsSearchInitiating = false;
                 return;
@@ -784,7 +822,18 @@ namespace Calcuchord {
             SvgOptions.ForEach(x => x.RaisePropertyChanged(nameof(x.IsChecked)));
         }
 
-        IEnumerable<MatchViewModel> GetMatchResults(NoteViewModel[] sel_notes) {
+        IEnumerable<MatchViewModel> GetMatchResults(NoteViewModel[] sel_note_vml) {
+            MatchScoreMethodType score_method = IsExactMatchOnly ?
+                MatchScoreMethodType.Exact :
+                MatchScoreMethodType.Voicing;
+            MatchProvider matcher = MatchProvider;
+            var sel_notes = sel_note_vml.Select(x => x.InstrumentNote).ToArray();
+            if(IsTranslateMode) {
+                score_method = MatchScoreMethodType.Translation;
+                matcher = TranslateMatchProvider;
+                sel_notes = TranslateMatchViewModel.NotePattern.Notes.Cast<InstrumentNote>().ToArray();
+            }
+
             // prefer desired root over key?
             var target_key = SelectedKey;
 
@@ -798,7 +847,7 @@ namespace Calcuchord {
             var unavail_keyl = KeyOptions.ToList();
             var unavail_suffl = SuffixOptions.ToList();
             var mrl = new List<MatchViewModel>();
-            foreach(var kvp in MatchProvider.PatternLookup) {
+            foreach(var kvp in matcher.PatternLookup) {
                 bool omitted_key = target_key is { } tk2 && tk2 != kvp.Key;
 
                 foreach(var kvp2 in kvp.Value) {
@@ -806,7 +855,8 @@ namespace Calcuchord {
                     foreach(MatchViewModel mvm in kvp2.Value) {
                         bool valid = false;
                         if(IsSearchModeSelected) {
-                            mvm.Score = MatchProvider.GetScore(mvm.NotePattern,sel_notes);
+                            mvm.Score = matcher.GetScore(
+                                mvm.NotePattern,sel_notes,score_method);
                             if(mvm.Score > 0 || sel_notes.Length == 0) {
                                 valid = true;
                             }
@@ -842,6 +892,11 @@ namespace Calcuchord {
                 },DispatcherPriority.Normal,MatchCts.Token);
 
             return mrl;
+        }
+
+        void ResetOptAvailability() {
+            KeyOptions.ForEach(x => x.IsEnabled = true);
+            SuffixOptions.ForEach(x => x.IsEnabled = true);
         }
 
         void LoadMatches(MatchUpdateSource source) {
@@ -920,26 +975,6 @@ namespace Calcuchord {
                            1);
             }
 
-        }
-
-        public async Task CancelMatchZoomAsync() {
-            if(ZoomCts == null) {
-                ZoomCts = new CancellationTokenSource();
-            } else {
-                await ZoomCts.CancelAsync();
-                ZoomCts.Dispose();
-                ZoomCts = new CancellationTokenSource();
-            }
-        }
-
-        async Task CancelMatchFilterAsync() {
-            if(MatchCts == null) {
-                MatchCts = new CancellationTokenSource();
-            } else {
-                await MatchCts.CancelAsync();
-                MatchCts.Dispose();
-                MatchCts = new CancellationTokenSource();
-            }
         }
 
         void CancelMatchFilter() {
@@ -1144,6 +1179,11 @@ namespace Calcuchord {
             if(reset) {
                 foreach(OptionViewModel ovm in OptionLookup.Values.SelectMany(x => x)) {
                     switch(ovm.OptionType) {
+                        case OptionType.ChordSort:
+                        case OptionType.ScaleSort:
+                        case OptionType.ModeSort:
+                            ovm.IsChecked = ovm.OptionValue == MatchSortType.Score.ToString();
+                            break;
                         case OptionType.Degree:
                             ovm.IsChecked = ovm.OptionValue == ChordKeyDegreeType.I.ToString();
                             break;
@@ -1299,6 +1339,41 @@ namespace Calcuchord {
 
 
                 bool is_done = false;
+                CancellationTokenSource batch_cts = new CancellationTokenSource();
+                MpCommand cancel_cmd = new MpCommand(
+                    () => {
+                        batch_cts?.Cancel();
+                        is_done = true;
+                    });
+                string title = SelectedTuning.FullName.RemoveInvalidPathChars().Replace("-"," ")
+                    .Replace(" ","_");
+                TextFieldDialogView tfdv = new TextFieldDialogView();
+                tfdv.TitleTextBlock.Text = "Enter title:";
+                tfdv.InputTextBox.Text = title;
+                tfdv.CancelButton.Command = cancel_cmd;
+                tfdv.OkButton.Command = new MpCommand(
+                    () => {
+                        if(tfdv.InputTextBox.Text.RemoveInvalidPathChars() is { } final_title &&
+                           !string.IsNullOrEmpty(final_title)) {
+                            title = final_title;
+                        }
+
+                        is_done = true;
+                    });
+
+                DialogHost.Show(tfdv,MainDialogHostName).FireAndForgetSafeAsync();
+
+                while(!is_done) {
+                    await Task.Delay(300);
+                }
+
+                DialogHost.Close(MainDialogHostName);
+                if(batch_cts.IsCancellationRequested) {
+                    batch_cts.Dispose();
+                    return;
+                }
+
+
                 ProgressView busy_view = new ProgressView
                 {
                     TitleTextBlock =
@@ -1306,13 +1381,8 @@ namespace Calcuchord {
                         Text = "Please wait...(This may take a while)",
                     },
                 };
-                CancellationTokenSource batch_cts = new CancellationTokenSource();
                 busy_view.CancelButton.IsVisible = true;
-                busy_view.CancelButton.Command = new MpCommand(
-                    () => {
-                        batch_cts.Cancel();
-                        is_done = true;
-                    });
+                busy_view.CancelButton.Command = cancel_cmd;
 
                 DialogHost.Show(busy_view,MainDialogHostName).FireAndForgetSafeAsync();
                 int matches_per_page = GetLoadMoreCount(false);
@@ -1320,33 +1390,23 @@ namespace Calcuchord {
                 try {
                     _ = Task.Run(
                         async () => {
-                            //await Task.Delay(1_500);
                             var export_items = AllResults;
-                            string title = SelectedTuning.FullName.RemoveInvalidPathChars().Replace(" - "," ");
 
                             if(exp_type == "HTML" && PlatformWrapper.Services.ShareHtml is { } shtml) {
                                 Dispatcher.UIThread.Post(
                                     () => {
+                                        busy_view.ProgressDetailTextBlock.IsVisible = false;
                                         busy_view.ProgressCtrl.IsVisible = false;
                                         busy_view.Spinner.IsVisible = true;
                                     });
                                 string html = builder.GetBatchHtml(
-                                    SelectedTuning.Tuning,export_items.Select(x => x.NotePattern).ToArray());
+                                    title,export_items.Select(x => x.NotePattern).ToArray());
                                 await shtml.ShareHtmlAsync(html,title);
                             } else if(exp_type == "FULLPDF" && PlatformWrapper.Services.SharePdf is { } spdf) {
-
-#if DEBUG
-                                // if(ThemeViewModel.Instance.IsDesktop &&
-                                //    TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
-                                //    tl.Clipboard is { } cb) {
-                                //     cb.SetTextAsync(svg_html.ToPrettyPrintXml()).FireAndForgetSafeAsync();
-                                // }
-#endif
-
-                                int page_count = export_items.Length / matches_per_page;
+                                int page_count = (int)Math.Ceiling(export_items.Length / (double)matches_per_page);
                                 int compl_count = 0;
 
-                                //2480 pixels wide by 3508 
+                                //A4 2480 pixels wide by 3508 
                                 double scale = 1240d / (MatchColCount * MatchFixedWidth);
                                 DateTime start_dt = DateTime.Now;
 
@@ -1371,11 +1431,13 @@ namespace Calcuchord {
                                 async Task<(byte[],int)> CreatePagePdfAsync(IEnumerable<NotePattern> items,
                                     int pageNum) {
                                     string svg_html = builder.GetBatchSvg(
-                                        SelectedTuning.Tuning,
                                         items,
                                         MatchColCount,
                                         pageNum == 0,
-                                        pageNum == page_count - 1);
+                                        pageNum == page_count - 1,
+                                        pageNum == 0 ?
+                                            title :
+                                            string.Empty);
                                     byte[] pdf_page_bytes = Extensions.ToPdfBytes(
                                         svg_html,
                                         ThemeViewModel.Instance.IsDark ?
@@ -1409,7 +1471,7 @@ namespace Calcuchord {
 
                                 byte[] pdf_bytes =
                                     Extensions.MergePdf(results.OrderBy(x => x.Item2).Select(x => x.Item1));
-                                await spdf.SharePdfAsync(pdf_bytes,SelectedMatch.ShareTitle);
+                                await spdf.SharePdfAsync(pdf_bytes,title);
 
                             }
 
@@ -1594,12 +1656,15 @@ namespace Calcuchord {
         public ICommand ResetInstrumentCommand => new MpCommand(
             () => {
                 SelectedKey = null;
+                LastSelectedKey = null;
                 SelectedTuning.ResetSelection();
                 LastNotes = [];
+                ResetOptAvailability();
 
                 Matches.Clear();
 
                 UpdateViewProps();
+
                 InstrumentView.Instance.ScrollSelectionIntoView();
             });
 
@@ -1739,8 +1804,7 @@ namespace Calcuchord {
                 bool suppress_action = false;
                 if(args is not OptionViewModel ovm) {
                     if(args is object[] arg_parts &&
-                       arg_parts.Any() &&
-                       arg_parts[0] is OptionViewModel sort_ovm) {
+                       arg_parts.FirstOrDefault() is OptionViewModel sort_ovm) {
                         ovm = sort_ovm;
 
                     } else if(args is object[] arg_parts2 &&
@@ -1863,6 +1927,7 @@ namespace Calcuchord {
 
                         Dispatcher.UIThread.Invoke(
                             () => {
+                                MatchesView.Instance.DoBusyCheckAsync(500).FireAndForgetSafeAsync();
                                 UpdateMatchCss();
                                 if(SelectedInstrument != null &&
                                    flag.RequiresReset(SelectedInstrument.InstrumentType,SelectedPatternType)) {
@@ -1870,7 +1935,6 @@ namespace Calcuchord {
                                     ResetMatchSvg();
                                 }
 
-                                MatchesView.Instance.DoBusyCheckAsync(500).FireAndForgetSafeAsync();
 
                             },DispatcherPriority.Background);
 
@@ -1879,11 +1943,23 @@ namespace Calcuchord {
                     case OptionType.ChordSort:
                     case OptionType.ScaleSort:
                     case OptionType.ModeSort:
-                        bool is_secondary = args is object[];
+                        if(args is not object[] arg_parts ||
+                           arg_parts.Length < 2) {
+                            break;
+                        }
+
+                        bool is_secondary = arg_parts[1] is bool;
                         if(is_secondary) {
                             ovm.IsChecked = !ovm.IsChecked;
                         } else {
-                            SortOptions.Move(SortOptions.IndexOf(ovm),SortOptions.Count - 1);
+                            OptionViewModel sort_source_ovm = arg_parts[0] as OptionViewModel;
+                            OptionViewModel sort_target_ovm = arg_parts[1] as OptionViewModel;
+                            int s0_idx = SortOptions.IndexOf(sort_source_ovm);
+                            int e0_idx = SortOptions.IndexOf(sort_target_ovm);
+                            SortOptions.Move(s0_idx,e0_idx);
+                            int e1_idx = SortOptions.IndexOf(sort_target_ovm);
+                            SortOptions.Move(e1_idx,s0_idx);
+
                             OnPropertyChanged(nameof(SortOption1));
                             OnPropertyChanged(nameof(SortOption2));
                             OnPropertyChanged(nameof(SortOption3));
@@ -2051,6 +2127,48 @@ namespace Calcuchord {
         public ICommand LoadMoreCommand => new MpCommand(
             () => {
                 LoadMore();
+            });
+
+        public ICommand TranslatePatternCommand => new MpCommand<object>(
+            async (args) => {
+                if(args is not object[] arg_parts ||
+                   arg_parts[0] is not MatchViewModel mtvm ||
+                   arg_parts[1] is not TuningViewModel tvm) {
+                    return;
+                }
+
+                PlatformWrapper.Services.Logger.WriteLine(
+                    $"Translate mode activated: source: '{mtvm}' target: '{tvm}'");
+
+                await mtvm.SetMatchToInstrumentCommand.ExecuteAsync();
+                TranslateModeTuning = tvm;
+                TranslateMatchViewModel = mtvm;
+
+                // set score to primary sort?
+                //var cmd_args = new object[3]{SortOption1,SortOptionScore,"SUPPRESS"};
+                //SelectOptionCommand.Execute(cmd_args);
+
+                _ = Task.Run(
+                    () => {
+                        TranslateMatchProvider = new MatchProvider(SelectedPatternType,tvm.Tuning);
+                        Dispatcher.UIThread.Invoke(
+                            () => {
+                                OnPropertyChanged(nameof(IsTranslateMode));
+                                UpdateMatchesAsync(MatchUpdateSource.FindClick).FireAndForgetSafeAsync();
+                            });
+
+                    });
+            });
+
+        public ICommand FinishTranslateCommand => new MpCommand(
+            () => {
+                PlatformWrapper.Services.Logger.WriteLine("Translate mode deactivated");
+                TranslateModeTuning = null;
+                TranslateMatchViewModel = null;
+                TranslateMatchProvider = null;
+                OnPropertyChanged(nameof(IsTranslateMode));
+                UpdateMatchesAsync(MatchUpdateSource.FindClick).FireAndForgetSafeAsync();
+
             });
 
         #endregion

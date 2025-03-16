@@ -208,6 +208,7 @@
             </Border.Background>
             <Border.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsLoaded" />
                     <Binding Path="!IsSearchButtonVisible" />
                     <Binding Path="!IsVisible"
                              ElementName="EmptyTextCntrContentControl" />
@@ -256,7 +257,7 @@
 
                         </Viewbox>
                         <Button x:Name="LoadMoreButton"
-                                Width="{Binding Bounds.Width, ElementName=MatchItemsRepeater}"
+                                Width="{Binding Bounds.Width, ElementName=MatchesScrollViewer}"
                                 Height="64"
                                 Command="{Binding LoadMoreCommand}">
                             <Button.Background>
@@ -268,6 +269,7 @@
                                     <Binding Path="CanLoadMore" />
                                     <Binding Path="!IsLoadingMore" />
                                     <Binding Path="!IsSearchInitiating" />
+                                    <Binding Path="IsLoaded" />
                                 </MultiBinding>
                             </Button.IsVisible>
                             <avalonia:MaterialIcon Width="48"
@@ -277,15 +279,22 @@
                                                    Kind="ArrowDownCircle" />
                         </Button>
                         <local:BusyOverlayView x:Name="LoadMoreBusyOverlay"
-                                               IsVisible="{Binding IsLoadingMore}"
-                                               Width="{Binding Bounds.Width, ElementName=MatchItemsRepeater}"
-                                               Height="64" />
+                                               Width="{Binding Bounds.Width, ElementName=MatchesScrollViewer}"
+                                               Height="64">
+                            <local:BusyOverlayView.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="IsLoadingMore" />
+                                    <Binding Path="IsLoaded" />
+                                </MultiBinding>
+                            </local:BusyOverlayView.IsVisible>
+                        </local:BusyOverlayView>
                     </StackPanel>
                 </ScrollViewer>
 
                 <!-- SHARE -->
                 <controls:Card Grid.Row="0"
                                Classes="button-group"
+                               IsVisible="{Binding !IsVisible, ElementName=MatchesBusyOverlay}"
                                Margin="10"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center">
@@ -342,6 +351,7 @@
                 <controls:Card Grid.Row="0"
                                x:Name="ZoomButtonCard"
                                Classes="button-group"
+                               IsVisible="{Binding !IsVisible, ElementName=MatchesBusyOverlay}"
                                Classes.right-drawer-float="{Binding !IsPhone, Source={x:Static local:ThemeViewModel.Instance}}"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
@@ -417,6 +427,7 @@
 
             <!-- RESET -->
             <HyperlinkButton x:Name="ResetInstrumentLinkBUtton"
+                             Background="Transparent"
                              Classes="fade fade-hide"
                              Cursor="Hand"
                              HorizontalAlignment="Center"
