@@ -219,10 +219,14 @@
             <Grid RowDefinitions="Auto,*">
 
                 <ScrollViewer x:Name="MatchesScrollViewer"
+                              local:LoadMoreExtension.IsEnabled="{Binding IsAutoLoadMoreEnabled}"
+                              local:LoadMoreExtension.LoadMoreCommand="{Binding LoadMoreCommand}"
+                              local:LoadMoreExtension.Threshold="0.75"
                               Bounds="{Binding MatchesContainerRect,Mode=OneWayToSource}"
                               Grid.Row="1">
                     <StackPanel>
-                        <Viewbox VerticalAlignment="Top">
+                        <Viewbox x:Name="MatchesViewbox"
+                                 VerticalAlignment="Top">
                             <!-- NOTE no margin/padding on repeater to get accurate bounds -->
                             <!-- <ItemsRepeater x:Name="MatchItemsRepeater" -->
                             <!--                Width="{Binding MatchesViewFixedWidth}" -->
@@ -258,7 +262,7 @@
                         </Viewbox>
                         <Button x:Name="LoadMoreButton"
                                 Width="{Binding Bounds.Width, ElementName=MatchesScrollViewer}"
-                                Height="64"
+                                Height="{Binding MatchesLoadMoreFixedHeight}"
                                 Command="{Binding LoadMoreCommand}">
                             <Button.Background>
                                 <SolidColorBrush Color="{DynamicResource FgColor}"
@@ -270,6 +274,7 @@
                                     <Binding Path="!IsLoadingMore" />
                                     <Binding Path="!IsSearchInitiating" />
                                     <Binding Path="IsLoaded" />
+                                    <Binding Path="!IsAutoLoadMoreEnabled" />
                                 </MultiBinding>
                             </Button.IsVisible>
                             <avalonia:MaterialIcon Width="48"
@@ -280,11 +285,12 @@
                         </Button>
                         <local:BusyOverlayView x:Name="LoadMoreBusyOverlay"
                                                Width="{Binding Bounds.Width, ElementName=MatchesScrollViewer}"
-                                               Height="64">
+                                               Height="{Binding MatchesLoadMoreFixedHeight}">
                             <local:BusyOverlayView.IsVisible>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="IsLoadingMore" />
                                     <Binding Path="IsLoaded" />
+                                    <Binding Path="!IsAutoLoadMoreEnabled" />
                                 </MultiBinding>
                             </local:BusyOverlayView.IsVisible>
                         </local:BusyOverlayView>
@@ -303,12 +309,6 @@
                             IsEnabled="{Binding !IsMatchesEmpty}"
                             Padding="8"
                             Classes="float">
-
-                        <!-- <ToolTip.Tip> -->
-                        <!--     <controls:Card Classes="tt"> -->
-                        <!--         <TextBlock Text="Open in new tab..." /> -->
-                        <!--     </controls:Card> -->
-                        <!-- </ToolTip.Tip> -->
                         <Button.Flyout>
                             <Flyout>
                                 <ContextMenu Placement="AnchorAndGravity"

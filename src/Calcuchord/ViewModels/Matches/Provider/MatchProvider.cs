@@ -103,7 +103,17 @@ namespace Calcuchord {
 
             }
 
-            return score / Math.Max(1,Math.Max(pattern.Notes.Count,matchNotes.Length));
+            // if(score == 0) {
+            //     return 0;
+            // }
+            //
+            // double score1 = matchNotes.Length / score;
+            int pattern_len = pattern.Notes.Count(x => !x.IsMute) +
+                              Math.Min(pattern.Notes.Count(x => x.IsMute),matchNotes.Count(x => x.IsMute));
+            // double score2 = pattern_len / score; 
+            // return (score1 + score2) / 2d;
+
+            return score / pattern_len; //Math.Max(1,Math.Max(pattern.Notes.Count,matchNotes.Length));
         }
 
         #endregion

@@ -22,8 +22,10 @@ namespace Calcuchord {
             // hide host opt from flyout
             bl.Where(x => x.DataContext == DataContext).ForEach(x => x.IsVisible = false);
 
-            if(!MainViewModel.Instance.IsSearchModeSelected || MainViewModel.Instance.IsExactMatchOnly) {
+            if(!MainViewModel.Instance.IsSearchModeSelected &&
+               bl.FirstOrDefault(x => x.DataContext == MainViewModel.Instance.SortOptionScore) is { } score_ovm) {
                 // hide score 
+                score_ovm.IsVisible = false;
             }
         }
     }

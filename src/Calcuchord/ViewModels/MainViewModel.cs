@@ -258,6 +258,7 @@ namespace Calcuchord {
         public double MatchFixedWidth => 350;
         public double MatchFixedHeight => 400;
         public double MatchesViewFixedWidth => 1050;
+        public double MatchesLoadMoreFixedHeight => 64;
         public Rect MatchesContainerRect { get; set; }
 
         #endregion
@@ -266,8 +267,9 @@ namespace Calcuchord {
 
         #region UI
 
-        int MinPageCount => 10;
+        int MinPageCount => MatchColCount;
         public int LoadMoreCount { get; private set; } = 20;
+        public bool IsAutoLoadMoreEnabled => true;
         public bool CanLoadMore => Matches.Count < AllResults.Length;
         public bool IsLoadingMore { get; set; }
 
@@ -786,6 +788,8 @@ namespace Calcuchord {
         }
 
         void UpdateViewProps() {
+            OnPropertyChanged(nameof(CanLoadMore));
+
             OnPropertyChanged(nameof(SelectedPatternType));
             OnPropertyChanged(nameof(SelectedInstrumentIndex));
             OnPropertyChanged(nameof(SelectedInstrument));
@@ -963,7 +967,7 @@ namespace Calcuchord {
                         score = match.NotePattern.Position;
                         break;
                     case MatchSortType.Score:
-                        score = IsSearchModeSelected && !IsExactMatchOnly ?
+                        score = IsSearchModeSelected ?
                             match.Score :
                             1;
                         break;
@@ -1385,7 +1389,7 @@ namespace Calcuchord {
                 busy_view.CancelButton.Command = cancel_cmd;
 
                 DialogHost.Show(busy_view,MainDialogHostName).FireAndForgetSafeAsync();
-                int matches_per_page = GetLoadMoreCount(false);
+                int matches_per_page = GetPageCount(false);
 
                 try {
                     _ = Task.Run(
@@ -1661,7 +1665,9 @@ namespace Calcuchord {
                 LastNotes = [];
                 ResetOptAvailability();
 
+                AllResults = [];
                 Matches.Clear();
+                IsMatchesEmpty = true;
 
                 UpdateViewProps();
 
@@ -1948,6 +1954,8 @@ namespace Calcuchord {
                             break;
                         }
 
+                        bool suppress = arg_parts.Length == 3;
+
                         bool is_secondary = arg_parts[1] is bool;
                         if(is_secondary) {
                             ovm.IsChecked = !ovm.IsChecked;
@@ -1965,6 +1973,11 @@ namespace Calcuchord {
                             OnPropertyChanged(nameof(SortOption3));
                             OnPropertyChanged(nameof(SortOption4));
                             //await Task.Delay(SortAnimDelayMs);
+                        }
+
+                        if(suppress) {
+                            // translate resort
+                            break;
                         }
 
                         UpdateMatchesAsync(MatchUpdateSource.SortToggle).FireAndForgetSafeAsync();
@@ -2077,7 +2090,7 @@ namespace Calcuchord {
                 UpdateMatchesAsync(MatchUpdateSource.FilterToggle).FireAndForgetSafeAsync();
             });
 
-        int GetLoadMoreCount(bool actualPage = true) {
+        int GetPageCount(bool actualPage = true) {
             double outer_item_w = MatchesContainerRect.Width / MatchColCount;
             double item_scale = outer_item_w / MatchWidth;
             double outer_item_h = MatchFixedHeight * item_scale;
@@ -2094,7 +2107,7 @@ namespace Calcuchord {
 
         void UpdatePageCount() {
             int last_count = LoadMoreCount;
-            int new_count = GetLoadMoreCount();
+            int new_count = GetPageCount();
             LoadMoreCount = Math.Max(MinPageCount,new_count);
             if(LoadMoreCount <= last_count) {
                 return;
@@ -2105,19 +2118,53 @@ namespace Calcuchord {
 
         void ResetPaging() {
             Matches.Clear();
+            IsLoadingMore = false;
             LoadMore(LoadMoreCount * 2);
         }
 
         void LoadMore(int? forceCount = null) {
+            if(IsLoadingMore) {
+                PlatformWrapper.Services.Logger.WriteLine("Load more ignored");
+                return;
+            }
+
             int loadCount = forceCount ?? LoadMoreCount;
-            Matches.AddRange(AllResults.Skip(Matches.Count).Take(loadCount));
-            OnPropertyChanged(nameof(CanLoadMore));
+            int col_diff = (Matches.Count + loadCount) % MatchColCount;
+            PlatformWrapper.Services.Logger.WriteLine(
+                $"Loading {loadCount + col_diff} items. Cur Count: {Matches.Count} Col Count: {MatchColCount} Col Diff: {col_diff}");
+            var items_to_add = AllResults.Skip(Matches.Count).Take(loadCount + col_diff);
             IsLoadingMore = true;
+            if(IsAutoLoadMoreEnabled) {
+                Dispatcher.UIThread.Invoke(
+                    async () => {
+                        // dont delay reset or col change
+                        int delay = forceCount == null ? 10 : 0;
+                        foreach(MatchViewModel item in items_to_add) {
+                            if(!IsLoadingMore) {
+                                // canceled
+                                return;
+                            }
+
+                            Matches.Add(item);
+                            await Task.Delay(delay);
+                        }
+
+                        IsLoadingMore = false;
+                        OnPropertyChanged(nameof(CanLoadMore));
+                    },DispatcherPriority.Background);
+
+                return;
+            }
+
+            Matches.AddRange(items_to_add);
+            OnPropertyChanged(nameof(CanLoadMore));
+
             Dispatcher.UIThread.Post(
                 async () => {
                     while(!MatchesView.Instance.MatchItemsRepeater.IsArrangeValid) {
                         await Task.Delay(300);
                     }
+                    //await Task.Delay(300);
 
                     IsLoadingMore = false;
 
@@ -2145,14 +2192,15 @@ namespace Calcuchord {
                 TranslateMatchViewModel = mtvm;
 
                 // set score to primary sort?
-                //var cmd_args = new object[3]{SortOption1,SortOptionScore,"SUPPRESS"};
-                //SelectOptionCommand.Execute(cmd_args);
+                object[] cmd_args = new object[3] { SortOption1,SortOptionScore,"SUPPRESS" };
+                SelectOptionCommand.Execute(cmd_args);
 
                 _ = Task.Run(
                     () => {
                         TranslateMatchProvider = new MatchProvider(SelectedPatternType,tvm.Tuning);
                         Dispatcher.UIThread.Invoke(
-                            () => {
+                            async () => {
+                                await Task.Delay(500);
                                 OnPropertyChanged(nameof(IsTranslateMode));
                                 UpdateMatchesAsync(MatchUpdateSource.FindClick).FireAndForgetSafeAsync();
                             });

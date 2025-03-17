@@ -73,7 +73,7 @@
                                 <Setter Property="Padding"
                                         Value="0" />
                                 <Setter Property="CornerRadius"
-                                        Value="0,0,5,5" />
+                                        Value="5" />
                             </Style>
                             <Style Selector="Button.sub">
                                 <Setter Property="Padding"

@@ -34,6 +34,11 @@ namespace Calcuchord {
                 return;
             }
 
+            if(cm.Items.Count == 3) {
+                // remove last translate menu
+                cm.Items.RemoveAt(2);
+            }
+
             MenuItem trans_mi = new MenuItem
             {
                 Header = "Translate",
