@@ -23,7 +23,7 @@
                         Width="300">
         <StackPanel Spacing="16">
             <TextBlock x:Name="TitleTextBlock"
-                       Classes="Body2" />
+                       FontSize="32" />
             <Border x:Name="WasmWarningContainer"
                     Background="Orange"
                     IsVisible="{Binding IsBrowser, Source={x:Static local:ThemeViewModel.Instance}}"

@@ -32,7 +32,6 @@
                            VerticalAlignment="Center"
                            Text="Label" />
                 <TextBox x:Name="InputTextBox"
-                         IsFocused="True"
                          Width="175"
                          Text="Input" />
             </StackPanel>

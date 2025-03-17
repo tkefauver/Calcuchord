@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -20,6 +21,8 @@ using DialogHostAvalonia;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
 using Newtonsoft.Json;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.IO;
 using SkiaSharp;
 using AvSnackbarHost = Material.Styles.Controls.SnackbarHost;
 using AvSvg = Avalonia.Svg.Skia.Svg;
@@ -1351,18 +1354,19 @@ namespace Calcuchord {
                         batch_cts?.Cancel();
                         is_done = true;
                     });
-                string title = SelectedTuning.FullName.RemoveInvalidPathChars().Replace("-",string.Empty)
+                string view_title = $"{PatternSingularName.ToTitleCase()} Export";
+                string export_title = SelectedTuning.FullName.RemoveInvalidPathChars().Replace("-",string.Empty)
                     .Replace(" ",string.Empty);
                 TextFieldDialogView tfdv = new TextFieldDialogView();
-                tfdv.TitleTextBlock.Text = $"{PatternSingularName.ToTitleCase()} Export";
+                tfdv.TitleTextBlock.Text = view_title;
                 tfdv.InputLabelTextBlock.Text = "Title:";
-                tfdv.InputTextBox.Text = title;
+                tfdv.InputTextBox.Text = export_title;
                 tfdv.CancelButton.Command = cancel_cmd;
                 tfdv.OkButton.Command = new MpCommand(
                     () => {
                         if(tfdv.InputTextBox.Text.RemoveInvalidPathChars() is { } final_title &&
                            !string.IsNullOrEmpty(final_title)) {
-                            title = final_title;
+                            export_title = final_title;
                         }
 
                         is_done = true;
@@ -1382,13 +1386,9 @@ namespace Calcuchord {
 
                 is_done = false;
 
-                ProgressView busy_view = new ProgressView
-                {
-                    TitleTextBlock =
-                    {
-                        Text = "Please wait...(This may take a while)",
-                    },
-                };
+                ProgressView busy_view = new ProgressView();
+                busy_view.TitleTextBlock.Text = view_title;
+                busy_view.TitleTextBlock.FontSize = 32;
                 busy_view.CancelButton.IsVisible = true;
                 busy_view.CancelButton.Command = cancel_cmd;
 
@@ -1408,8 +1408,8 @@ namespace Calcuchord {
                                         busy_view.Spinner.IsVisible = true;
                                     });
                                 string html = builder.GetBatchHtml(
-                                    title,export_items.Select(x => x.NotePattern).ToArray());
-                                await shtml.ShareHtmlAsync(html,title);
+                                    export_title,export_items.Select(x => x.NotePattern).ToArray());
+                                await shtml.ShareHtmlAsync(html,export_title);
                             } else if(exp_type == "FULLPDF" && PlatformWrapper.Services.SharePdf is { } spdf) {
                                 int page_count = (int)Math.Ceiling(export_items.Length / (double)matches_per_page);
                                 int compl_count = 0;
@@ -1432,11 +1432,11 @@ namespace Calcuchord {
                                         () => {
                                             busy_view.ProgressCtrl.Value = compl_count / (double)page_count;
                                             busy_view.ProgressDetailTextBlock.Text =
-                                                $"{remaining} pages / {remaining_dur:c} remaining...";
+                                                $"{remaining} pages / {remaining_dur:hh\\:mm\\:ss} remaining...";
                                         });
                                 }
 
-                                async Task<(byte[],int)> CreatePagePdfAsync(IEnumerable<NotePattern> items,
+                                async Task<(PdfDocument,int)> CreatePagePdfAsync(IEnumerable<NotePattern> items,
                                     int pageNum) {
                                     string svg_html = builder.GetBatchSvg(
                                         items,
@@ -1444,17 +1444,18 @@ namespace Calcuchord {
                                         pageNum == 0,
                                         pageNum == page_count - 1,
                                         pageNum == 0 ?
-                                            title :
+                                            export_title :
                                             string.Empty);
-                                    byte[] pdf_page_bytes = Extensions.ToPdfBytes(
+                                    using MemoryStream ms = Extensions.ToPdfStream(
                                         svg_html,
                                         ThemeViewModel.Instance.IsDark ?
                                             SKColors.Black :
                                             SKColors.White,
                                         (float)scale);
                                     await Task.Delay(1);
+                                    PdfDocument pdf_doc = PdfReader.Open(ms,PdfDocumentOpenMode.Import);
                                     CompletePage();
-                                    return (pdf_page_bytes,pageNum);
+                                    return (pdf_doc,pageNum);
                                 }
 
                                 var pages = new List<IEnumerable<NotePattern>>();
@@ -1474,12 +1475,26 @@ namespace Calcuchord {
                                     () => {
                                         busy_view.ProgressCtrl.IsVisible = false;
                                         busy_view.Spinner.IsVisible = true;
-                                        busy_view.ProgressDetailTextBlock.Text = "Finishing up...";
+                                        busy_view.ProgressDetailTextBlock.Text =
+                                            "Finishing up (this may take a while)...";
                                     });
 
-                                byte[] pdf_bytes =
-                                    Extensions.MergePdf(results.OrderBy(x => x.Item2).Select(x => x.Item1));
-                                await spdf.SharePdfAsync(pdf_bytes,title);
+                                using PdfDocument outPdf = new PdfDocument();
+                                foreach(PdfDocument pdf in results.OrderBy(x => x.Item2).Select(x => x.Item1)) {
+                                    foreach(PdfPage page in pdf.Pages) {
+                                        outPdf.AddPage(page);
+                                    }
+                                }
+
+                                using MemoryStream stream = new MemoryStream();
+                                outPdf.Save(stream,false);
+                                byte[] pdf_bytes = stream.ToArray();
+                                if(OperatingSystem.IsIOS()) {
+                                    // close it first 
+                                    is_done = true;
+                                    await Task.Delay(150);
+                                }
+                                await spdf.SharePdfAsync(pdf_bytes,export_title);
 
                             }
 
@@ -1811,7 +1826,7 @@ namespace Calcuchord {
 
         public ICommand SelectOptionCommand => new MpCommand<object>(
             (args) => {
-                bool suppress_action = false;
+                bool suppress_action = IsSearchButtonVisible;
                 if(args is not OptionViewModel ovm) {
                     if(args is object[] arg_parts &&
                        arg_parts.FirstOrDefault() is OptionViewModel sort_ovm) {
@@ -1846,7 +1861,6 @@ namespace Calcuchord {
                                         Matches.Clear();
                                         UpdateViewProps();
                                         await Task.Delay(100);
-                                        //InstrumentView.Instance.MeasureInstrument();
                                         IsBusy = false;
                                         UpdateMatchesAsync(MatchUpdateSource.TabChanged)
                                             .FireAndForgetSafeAsync();
@@ -1867,6 +1881,10 @@ namespace Calcuchord {
                                         InitOptions(false);
                                         UpdateViewProps();
                                         IsBusy = false;
+                                        if(suppress_action) {
+                                            return;
+                                        }
+
                                         UpdateMatchesAsync(MatchUpdateSource.PatternChanged).FireAndForgetSafeAsync();
                                     },DispatcherPriority.Background);
                             });
@@ -1914,6 +1932,10 @@ namespace Calcuchord {
                     case OptionType.ModeSuffix:
                         ovm.IsChecked = !ovm.IsChecked;
                         SelectedSuffixes = SuffixOptions.Where(x => x.IsChecked).Select(x => x.OptionValue);
+                        
+                        if(suppress_action) {
+                            break;
+                        }
                         UpdateMatchesAsync(MatchUpdateSource.FilterToggle).FireAndForgetSafeAsync();
                         break;
                     case OptionType.ChordSvg:
@@ -1958,7 +1980,7 @@ namespace Calcuchord {
                             break;
                         }
 
-                        bool suppress = arg_parts.Length == 3;
+                        bool suppress = arg_parts.Length == 3 || suppress_action;
 
                         bool is_secondary = arg_parts[1] is bool;
                         if(is_secondary) {

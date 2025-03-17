@@ -21,14 +21,19 @@ namespace Calcuchord {
                 Path.GetRandomFileName().SplitNoEmpty(".")[0] + "." + ext);
         }
 
-        public static byte[] ToPdfBytes(string svgXml,SKColor bg,float scale) {
+        public static MemoryStream ToPdfStream(string svgXml,SKColor bg,float scale) {
             using SKSvg svg = new SKSvg();
             if(svg.FromSvg(svgXml) is null) {
                 return null;
             }
 
-            using MemoryStream ms = new MemoryStream();
+            MemoryStream ms = new MemoryStream();
             svg.Picture.ToPdf(ms,bg,scale,scale);
+            return ms;
+        }
+
+        public static byte[] ToPdfBytes(string svgXml,SKColor bg,float scale) {
+            using MemoryStream ms = ToPdfStream(svgXml,bg,scale);
             return ms.ToArray();
         }
 

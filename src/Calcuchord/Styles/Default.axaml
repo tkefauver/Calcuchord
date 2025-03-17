@@ -47,16 +47,16 @@
     <!-- </Style> -->
 
     <!-- TABLET SS -->
-    <!-- <Style Selector="Window.debug"> -->
-    <!--     <Setter Property="SystemDecorations" -->
-    <!--             Value="None" /> -->
-    <!--     <Setter Property="Width" -->
-    <!--             Value="1032" /> -->
-    <!--     <Setter Property="Height" -->
-    <!--             Value="1376" /> -->
-    <!--     <Setter Property="SizeToContent" -->
-    <!--             Value="Manual" /> -->
-    <!-- </Style> -->
+    <Style Selector="Window.debug">
+        <Setter Property="SystemDecorations"
+                Value="None" />
+        <Setter Property="Width"
+                Value="1032" />
+        <Setter Property="Height"
+                Value="1376" />
+        <Setter Property="SizeToContent"
+                Value="Manual" />
+    </Style>
 
     <!-- TOOLTIPS -->
     <Style Selector=":is(ToolTip)">
