@@ -24,6 +24,7 @@
         <PackageReference Include="Avalonia.ReactiveUI"/>
         <PackageReference Include="Avalonia.Svg.Skia"/>
         <PackageReference Include="Avalonia.Fonts.Inter"/>
+        <PackageReference Include="iTextSharp" />
         <PackageReference Include="Material.Avalonia"/>
         <PackageReference Include="Material.Avalonia.Dialogs"/>
         <PackageReference Include="Material.Icons.Avalonia"/>
@@ -41,7 +42,6 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="PdfSharp"/>
         <PackageReference Include="PropertyChanged.Fody" PrivateAssets="All"/>
         <PackageReference Include="ReactiveUI"/>
         <PackageReference Include="System.Formats.Nrbf"/>

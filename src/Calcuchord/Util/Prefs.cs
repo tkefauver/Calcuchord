@@ -106,6 +106,9 @@ namespace Calcuchord {
         #region Members
 
         [JsonProperty]
+        public bool IsExactMatchOnly { get; set; }
+
+        [JsonProperty]
         public string PrefsVersion { get; set; } = string.Empty;
 
         [JsonProperty]
@@ -235,6 +238,7 @@ namespace Calcuchord {
                 Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
                 Options = mvm.OptionLookup.Values.SelectMany(x => x).ToList();
                 MatchColCount = mvm.MatchColCount;
+                IsExactMatchOnly = mvm.IsExactMatchOnly;
                 PrefsVersion = RuntimeBuildInfo.Version.ToString();
             }
 

@@ -122,9 +122,15 @@
           RowDefinitions="Auto,*">
         <TransitioningContentControl x:Name="InstrumentContentControl"
                                      Grid.Row="1"
-                                     IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}"
                                      DataContext="{Binding SelectedInstrument}"
                                      Content="{Binding IsPianoSelected, Source={x:Static local:MainViewModel.Instance}}">
+            <TransitioningContentControl.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Converter="{x:Static ObjectConverters.IsNotNull}" />
+                    <Binding Path="SelectedTuning"
+                             Converter="{x:Static ObjectConverters.IsNotNull}" />
+                </MultiBinding>
+            </TransitioningContentControl.IsVisible>
             <TransitioningContentControl.PageTransition>
                 <CrossFade Duration="0:0:1.0" />
             </TransitioningContentControl.PageTransition>

@@ -18,14 +18,17 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using DialogHostAvalonia;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
 using Newtonsoft.Json;
-using PdfSharp.Pdf;
-using PdfSharp.Pdf.IO;
 using SkiaSharp;
 using AvSnackbarHost = Material.Styles.Controls.SnackbarHost;
 using AvSvg = Avalonia.Svg.Skia.Svg;
+// using PdfDocument = PdfSharp.Pdf.PdfDocument;
+// using PdfPage = PdfSharp.Pdf.PdfPage;
+// using PdfReader = PdfSharp.Pdf.IO.PdfReader;
 
 #if DEBUG
 using System.Diagnostics;
@@ -450,7 +453,7 @@ namespace Calcuchord {
         public CancellationTokenSource ZoomCts { get; private set; }
         public CancellationTokenSource MatchCts { get; private set; }
 
-        public bool IsMatchesEmpty { get; private set; }
+        public bool IsMatchesEmpty { get; private set; } = true;
 
 
         public bool IsSearchButtonVisible {
@@ -662,6 +665,7 @@ namespace Calcuchord {
 
             ThemeViewModel.Instance.Init();
             MatchColCount = Prefs.Instance.MatchColCount;
+            IsExactMatchOnly = Prefs.Instance.IsExactMatchOnly;
 
             if(!instl.Any()) {
                 IsBusy = false;
@@ -1281,14 +1285,14 @@ namespace Calcuchord {
 
             UpdateViewProps();
 
-            if(IsSearchModeSelected) {
-                while(!InstrumentView.Instance.MeasureInstrument()) {
-                    await Task.Delay(300);
-                    //Debug.WriteLine("remeasuring...");
-                }
-            }
-
             if(SelectedTuning is { } st) {
+                if(IsSearchModeSelected) {
+                    while(!InstrumentView.Instance.MeasureInstrument()) {
+                        await Task.Delay(300);
+                        //Debug.WriteLine("remeasuring...");
+                    }
+                }
+
                 st.RaisePropertyChanged(nameof(st.IsSelected));
             }
 
@@ -1436,7 +1440,7 @@ namespace Calcuchord {
                                         });
                                 }
 
-                                async Task<(PdfDocument,int)> CreatePagePdfAsync(IEnumerable<NotePattern> items,
+                                async Task<(byte[],int)> CreatePagePdfAsync(IEnumerable<NotePattern> items,
                                     int pageNum) {
                                     string svg_html = builder.GetBatchSvg(
                                         items,
@@ -1446,16 +1450,15 @@ namespace Calcuchord {
                                         pageNum == 0 ?
                                             export_title :
                                             string.Empty);
-                                    using MemoryStream ms = Extensions.ToPdfStream(
+                                    var bytes = Extensions.ToPdfBytes(
                                         svg_html,
                                         ThemeViewModel.Instance.IsDark ?
                                             SKColors.Black :
                                             SKColors.White,
                                         (float)scale);
                                     await Task.Delay(1);
-                                    PdfDocument pdf_doc = PdfReader.Open(ms,PdfDocumentOpenMode.Import);
                                     CompletePage();
-                                    return (pdf_doc,pageNum);
+                                    return (bytes,pageNum);
                                 }
 
                                 var pages = new List<IEnumerable<NotePattern>>();
@@ -1479,22 +1482,19 @@ namespace Calcuchord {
                                             "Finishing up (this may take a while)...";
                                     });
 
-                                using PdfDocument outPdf = new PdfDocument();
-                                foreach(PdfDocument pdf in results.OrderBy(x => x.Item2).Select(x => x.Item1)) {
-                                    foreach(PdfPage page in pdf.Pages) {
-                                        outPdf.AddPage(page);
-                                    }
-                                }
-
                                 using MemoryStream stream = new MemoryStream();
-                                outPdf.Save(stream,false);
-                                byte[] pdf_bytes = stream.ToArray();
-                                if(OperatingSystem.IsIOS()) {
-                                    // close it first 
-                                    is_done = true;
-                                    await Task.Delay(150);
+                                using var document = new Document();
+                                using var pdfCopy = new PdfCopy(document, stream);
+                                pdfCopy.CloseStream = false;
+                                document.Open();
+                                foreach (var pdf_page_bytes in results.OrderBy(x => x.Item2).Select(x => x.Item1)) {
+                                    using var pdfReader = new PdfReader(pdf_page_bytes);
+                                    pdfCopy.AddDocument(pdfReader);
+                                    pdfReader.Close();
                                 }
-                                await spdf.SharePdfAsync(pdf_bytes,export_title);
+                                document?.Close();
+                                pdfCopy.CloseStream = true;
+                                await spdf.SharePdfAsync(stream.ToArray(),export_title);
 
                             }
 
@@ -1932,10 +1932,11 @@ namespace Calcuchord {
                     case OptionType.ModeSuffix:
                         ovm.IsChecked = !ovm.IsChecked;
                         SelectedSuffixes = SuffixOptions.Where(x => x.IsChecked).Select(x => x.OptionValue);
-                        
+
                         if(suppress_action) {
                             break;
                         }
+
                         UpdateMatchesAsync(MatchUpdateSource.FilterToggle).FireAndForgetSafeAsync();
                         break;
                     case OptionType.ChordSvg:
