@@ -54,6 +54,10 @@
                 Value="834" />
         <Setter Property="Height"
                 Value="1194" />
+        <!-- <Setter Property="Width" -->
+        <!--         Value="1032" /> -->
+        <!-- <Setter Property="Height" -->
+        <!--         Value="1376" /> -->
         <Setter Property="SizeToContent"
                 Value="Manual" />
     </Style>

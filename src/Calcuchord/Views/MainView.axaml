@@ -111,6 +111,7 @@
                                    SnackbarHorizontalAlignment="Center"
                                    SnackbarVerticalAlignment="Top">
                 <controls:NavigationDrawer x:Name="MainNavDrawer"
+                                           LeftDrawerExpandThresholdWidth="768"
                                            LeftDrawerOpened="{Binding IsDrawerOpen, Mode=TwoWay}"
                                            Classes="permanent main">
                     <controls:NavigationDrawer.LeftDrawerContent>
