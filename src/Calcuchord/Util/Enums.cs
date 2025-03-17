@@ -22,10 +22,10 @@ namespace Calcuchord {
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum MatchSortType {
+        Score,
         Key,
         Position,
         Suffix,
-        Score,
     }
 
     public enum DrawerPageType {

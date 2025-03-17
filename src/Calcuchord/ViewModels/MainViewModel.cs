@@ -270,6 +270,7 @@ namespace Calcuchord {
         int MinPageCount => MatchColCount;
         public int LoadMoreCount { get; private set; } = 20;
         public bool IsAutoLoadMoreEnabled => true;
+        public bool IsTranslateModeEnabled => false;
         public bool CanLoadMore => Matches.Count < AllResults.Length;
         public bool IsLoadingMore { get; set; }
 
@@ -384,16 +385,17 @@ namespace Calcuchord {
 
         public int SelectedInstrumentIndex {
             get => Instruments.IndexOf(SelectedInstrument);
-            set {
-                if(value >= 0 && value < Instruments.Count) {
-                    SelectedInstrument = Instruments[value];
-                } else {
-                    SelectedInstrument = null;
-                }
+            set => Dispatcher.UIThread.Post(
+                () => {
+                    if(value >= 0 && value < Instruments.Count) {
+                        SelectedInstrument = Instruments[value];
+                    } else {
+                        SelectedInstrument = null;
+                    }
 
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(SelectedInstrument));
-            }
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(SelectedInstrument));
+                });
 
         }
 
@@ -1349,10 +1351,11 @@ namespace Calcuchord {
                         batch_cts?.Cancel();
                         is_done = true;
                     });
-                string title = SelectedTuning.FullName.RemoveInvalidPathChars().Replace("-"," ")
-                    .Replace(" ","_");
+                string title = SelectedTuning.FullName.RemoveInvalidPathChars().Replace("-",string.Empty)
+                    .Replace(" ",string.Empty);
                 TextFieldDialogView tfdv = new TextFieldDialogView();
-                tfdv.TitleTextBlock.Text = "Enter title:";
+                tfdv.TitleTextBlock.Text = $"{PatternSingularName.ToTitleCase()} Export";
+                tfdv.InputLabelTextBlock.Text = "Title:";
                 tfdv.InputTextBox.Text = title;
                 tfdv.CancelButton.Command = cancel_cmd;
                 tfdv.OkButton.Command = new MpCommand(
@@ -1377,6 +1380,7 @@ namespace Calcuchord {
                     return;
                 }
 
+                is_done = false;
 
                 ProgressView busy_view = new ProgressView
                 {

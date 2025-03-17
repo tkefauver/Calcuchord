@@ -28,6 +28,7 @@ namespace Calcuchord {
 
         void FlyoutBase_OnOpened(object sender,EventArgs e) {
             if(MainViewModel.Instance is not { } mvm ||
+               !mvm.IsTranslateModeEnabled ||
                sender is not Flyout flyout ||
                flyout.Content is not Control c ||
                c.GetVisualDescendant<ContextMenu>() is not { } cm) {
