@@ -210,6 +210,12 @@
             <Setter Property="Cursor"
                     Value="Hand" />
         </Style>
+
+        <!-- TRANS-MODE -->
+        <Style Selector="StackPanel.trans-mode controls|Card.button-group:not(.trans-enabled)">
+            <Setter Property="IsEnabled"
+                    Value="False" />
+        </Style>
     </UserControl.Styles>
     <controls:ColorZone Mode="Accent"
                         Foreground="{DynamicResource Fg}">
@@ -226,6 +232,7 @@
 
             <!-- OPT BTN -->
             <Button x:Name="InstrumentOptionsButton"
+                    IsEnabled="{Binding !IsTranslateMode, Source={x:Static local:MainViewModel.Instance}}"
                     HorizontalAlignment="Right"
                     Classes="float">
                 <Button.Flyout>
@@ -273,6 +280,7 @@
                             Classes.chords="{Binding IsChordsSelected}"
                             Classes.has-key="{Binding SelectedKey, Converter={x:Static ObjectConverters.IsNotNull}}"
                             Classes.search-mode="{Binding IsSearchModeSelected}"
+                            Classes.trans-mode="{Binding IsTranslateMode}"
                             Margin="10,0,10,10"
                             Spacing="10">
 
@@ -318,7 +326,7 @@
                     <TextBlock Classes="header resettable"
                                PointerReleased="InputElement_OnPointerReleased"
                                Text="Sort" />
-                    <controls:Card Classes="button-group sort"
+                    <controls:Card Classes="button-group sort trans-enabled"
                                    Classes.search-mode="{Binding IsSearchModeSelected}">
                         <ListBox SelectedItem="{x:Null}">
                             <ListBox.ItemsPanel>
@@ -372,7 +380,7 @@
                         </local:HintView>
                     </StackPanel>
 
-                    <controls:Card Classes="button-group svg">
+                    <controls:Card Classes="button-group svg trans-enabled">
                         <ItemsControl ItemsSource="{Binding SvgOptions}" />
                     </controls:Card>
 

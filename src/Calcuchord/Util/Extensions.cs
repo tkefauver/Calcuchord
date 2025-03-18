@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -52,6 +53,23 @@ namespace Calcuchord {
                         ex.Dump();
                     }
                 },dp);
+        }
+
+        public static async void FireAndForgetSafeAsync(this Task task,DispatcherPriority dp,CancellationToken ct) {
+            try {
+                await Dispatcher.UIThread.InvokeAsync(
+                    async () => {
+                        try {
+                            await task;
+                        } catch(Exception ex) {
+                            ex.Dump();
+                        }
+                    },dp,ct);
+            } catch(Exception ex) {
+                if(ex is not TaskCanceledException) {
+                    ex.Dump();
+                }
+            }
         }
 
         public static string RemoveInvalidPathChars(this string originalString) {

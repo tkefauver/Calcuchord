@@ -11,7 +11,7 @@ namespace Calcuchord {
         public Control Build(object param) {
             string key = "DefaultTemplate";
             if(param is MainContentFlags mcf) {
-                if(mcf.HasFlag(MainContentFlags.Search)) {
+                if(mcf.HasFlag(MainContentFlags.Search) || mcf.HasFlag(MainContentFlags.Translate)) {
                     if(mcf.HasFlag(MainContentFlags.Landscape)) {
                         key = "SearchLandscapeTemplate";
                     } else {

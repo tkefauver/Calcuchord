@@ -11,6 +11,16 @@ namespace Calcuchord {
         Bookmarks = 2,
         Index = 4,
         Landscape = 8,
+        Translate = 16,
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    [Flags]
+    public enum InstrumentContentFlags {
+        None = 0,
+        Fretboard = 1,
+        Keyboard = 2,
+        Translate = 4,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

@@ -28,21 +28,25 @@ namespace Calcuchord {
 
         void FlyoutBase_OnOpened(object sender,EventArgs e) {
             if(MainViewModel.Instance is not { } mvm ||
-               !mvm.IsTranslateModeEnabled ||
                sender is not Flyout flyout ||
                flyout.Content is not Control c ||
-               c.GetVisualDescendant<ContextMenu>() is not { } cm) {
+               c.GetVisualDescendant<ContextMenu>() is not { } cm ||
+               DataContext is not MatchViewModel mtvm) {
                 return;
             }
 
-            if(cm.Items.Count == 3) {
+            if(cm.Items.Count == 2) {
                 // remove last translate menu
-                cm.Items.RemoveAt(2);
+                cm.Items.RemoveAt(1);
             }
 
             MenuItem trans_mi = new MenuItem
             {
                 Header = "Translate",
+                Icon = new MaterialIcon
+                {
+                    Kind = MaterialIconKind.Translate,
+                },
             };
             foreach(InstrumentViewModel inst in mvm.Instruments) {
                 MenuItem inst_mi = new MenuItem
@@ -54,7 +58,7 @@ namespace Calcuchord {
                     },
                 };
                 foreach(TuningViewModel tuning in inst.Tunings) {
-                    if(tuning == mvm.SelectedTuning) {
+                    if(tuning.Tuning == mtvm.NotePattern.Parent.Parent) {
                         // hide current tuning
                         continue;
                     }

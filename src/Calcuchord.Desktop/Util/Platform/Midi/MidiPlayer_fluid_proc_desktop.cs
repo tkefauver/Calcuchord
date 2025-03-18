@@ -14,7 +14,7 @@ namespace Calcuchord.Desktop {
             {
                 FileName = "fluidsynth",
                 Arguments = $"-a alsa -g 1.0 {soundFontPath} {MidiFilePath}",
-                UseShellExecute = false,
+                UseShellExecute = true,
                 CreateNoWindow = true,
             };
             using Process p = Process.Start(psi);

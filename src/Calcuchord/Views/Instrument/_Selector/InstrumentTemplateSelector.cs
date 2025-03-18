@@ -9,11 +9,17 @@ namespace Calcuchord {
         public Dictionary<string,IDataTemplate> AvailableTemplates { get; } = new Dictionary<string,IDataTemplate>();
 
         public Control Build(object param) {
+            if(param is not InstrumentContentFlags icf) {
+                return null;
+            }
+
             string key = null;
-            if(param is bool is_piano) {
-                key = is_piano ? "KeyboardViewTemplate" : "FretboardViewTemplate";
+            if(icf.HasFlag(InstrumentContentFlags.Translate)) {
+                key = "TranslateTemplate";
+            } else if(icf.HasFlag(InstrumentContentFlags.Keyboard)) {
+                key = "KeyboardTemplate";
             } else {
-                key = "EmptyTemplate";
+                key = "FretboardTemplate";
             }
 
             return AvailableTemplates[key].Build(param);

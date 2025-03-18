@@ -93,7 +93,7 @@
                     Value="False" />
         </Style>
         <Style
-            Selector="Border#MatchContainerBorder.search-mode:not(.selected):pointerover Grid#ScoreContainer, Border#MatchContainerBorder.search-mode.selected Grid#ScoreContainer">
+            Selector="Border#MatchContainerBorder.search-mode:not(.selected):not(.translate-match):pointerover Grid#ScoreContainer, Border#MatchContainerBorder.search-mode.selected:not(.translate-match) Grid#ScoreContainer">
             <Setter Property="IsVisible"
                     Value="True" />
             <Style.Animations>
@@ -133,6 +133,7 @@
                 Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}, FallbackValue=False, TargetNullValue=False}"
                 Classes.selected="{Binding IsSelected}"
                 Classes.bookmarked="{Binding IsBookmarked}"
+                Classes.translate-match="{Binding IsTranslateSourceMatch}"
                 Classes.bookmark-mode="{Binding IsBookmarkModeSelected, Source={x:Static local:MainViewModel.Instance}}"
                 Classes.search-mode="{Binding IsSearchModeSelected, Source={x:Static local:MainViewModel.Instance}}"
                 PointerReleased="MatchContainerBorder_OnPointerReleased">
@@ -164,16 +165,6 @@
                      Css="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}"
                      Source="{Binding NotePattern, Converter={x:Static local:PatternToSvgConverter.Instance}}"
                      Stretch="Uniform" />
-                <!-- <Image Source="/Assets/Images/logo.png" -->
-                <!--        Grid.Row="1" -->
-                <!--        Stretch="Uniform" /> -->
-                <!-- <Image Grid.Row="1" -->
-                <!--        Stretch="Uniform"> -->
-                <!--     <Image.Source> -->
-                <!--         <SvgImage Source="{Binding SvgSource}" -->
-                <!--                   Css="{Binding MatchSvgCss, Source={x:Static local:MainViewModel.Instance}}" /> -->
-                <!--     </Image.Source> -->
-                <!-- </Image> -->
                 <!-- <local:ChordView Grid.Row="1" /> -->
 
                 <!-- SCORE -->
@@ -182,11 +173,6 @@
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
                       Margin="5">
-                    <!-- <Grid.Transitions> -->
-                    <!--     <Transitions> -->
-                    <!--         <DoubleTransition Property="Opacity" Duration="0:0:5" Easing="ExponentialEaseIn"/> -->
-                    <!--     </Transitions> -->
-                    <!-- </Grid.Transitions> -->
                     <ProgressBar Classes="circular no-transitions"
                                  Foreground="Crimson"
                                  Value="1"
@@ -235,7 +221,8 @@
                     </UniformGrid.Styles>
 
                     <!-- SET NECK BTN -->
-                    <Button Command="{Binding SetMatchToInstrumentCommand}">
+                    <Button IsEnabled="{Binding !IsTranslateMode, Source={x:Static local:MainViewModel.Instance}}"
+                            Command="{Binding SetMatchToInstrumentCommand}">
                         <avalonia:MaterialIcon Kind="ContentCopy" />
                     </Button>
 
@@ -266,19 +253,26 @@
                                 PlacementAnchor="TopRight"
                                 PlacementGravity="BottomRight">
                             <ContextMenu>
-                                <MenuItem Header="Export midi..."
-                                          Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                          CommandParameter="MIDI">
+                                <MenuItem Header="Export">
                                     <MenuItem.Icon>
-                                        <avalonia:MaterialIcon Kind="Midi" />
+                                        <avalonia:MaterialIcon Kind="Export" />
                                     </MenuItem.Icon>
-                                </MenuItem>
-                                <MenuItem Header="Export pdf..."
-                                          Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
-                                          CommandParameter="PDF">
-                                    <MenuItem.Icon>
-                                        <avalonia:MaterialIcon Kind="FilePdfBox" />
-                                    </MenuItem.Icon>
+                                    <MenuItem.Items>
+                                        <MenuItem Header="Midi"
+                                                  Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                                  CommandParameter="MIDI">
+                                            <MenuItem.Icon>
+                                                <avalonia:MaterialIcon Kind="Midi" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="Pdf"
+                                                  Command="{Binding ExportMatchesCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                                  CommandParameter="PDF">
+                                            <MenuItem.Icon>
+                                                <avalonia:MaterialIcon Kind="FilePdfBox" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </MenuItem.Items>
                                 </MenuItem>
                             </ContextMenu>
                         </Flyout>

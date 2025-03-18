@@ -5,7 +5,7 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <LangVersion>latest</LangVersion>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-        <NoWarn>$(NoWarn);CS7035;</NoWarn>
+        <NoWarn>$(NoWarn);CS7035;NU1701;</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -24,7 +24,7 @@
         <PackageReference Include="Avalonia.ReactiveUI"/>
         <PackageReference Include="Avalonia.Svg.Skia"/>
         <PackageReference Include="Avalonia.Fonts.Inter"/>
-        <PackageReference Include="iTextSharp" />
+        <PackageReference Include="iTextSharp"/>
         <PackageReference Include="Material.Avalonia"/>
         <PackageReference Include="Material.Avalonia.Dialogs"/>
         <PackageReference Include="Material.Icons.Avalonia"/>

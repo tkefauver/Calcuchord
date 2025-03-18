@@ -125,6 +125,7 @@
                                               DockPanel.Dock="Top" />
                         <!-- FOOTER MENU -->
                         <local:MainFooterView x:Name="FooterView"
+                                              IsEnabled="{Binding !IsTranslateMode}"
                                               DockPanel.Dock="Bottom" />
 
                         <local:ContentView Classes="fade"

@@ -106,6 +106,9 @@ namespace Calcuchord {
 
         public MusicPatternType PatternType { get; protected set; }
 
+        public bool IsTranslateSourceMatch =>
+            MainViewModel.Instance.TranslateSourceMatchViewModel == this;
+
         public bool IsSelected { get; set; }
 
         #endregion

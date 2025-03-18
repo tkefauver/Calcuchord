@@ -123,7 +123,7 @@
         <TransitioningContentControl x:Name="InstrumentContentControl"
                                      Grid.Row="1"
                                      DataContext="{Binding SelectedInstrument}"
-                                     Content="{Binding IsPianoSelected, Source={x:Static local:MainViewModel.Instance}}">
+                                     Content="{Binding InstrumentFlags, Source={x:Static local:MainViewModel.Instance}}">
             <TransitioningContentControl.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                     <Binding Converter="{x:Static ObjectConverters.IsNotNull}" />
@@ -136,16 +136,20 @@
             </TransitioningContentControl.PageTransition>
             <TransitioningContentControl.DataTemplates>
                 <local:InstrumentTemplateSelector>
-                    <DataTemplate x:Key="KeyboardViewTemplate">
+                    <DataTemplate x:Key="KeyboardTemplate">
                         <local:KeyboardView
-                            DataContext="{Binding $parent[TransitioningContentControl].((local:InstrumentViewModel)DataContext).SelectedTuning}" />
+                            DataContext="{Binding $parent[TransitioningContentControl].((local:InstrumentViewModel)DataContext).SelectedTuning, FallbackValue={x:Null}}" />
                     </DataTemplate>
-                    <DataTemplate x:Key="FretboardViewTemplate">
+                    <DataTemplate x:Key="FretboardTemplate">
                         <local:FretboardView
-                            DataContext="{Binding $parent[TransitioningContentControl].((local:InstrumentViewModel)DataContext).SelectedTuning}" />
+                            DataContext="{Binding $parent[TransitioningContentControl].((local:InstrumentViewModel)DataContext).SelectedTuning, FallbackValue={x:Null}}" />
                     </DataTemplate>
-                    <DataTemplate x:Key="EmptyTemplate">
-                        <Border />
+                    <DataTemplate x:Key="TranslateTemplate">
+                        <Grid Height="200"
+                              DataContext="{Binding $parent[local:MainView].((local:MainViewModel)DataContext).TranslateSourceMatchViewModel, FallbackValue={x:Null}}">
+                            <local:MatchView HorizontalAlignment="Center"
+                                             VerticalAlignment="Center" />
+                        </Grid>
                     </DataTemplate>
                 </local:InstrumentTemplateSelector>
             </TransitioningContentControl.DataTemplates>
@@ -307,6 +311,7 @@
                            Margin="10,5,10,0"
                            HorizontalAlignment="Right"
                            VerticalAlignment="Center"
+                           IsVisible="{Binding !IsVisible, ElementName=TranslateBackButton}"
                            x:DataType="local:MainViewModel"
                            DataContext="{x:Static local:MainViewModel.Instance}">
                 <UniformGrid Columns="2">
