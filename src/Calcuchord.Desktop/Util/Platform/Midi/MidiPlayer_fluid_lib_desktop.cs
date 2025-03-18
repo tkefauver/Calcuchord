@@ -9,11 +9,11 @@ namespace Calcuchord.Desktop {
         NFluidSettings Settings { get; set; }
         Synth Synth { get; set; }
         AudioDriver AudioDriver { get; set; }
+        string LastSoundFontPath { get; set; }
 
-        public override void Init(object obj) {
+        void SetupDriver(string soundFontPath) {
             try {
                 Settings = new NFluidSettings();
-
                 // Change this if you don't have pulseaudio or want to change to anything else.
                 if(OperatingSystem.IsLinux()) {
                     Settings[ConfigurationKeys.AudioDriver].StringValue = "pulseaudio";
@@ -22,12 +22,14 @@ namespace Calcuchord.Desktop {
                 Settings[ConfigurationKeys.SynthAudioChannels].IntValue = 2;
                 Synth = new Synth(Settings);
 
-                Synth.LoadSoundFont(GetInstrumentSoundFontPath(null),true);
+                Synth.Gain = 1.0f;
+                Synth.LoadSoundFont(soundFontPath,true);
                 for(int i = 0; i < 16; i++) {
                     Synth.SoundFontSelect(i,0);
                 }
 
                 AudioDriver = new AudioDriver(Synth.Settings,Synth);
+                LastSoundFontPath = soundFontPath;
 
 
             } catch(Exception ex) {
@@ -38,6 +40,10 @@ namespace Calcuchord.Desktop {
         }
 
         protected override void PlayFile(string soundFontPath) {
+            if(LastSoundFontPath != soundFontPath) {
+                SetupDriver(soundFontPath);
+            }
+
             Player player = new Player(Synth);
             player.Add(MidiFilePath);
             player.Play();
