@@ -30,6 +30,9 @@ namespace Calcuchord {
         public bool IsMobileOs =>
             OperatingSystem.IsAndroid() || OperatingSystem.IsIOS();
 
+        public bool IsMacOs => OperatingSystem.IsMacOS();
+        public bool IsIos => OperatingSystem.IsIOS();
+
         public bool IsDesktop { get; }
 
         public bool IsBrowser { get; }

@@ -122,6 +122,7 @@
                         <TextBlock Text="{Binding $parent[HyperlinkButton].CommandParameter}" />
                     </HyperlinkButton>
                     <HyperlinkButton Cursor="Hand"
+                                     IsVisible="False"
                                      Padding="0,10,0,0"
                                      Background="{DynamicResource HttTransparent}"
                                      HorizontalAlignment="Right"

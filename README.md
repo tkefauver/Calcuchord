@@ -13,10 +13,11 @@
 - sound preview using midi playback
 - chord fingering discovery
 - export to midi, pdf and html
+- translate any pattern to any other tuning or instrument
 
 ## Requirements
 
-For windows and linux midi playback you need to install [fluidsynth](https://github.com/FluidSynth/fluidsynth)
+For windows midi playback you need to install [fluidsynth](https://github.com/FluidSynth/fluidsynth)
 
 Desktop & mobile versions coming soon!
 
