@@ -7,6 +7,8 @@
     <!--    <PackageVersion Include="HarfBuzzSharp.NativeAssets.Android" Version="8.3.0.1" />-->
     <PackageVersion Include="Avalonia.Native" Version="11.2.5" />
     <PackageVersion Include="iTextSharp" Version="5.5.13.4" />
+    <PackageVersion Include="managed-midi" Version="1.10.1" />
+    <PackageVersion Include="Melanchall.DryWetMidi" Version="7.2.0" />
     <PackageVersion Include="Melanchall.DryWetMidi.Nativeless" Version="7.2.0" />
     <PackageVersion Include="MonkeyPaste.Common.Avalonia" Version="1.0.3.32" />
     <PackageVersion Include="Mono.AotProfiler.Android" Version="7.0.0" />

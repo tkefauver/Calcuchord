@@ -36,7 +36,7 @@ namespace Calcuchord.Android {
             // _context.StartActivity(intent);
         }
 
-        protected override async Task<string> ShowSaveFilePickerAsync(string title,string[] extTypes) {
+        protected override async Task<string> ShowSaveFilePickerAsync(string title,string[] extTypes, string[] mimeTypes, string fileTypeName) {
             await Task.Delay(1);
             string fileName = $"{title}.{extTypes[0]}";
             return Path.Combine(PlatformWrapper.Services.StorageHelper.ShareDir,fileName);

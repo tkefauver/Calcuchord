@@ -16,7 +16,7 @@ namespace Calcuchord {
                 return;
             }
 
-            string fp = await ShowSaveFilePickerAsync(title,["mid","midi"]);
+            string fp = await ShowSaveFilePickerAsync(title, ["mid", "midi"], ["audio/midi","audio/x-midi"],"Midi File");
             if(fp is null) {
                 return;
             }
@@ -31,7 +31,7 @@ namespace Calcuchord {
         }
 
         public virtual async Task SharePdfAsync(byte[] pdfBytes,string title) {
-            string fp = await ShowSaveFilePickerAsync(title,["pdf"]);
+            string fp = await ShowSaveFilePickerAsync(title, ["pdf"], ["application/pdf"],"Pdf document");
             if(fp is null) {
                 return;
             }
@@ -42,7 +42,7 @@ namespace Calcuchord {
         }
 
         public virtual async Task ShareHtmlAsync(string html,string title) {
-            string fp = await ShowSaveFilePickerAsync(title,["html"]);
+            string fp = await ShowSaveFilePickerAsync(title, ["html"], ["text/html"],"Html Document");
             if(fp is null) {
                 return;
             }
@@ -54,8 +54,7 @@ namespace Calcuchord {
         protected virtual void FinishShare(string filePath,string mimeType) {
             PlatformWrapper.Services.UriNavigator.NavigateTo(Path.GetDirectoryName(filePath),filePath);
         }
-
-        protected virtual async Task<string> ShowSaveFilePickerAsync(string title,string[] extTypes) {
+        protected virtual async Task<string> ShowSaveFilePickerAsync(string title,string[] extTypes, string[] mimeTypes, string fileTypeName) {
             if(TopLevel.GetTopLevel(MainView.Instance) is not { } topLevel ||
                !topLevel.StorageProvider.CanSave) {
                 return null;
@@ -72,13 +71,18 @@ namespace Calcuchord {
                             Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
                     }
 
+
+
                     // Start async operation to open the dialog.
                     file = await topLevel.StorageProvider.SaveFilePickerAsync(
                         new FilePickerSaveOptions
                         {
                             Title = $"Save '{title}'",
                             DefaultExtension = extTypes.FirstOrDefault(),
-                            FileTypeChoices = extTypes.Select(x => new FilePickerFileType(x)).ToList(),
+                            FileTypeChoices = [new(fileTypeName){
+                                Patterns = extTypes.Select(x=>$"*.{x}").ToList(),
+                                MimeTypes = mimeTypes
+                            }],
                             SuggestedFileName = $"{title}.{extTypes.FirstOrDefault()}",
                             SuggestedStartLocation = LastFolder,
                         });
