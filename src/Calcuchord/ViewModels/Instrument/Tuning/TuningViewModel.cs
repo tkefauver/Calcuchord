@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -240,6 +241,65 @@ namespace Calcuchord {
             NoteRows.ForEach(x => x.ResetSelection());
         }
 
+        public IEnumerable<MatchViewModel> GetMatchResults(
+            InstrumentNote[] sel_notes,
+            MatchScoreMethodType score_method,
+            DisplayModeType mode_type,
+            MusicPatternType pattern_type,
+            NoteType? target_key,
+            IEnumerable<string> target_suffixes,
+            out string[] keyl,
+            out string[] suffl) {
+
+            List<NoteType> avail_keys = [];
+            List<string> avail_suffixes = [];
+            var mrl = new List<MatchViewModel>();
+            foreach(PatternKeyCollection pkc in Tuning.Collections[pattern_type]) {
+                bool omitted_key = target_key is { } tk2 && tk2 != pkc.Key;
+
+                foreach(NotePattern np in pkc.Patterns) {
+                    bool omitted_suff = target_suffixes.Any() && !target_suffixes.Contains(np.SuffixKey);
+                    bool valid = false;
+                    double score = 1;
+                    if(mode_type == DisplayModeType.Search) {
+                        score = GetScore(np,sel_notes,score_method);
+                        if(score > 0 || sel_notes.Length == 0) {
+                            valid = true;
+                        }
+                    } else if(mode_type == DisplayModeType.Bookmarks) {
+                        if(np.IsBookmarked) {
+                            valid = true;
+                        }
+                    } else {
+                        valid = true;
+                    }
+
+                    if(!valid) {
+                        continue;
+                    }
+
+                    if(!avail_keys.Contains(np.Key)) {
+                        avail_keys.Add(np.Key);
+                    }
+
+                    if(!avail_suffixes.Contains(np.SuffixKey)) {
+                        avail_suffixes.Add(np.SuffixKey);
+                    }
+
+                    if(!omitted_key &&
+                       !omitted_suff &&
+                       (mode_type != DisplayModeType.Search || score > 0)) {
+                        //yield return mvm;
+                        mrl.Add(new MatchViewModel(pattern_type,np,score));
+                    }
+                }
+            }
+
+            keyl = avail_keys.Select(x => x.ToString()).ToArray();
+            suffl = avail_suffixes.ToArray();
+            return mrl;
+        }
+
         public override string ToString() {
             return Tuning == null ?
                 base.ToString() :
@@ -353,6 +413,23 @@ namespace Calcuchord {
             // Tuning.OpenNotes.Clear();
             // Tuning.OpenNotes.AddRange(new_open_notes);
             await InitAsync(Tuning);
+        }
+
+        double GetScore(NotePattern pattern,InstrumentNote[] matchNotes,MatchScoreMethodType scoring) {
+            double score = 0;
+            foreach(InstrumentNote mn in matchNotes) {
+                double max_score = pattern.Notes.Max(x => x.Distance(mn,scoring));
+                if(scoring == MatchScoreMethodType.Exact && max_score == 0) {
+                    return 0;
+                }
+
+                score += max_score;
+            }
+
+            int pattern_len = pattern.Notes.Count(x => !x.IsMute) +
+                              Math.Min(pattern.Notes.Count(x => x.IsMute),matchNotes.Count(x => x.IsMute));
+
+            return score / pattern_len;
         }
 
         #endregion

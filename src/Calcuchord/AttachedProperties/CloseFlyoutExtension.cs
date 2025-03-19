@@ -48,7 +48,6 @@ namespace Calcuchord {
                 fl.Opened -= FlOnOpened;
                 fl.Closed -= FlOnClosed;
             }
-
             void FlOnOpened(object sender,EventArgs eventArgs) {
                 if(sender is not Flyout fl ||
                    fl.Content is not Control c ||

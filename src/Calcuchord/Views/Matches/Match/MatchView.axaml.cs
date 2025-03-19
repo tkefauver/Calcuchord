@@ -26,7 +26,8 @@ namespace Calcuchord {
             presenter.BringIntoView();
         }
 
-        void FlyoutBase_OnOpened(object sender,EventArgs e) {
+        void PopupFlyoutBase_OnOpening(object sender,EventArgs e) {
+            
             if(MainViewModel.Instance is not { } mvm ||
                sender is not Flyout flyout ||
                flyout.Content is not Control c ||

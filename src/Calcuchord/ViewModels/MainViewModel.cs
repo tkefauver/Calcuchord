@@ -67,8 +67,8 @@ namespace Calcuchord {
 
         #region Members
 
-        MatchProvider TranslateMatchProvider { get; set; }
-        MatchProvider MatchProvider { get; set; }
+        // MatchProvider TranslateMatchProvider { get; set; }
+        // MatchProvider MatchProvider { get; set; }
 
         #endregion
 
@@ -631,7 +631,6 @@ namespace Calcuchord {
 
                     break;
                 case nameof(SelectedPatternType):
-                    InitMatchProvider();
                     OnPropertyChanged(nameof(CurSvgOptionType));
                     OnPropertyChanged(nameof(SvgOptions));
                     OnPropertyChanged(nameof(IsChordsSelected));
@@ -869,14 +868,16 @@ namespace Calcuchord {
         }
 
         IEnumerable<MatchViewModel> GetMatchResults(NoteViewModel[] sel_note_vml) {
+            if(SelectedTuning is not { } stvm) {
+                return [];
+            }
+
             MatchScoreMethodType score_method = IsExactMatchOnly ?
                 MatchScoreMethodType.Exact :
                 MatchScoreMethodType.Voicing;
-            MatchProvider matcher = MatchProvider;
             var sel_notes = sel_note_vml.Select(x => x.InstrumentNote).ToArray();
             if(IsTranslateMode) {
                 score_method = MatchScoreMethodType.Translation;
-                matcher = TranslateMatchProvider;
                 sel_notes = TranslateSourceMatchViewModel.NotePattern.Notes.Cast<InstrumentNote>().ToArray();
             }
 
@@ -890,51 +891,20 @@ namespace Calcuchord {
                 target_key = tk.ToDegree(td);
             }
 
-            var unavail_keyl = KeyOptions.ToList();
-            var unavail_suffl = SuffixOptions.ToList();
-            var mrl = new List<MatchViewModel>();
-            foreach(var kvp in matcher.PatternLookup) {
-                bool omitted_key = target_key is { } tk2 && tk2 != kvp.Key;
-
-                foreach(var kvp2 in kvp.Value) {
-                    bool omitted_suff = SelectedSuffixes.Any() && !SelectedSuffixes.Contains(kvp2.Key);
-                    foreach(MatchViewModel mvm in kvp2.Value) {
-                        bool valid = false;
-                        if(IsSearchModeSelected) {
-                            mvm.Score = matcher.GetScore(
-                                mvm.NotePattern,sel_notes,score_method);
-                            if(mvm.Score > 0 || sel_notes.Length == 0) {
-                                valid = true;
-                            }
-                        } else if(IsBookmarkModeSelected) {
-                            if(mvm.IsBookmarked) {
-                                valid = true;
-                            }
-                        } else {
-                            valid = true;
-                        }
-
-                        if(!valid) {
-                            continue;
-                        }
-
-                        unavail_keyl.Remove(KeyOptLookup[kvp.Key]);
-                        unavail_suffl.Remove(SuffixOptLookup[kvp2.Key]);
-                        if(!omitted_key &&
-                           !omitted_suff &&
-                           (!IsSearchModeSelected || mvm.Score > 0)) {
-                            //yield return mvm;
-                            mrl.Add(mvm);
-                        }
-
-                    }
-                }
-            }
+            var mrl = stvm.GetMatchResults(
+                sel_notes,
+                score_method,
+                SelectedDisplayMode,
+                SelectedPatternType,
+                target_key,
+                SelectedSuffixes,
+                out string[] avail_keyl,
+                out string[] avail_suffl);
 
             Dispatcher.UIThread.Invoke(
                 () => {
-                    KeyOptions.ForEach(x => x.IsEnabled = !unavail_keyl.Contains(x));
-                    SuffixOptions.ForEach(x => x.IsEnabled = !unavail_suffl.Contains(x));
+                    KeyOptions.ForEach(x => x.IsEnabled = avail_keyl.Contains(x.OptionValue));
+                    SuffixOptions.ForEach(x => x.IsEnabled = avail_suffl.Contains(x.OptionValue));
                 },DispatcherPriority.Normal,MatchCts.Token);
 
             return mrl;
@@ -1033,22 +1003,6 @@ namespace Calcuchord {
                 MatchCts.Dispose();
                 MatchCts = new CancellationTokenSource();
             }
-        }
-
-        void InitMatchProvider() {
-            if(MatchProvider != null &&
-               SelectedTuning != null &&
-               MatchProvider.PatternType == SelectedPatternType &&
-               MatchProvider.Tuning == SelectedTuning.Tuning) {
-                // already set
-                return;
-            }
-
-            MatchProvider = new MatchProvider(
-                SelectedPatternType,
-                SelectedTuning == null ?
-                    null :
-                    SelectedTuning.Tuning);
         }
 
         #endregion
@@ -1337,7 +1291,6 @@ namespace Calcuchord {
 
             if(SelectedTuning != null) {
                 InitOptions(reset_opts);
-                Task.Run(InitMatchProvider).FireAndForgetSafeAsync();
             }
 
             UpdateViewProps();
@@ -1939,7 +1892,6 @@ namespace Calcuchord {
                         Task.Run(
                             () => {
                                 CancelMatchFilter();
-                                InitMatchProvider();
                                 Dispatcher.UIThread.Invoke(
                                     () => {
                                         Matches.Clear();
@@ -2322,19 +2274,10 @@ namespace Calcuchord {
                 TranslateSourceMatchViewModel.RaisePropertyChanged(
                     nameof(TranslateSourceMatchViewModel.IsTranslateSourceMatch));
 
-                _ = Task.Run(
-                    () => {
-                        TranslateMatchProvider = new MatchProvider(SelectedPatternType,tvm.Tuning);
-                        Dispatcher.UIThread.Invoke(
-                            () => {
-                                //await Task.Delay(500);
-                                OnPropertyChanged(nameof(IsTranslateMode));
-                                if(needs_query) {
-                                    UpdateMatchesAsync(MatchUpdateSource.FindClick).FireAndForgetSafeAsync();
-                                }
-                            });
-
-                    });
+                OnPropertyChanged(nameof(IsTranslateMode));
+                if(needs_query) {
+                    UpdateMatchesAsync(MatchUpdateSource.FindClick).FireAndForgetSafeAsync();
+                }
             });
 
         public ICommand FinishTranslateCommand => new MpCommand(
@@ -2356,7 +2299,6 @@ namespace Calcuchord {
                 // NOTE null match AFTER tuning to avoid instInit
                 TranslateTargetTuning = null;
                 TranslateSourceMatchViewModel = null;
-                TranslateMatchProvider = null;
 
                 OnPropertyChanged(nameof(InstrumentFlags));
                 OnPropertyChanged(nameof(ContentFlags));

@@ -239,7 +239,7 @@
 
 
                 <Button x:Name="ShareButton"
-                        local:CloseFlyoutExtension.IsEnabled="False"
+                        local:CloseFlyoutExtension.IsEnabled="True"
                         Margin="0"
                         Padding="0"
                         Height="63"
@@ -248,7 +248,7 @@
                         VerticalAlignment="Top"
                         Classes="float">
                     <Button.Flyout>
-                        <Flyout Opened="FlyoutBase_OnOpened"
+                        <Flyout Opening="PopupFlyoutBase_OnOpening"
                                 Placement="AnchorAndGravity"
                                 PlacementAnchor="TopRight"
                                 PlacementGravity="BottomRight">
