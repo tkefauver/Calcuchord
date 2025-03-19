@@ -280,6 +280,8 @@ namespace Calcuchord {
         int PageCacheCount => 2;
         public int LoadMoreCount { get; private set; } = 20;
 
+        bool IsLoadingMore { get; set; }
+
         public MainContentFlags ContentFlags {
             get {
                 MainContentFlags cf = MainContentFlags.None;
@@ -958,7 +960,7 @@ namespace Calcuchord {
             sorted_results = SortMatches(results);
             AllResults = sorted_results.ToArray();
             Dispatcher.UIThread.Invoke(
-                async() => {
+                async () => {
 
                     Matches.Clear();
                     await LoadMoreAsync();
@@ -2216,19 +2218,26 @@ namespace Calcuchord {
                 return;
             }
 
-            LoadMoreAsync(LoadMoreCount - last_count).FireAndForgetSafeAsync(DispatcherPriority.Background,MatchCts.Token);
+            LoadMoreAsync(LoadMoreCount - last_count)
+                .FireAndForgetSafeAsync(DispatcherPriority.Background,MatchCts.Token);
         }
 
         async Task LoadMoreAsync(int? forceCount = null) {
+            if(IsLoadingMore) {
+                PlatformWrapper.Services.Logger.WriteLine("Loading more");
+                return;
+            }
+
             int loadCount = forceCount ?? LoadMoreCount;
             int col_diff = (Matches.Count + loadCount) % MatchColCount;
             //PlatformWrapper.Services.Logger.WriteLine($"Loading {loadCount + col_diff} items. Cur Count: {Matches.Count} Col Count: {MatchColCount} Col Diff: {col_diff}");
             var items_to_add = AllResults.Skip(Matches.Count).Take(loadCount + col_diff);
             int delay = forceCount == null && Matches.Any() ? 10 : 0;
+            IsLoadingMore = Matches.Any();
             foreach(MatchViewModel item in items_to_add) {
                 if(MatchCts.IsCancellationRequested) {
                     // canceled
-                    return;
+                    break;
                 }
 
                 Matches.Add(item);
@@ -2238,8 +2247,8 @@ namespace Calcuchord {
                     return;
                 }
             }
-            Matches.AddRange(items_to_add);
-            
+
+            IsLoadingMore = false;
         }
 
         public ICommand LoadMoreCommand => new MpCommand(
