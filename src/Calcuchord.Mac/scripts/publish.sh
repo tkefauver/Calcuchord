@@ -1,8 +1,8 @@
 #!/bin/bash
 
-VERSION="1.0.0"
+VERSION="1.0.7"
 CONFIG="Release"
-RUNTIME_ID="osx-x64"
+RUNTIME_ID="osx-arm64"
 FRAMEWORK_ID="net9.0-macos"
 APP_HOST_NAME="Calcuchord.Mac"
 DESIRED_APP_HOST_NAME="Calcuchord"
