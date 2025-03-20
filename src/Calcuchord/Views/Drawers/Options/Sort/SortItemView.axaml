@@ -64,7 +64,7 @@
 
                     <Button x:Name="SortPropButton"
                             Grid.Column="1"
-                            local:CloseFlyoutExtension.IsEnabled="True"
+                            local:CloseFlyoutExtension.IsEnabled="{Binding IsDesktop, Source={x:Static local:ThemeViewModel.Instance}}"
                             Classes="opt-btn key">
                         <Button.Styles>
                             <Style Selector="FlyoutPresenter">

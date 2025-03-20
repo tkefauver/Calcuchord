@@ -239,7 +239,7 @@
 
 
                 <Button x:Name="ShareButton"
-                        local:CloseFlyoutExtension.IsEnabled="True"
+                        local:CloseFlyoutExtension.IsEnabled="{Binding IsDesktop, Source={x:Static local:ThemeViewModel.Instance}}"
                         Margin="0"
                         Padding="0"
                         Height="63"
