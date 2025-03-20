@@ -1,6 +1,7 @@
 #!/bin/bash
 
 PROJ_DIR="../.."
+VERSION="1.0.10.0"
 
 # Clean-up
 rm -rf ./out/
@@ -21,7 +22,18 @@ mkdir staging_folder
 
 # Debian control file
 mkdir ./staging_folder/DEBIAN
-cp config/control ./staging_folder/DEBIAN
+cat > staging_folder/DEBIAN/control <<- EOM
+Package: Calcuchord
+Version: ${VERSION}
+Section: devel
+Priority: optional
+Architecture: amd64
+Depends: libx11-6, libice6, libsm6, libfontconfig1, fluidsynth
+Maintainer: Thomas Kefauver <tkefauver@gmail.com>
+Homepage: https://github.com/tkefauver/Calcuchord
+Description: Reverse search for musicians
+Copyright: 2022-2024 Thomas Kefauver <tkefauver@gmail.com>
+EOM
 
 # Starter script
 mkdir ./staging_folder/usr
@@ -54,4 +66,9 @@ mkdir ./staging_folder/usr/share/icons/hicolor/scalable/apps
 cp ../../../Calcuchord/Assets/Svg/logo.svg ./staging_folder/usr/share/icons/hicolor/scalable/apps/Calcuchord.svg
 
 # Make .deb file
-dpkg-deb --root-owner-group --build ./staging_folder/ ./Calcuchord_1.0.0_amd64.deb
+PACKAGE_PATH="Calcuchord-${VERSION}-amd64.deb"
+dpkg-deb --root-owner-group --build ./staging_folder/ "./$PACKAGE_PATH"
+
+# upload release
+TAG_NAME="v$VERSION"
+gh release upload "$TAG_NAME" "$PACKAGE_PATH"

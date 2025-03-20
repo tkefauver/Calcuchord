@@ -13,7 +13,7 @@
 - sound preview using midi playback
 - chord fingering discovery
 - export to midi, pdf and html
-- translate any pattern to any other tuning or instrument
+- translate any pattern (chord, scale or mode) to any other tuning or instrument
 
 ## Requirements
 
