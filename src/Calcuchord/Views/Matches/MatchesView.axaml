@@ -254,7 +254,7 @@
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center">
                     <Button x:Name="ExportButton"
-                            local:CloseFlyoutExtension.IsEnabled="True"
+                            local:CloseFlyoutExtension.IsEnabled="{Binding IsDesktop, Source={x:Static local:ThemeViewModel.Instance}}"
                             IsEnabled="{Binding !IsMatchesEmpty}"
                             Padding="8"
                             Classes="float">

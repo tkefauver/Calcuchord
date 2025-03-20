@@ -47,8 +47,8 @@ public class Share_ios : Share_default {
                 if (share_activity.PopoverPresentationController != null)
                 {
                     share_activity.PopoverPresentationController.SourceView = vc.View;
-                    //share_activity.PopoverPresentationController.SourceRect = new CGRect(vc.View.Frame.GetMidX(), vc.View.Frame.GetMidY(),0,0);
-                    share_activity.PopoverPresentationController.SourceRect = new CGRect(0,0,1.0,1.0);
+                    share_activity.PopoverPresentationController.SourceRect = new CGRect(vc.View.Frame.GetMidX(), vc.View.Frame.GetMidY(),0,0);
+                    //share_activity.PopoverPresentationController.SourceRect = new CGRect(0,0,1.0,1.0);
                 }
 
                 await vc.PresentViewControllerAsync(share_activity, true);
