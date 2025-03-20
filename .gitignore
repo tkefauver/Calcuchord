@@ -466,3 +466,4 @@ src/Calcuchord.Android/scripts/publish2.sh
 src/Calcuchord.Desktop/scripts/linux/out
 src/Calcuchord.Desktop/scripts/linux/staging_folder
 *.deb
+src/Calcuchord.Wap
