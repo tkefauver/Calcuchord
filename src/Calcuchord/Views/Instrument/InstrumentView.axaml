@@ -84,16 +84,14 @@
 
         <!-- FILTER OP BTNS -->
 
-        <Style Selector="RadioButton.filter-op"
+        <Style Selector=":is(Button).filter-op"
                x:DataType="local:MainViewModel">
-            <Setter Property="GroupName"
-                    Value="SearchTypeGroup" />
             <Setter Property="Foreground"
                     Value="{DynamicResource Fg}" />
             <Setter Property="Padding"
                     Value="8,4" />
         </Style>
-        <Style Selector="RadioButton.filter-op TextBlock"
+        <Style Selector=":is(Button).filter-op TextBlock"
                x:DataType="local:MainViewModel">
             <Setter Property="FontFamily"
                     Value="{StaticResource NunitoFont}" />
@@ -103,12 +101,21 @@
                     Value="Bold" />
         </Style>
 
+        <Style Selector="RadioButton.filter-op"
+               x:DataType="local:MainViewModel">
+            <Setter Property="GroupName"
+                    Value="SearchTypeGroup" />
+        </Style>
         <Style Selector="RadioButton.filter-op:unchecked"
                x:DataType="local:MainViewModel">
-            <Setter Property="Cursor"
-                    Value="Hand" />
             <Setter Property="Opacity"
                     Value="0.3" />
+            <Setter Property="Cursor"
+                    Value="Hand" />
+        </Style>
+        <Style Selector="RadioButton.filter-op:checked">
+            <Setter Property="IsHitTestVisible"
+                    Value="False" />
         </Style>
         <Style Selector="RadioButton.filter-op:unchecked:pointerover"
                x:DataType="local:MainViewModel">
@@ -306,31 +313,46 @@
 
             </StackPanel>
 
-            <controls:Card DockPanel.Dock="Right"
-                           Classes="button-group pattern"
-                           Margin="10,5,10,0"
-                           HorizontalAlignment="Right"
-                           VerticalAlignment="Center"
-                           IsVisible="{Binding !IsVisible, ElementName=TranslateBackButton}"
-                           x:DataType="local:MainViewModel"
-                           DataContext="{x:Static local:MainViewModel.Instance}">
-                <UniformGrid Columns="2">
-                    <RadioButton Classes="filter-op"
-                                 Command="{Binding ToggleSearchTypeCommand}"
-                                 CommandParameter="EXACT"
-                                 IsChecked="{Binding IsExactMatchOnly, Mode=OneWay}">
-                        <TextBlock Classes=""
-                                   Text="EXACT" />
-                    </RadioButton>
-                    <RadioButton Classes="filter-op"
-                                 Command="{Binding ToggleSearchTypeCommand}"
-                                 CommandParameter="VOICE"
-                                 IsChecked="{Binding !IsExactMatchOnly, Mode=OneWay}">
-                        <TextBlock Classes=""
-                                   Text="VOICE" />
-                    </RadioButton>
-                </UniformGrid>
-            </controls:Card>
+            <StackPanel x:DataType="local:MainViewModel"
+                        DataContext="{x:Static local:MainViewModel.Instance}"
+                        Orientation="Horizontal"
+                        DockPanel.Dock="Right"
+                        Spacing="5"
+                        Margin="10,5,10,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        IsVisible="{Binding !IsVisible, ElementName=TranslateBackButton}">
+                <!-- RESET -->
+                <Button x:Name="ResetInstrumentLinkBUtton"
+                        Classes="filter-op fade fade-hide"
+                        Cursor="Hand"
+                        Opacity="{Binding !IsDefaultSelection, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
+                        Command="{Binding ResetInstrumentCommand}">
+                    <TextBlock Text="Reset" />
+                </Button>
+
+                <controls:Card DockPanel.Dock="Right"
+                               Classes="button-group pattern">
+                    <UniformGrid Columns="2">
+                        <RadioButton Classes="filter-op"
+                                     Command="{Binding ToggleSearchTypeCommand}"
+                                     CommandParameter="EXACT"
+                                     IsChecked="{Binding IsExactMatchOnly, Mode=OneWay}">
+                            <TextBlock Classes=""
+                                       Text="EXACT" />
+                        </RadioButton>
+                        <RadioButton Classes="filter-op"
+                                     Command="{Binding ToggleSearchTypeCommand}"
+                                     CommandParameter="VOICE"
+                                     IsChecked="{Binding !IsExactMatchOnly, Mode=OneWay}">
+                            <TextBlock Classes=""
+                                       Text="VOICE" />
+                        </RadioButton>
+                    </UniformGrid>
+                </controls:Card>
+
+            </StackPanel>
+
         </DockPanel>
 
     </Grid>

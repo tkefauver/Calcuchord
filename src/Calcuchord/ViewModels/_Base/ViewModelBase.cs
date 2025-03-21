@@ -3,8 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace Calcuchord {
     public abstract partial class ViewModelBase : INotifyPropertyChanged {
-        [JsonIgnore]
-        public bool IsBusy { get; set; }
 
         public void RaisePropertyChanged(string propertyName) {
             OnPropertyChanged(propertyName);

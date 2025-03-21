@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -202,9 +201,6 @@ namespace Calcuchord {
 
         public async Task<bool> InitAsync(Tuning tuning) {
             bool success = true;
-
-            IsBusy = true;
-
             Tuning = tuning;
             Tuning.SetParent(Parent.Instrument);
 
@@ -233,7 +229,6 @@ namespace Calcuchord {
 
             Parent.Instrument.RefreshModelTree();
 
-            IsBusy = false;
             return success;
         }
 
@@ -417,19 +412,74 @@ namespace Calcuchord {
 
         double GetScore(NotePattern pattern,InstrumentNote[] matchNotes,MatchScoreMethodType scoring) {
             double score = 0;
-            foreach(InstrumentNote mn in matchNotes) {
-                double max_score = pattern.Notes.Max(x => x.Distance(mn,scoring));
-                if(scoring == MatchScoreMethodType.Exact && max_score == 0) {
-                    return 0;
-                }
-
-                score += max_score;
+            if(pattern.ToString() == "C minor_1_1" ||
+               pattern.ToString() == "C major_1_4") {
+                //bls
             }
 
-            int pattern_len = pattern.Notes.Count(x => !x.IsMute) +
-                              Math.Min(pattern.Notes.Count(x => x.IsMute),matchNotes.Count(x => x.IsMute));
+            double[,] score_matrix = new double[pattern.Parent.Parent.Parent.RowCount,matchNotes.Length];
+            for(int p = 0; p < pattern.Parent.Parent.Parent.RowCount; p++) {
+                if(scoring == MatchScoreMethodType.Exact) {
+                    if(matchNotes.FirstOrDefault(x => x.RowNum == p) is not { } match_row_note) {
+                        continue;
+                    }
 
-            return score / pattern_len;
+                    double exact_score = pattern.Notes[p].SimilarityScore(match_row_note,scoring);
+                    if(exact_score == 0) {
+                        return 0;
+                    }
+
+                    score += exact_score;
+                    continue;
+                }
+
+                for(int m = 0; m < matchNotes.Length; m++) {
+                    score_matrix[p,m] = pattern.Notes[p].SimilarityScore(matchNotes[m],scoring);
+                }
+            }
+
+            if(scoring != MatchScoreMethodType.Exact) {
+                var used_pattern_note_idxl = new List<int>();
+                for(int m = 0; m < matchNotes.Length; m++) {
+                    double max_match_score = 0;
+                    int max_match_pattern_idx = -1;
+                    for(int p = 0; p < pattern.Notes.Count; p++) {
+                        if(used_pattern_note_idxl.Contains(p)) {
+                            continue;
+                        }
+
+                        if(score_matrix[p,m] > max_match_score) {
+                            max_match_score = score_matrix[p,m];
+                            max_match_pattern_idx = p;
+                        }
+                    }
+
+                    if(max_match_pattern_idx < 0) {
+                        continue;
+                    }
+
+                    score += max_match_score;
+                    used_pattern_note_idxl.Add(max_match_pattern_idx);
+                }
+            }
+
+            return score / matchNotes.Length;
+
+            // foreach(InstrumentNote mn in matchNotes.Where(x=>!x.IsMute)) {
+            //     double max_score = pattern.Notes.Where(x=>!x.IsMute).Max(x => x.SimilarityScore(mn,scoring));
+            //     if(scoring == MatchScoreMethodType.Exact && max_score == 0) {
+            //         return 0;
+            //     }
+            //
+            //     score += max_score;
+            // }
+            //
+            // int pattern_len = matchNotes.Length;
+            // //int pattern_len = matchNotes.Count(x => !x.IsMute);
+            // // int pattern_len = pattern.Notes.Count(x => !x.IsMute) +
+            // //                   Math.Min(pattern.Notes.Count(x => x.IsMute),matchNotes.Count(x => x.IsMute));
+            //
+            // return score / pattern_len;
         }
 
         #endregion

@@ -277,10 +277,14 @@ namespace Calcuchord {
 
         #region UI
 
+        public bool IsBusy { get; private set; }
+
         int PageCacheCount => 2;
         public int LoadMoreCount { get; private set; } = 20;
+        public bool IsAutoLoadMoreEnabled => false;
+        public bool IsTranslateModeEnabled => false;
+        public bool CanLoadMore => Matches.Count < AllResults.Length;
 
-        bool IsLoadingMore { get; set; }
 
         public MainContentFlags ContentFlags {
             get {
@@ -831,6 +835,8 @@ namespace Calcuchord {
         }
 
         void UpdateViewProps() {
+            OnPropertyChanged(nameof(CanLoadMore));
+
             OnPropertyChanged(nameof(SelectedPatternType));
             OnPropertyChanged(nameof(SelectedInstrumentIndex));
             OnPropertyChanged(nameof(SelectedInstrument));
@@ -875,7 +881,8 @@ namespace Calcuchord {
             MatchScoreMethodType score_method = IsExactMatchOnly ?
                 MatchScoreMethodType.Exact :
                 MatchScoreMethodType.Voicing;
-            var sel_notes = sel_note_vml.Select(x => x.InstrumentNote).ToArray();
+            var sel_notes = sel_note_vml.Select(x => x.IsInMuteState ? InstrumentNote.Mute(x.RowNum) : x.InstrumentNote)
+                .ToArray();
             if(IsTranslateMode) {
                 score_method = MatchScoreMethodType.Translation;
                 sel_notes = TranslateSourceMatchViewModel.NotePattern.Notes.Cast<InstrumentNote>().ToArray();
@@ -930,10 +937,10 @@ namespace Calcuchord {
             sorted_results = SortMatches(results);
             AllResults = sorted_results.ToArray();
             Dispatcher.UIThread.Invoke(
-                async () => {
+                () => {
 
                     Matches.Clear();
-                    await LoadMoreAsync();
+                    LoadMore();
 
                     if(source == MatchUpdateSource.FindClick ||
                        source == MatchUpdateSource.FilterToggle ||
@@ -1664,27 +1671,31 @@ namespace Calcuchord {
 
         public ICommand ChangeMatchColumnsCommand => new MpCommand<object>(
             (args) => {
-                _ = Task.Run(
-                    () => {
-                        int delta = 1;
-                        if(args is not null) {
-                            delta = -1;
+                IsBusy = true;
+
+                Dispatcher.UIThread.InvokeAsync(
+                        () => {
+                            int delta = 1;
+                            if(args is not null) {
+                                delta = -1;
+                            }
+
+                            int new_col_count = Math.Clamp(MatchColCount + delta,1,MaxMatchColCount);
+                            if(new_col_count == MatchColCount) {
+                                return;
+                            }
+
+                            MatchColCount = new_col_count;
+                        },DispatcherPriority.Background)
+                    .FireAndForgetSafeAsync();
+                Dispatcher.UIThread.Post(
+                    async () => {
+                        while(!MatchesView.Instance.MatchItemsRepeater.IsArrangeValid) {
+                            await Task.Delay(100);
                         }
 
-                        int new_col_count = Math.Clamp(MatchColCount + delta,1,MaxMatchColCount);
-                        if(new_col_count == MatchColCount) {
-                            return;
-                        }
-
-                        Dispatcher.UIThread.Post(
-                            () => {
-                                MatchColCount = new_col_count;
-                            },DispatcherPriority.Background);
-
-                        Prefs.Instance.Save();
+                        IsBusy = false;
                     });
-
-
             });
 
         public ICommand ResetInstrumentCommand => new MpCommand(
@@ -2141,73 +2152,93 @@ namespace Calcuchord {
                 UpdateMatchesAsync(MatchUpdateSource.FilterToggle).FireAndForgetSafeAsync();
             });
 
-        int GetMatchesPerPage() {
+        int GetMatchesPerPage(bool actualPage = true) {
+            // double outer_item_w = MatchesContainerRect.Width / MatchColCount;
+            // double item_scale = outer_item_w / MatchWidth;
+            // double outer_item_h = MatchFixedHeight * item_scale;
+            // double outer_h =
+            //     actualPage ?
+            //         MatchesContainerRect.Height :
+            //         MainView.Instance.MainContentView.Bounds.Height;
+            // int vis_row_count = (int)Math.Ceiling(outer_h / outer_item_h);
+            // int viewport_items = vis_row_count * MatchColCount;
+            //
+            // if(MatchesView.Instance is { } mtv &&
+            //    mtv.GetVisualMatchCount(actualPage) is { } measured_count) {
+            //     PlatformWrapper.Services.Logger.WriteLine($" items1: {viewport_items} items2: {measured_count}");
+            //     viewport_items = measured_count;
+            // }
+            //
+            // return viewport_items;
+            int def_count = 0;
             switch(MatchColCount) {
                 case 1:
-                    return 1;
+                    def_count = 1;
+                    break;
                 case 2:
-                    return 2;
+                    def_count = 2;
+                    break;
                 default:
                 case 3:
-                    return 6;
+                    def_count = 6;
+                    break;
                 case 4:
-                    return 8;
+                    def_count = 8;
+                    break;
                 case 5:
-                    return 15;
+                    def_count = 15;
+                    break;
                 case 6:
-                    return 18;
+                    def_count = 18;
+                    break;
                 case 7:
-                    return 28;
+                    def_count = 28;
+                    break;
                 case 8:
-                    return 32;
+                    def_count = 32;
+                    break;
             }
+
+            // double factor = MainView.Instance.Bounds.Height / 740d;
+            // return (int)(def_count * factor);
+            return def_count * 2;
         }
 
         void UpdatePageCount() {
             int last_count = LoadMoreCount;
             LoadMoreCount = GetMatchesPerPage() * PageCacheCount;
-            if(LoadMoreCount <= last_count) {
-                return;
-            }
-
-            LoadMoreAsync(LoadMoreCount - last_count)
-                .FireAndForgetSafeAsync(DispatcherPriority.Background,MatchCts.Token);
+            LoadMore(Math.Max(0,LoadMoreCount - last_count));
         }
 
-        async Task LoadMoreAsync(int? forceCount = null) {
-            if(IsLoadingMore) {
-                PlatformWrapper.Services.Logger.WriteLine("Loading more");
+        void LoadMore(int? forceCount = null) {
+            int loadCount = forceCount ?? LoadMoreCount;
+            if(loadCount == 0) {
                 return;
             }
 
-            int loadCount = forceCount ?? LoadMoreCount;
-            int col_diff = (Matches.Count + loadCount) % MatchColCount;
-            //PlatformWrapper.Services.Logger.WriteLine($"Loading {loadCount + col_diff} items. Cur Count: {Matches.Count} Col Count: {MatchColCount} Col Diff: {col_diff}");
-            var items_to_add = AllResults.Skip(Matches.Count).Take(loadCount + col_diff);
-            int delay = forceCount == null && Matches.Any() ? 10 : 0;
-            IsLoadingMore = Matches.Any();
-            foreach(MatchViewModel item in items_to_add) {
-                if(MatchCts.IsCancellationRequested) {
-                    // canceled
-                    break;
-                }
-
-                Matches.Add(item);
-                try {
-                    await Task.Delay(delay,MatchCts.Token);
-                } catch {
-                    return;
-                }
+            while((Matches.Count + loadCount) % MatchColCount != 0) {
+                loadCount++;
             }
 
-            IsLoadingMore = false;
+            //PlatformWrapper.Services.Logger.WriteLine($"Loading {loadCount + col_diff} items. Cur Count: {Matches.Count} Col Count: {MatchColCount} Col Diff: {col_diff}");
+            var items_to_add = AllResults.Skip(Matches.Count).Take(loadCount);
+            Matches.AddRange(items_to_add);
+            OnPropertyChanged(nameof(CanLoadMore));
         }
 
         public ICommand LoadMoreCommand => new MpCommand(
             () => {
-                //PlatformWrapper.Services.Logger.WriteLine("Loading more...");
-                //Dispatcher.UIThread.InvokeAsync(() => LoadMore(),DispatcherPriority.ContextIdle,MatchCts.Token);
-                LoadMoreAsync().FireAndForgetSafeAsync(DispatcherPriority.Background,MatchCts.Token);
+                IsBusy = true;
+                Dispatcher.UIThread.InvokeAsync(() => LoadMore(),DispatcherPriority.Background)
+                    .FireAndForgetSafeAsync();
+                Dispatcher.UIThread.Post(
+                    async () => {
+                        while(!MatchesView.Instance.MatchItemsRepeater.IsArrangeValid) {
+                            await Task.Delay(100);
+                        }
+
+                        IsBusy = false;
+                    });
             });
 
         public ICommand TranslatePatternCommand => new MpCommand<object>(
@@ -2315,7 +2346,7 @@ namespace Calcuchord {
                                 break;
                             }
 
-                            await LoadMoreAsync();
+                            LoadMore();
                         }
 
                         mtvm_to_select.SelectMatchCommand.Execute(null);

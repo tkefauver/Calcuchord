@@ -234,13 +234,10 @@ namespace Calcuchord {
         #region Public Methods
 
         public async Task InitAsync(Instrument instrument) {
-            IsBusy = true;
             Instrument = instrument;
             Tunings.Clear();
             Tunings.AddRange(await Task.WhenAll(Instrument.Tunings.Select(x => CreateTuningViewModelAsync(x))));
             Instrument.RefreshModelTree();
-
-            IsBusy = false;
         }
 
         public override string ToString() {

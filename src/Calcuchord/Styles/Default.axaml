@@ -32,8 +32,8 @@
 
     <!-- MOBILE SS -->
     <Style Selector="Window.debug">
-        <Setter Property="SystemDecorations"
-                Value="None" />
+        <!-- <Setter Property="SystemDecorations" -->
+        <!--         Value="None" /> -->
         <Setter Property="Width"
                 Value="417" />
         <Setter Property="Height"

@@ -236,16 +236,8 @@ namespace Calcuchord {
                     return;
                 }
 
-                if(!mvm.IsSearchModeSelected) {
-                    // switch to search mode
-                    mvm.SelectOptionCommand.Execute(mvm.SearchOptionViewModel);
-
-                    // wait for inst to load...
-                    await Task.Delay(500);
-                }
-
                 stvm.ResetSelection();
-                await Task.Delay(300);
+                //await Task.Delay(300);
 
                 foreach(NoteViewModel nvm in stvm.AllNotes.Where(x => x.IsRealNote)) {
                     if(NotePattern.Notes.FirstOrDefault(
@@ -254,16 +246,30 @@ namespace Calcuchord {
                         continue;
                     }
 
-                    nvm.Parent.ToggleNoteSelectedCommand.Execute(nvm);
+                    nvm.Parent.ToggleSelected(nvm,false);
                     if(ng_match.IsMute) {
                         // toggle to mute
-                        nvm.Parent.ToggleNoteSelectedCommand.Execute(nvm);
+                        nvm.Parent.ToggleSelected(nvm,false);
                     }
                 }
 
-                await Task.Delay(250);
+                if(!mvm.IsSearchModeSelected) {
+                    // switch to search mode
+                    mvm.SelectOptionCommand.Execute(mvm.SearchOptionViewModel);
+
+                    // wait for inst to load...
+                    //await Task.Delay(500);
+                }
+
+                while(InstrumentView.Instance == null ||
+                      !InstrumentView.Instance.IsArrangeValid) {
+                    await Task.Delay(100);
+                }
+                //await Task.Delay(250);
 
                 InstrumentView.Instance.ScrollSelectionIntoView();
+
+                mvm.UpdateMatchesAsync(MatchUpdateSource.FindClick).FireAndForgetSafeAsync();
 
             });
 

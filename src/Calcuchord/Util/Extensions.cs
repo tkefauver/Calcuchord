@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using HtmlAgilityPack;
@@ -14,6 +15,19 @@ using Svg.Skia;
 
 namespace Calcuchord {
     public static class Extensions {
+        public static Point GetChildScale(this Viewbox vb) {
+            if(vb.Child is not { } c) {
+                return new Point(1,1);
+            }
+
+            if(c.Bounds.Width == 0 ||
+               c.Bounds.Height == 0) {
+                return new Point();
+            }
+
+            return new Point(vb.Bounds.Width / c.Bounds.Width,vb.Bounds.Height / c.Bounds.Height);
+        }
+
         public static string GetTempFile(string ext) {
             return Path.Combine(
                 Path.GetTempPath(),
@@ -56,6 +70,43 @@ namespace Calcuchord {
         }
 
         public static async void FireAndForgetSafeAsync(this Task task,DispatcherPriority dp,CancellationToken ct) {
+            try {
+                await Dispatcher.UIThread.InvokeAsync(
+                    async () => {
+                        try {
+                            await task;
+                        } catch(Exception ex) {
+                            ex.Dump();
+                        }
+                    },dp,ct);
+            } catch(Exception ex) {
+                if(ex is not TaskCanceledException) {
+                    ex.Dump();
+                }
+            }
+        }
+
+        public static async void FireAndForgetSafeAsync(this DispatcherOperation task) {
+            try {
+                await task;
+            } catch(Exception ex) {
+                ex.Dump();
+            }
+        }
+
+        public static async void FireAndForgetSafeAsync(this DispatcherOperation task,DispatcherPriority dp) {
+            await Dispatcher.UIThread.InvokeAsync(
+                async () => {
+                    try {
+                        await task;
+                    } catch(Exception ex) {
+                        ex.Dump();
+                    }
+                },dp);
+        }
+
+        public static async void FireAndForgetSafeAsync(this DispatcherOperation task,DispatcherPriority dp,
+            CancellationToken ct) {
             try {
                 await Dispatcher.UIThread.InvokeAsync(
                     async () => {

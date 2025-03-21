@@ -5,7 +5,7 @@ using MonkeyPaste.Common;
 
 namespace Calcuchord {
     public static class MusicHelpers {
-        public static double Distance(this InstrumentNote a,InstrumentNote b,MatchScoreMethodType scoring) {
+        public static double SimilarityScore(this InstrumentNote a,InstrumentNote b,MatchScoreMethodType scoring) {
             if(a.Key != b.Key ||
                a.IsMute != b.IsMute) {
                 return 0;
@@ -19,7 +19,10 @@ namespace Calcuchord {
                             1 :
                             0;
                 case MatchScoreMethodType.Voicing:
-                    return 1d / (1 + Math.Abs(a.RowNum - b.RowNum) + Math.Abs(a.ColNum - b.ColNum));
+                    double inst_dist = 1d / (1 + Math.Abs(a.RowNum - b.RowNum) + Math.Abs(a.ColNum - b.ColNum));
+                    double pitch_dist = 1 / (1d + Math.Abs(a.Register - b.Register));
+                    return (inst_dist + pitch_dist) / 2d;
+                //return inst_dist;
                 case MatchScoreMethodType.Translation:
                     return 1 / (1d + Math.Abs(a.Register - b.Register));
             }

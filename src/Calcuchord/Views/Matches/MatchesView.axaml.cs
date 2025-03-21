@@ -40,19 +40,27 @@ namespace Calcuchord {
             return 1;
         }
 
-        public int GetVisualMatchCount() {
-            var mvl = this.GetVisualDescendants<MatchView>().OrderBy(x => x.Bounds.Top).ThenBy(x => x.Bounds.Left);
-            int count = 0;
-            foreach(MatchView mv in mvl) {
-                if(mv.TranslatePoint(mv.Bounds.BottomRight,MatchesScrollViewer) is not { } mv_sv_br_p) {
-                    continue;
-                }
+        public int? GetVisualMatchCount(bool actualPage) {
+            if(this.GetVisualDescendant<MatchView>() is not { } first_mv ||
+               first_mv.Bounds.Width == 0 ||
+               first_mv.Bounds.Height == 0) {
+                return null;
+            }
 
-                if(!MatchesScrollViewer.Bounds.Contains(mv_sv_br_p)) {
-                    break;
-                }
+            Point outer_scale = MatchesViewbox.GetChildScale();
+            double iw = first_mv.Bounds.Width * outer_scale.X;
+            double ih = first_mv.Bounds.Height * outer_scale.Y;
 
-                count++;
+            double tw = MatchesScrollViewer.Bounds.Width;
+            double th = actualPage ?
+                MatchesScrollViewer.Bounds.Height :
+                MainView.Instance.MainContentView.Bounds.Height;
+
+            int rc = (int)(th / ih);
+            int cc = (int)(tw / iw);
+            int count = rc * cc;
+            if(count <= 0) {
+                return null;
             }
 
             return count;

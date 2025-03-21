@@ -227,7 +227,7 @@ namespace Calcuchord {
             }
         }
 
-        void ToggleSelected(NoteViewModel nvm,bool root) {
+        public void ToggleSelected(NoteViewModel nvm,bool root) {
             if(MainViewModel.Instance is not { } mvm) {
                 return;
             }
