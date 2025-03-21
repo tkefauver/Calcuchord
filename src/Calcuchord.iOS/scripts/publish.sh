@@ -33,15 +33,13 @@ if [ "$1" = "pub" ] || [ "$2" = "pub" ] || [ "$3" = "pub" ]; then
   read -p "DID YOU TICK THE VERSION?? Press enter to continue..."
 fi
 
-cd ..
+rm -fr ../obj
+rm -fr ../bin
+rm -f ../*.csproj.user
 
-rm -fr obj
-rm -fr bin
-rm -f *.csproj.user
+dotnet publish ../Calcuchord.iOS.csproj -c ${CONFIG} -f ${FRAMEWORK} ${PUB_PROP_ARG} -p:RuntimeIdentifier=${RUNTIME} ${DEVICE_ARG}${DEVICE_ID}
 
-dotnet publish -c ${CONFIG} -f ${FRAMEWORK} ${PUB_PROP_ARG} -p:RuntimeIdentifier=${RUNTIME} ${DEVICE_ARG}${DEVICE_ID}
-
-PUB_DIR="bin/${CONFIG}/${FRAMEWORK}/${RUNTIME}/publish"
+PUB_DIR="../bin/${CONFIG}/${FRAMEWORK}/${RUNTIME}/publish"
 PAYLOAD_DIR="$PUB_DIR/tmp"
 # unzip the IPA file to tmp foldercd D
 mkdir "$PAYLOAD_DIR"
@@ -50,13 +48,13 @@ unzip "$PUB_DIR/${EXE_NAME}.ipa" -d "$PAYLOAD_DIR"
 # from https://github.com/flutter/flutter/issues/133465#issuecomment-2159512125
 if [ "$1" = "rel" ] || [ "$2" = "rel" ] || [ "$3" = "rel" ]; then
   xcrun devicectl device uninstall -q app --device ${DEVICE_ID} ${BUNDLE_ID}
-  xcrun devicectl device install app --device ${DEVICE_ID} "$PAYLOAD_DIR/$EXE_NAME.app"
+  xcrun devicectl device install app --device ${DEVICE_ID} "$PAYLOAD_DIR/Payload/$EXE_NAME.app"
   xcrun devicectl device process launch --console --device ${DEVICE_ID} ${BUNDLE_ID}
 fi
 
 # run ios-deploy to install the app into iOS device
 #ios-deploy -r -b ./tmp/Payload/*.app -O "/Users/tkefauver/Desktop/output.log" -E "/Users/tkefauver/Desktop/error.log"
-rm -r "$PAYLOAD_DIR"
+#rm -r "$PAYLOAD_DIR"
 
 if [ "$1" = "pub" ] || [ "$2" = "pub" ] || [ "$3" = "pub" ]; then
   open -R "$PUB_DIR/${EXE_NAME}.ipa"
