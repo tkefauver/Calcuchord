@@ -31,7 +31,7 @@ InstallDir "$PROGRAMFILES\${APPNAME}"
 # This will be in the installer/uninstaller's title bar
 Name "${APPNAME}"
 Icon "logo.ico"
-outFile "Calcuchord-$VERSIONMAJOR.$VERSIONMINOR.$VERSIONBUILD-win-installer.exe"
+outFile "Calcuchord-${VERSIONMAJOR}.${VERSIONMINOR}.${VERSIONBUILD}-win-installer.exe"
  
 !include LogicLib.nsh
  
@@ -59,10 +59,10 @@ section "install"
 	# Files for the install directory - to build the installer, these should be in the same directory as the install script (this file)
 	setOutPath $INSTDIR
 	# Files added here should be removed by the uninstaller (see section "uninstall")
-	file "av_libglesv2.dll"
-	file "Calcuchord.exe"
-	file "libHarfBuzzSharp.dll"
-	file "libSkiaSharp.dll"	
+	file "out\av_libglesv2.dll"
+	file "out\Calcuchord.exe"
+	file "out\libHarfBuzzSharp.dll"
+	file "out\libSkiaSharp.dll"	
 	file "logo.ico"
 	# Add any other files for the install directory (license files, app data, etc) here
  

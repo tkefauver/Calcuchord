@@ -467,3 +467,5 @@ src/Calcuchord.Desktop/scripts/linux/out
 src/Calcuchord.Desktop/scripts/linux/staging_folder
 *.deb
 src/Calcuchord.Wap
+src/Calcuchord.Desktop/scripts/windows/out
+src/Calcuchord.Desktop/scripts/windows/*.exe
