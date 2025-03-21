@@ -15,9 +15,9 @@
 	<key>CFBundleExecutable</key>
 	<string>Calcuchord.Mac</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.10.0</string>
+	<string>1.0.11.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.2</string>
+	<string>1.3</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>12.0</string>
 	<key>CFBundleInfoDictionaryVersion</key>

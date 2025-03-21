@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="1.0.10.0"
+VERSION="1.0.11.0"
 CONFIG="Release"
 RUNTIME_ID="osx-x64"
 FRAMEWORK_ID="net9.0-macos"
