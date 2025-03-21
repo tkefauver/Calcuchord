@@ -3,7 +3,13 @@
         <DotNetVersion>9.0</DotNetVersion>
         <AvaloniaVersion>11.2.5</AvaloniaVersion>
         <MaterialAvaloniaVersion>3.9.2</MaterialAvaloniaVersion>
+		    <NoWarn>$(NoWarn);NU1701</NoWarn>
     </PropertyGroup>
+
+
+  <PropertyGroup>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+  </PropertyGroup>
 
     <PropertyGroup>
         <!--        <BuildOs>LINUX</BuildOs>-->
