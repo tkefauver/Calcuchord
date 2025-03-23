@@ -1694,6 +1694,12 @@ namespace Calcuchord {
                             await Task.Delay(100);
                         }
 
+                        await Task.Delay(300);
+
+                        if(SelectedMatch is { } sel_mtvm) {
+                            MatchesView.Instance.ScrollItemIntoView(sel_mtvm);
+                        }
+
                         IsBusy = false;
                     });
             });

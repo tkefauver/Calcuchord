@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJ_DIR="../.."
-VERSION="1.0.11.0"
+VERSION="1.0.12.0"
 
 # Clean-up
 rm -rf ./out/
