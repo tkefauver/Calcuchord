@@ -41,13 +41,11 @@ BUNDLE_PATH="$BUILD_DIR/$DESIRED_APP_HOST_NAME.app"
 # sign
 ENTITLEMENTS="$PROJ_DIR/Entitlements2.plist"
 SIGNING_ID="Apple Development: thomas kefauver (MY7R67BXWM)"
-#SIGNING_ID="Apple Distribution: thomas kefauver (3382GDS46D)"
 
 if [ "$1" = "adhoc" ] || [ "$2" = "adhoc" ] || [ "$3" = "adhoc" ]; then
   SIGNING_ID="Apple Distribution: thomas kefauver (3382GDS46D)"
 fi
 
-#codesign --force --deep --sign "$SIGNING_ID" --entitlements "$ENTITLEMENTS" "$BUNDLE_PATH"
 find "$BUNDLE_PATH/Contents/MacOS/"|while read fname; do
     if [[ -f $fname ]]; then
         echo "[INFO] Signing $fname"
