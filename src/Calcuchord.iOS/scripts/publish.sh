@@ -23,11 +23,11 @@ if [ "$1" = "sim" ] || [ "$2" = "sim" ] || [ "$3" = "sim" ]; then
 fi
 
 
-if [ "$1" = "rel" ] || [ "$2" = "rel" ] || [ "$3" = "rel" ]; then
+if [ "$1" = "adhoc" ] || [ "$2" = "adhoc" ] || [ "$3" = "adhoc" ]; then
   CONFIG="Release"
 fi
 
-if [ "$1" = "pub" ] || [ "$2" = "pub" ] || [ "$3" = "pub" ]; then
+if [ "$1" = "store" ] || [ "$2" = "store" ] || [ "$3" = "store" ]; then
   CONFIG="Release"
   PUB_PROP_ARG="-p:IsPublishMode=true"
   read -p "DID YOU TICK THE VERSION?? Press enter to continue..."
@@ -46,7 +46,7 @@ mkdir "$PAYLOAD_DIR"
 unzip "$PUB_DIR/${EXE_NAME}.ipa" -d "$PAYLOAD_DIR"
 
 # from https://github.com/flutter/flutter/issues/133465#issuecomment-2159512125
-if [ "$1" = "rel" ] || [ "$2" = "rel" ] || [ "$3" = "rel" ]; then
+if [ "$1" = "adhoc" ] || [ "$2" = "adhoc" ] || [ "$3" = "adhoc" ]; then
   xcrun devicectl device uninstall -q app --device ${DEVICE_ID} ${BUNDLE_ID}
   xcrun devicectl device install app --device ${DEVICE_ID} "$PAYLOAD_DIR/Payload/$EXE_NAME.app"
   xcrun devicectl device process launch --console --device ${DEVICE_ID} ${BUNDLE_ID}
@@ -56,6 +56,6 @@ fi
 #ios-deploy -r -b ./tmp/Payload/*.app -O "/Users/tkefauver/Desktop/output.log" -E "/Users/tkefauver/Desktop/error.log"
 #rm -r "$PAYLOAD_DIR"
 
-if [ "$1" = "pub" ] || [ "$2" = "pub" ] || [ "$3" = "pub" ]; then
+if [ "$1" = "store" ] || [ "$2" = "store" ] || [ "$3" = "store" ]; then
   open -R "$PUB_DIR/${EXE_NAME}.ipa"
 fi
