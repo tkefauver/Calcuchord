@@ -103,6 +103,7 @@ namespace Calcuchord {
                 "Standard",
                 readOnlyTuning,
                 capoNum);
+            tuning.CreateId();
             tuning.IsChordsFromFile = chordsFromFile;
             tuning.IsSelected = isDefTuningSelected;
             tuning.OpenNotes.AddRange(open_notes);

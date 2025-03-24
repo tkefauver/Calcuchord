@@ -333,6 +333,7 @@ namespace Calcuchord {
 
         public string MainDialogHostName => "MainDialogHost";
         public string InstEditDialogHostName => "InstrumentEditorPopupHost";
+        public string BookmarkGroupEditDialogHostName => "BookmarkGroupEditorPopupHost";
 
         public bool IsDoingIntro { get; private set; }
         public bool IsLoaded { get; private set; }
@@ -543,7 +544,7 @@ namespace Calcuchord {
             var other_instl = Instruments.Where(x => !ignored.Contains(x));
 
             int suffix = 1;
-            while(other_instl.Any(x => string.Equals(x.Title,unique_name,StringComparison.CurrentCultureIgnoreCase))) {
+            while(other_instl.Any(x => string.Equals(x.Name,unique_name,StringComparison.CurrentCultureIgnoreCase))) {
                 unique_name = $"{desiredName}{suffix++}";
             }
 
@@ -570,6 +571,14 @@ namespace Calcuchord {
 
         void MainViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
+                case nameof(IsBookmarkModeSelected):
+                    if(IsBookmarkModeSelected &&
+                       SelectedTuning is not null &&
+                       SelectedTuning.SelectedBookmarkGroups.None()) {
+                        SelectedTuning.SelectedBookmarkGroups.Add(SelectedTuning.DefaultBookmarkGroup);
+                    }
+
+                    break;
                 case nameof(SelectedInstrument):
                     OnPropertyChanged(nameof(InstrumentFlags));
                     break;
@@ -640,6 +649,9 @@ namespace Calcuchord {
                     OnPropertyChanged(nameof(IsChordsSelected));
                     OnPropertyChanged(nameof(IsScalesSelected));
                     OnPropertyChanged(nameof(IsModesSelected));
+                    if(SelectedTuning is { } stvm) {
+                        stvm.RaisePropertyChanged(nameof(stvm.AvailableBookmarkGroups));
+                    }
 
                     break;
                 case nameof(SelectedDisplayMode):
@@ -1151,13 +1163,43 @@ namespace Calcuchord {
                 return true;
             }
 
-            // just reset them..
-            PlatformWrapper.Services.Logger.WriteLine(
-                $"Options expired! This Version: {Prefs.Instance.LastPrefsVersion} Needed Version: {Prefs.Instance.LastOptionsUpdatedPrefsVersion}");
-            opts.Clear();
-            opts.AddRange(CreateDefaultOptions());
-            PlatformWrapper.Services.Logger.WriteLine("Options reset");
-            return false;
+            if(Prefs.Instance.IsOptionsRequireReset) {
+                // just reset them..
+                PlatformWrapper.Services.Logger.WriteLine(
+                    $"Options expired! This Version: {Prefs.Instance.LastPrefsVersion} Needed Version: {Prefs.Instance.LastOptionsUpdatedPrefsVersion}");
+                opts.Clear();
+                opts.AddRange(CreateDefaultOptions());
+
+                PlatformWrapper.Services.Logger.WriteLine("Options reset");
+                return false;
+            }
+
+            void UniquifyInstrumentNames() {
+                Instruments.ForEach(x => x.Validate());
+
+                var invalid_ivm_groups = Instruments.Where(x => !x.IsValid).ToList().GroupBy(x => x.Name);
+                if(invalid_ivm_groups.None()) {
+                    return;
+                }
+
+                foreach(var invalid_ivm_group in invalid_ivm_groups) {
+                    // make last dup named 
+                    foreach(InstrumentViewModel invalid_ivm in invalid_ivm_group) {
+                        if(invalid_ivm_group.All(x => x.IsValid)) {
+                            // all done
+                            break;
+                        }
+
+                        invalid_ivm.Name = GetUniqueInstrumentName(invalid_ivm.Name,[]);
+                    }
+                }
+            }
+
+            UniquifyInstrumentNames();
+            UniquifyInstrumentNames();
+
+
+            return true;
         }
 
         void SetOptions(IEnumerable<OptionViewModel> opts) {
@@ -1539,7 +1581,8 @@ namespace Calcuchord {
 
         public MpIAsyncCommand FinishEditInstrumentCommand => new MpAsyncCommand(
             async () => {
-                if(EditModeInstrument is not { } emi_vm) {
+                if(EditModeInstrument is not { } emi_vm ||
+                   !emi_vm.IsValid) {
                     return;
                 }
 
@@ -1664,7 +1707,7 @@ namespace Calcuchord {
                 {
                     Instrument = Instrument.CreateByType(InstrumentType.Guitar),
                 };
-                EditModeInstrument.Title = GetUniqueInstrumentName(EditModeInstrument.Title,[]);
+                EditModeInstrument.Name = GetUniqueInstrumentName(EditModeInstrument.Name,[]);
                 await EditModeInstrument.InitAsync(EditModeInstrument.Instrument);
                 await BeginEditInstrumentCommand.ExecuteAsync(EditModeInstrument);
             });
@@ -1735,7 +1778,7 @@ namespace Calcuchord {
                 {
                     DataContext = new DialogViewModel
                     {
-                        Label = $"Are you sure you want to delete '{to_remove_ivm.Title}'?",
+                        Label = $"Are you sure you want to delete '{to_remove_ivm.Name}'?",
                         OkCommand = new MpCommand(
                             () => {
                                 confirmed = true;

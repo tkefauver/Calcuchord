@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MonkeyPaste.Common;
@@ -7,9 +8,16 @@ namespace Calcuchord {
     [JsonObject]
     public class Tuning {
 
+        #region Constants
+
+        #endregion
+
         #region Properties
 
         #region Members
+
+        [JsonProperty]
+        public string Id { get; set; }
 
         [JsonProperty]
         public bool IsSelected { get; set; }
@@ -39,6 +47,11 @@ namespace Calcuchord {
 
         #region Ignored
 
+        // [JsonIgnore]
+        // public string Id =>
+        //     Parent == null ? string.Empty :
+        //         $"{Parent.Name}{Instrument.ID_DELIMETER}{string.Join(Note.ID_DELIMETER,OpenNotes.OrderBy(x => x.RowNum).Select(x => x.FullName))}";
+
         [JsonIgnore]
         public bool IsChordsFromFile { get; set; }
 
@@ -57,7 +70,7 @@ namespace Calcuchord {
                     {
                         { MusicPatternType.Chords,Chords },
                         { MusicPatternType.Scales,Scales },
-                        { MusicPatternType.Modes,Modes }
+                        { MusicPatternType.Modes,Modes },
                     };
                 }
 
@@ -92,6 +105,10 @@ namespace Calcuchord {
 
         #region Public Methods
 
+        public void CreateId() {
+            Id = Guid.NewGuid().ToString();
+        }
+
         public void ClearPatterns() {
             Chords.Clear();
             Scales.Clear();
@@ -117,6 +134,7 @@ namespace Calcuchord {
         public Tuning Clone() {
             // NOTE is shallow clone only (no patterns or parent)
             Tuning clone = new Tuning(Name,IsReadOnly,CapoFretNum);
+            clone.CreateId();
             clone.OpenNotes.Clear();
             clone.OpenNotes.AddRange(OpenNotes.Select(x => x.Clone()));
             return clone;

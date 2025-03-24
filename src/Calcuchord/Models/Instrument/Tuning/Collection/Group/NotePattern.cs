@@ -22,9 +22,26 @@ namespace Calcuchord {
         [JsonProperty]
         public bool IsBookmarked { get; set; }
 
+        [JsonProperty]
+        public string BookmarkGroupIdsCsv { get; set; } = string.Empty;
+
         #endregion
 
         #region Ignored
+
+        [JsonIgnore]
+        List<string> _bookmarkGroupIds;
+
+        [JsonIgnore]
+        List<string> BookmarkGroupIds {
+            get {
+                if(_bookmarkGroupIds == null) {
+                    _bookmarkGroupIds = BookmarkGroupIdsCsv.Split(',').ToList();
+                }
+
+                return _bookmarkGroupIds;
+            }
+        }
 
         [JsonIgnore]
         public MusicPatternType PatternType =>
@@ -101,6 +118,34 @@ namespace Calcuchord {
 
         public override string ToString() {
             return FullName;
+        }
+
+        public bool IsInBookmarkGroup(BookmarkGroup bmg) {
+            if(bmg == null) {
+                return false;
+            }
+
+            return BookmarkGroupIds.Contains(bmg.Id);
+        }
+
+        public void AddToBookmarkGroup(BookmarkGroup bmg) {
+            if(bmg is null ||
+               IsInBookmarkGroup(bmg)) {
+                return;
+            }
+
+            BookmarkGroupIds.Add(bmg.Id);
+            BookmarkGroupIdsCsv = string.Join(",",BookmarkGroupIds);
+        }
+
+        public void RemoveFromBookmarkGroup(BookmarkGroup bmg) {
+            if(bmg is null ||
+               !IsInBookmarkGroup(bmg)) {
+                return;
+            }
+
+            BookmarkGroupIds.Remove(bmg.Id);
+            BookmarkGroupIdsCsv = string.Join(",",BookmarkGroupIds);
         }
 
         public IEnumerable<IEnumerable<int>> GetToneGroups() {

@@ -1,6 +1,9 @@
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Threading;
 using MonkeyPaste.Common;
 using PropertyChanged;
 
@@ -56,6 +59,57 @@ namespace Calcuchord {
 
                 mvm.UpdateMatchesAsync(MatchUpdateSource.SortToggle).FireAndForgetSafeAsync();
             }
+        }
+
+        void BookmarkItemView_PointerPressed(object sender,PointerPressedEventArgs e) {
+            if(e.ClickCount <= 1 ||
+               sender is not Control ctrl ||
+               ctrl.DataContext is not BookmarkGroupViewModel bmgvm) {
+                return;
+            }
+
+            bmgvm.DoubleTapCommand.Execute(null);
+
+        }
+
+        DateTime? LastDoubleTappedDt { get; set; }
+        object LastDoubleTappedSender { get; set; }
+
+        void InputElement_OnDoubleTapped(object sender,TappedEventArgs e) {
+            if(sender is not Control ctrl ||
+               ctrl.DataContext is not BookmarkGroupViewModel bmgvm) {
+                return;
+            }
+
+            LastDoubleTappedDt = DateTime.Now;
+            LastDoubleTappedSender = sender;
+
+            bmgvm.DoubleTapCommand.Execute(null);
+        }
+
+        void InputElement_OnTapped(object sender,TappedEventArgs e) {
+            if(sender is not Control ctrl ||
+               ctrl.DataContext is not BookmarkGroupViewModel bmgvm) {
+                return;
+            }
+
+            Dispatcher.UIThread.Post(
+                async () => {
+                    await Task.Delay(1_000);
+
+                    if(LastDoubleTappedDt is { } ldtdt &&
+                       DateTime.Now - ldtdt < TimeSpan.FromSeconds(2) &&
+                       LastDoubleTappedSender == sender) {
+                        // cancel select toggle
+                        return;
+                    }
+
+                    if(bmgvm.Parent.SelectedBookmarkGroups.Contains(bmgvm)) {
+                        bmgvm.Parent.SelectedBookmarkGroups.Remove(bmgvm);
+                    } else {
+                        bmgvm.Parent.SelectedBookmarkGroups.Add(bmgvm);
+                    }
+                });
         }
     }
 }

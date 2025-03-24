@@ -42,7 +42,22 @@
                     Value="0,30,0,0" />
         </Style>
 
-        <Style Selector="TabItem" />
+        <Style Selector="Button.invalid"
+               x:DataType="local:MainViewModel">
+            <Setter Property="BorderThickness"
+                    Value="2" />
+            <Setter Property="BorderBrush"
+                    Value="Red" />
+            <Setter Property="ToolTip.Tip">
+                <Setter.Value>
+                    <Template>
+                        <controls:ColorZone Classes="tt">
+                            <TextBlock Text="{Binding EditModeInstrument.InvalidText}" />
+                        </controls:ColorZone>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Styles>
 
 
@@ -84,6 +99,7 @@
                                         VerticalAlignment="Bottom"
                                         Classes="float-text dark"
                                         IsDefault="True"
+                                        Classes.invalid="{Binding !EditModeInstrument.IsValid}"
                                         Command="{Binding FinishEditInstrumentCommand}">
                                     <TextBlock FontSize="18"
                                                Text="Done" />

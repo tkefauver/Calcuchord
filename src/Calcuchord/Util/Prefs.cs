@@ -90,6 +90,9 @@ namespace Calcuchord {
             Instance.LastPrefsVersion = Instance.PrefsVersion;
             Instance.WasOptionsOutOfDateOnStartup =
                 Instance.PrefsVersion.ToVersion() < Instance.LastOptionsUpdatedPrefsVersion;
+
+            Instance.IsOptionsRequireReset =
+                Instance.PrefsVersion.ToVersion() < Instance.ResetRequiredPrefsVersion;
             IsLoaded = true;
 
 
@@ -124,6 +127,9 @@ namespace Calcuchord {
         [JsonProperty]
         public List<OptionViewModel> Options { get; set; } = [];
 
+        [JsonProperty]
+        public List<BookmarkGroup> BookmarkGroups { get; set; } = [];
+
         #endregion
 
         #region Ignored
@@ -132,13 +138,20 @@ namespace Calcuchord {
         public bool WasOptionsOutOfDateOnStartup { get; private set; }
 
         [JsonIgnore]
+        public bool IsOptionsRequireReset { get; private set; }
+
+
+        [JsonIgnore]
         public string LastPrefsVersion { get; private set; } = string.Empty;
 
         [JsonIgnore]
         BuildInfo RuntimeBuildInfo { get; } = new BuildInfo();
 
         [JsonIgnore]
-        public Version LastOptionsUpdatedPrefsVersion { get; } = new Version("1.0.9195.22711");
+        public Version LastOptionsUpdatedPrefsVersion { get; } = new Version("1.0.9214.18195");
+
+        [JsonIgnore]
+        Version ResetRequiredPrefsVersion { get; } = new Version("1.0.9195.22711");
 
         [JsonIgnore]
         public bool IsSaveIgnored { get; set; }
@@ -236,6 +249,9 @@ namespace Calcuchord {
         void SyncModels() {
             if(MainViewModel.Instance is { } mvm) {
                 Instruments = mvm.Instruments.Select(x => x.Instrument).ToList();
+                BookmarkGroups = mvm.Instruments.SelectMany(x => x.Tunings).SelectMany(x => x.BookmarkGroups)
+                    .Where(x => !x.IsAddGroupPlaceholder)
+                    .Select(x => x.BookmarkGroup).ToList();
                 Options = mvm.OptionLookup.Values.SelectMany(x => x).ToList();
                 MatchColCount = mvm.MatchColCount;
                 IsExactMatchOnly = mvm.IsExactMatchOnly;

@@ -180,10 +180,10 @@ namespace Calcuchord {
             }
         }
 
-        public string Title {
+        public string Name {
             get => Instrument.Name;
             set {
-                if(Title != value) {
+                if(Name != value) {
                     Instrument.Name = value;
                     OnPropertyChanged();
                 }
@@ -238,6 +238,7 @@ namespace Calcuchord {
             Tunings.Clear();
             Tunings.AddRange(await Task.WhenAll(Instrument.Tunings.Select(x => CreateTuningViewModelAsync(x))));
             Instrument.RefreshModelTree();
+            Validate();
         }
 
         public override string ToString() {
@@ -266,6 +267,9 @@ namespace Calcuchord {
 
         void InstrumentViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
+                case nameof(Name):
+                    Validate();
+                    break;
                 case nameof(IsEditModeEnabled):
                     if(IsEditModeEnabled) {
                         UpdateEditorSelectionToType();
@@ -354,6 +358,20 @@ namespace Calcuchord {
             return tvm;
         }
 
+        public bool Validate() {
+            if(MainViewModel.Instance is not { } mvm ||
+               mvm.Instruments is not { } all_inst_vml ||
+               // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+               all_inst_vml.Where(x => x != this).All(x => x.Name != Name)) {
+                InvalidText = string.Empty;
+            } else {
+                InvalidText = "Instrument name must be unique.";
+            }
+
+            OnPropertyChanged(nameof(IsValid));
+            return IsValid;
+        }
+
         async Task ChangeInstrumentTypeAsync() {
             IsInstrumentTypeChanging = true;
 
@@ -365,8 +383,8 @@ namespace Calcuchord {
 
             bool needs_default_name =
                 Instrument == null ||
-                string.IsNullOrWhiteSpace(Title) ||
-                Enum.GetNames(typeof(InstrumentType)).Any(x => Title.ToLower().StartsWith(x.ToLower()));
+                string.IsNullOrWhiteSpace(Name) ||
+                Enum.GetNames(typeof(InstrumentType)).Any(x => Name.ToLower().StartsWith(x.ToLower()));
             if(needs_default_name) {
                 // user hasn't changed name
                 new_inst_name = MainViewModel.Instance.GetUniqueInstrumentName(
@@ -374,7 +392,7 @@ namespace Calcuchord {
                     [this]);
             } else {
                 // use current name
-                new_inst_name = Title;
+                new_inst_name = Name;
             }
 
             await InitAsync(
@@ -386,7 +404,7 @@ namespace Calcuchord {
 
             OnPropertyChanged(nameof(FretCounts));
             OnPropertyChanged(nameof(StringCounts));
-            OnPropertyChanged(nameof(Title));
+            OnPropertyChanged(nameof(Name));
 
             // BUG init will end up using previous string counts
             // so block changes until complete 

@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
@@ -20,6 +22,8 @@ namespace Calcuchord {
         #endregion
 
         #region Constants
+
+        const string DEFAULT_BOOKMARK_GROUP_NAME = "Favorites";
 
         #endregion
 
@@ -53,6 +57,20 @@ namespace Calcuchord {
                     -1 :
                     x.RowNum);
 
+        public ObservableCollection<BookmarkGroupViewModel> SelectedBookmarkGroups { get; set; } = [];
+        public ObservableCollection<BookmarkGroupViewModel> BookmarkGroups { get; } = [];
+
+        public IEnumerable<BookmarkGroupViewModel> AvailableBookmarkGroups =>
+            BookmarkGroups
+                .Where(x => x.PatternType == MainViewModel.Instance.SelectedPatternType)
+                .OrderBy(x => x.SortOrderIdx);
+
+        public BookmarkGroupViewModel DefaultBookmarkGroup =>
+            AvailableBookmarkGroups.FirstOrDefault(x => x.IsDefault);
+
+        public BookmarkGroupViewModel AddNewPlaceholderGroup { get; private set; }
+
+
         public ObservableCollection<NoteRowViewModel> NoteRows { get; } = [];
 
         public IEnumerable<NoteViewModel> AllNotes =>
@@ -85,9 +103,17 @@ namespace Calcuchord {
 
         #region Layout
 
+        public int BookmarkColumnCount =>
+            AvailableBookmarkGroups.Count() <= 2 ?
+                1 :
+                AvailableBookmarkGroups.Count() <= 3 ?
+                    2 : 3;
+
         #endregion
 
         #region State
+
+        public bool IsAnyBookmarksSelected => SelectedBookmarkGroups.Any();
 
         public bool IsFretless =>
             Parent.IsFretless;
@@ -204,6 +230,10 @@ namespace Calcuchord {
             Tuning = tuning;
             Tuning.SetParent(Parent.Instrument);
 
+            if(string.IsNullOrEmpty(Tuning.Id)) {
+                Tuning.CreateId();
+            }
+
             NoteRows.Clear();
 
             Tuning.OpenNotes.OrderBy(x => x.RowNum).ForEach(x => NoteRows.Add(new NoteRowViewModel(this,x)));
@@ -222,6 +252,41 @@ namespace Calcuchord {
                     .Select(x => x.OpenNote)
                     .OrderBy(x => x.RowNum));
 
+            BookmarkGroups.Clear();
+            BookmarkGroups.AddRange(
+                Prefs.Instance.BookmarkGroups
+                    .Where(x => x.IsTuningBookmark(Tuning))
+                    .Select(x => new BookmarkGroupViewModel(this,x)));
+            if(BookmarkGroups.None()) {
+                // initial tuning init, add default bookmark groups
+                BookmarkGroups.AddRange(
+                    Enumerable.Range(0,Enum.GetNames(typeof(MusicPatternType)).Length)
+                        .Select(
+                            x => new BookmarkGroupViewModel(
+                                this,
+                                BookmarkGroup.Create(
+                                    Tuning,(MusicPatternType)x,DEFAULT_BOOKMARK_GROUP_NAME,isDefault: true))));
+                if(Tuning.Collections
+                           .SelectMany(x => x.Value).SelectMany(x => x.Patterns).Where(x => x.IsBookmarked) is
+                       { } legacy_bookmarks &&
+                   legacy_bookmarks.Any()) {
+                    // add legacy bookmarks to default groups
+                    foreach(NotePattern lb in legacy_bookmarks) {
+                        if(BookmarkGroups.FirstOrDefault(x => x.PatternType == lb.PatternType) is { } def_pt_bmgvm) {
+                            def_pt_bmgvm.TogglePatternCommand.Execute(lb);
+                        }
+                    }
+
+                    Prefs.Instance.Save();
+                }
+            }
+
+            AddNewPlaceholderGroup = new BookmarkGroupViewModel(this,null);
+            BookmarkGroups.Add(AddNewPlaceholderGroup);
+            BookmarkGroups.CollectionChanged += BookmarkGroups_CollectionChanged;
+            SelectedBookmarkGroups.CollectionChanged += SelectedBookmarkGroups_CollectionChanged;
+
+
             if(!IsLoaded &&
                (!Parent.IsEditModeEnabled || IsCurGenTuning)) {
                 success = await LoadPatternsAsync();
@@ -230,6 +295,42 @@ namespace Calcuchord {
             Parent.Instrument.RefreshModelTree();
 
             return success;
+        }
+
+        void BookmarkGroups_CollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
+            OnPropertyChanged(nameof(AvailableBookmarkGroups));
+            OnPropertyChanged(nameof(BookmarkColumnCount));
+        }
+
+        void SelectedBookmarkGroups_CollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
+            OnPropertyChanged(nameof(IsAnyBookmarksSelected));
+            if(SelectedBookmarkGroups.Contains(AddNewPlaceholderGroup)) {
+                AddNewPlaceholderGroup.DoubleTapCommand.Execute("SELECTED");
+            }
+
+            Dispatcher.UIThread.Post(
+                async () => {
+                    SelectedBookmarkGroups.Remove(AddNewPlaceholderGroup);
+
+                    if(BookmarkGroups.Any(x => x.IsEditing)) {
+                        return;
+                    }
+
+
+                    // if(SelectedBookmarkGroups.None() &&
+                    //    BookmarkGroups.FirstOrDefault(
+                    //        x =>
+                    //            x.GroupName == DEFAULT_BOOKMARK_GROUP_NAME &&
+                    //            x.PatternType == MainViewModel.Instance.SelectedPatternType) is { } cur_def_bgvm) {
+                    //     // always have def selected
+                    //
+                    //     SelectedBookmarkGroups.Add(cur_def_bgvm);
+                    // } else 
+                    if(MainViewModel.Instance.IsBookmarkModeSelected) {
+                        MainViewModel.Instance.UpdateMatchesAsync(MatchUpdateSource.BookmarkToggle)
+                            .FireAndForgetSafeAsync(DispatcherPriority.Background);
+                    }
+                });
         }
 
         public void ResetSelection() {
@@ -262,7 +363,7 @@ namespace Calcuchord {
                             valid = true;
                         }
                     } else if(mode_type == DisplayModeType.Bookmarks) {
-                        if(np.IsBookmarked) {
+                        if(SelectedBookmarkGroups.Any(x => np.IsInBookmarkGroup(x.BookmarkGroup))) {
                             valid = true;
                         }
                     } else {
@@ -293,6 +394,10 @@ namespace Calcuchord {
             keyl = avail_keys.Select(x => x.ToString()).ToArray();
             suffl = avail_suffixes.ToArray();
             return mrl;
+        }
+
+        public void ResetBookmarkIds(string lastName) {
+
         }
 
         public override string ToString() {
@@ -334,6 +439,8 @@ namespace Calcuchord {
 
                                 MainViewModel.Instance.RaisePropertyChanged(
                                     nameof(MainViewModel.Instance.SelectedTuning));
+
+                                OnPropertyChanged(nameof(AvailableBookmarkGroups));
 
                                 if(Design.IsDesignMode ||
                                    !MainViewModel.Instance.IsLoaded ||

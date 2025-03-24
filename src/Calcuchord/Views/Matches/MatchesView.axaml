@@ -102,7 +102,7 @@
                     <Template>
                         <TextBlock Classes="empty-label">
                             <TextBlock.Inlines>
-                                <Run Text="{Binding SelectedInstrument.Title}"
+                                <Run Text="{Binding SelectedInstrument.Name}"
                                      FontStyle="Oblique"
                                      Classes="article2" />
                                 <Run Text="needs a" />
@@ -151,7 +151,23 @@
         </Style>
 
         <Style
-            Selector="TransitioningContentControl#EmptyTextCntrContentControl.bookmark-mode:not(.init):not(.no-tuning-sel)">
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.bookmark-mode:not(.init):not(.no-tuning-sel).no-bookmarks-sel">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Template>
+                        <TextBlock Classes="empty-label">
+                            <TextBlock.Inlines>
+                                <Run Text="No bookmark groups selected." />
+
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </Template>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style
+            Selector="TransitioningContentControl#EmptyTextCntrContentControl.bookmark-mode:not(.init):not(.no-tuning-sel):not(.no-bookmarks-sel)">
             <Setter Property="Content">
                 <Setter.Value>
                     <Template>
@@ -392,6 +408,7 @@
                                          Classes.init="{Binding !IsLoaded}"
                                          Classes.no-inst-sel="{Binding SelectedInstrument, Converter={x:Static ObjectConverters.IsNull}}"
                                          Classes.no-tuning-sel="{Binding SelectedTuning, Converter={x:Static ObjectConverters.IsNull}}"
+                                         Classes.no-bookmarks-sel="{Binding !SelectedTuning.IsAnyBookmarksSelected, TargetNullValue=False}"
                                          Classes.no-sel="{Binding IsDefaultSelection}"
                                          Classes.empty-inst="{Binding IsInstrumentsEmpty}"
                                          Classes.empty-tuning="{Binding IsTuningsEmpty}"

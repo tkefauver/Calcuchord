@@ -153,7 +153,7 @@
                             <avalonia:MaterialIcon Kind="{Binding Icon}" />
                             <TextBlock Classes="Headline5"
                                        VerticalAlignment="Center"
-                                       Text="{Binding Title}" />
+                                       Text="{Binding Name}" />
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -189,7 +189,7 @@
                             Height="{StaticResource SlotHeight}"
                             VerticalContentAlignment="Center"
                             HorizontalContentAlignment="Left"
-                            Padding="0,10">
+                            Padding="10">
             <DockPanel LastChildFill="False">
                 <Button DockPanel.Dock="Left"
                         Classes="float"

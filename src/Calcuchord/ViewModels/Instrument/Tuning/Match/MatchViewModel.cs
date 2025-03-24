@@ -115,17 +115,10 @@ namespace Calcuchord {
 
         #region Model
 
-        public bool IsBookmarked {
-            get => NotePattern.IsBookmarked;
-            set {
-                if(IsBookmarked != value) {
-                    NotePattern.IsBookmarked = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(BookmarkIcon));
-                }
-
-            }
-        }
+        public bool IsBookmarked =>
+            MainViewModel.Instance.SelectedTuning is not null &&
+            MainViewModel.Instance.SelectedTuning.AvailableBookmarkGroups.Any(
+                x => NotePattern.IsInBookmarkGroup(x.BookmarkGroup));
 
         public double Score { get; set; }
 
@@ -189,20 +182,6 @@ namespace Calcuchord {
         #endregion
 
         #region Commands
-
-        public ICommand ToggleBookmarkCommand => new MpCommand(
-            async () => {
-                IsBookmarked = !IsBookmarked;
-
-                await Task.Delay(1_000);
-                if(MainViewModel.Instance.SelectedDisplayMode == DisplayModeType.Bookmarks) {
-                    MainViewModel.Instance.UpdateMatchesAsync(MatchUpdateSource.BookmarkToggle)
-                        .FireAndForgetSafeAsync();
-                }
-
-                Prefs.Instance.Save();
-
-            });
 
         public ICommand ToggleMatchPlaybackCommand => new MpCommand(
             () => {

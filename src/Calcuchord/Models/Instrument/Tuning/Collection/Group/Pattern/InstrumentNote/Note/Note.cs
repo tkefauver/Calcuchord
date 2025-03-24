@@ -12,6 +12,8 @@ namespace Calcuchord {
 
         #region Constants
 
+        public const string ID_DELIMETER = "&_&";
+
         const int MAX_NOTE_TYPE = 12;
         public const int MAX_REGISTER = 8;
 

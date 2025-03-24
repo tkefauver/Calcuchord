@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:local="clr-namespace:Calcuchord"
+             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             x:DataType="local:BookmarkGroupViewModel"
+             x:Class="Calcuchord.BookmarkGroupItemView">
+    <UserControl.Styles>
+        <Style Selector="avalonia|MaterialIcon#AddNewIcon">
+            <Setter Property="IsVisible"
+                    Value="False" />
+        </Style>
+
+        <Style Selector="StackPanel.add-new avalonia|MaterialIcon#AddNewIcon">
+            <Setter Property="IsVisible"
+                    Value="True" />
+        </Style>
+
+        <Style Selector="StackPanel.add-new Border#GroupColorBorder">
+            <Setter Property="IsVisible"
+                    Value="False" />
+        </Style>
+    </UserControl.Styles>
+    <StackPanel x:Name="ContainerPanel"
+                Classes.add-new="{Binding IsAddGroupPlaceholder}"
+                Orientation="Horizontal"
+                Spacing="5">
+        <Border x:Name="GroupColorBorder"
+                CornerRadius="5"
+                Width="25"
+                Height="25"
+                Margin="3"
+                Background="{Binding HexColor, Converter={x:Static local:HexToBrushOrColorConverter.Instance}}" />
+        <avalonia:MaterialIcon x:Name="AddNewIcon"
+                               Foreground="ForestGreen"
+                               Kind="Add"
+                               Margin="3"
+                               Width="25"
+                               Height="25" />
+        <TextBlock VerticalAlignment="Center"
+                   Foreground="{DynamicResource Fg}"
+                   Text="{Binding GroupName}" />
+    </StackPanel>
+</UserControl>

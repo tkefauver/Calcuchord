@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using MonkeyPaste.Common.Avalonia;
@@ -83,8 +84,11 @@ namespace Calcuchord {
                 return;
             }
 
-            if(e.Key == Key.D && e.KeyModifiers.HasFlag(KeyModifiers.Control)) {
-                sel_mtvm.ToggleBookmarkCommand.Execute(null);
+            if(e.Key == Key.D &&
+               e.KeyModifiers.HasFlag(KeyModifiers.Control) &&
+               this.GetVisualDescendants<MatchView>().FirstOrDefault(x => x.DataContext == mvm.SelectedMatch) is
+                   { } sel_mtv) {
+                FlyoutBase.ShowAttachedFlyout(sel_mtv.BookmarkButton);
                 return;
             }
 

@@ -127,7 +127,7 @@
             <TextBlock Text="Name" />
             <TextBox FontSize="22"
                      Watermark="Enter name..."
-                     Text="{Binding Title, Mode=TwoWay}" />
+                     Text="{Binding Name, Mode=TwoWay}" />
         </UniformGrid>
         <Border Classes="sep" />
 

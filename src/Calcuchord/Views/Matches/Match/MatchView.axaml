@@ -121,6 +121,16 @@
                     Value="{Binding Score}" />
         </Style>
 
+        <Style Selector="Button#BookmarkButton avalonia|MaterialIcon">
+            <Setter Property="Kind"
+                    Value="BookmarkOutline" />
+        </Style>
+
+        <Style Selector="Border#MatchContainerBorder.bookmarked Button#BookmarkButton avalonia|MaterialIcon">
+            <Setter Property="Kind"
+                    Value="Bookmark" />
+        </Style>
+
     </UserControl.Styles>
 
     <Viewbox x:Name="MatchOuterViewbox">
@@ -232,8 +242,15 @@
                     </Button>
 
                     <!-- BOOKMARK BTN  -->
-                    <Button Command="{Binding ToggleBookmarkCommand}">
-                        <avalonia:MaterialIcon Kind="{Binding BookmarkIcon}" />
+                    <Button x:Name="BookmarkButton"
+                            local:CloseFlyoutExtension.IsEnabled="True">
+                        <Button.Flyout>
+                            <Flyout x:DataType="local:TuningViewModel"
+                                    Opened="BookmarkFlyout_OnOpened">
+                                <ContextMenu />
+                            </Flyout>
+                        </Button.Flyout>
+                        <avalonia:MaterialIcon />
                     </Button>
                 </UniformGrid>
 
@@ -248,7 +265,7 @@
                         VerticalAlignment="Top"
                         Classes="float">
                     <Button.Flyout>
-                        <Flyout Opening="PopupFlyoutBase_OnOpening"
+                        <Flyout Opening="TranslateFlyoutBase_OnOpening"
                                 Placement="AnchorAndGravity"
                                 PlacementAnchor="TopRight"
                                 PlacementGravity="BottomRight">

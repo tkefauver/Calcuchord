@@ -216,6 +216,17 @@
             <Setter Property="IsEnabled"
                     Value="False" />
         </Style>
+
+        <!-- BOOKMARKS-MODE -->
+        <Style Selector=":is(Control).groups">
+            <Setter Property="IsVisible"
+                    Value="False" />
+        </Style>
+
+        <Style Selector="StackPanel.bookmark-mode :is(Control).groups">
+            <Setter Property="IsVisible"
+                    Value="True" />
+        </Style>
     </UserControl.Styles>
     <controls:ColorZone Mode="Accent"
                         Foreground="{DynamicResource Fg}">
@@ -266,7 +277,7 @@
                         Grid.RowSpan="2">
                 <TextBlock FontSize="32"
                            TextAlignment="Center"
-                           Text="{Binding Title}" />
+                           Text="{Binding Name}" />
                 <TextBlock FontSize="18"
                            TextAlignment="Center"
                            Foreground="{DynamicResource Bg}"
@@ -280,6 +291,7 @@
                             Classes.chords="{Binding IsChordsSelected}"
                             Classes.has-key="{Binding SelectedKey, Converter={x:Static ObjectConverters.IsNotNull}}"
                             Classes.search-mode="{Binding IsSearchModeSelected}"
+                            Classes.bookmark-mode="{Binding IsBookmarkModeSelected}"
                             Classes.trans-mode="{Binding IsTranslateMode}"
                             Margin="10,0,10,10"
                             Spacing="10">
@@ -289,6 +301,53 @@
                                Text="Type" />
                     <controls:Card Classes="button-group pattern">
                         <ItemsControl ItemsSource="{Binding PatternOptions}" />
+                    </controls:Card>
+
+
+                    <!-- BOOKMARK GROUPS -->
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="5">
+
+                        <TextBlock Classes="header resettable groups"
+                                   PointerReleased="InputElement_OnPointerReleased"
+                                   Text="Groups" />
+                        <local:HintView>
+                            <ToolTip.Tip>
+                                <controls:ColorZone Classes="tt">
+                                    <TextBlock Text="Double tap to edit" />
+                                </controls:ColorZone>
+                            </ToolTip.Tip>
+                        </local:HintView>
+                    </StackPanel>
+                    <controls:Card Classes="button-group groups"
+                                   x:DataType="local:MainViewModel">
+                        <ScrollViewer DataContext="{Binding SelectedTuning}"
+                                      MaxHeight="300">
+                            <ListBox x:DataType="local:TuningViewModel"
+                                     SelectedItems="{Binding SelectedBookmarkGroups}"
+                                     SelectionMode="Toggle,Multiple"
+                                     ItemsSource="{Binding AvailableBookmarkGroups}">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="{Binding BookmarkColumnCount}" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="local:BookmarkGroupViewModel">
+                                        <Button Margin="0"
+                                                Padding="0"
+                                                Background="Transparent"
+                                                CornerRadius="0"
+                                                Tapped="InputElement_OnTapped"
+                                                DoubleTapped="InputElement_OnDoubleTapped">
+                                            <local:BookmarkGroupItemView Margin="0,5,5,5"
+                                                                         Width="85"
+                                                                         Cursor="Hand" />
+                                        </Button>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </ScrollViewer>
                     </controls:Card>
 
 
@@ -321,6 +380,7 @@
                             <ItemsControl ItemsSource="{Binding SuffixOptions}" />
                         </ScrollViewer>
                     </controls:Card>
+
 
                     <!-- SORT -->
                     <TextBlock Classes="header resettable"

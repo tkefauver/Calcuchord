@@ -17,7 +17,8 @@
             CornerRadius="10">
         <StackPanel MinWidth="200"
                     Spacing="10">
-            <TextBlock FontSize="16"
+            <TextBlock x:Name="Title"
+                       FontSize="16"
                        MaxWidth="150"
                        HorizontalAlignment="Center"
                        TextAlignment="Center"
@@ -27,13 +28,15 @@
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Center"
                         Spacing="50">
-                <Button Width="70"
+                <Button x:Name="NoButton"
+                        Width="70"
                         IsCancel="True"
                         HorizontalAlignment="Left"
                         Command="{Binding CancelCommand}">
                     No
                 </Button>
-                <Button Width="70"
+                <Button x:Name="YesButton"
+                        Width="70"
                         IsDefault="True"
                         HorizontalAlignment="Right"
                         Command="{Binding OkCommand}">
