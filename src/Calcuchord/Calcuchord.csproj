@@ -69,4 +69,28 @@
             <SubType>Code</SubType>
         </Compile>
     </ItemGroup>
+
+
+    <ItemGroup>
+        <UpToDateCheckInput Remove="Views\Matches\Match\MatchView.axaml"/>
+        <UpToDateCheckInput Remove="Views\Matches\Match\Patterns\ChordView.axaml"/>
+        <UpToDateCheckInput Remove="Views\Matches\MatchesView.axaml"/>
+        <UpToDateCheckInput Remove="Views\Instrument\Fretboard\Fret\FretView.axaml"/>
+        <UpToDateCheckInput Remove="Views\Instrument\Fretboard\FretboardView.axaml"/>
+        <UpToDateCheckInput Remove="Views\Instrument\InstrumentView.axaml"/>
+        <UpToDateCheckInput Remove="Views\Instrument\Keyboard\Key\KeyView.axaml"/>
+        <UpToDateCheckInput Remove="Views\Instrument\Keyboard\KeyboardView.axaml"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <AdditionalFiles Include="Views\Content\Instrument\Fretboard\FretboardView.axaml"/>
+        <AdditionalFiles Include="Views\Content\Instrument\Fretboard\Fret\FretView.axaml"/>
+        <AdditionalFiles Include="Views\Content\Instrument\InstrumentView.axaml"/>
+        <AdditionalFiles Include="Views\Content\Instrument\Keyboard\KeyboardView.axaml"/>
+        <AdditionalFiles Include="Views\Content\Instrument\Keyboard\Key\KeyView.axaml"/>
+        <AdditionalFiles Include="Views\Content\Matches\MatchesView.axaml"/>
+        <AdditionalFiles Include="Views\Content\Matches\Match\MatchView.axaml"/>
+        <AdditionalFiles Include="Views\Content\Matches\Match\Patterns\ChordView.axaml"/>
+    </ItemGroup>
 </Project>

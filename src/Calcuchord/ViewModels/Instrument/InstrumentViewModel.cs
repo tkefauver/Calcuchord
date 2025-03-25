@@ -238,7 +238,6 @@ namespace Calcuchord {
             Tunings.Clear();
             Tunings.AddRange(await Task.WhenAll(Instrument.Tunings.Select(x => CreateTuningViewModelAsync(x))));
             Instrument.RefreshModelTree();
-            Validate();
         }
 
         public override string ToString() {
@@ -267,9 +266,6 @@ namespace Calcuchord {
 
         void InstrumentViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
             switch(e.PropertyName) {
-                case nameof(Name):
-                    Validate();
-                    break;
                 case nameof(IsEditModeEnabled):
                     if(IsEditModeEnabled) {
                         UpdateEditorSelectionToType();
@@ -356,20 +352,6 @@ namespace Calcuchord {
             TuningViewModel tvm = new TuningViewModel(this);
             await tvm.InitAsync(tuning);
             return tvm;
-        }
-
-        public bool Validate() {
-            if(MainViewModel.Instance is not { } mvm ||
-               mvm.Instruments is not { } all_inst_vml ||
-               // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-               all_inst_vml.Where(x => x != this).All(x => x.Name != Name)) {
-                InvalidText = string.Empty;
-            } else {
-                InvalidText = "Instrument name must be unique.";
-            }
-
-            OnPropertyChanged(nameof(IsValid));
-            return IsValid;
         }
 
         async Task ChangeInstrumentTypeAsync() {

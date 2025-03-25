@@ -143,17 +143,20 @@
             </TransitioningContentControl.PageTransition>
             <TransitioningContentControl.DataTemplates>
                 <local:InstrumentTemplateSelector>
-                    <DataTemplate x:Key="KeyboardTemplate">
+                    <DataTemplate x:Key="KeyboardTemplate"
+                                  x:DataType="local:MainViewModel">
                         <local:KeyboardView
-                            DataContext="{Binding $parent[TransitioningContentControl].((local:InstrumentViewModel)DataContext).SelectedTuning, FallbackValue={x:Null}}" />
+                            DataContext="{Binding SelectedTuning, Source={x:Static local:MainViewModel.Instance}}" />
                     </DataTemplate>
-                    <DataTemplate x:Key="FretboardTemplate">
+                    <DataTemplate x:Key="FretboardTemplate"
+                                  x:DataType="local:MainViewModel">
                         <local:FretboardView
-                            DataContext="{Binding $parent[TransitioningContentControl].((local:InstrumentViewModel)DataContext).SelectedTuning, FallbackValue={x:Null}}" />
+                            DataContext="{Binding SelectedTuning, Source={x:Static local:MainViewModel.Instance}}" />
                     </DataTemplate>
-                    <DataTemplate x:Key="TranslateTemplate">
+                    <DataTemplate x:Key="TranslateTemplate"
+                                  x:DataType="local:MainViewModel">
                         <Grid Height="200"
-                              DataContext="{Binding $parent[local:MainView].((local:MainViewModel)DataContext).TranslateSourceMatchViewModel, FallbackValue={x:Null}}">
+                              DataContext="{Binding TranslateSourceMatchViewModel, Source={x:Static local:MainViewModel.Instance}}">
                             <local:MatchView HorizontalAlignment="Center"
                                              VerticalAlignment="Center" />
                         </Grid>

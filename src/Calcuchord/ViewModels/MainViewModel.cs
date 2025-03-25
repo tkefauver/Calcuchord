@@ -344,6 +344,9 @@ namespace Calcuchord {
 
         #region Options
 
+        public bool IsAnyBookmarksSelected =>
+            SelectedTuning != null && SelectedTuning.SelectedBookmarkGroups.Any();
+
         public bool IsInEditInstrumentMode =>
             SelectedInstrument != null &&
             SelectedInstrument == EditModeInstrument;
@@ -650,7 +653,7 @@ namespace Calcuchord {
                     OnPropertyChanged(nameof(IsScalesSelected));
                     OnPropertyChanged(nameof(IsModesSelected));
                     if(SelectedTuning is { } stvm) {
-                        stvm.RaisePropertyChanged(nameof(stvm.AvailableBookmarkGroups));
+                        stvm.UpdateAvailableSortOrder(true);
                     }
 
                     break;
@@ -1173,30 +1176,6 @@ namespace Calcuchord {
                 PlatformWrapper.Services.Logger.WriteLine("Options reset");
                 return false;
             }
-
-            void UniquifyInstrumentNames() {
-                Instruments.ForEach(x => x.Validate());
-
-                var invalid_ivm_groups = Instruments.Where(x => !x.IsValid).ToList().GroupBy(x => x.Name);
-                if(invalid_ivm_groups.None()) {
-                    return;
-                }
-
-                foreach(var invalid_ivm_group in invalid_ivm_groups) {
-                    // make last dup named 
-                    foreach(InstrumentViewModel invalid_ivm in invalid_ivm_group) {
-                        if(invalid_ivm_group.All(x => x.IsValid)) {
-                            // all done
-                            break;
-                        }
-
-                        invalid_ivm.Name = GetUniqueInstrumentName(invalid_ivm.Name,[]);
-                    }
-                }
-            }
-
-            UniquifyInstrumentNames();
-            UniquifyInstrumentNames();
 
 
             return true;

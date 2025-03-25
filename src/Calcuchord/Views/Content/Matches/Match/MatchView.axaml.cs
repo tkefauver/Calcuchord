@@ -30,7 +30,6 @@ namespace Calcuchord {
         }
 
         void TranslateFlyoutBase_OnOpening(object sender,EventArgs e) {
-
             if(MainViewModel.Instance is not { } mvm ||
                sender is not Flyout flyout ||
                flyout.Content is not Control c ||
@@ -49,7 +48,7 @@ namespace Calcuchord {
                 Header = "Translate",
                 Icon = new MaterialIcon
                 {
-                    Kind = MaterialIconKind.Translate,
+                    Kind = MaterialIconKind.MusicClefTreble,
                 },
             };
             foreach(InstrumentViewModel inst in mvm.Instruments) {
@@ -134,7 +133,7 @@ namespace Calcuchord {
                                 IsVisible = mtvm.NotePattern.IsInBookmarkGroup(avail_bmvm.BookmarkGroup),
                             },
                         },
-                    Command = avail_bmvm.IsAddGroupPlaceholder ? avail_bmvm.DoubleTapCommand :
+                    Command = avail_bmvm.IsAddGroupPlaceholder ? avail_bmvm.BeginEditCommand :
                         avail_bmvm.TogglePatternCommand,
                     CommandParameter = mtvm.NotePattern,
                 };

@@ -15,6 +15,10 @@ using Svg.Skia;
 
 namespace Calcuchord {
     public static class Extensions {
+        public static double Distance(this Point p1,Point p2) {
+            return Math.Sqrt(Math.Pow(p2.X - p1.X,2) + Math.Pow(p2.Y - p1.Y,2));
+        }
+
         public static Point GetChildScale(this Viewbox vb) {
             if(vb.Child is not { } c) {
                 return new Point(1,1);

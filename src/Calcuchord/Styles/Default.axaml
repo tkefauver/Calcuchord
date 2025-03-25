@@ -54,7 +54,23 @@
     <!--             Value="Manual" /> -->
     <!-- </Style> -->
 
+    <!-- CONTROLS -->
+
+    <Style Selector=":is(Control).hide">
+        <Setter Property="Opacity"
+                Value="0" />
+        <Setter Property="IsHitTestVisible"
+                Value="False" />
+    </Style>
+    <Style Selector=":is(Decorator).hide">
+        <Setter Property="Opacity"
+                Value="0" />
+        <Setter Property="IsHitTestVisible"
+                Value="False" />
+    </Style>
+
     <!-- TOOLTIPS -->
+
     <Style Selector=":is(ToolTip)">
         <Setter Property="Background"
                 Value="Transparent" />
@@ -89,6 +105,7 @@
     </Style>
 
     <!-- FONTS -->
+
     <Style Selector=":is(TextBlock)">
         <Setter Property="FontFamily"
                 Value="{StaticResource GaramondFont}" />
@@ -110,10 +127,6 @@
         <Setter Property="FontFamily"
                 Value="{StaticResource GaramondFont}" />
     </Style>
-    <Style Selector="TextBox /template/ Panel#PART_TextFieldPanel">
-        <Setter Property="MinHeight"
-                Value="0" />
-    </Style>
 
     <!-- ICONS -->
     <Style Selector="avalonia|MaterialIcon">
@@ -124,6 +137,11 @@
     </Style>
 
     <!-- TEXT -->
+
+    <Style Selector="TextBox /template/ Panel#PART_TextFieldPanel">
+        <Setter Property="MinHeight"
+                Value="0" />
+    </Style>
 
     <Style Selector="SelectableTextBlock">
         <Setter Property="SelectionBrush">
@@ -153,6 +171,12 @@
     </Style>
 
     <!-- BUTTONS -->
+
+    <!-- <Style Selector="Button :is(Control)"> -->
+    <!--     ~1~ hold fix from https://github.com/AvaloniaUI/Avalonia/issues/17208 @1@ -->
+    <!--     <Setter Property="(Gestures.IsHoldWithMouseEnabled)" -->
+    <!--             Value="{Binding $parent[Button].(Gestures.IsHoldWithMouseEnabled)}" /> -->
+    <!-- </Style> -->
 
     <Style Selector="Button.float">
         <Setter Property="Theme"

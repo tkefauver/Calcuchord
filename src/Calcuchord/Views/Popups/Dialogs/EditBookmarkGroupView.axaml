@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              d:DesignWidth="800"
-             d:DesignHeight="450"
+             d:DesignHeight="400"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
@@ -27,9 +27,23 @@
             <Setter Property="Command"
                     Value="{Binding ChangeColorCommand}" />
         </Style>
+        <Style Selector="Button.float-text"
+               x:DataType="local:BookmarkGroupViewModel">
+            <Setter Property="ClipToBounds"
+                    Value="False" />
+            <Setter Property="Width"
+                    Value="70" />
+            <Setter Property="Margin"
+                    Value="0,30,0,0" />
+            <Setter Property="Padding"
+                    Value="0" />
+        </Style>
+
         <Style Selector="TextBlock">
             <Setter Property="VerticalAlignment"
                     Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Stretch" />
             <Setter Property="TextAlignment"
                     Value="Center" />
         </Style>
@@ -38,94 +52,117 @@
                     Identifier="{Binding BookmarkGroupEditDialogHostName, Source={x:Static local:MainViewModel.Instance}}">
         <controls:ColorZone Classes="popup-cntr"
                             Width="300">
-            <StackPanel Spacing="10">
-                <!-- NAME -->
-                <UniformGrid Columns="2">
-                    <TextBlock Text="Name" />
-                    <TextBox Text="{Binding GroupName, Mode=TwoWay}" />
-                </UniformGrid>
+            <Grid RowDefinitions="20,60"
+                  ColumnDefinitions="0.3*,0.3*,0.3*">
 
                 <!-- COLOR -->
-                <UniformGrid Columns="2">
-                    <TextBlock Text="Color" />
-                    <Button x:Name="ColorButton"
-                            local:CloseFlyoutExtension.IsEnabled="True"
-                            HorizontalAlignment="Center"
-                            Padding="16"
-                            Background="{Binding HexColor, Converter={x:Static local:HexToBrushOrColorConverter.Instance}}"
-                            CornerRadius="5">
-                        <Button.Flyout>
-                            <Flyout>
-                                <controls:ColorZone CornerRadius="5"
-                                                    Padding="10">
-                                    <UniformGrid Columns="4">
-                                        <Button Classes="color-btn"
-                                                Click="Button_OnClick"
-                                                Background="{Binding BookmarkColors[0], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
-                                                CommandParameter="0" />
-                                        <Button Classes="color-btn"
-                                                Click="Button_OnClick"
-                                                Background="{Binding BookmarkColors[1], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
-                                                CommandParameter="1" />
-                                        <Button Classes="color-btn"
-                                                Click="Button_OnClick"
-                                                Background="{Binding BookmarkColors[2], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
-                                                CommandParameter="2" />
-                                        <Button Classes="color-btn"
-                                                Click="Button_OnClick"
-                                                Background="{Binding BookmarkColors[3], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
-                                                CommandParameter="3" />
-                                        <Button Classes="color-btn"
-                                                Click="Button_OnClick"
-                                                Background="{Binding BookmarkColors[4], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
-                                                CommandParameter="4" />
-                                        <Button Classes="color-btn"
-                                                Click="Button_OnClick"
-                                                Background="{Binding BookmarkColors[5], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
-                                                CommandParameter="5" />
-                                        <Button Classes="color-btn"
-                                                Click="Button_OnClick"
-                                                Background="{Binding BookmarkColors[6], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
-                                                CommandParameter="6" />
-                                        <Button Classes="color-btn"
-                                                Click="Button_OnClick"
-                                                Background="{Binding BookmarkColors[7], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
-                                                CommandParameter="7" />
-                                    </UniformGrid>
-                                </controls:ColorZone>
+                <Button x:Name="ColorButton"
+                        local:CloseFlyoutExtension.IsEnabled="True"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Margin="25,30,0,0"
+                        Width="35"
+                        Height="35"
+                        Background="{Binding HexColor, Converter={x:Static local:HexToBrushOrColorConverter.Instance}}"
+                        CornerRadius="5">
+                    <Button.Flyout>
+                        <Flyout>
+                            <controls:ColorZone CornerRadius="5"
+                                                Padding="10">
+                                <UniformGrid Columns="3">
+                                    <Button Classes="color-btn"
+                                            Click="Button_OnClick"
+                                            Background="{Binding BookmarkColors[0], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
+                                            CommandParameter="0" />
+                                    <Button Classes="color-btn"
+                                            Click="Button_OnClick"
+                                            Background="{Binding BookmarkColors[1], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
+                                            CommandParameter="1" />
+                                    <Button Classes="color-btn"
+                                            Click="Button_OnClick"
+                                            Background="{Binding BookmarkColors[2], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
+                                            CommandParameter="2" />
+                                    <Button Classes="color-btn"
+                                            Click="Button_OnClick"
+                                            Background="{Binding BookmarkColors[3], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
+                                            CommandParameter="3" />
+                                    <Button Classes="color-btn"
+                                            Click="Button_OnClick"
+                                            Background="{Binding BookmarkColors[4], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
+                                            CommandParameter="4" />
+                                    <Button Classes="color-btn"
+                                            Click="Button_OnClick"
+                                            Background="{Binding BookmarkColors[5], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
+                                            CommandParameter="5" />
+                                    <Button Classes="color-btn"
+                                            Click="Button_OnClick"
+                                            Background="{Binding BookmarkColors[6], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
+                                            CommandParameter="6" />
+                                    <Button Classes="color-btn"
+                                            Click="Button_OnClick"
+                                            Background="{Binding BookmarkColors[7], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
+                                            CommandParameter="7" />
+                                    <Button Classes="color-btn"
+                                            Click="Button_OnClick"
+                                            Background="{Binding BookmarkColors[8], Converter={x:Static local:HexToBrushOrColorConverter.Instance}, Source={x:Static local:ThemeViewModel.Instance}}"
+                                            CommandParameter="7" />
+                                </UniformGrid>
+                            </controls:ColorZone>
 
-                            </Flyout>
-                        </Button.Flyout>
-                    </Button>
-                </UniformGrid>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+                <!-- NAME -->
+                <TextBox Grid.Column="1"
+                         Grid.ColumnSpan="2"
+                         Height="30"
+                         FontSize="18"
+                         MaxLength="{Binding MaxNameLength}"
+                         Margin="10,0,10,0"
+                         TextAlignment="Left"
+                         Watermark="Group Name"
+                         HorizontalAlignment="Stretch"
+                         VerticalAlignment="Bottom"
+                         Text="{Binding GroupName, Mode=TwoWay}" />
 
-                <UniformGrid Columns="3"
-                             Margin="0,20,0,0">
-                    <Button Classes="float-text"
-                            HorizontalAlignment="Center"
-                            Background="Gold"
-                            Command="{Binding FinishEditCommand}"
-                            CommandParameter="CANCEL">
-                        <TextBlock Foreground="Black"
-                                   Text="Cancel" />
-                    </Button>
-                    <Button Classes="float-text"
-                            Opacity="{Binding IsDefault, ConverterParameter=0|1, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
-                            IsHitTestVisible="{Binding !IsDefault}"
-                            HorizontalAlignment="Center"
-                            Background="Red"
-                            Command="{Binding FinishEditCommand}"
-                            CommandParameter="DELETE">
-                        <TextBlock Text="Remove" />
-                    </Button>
-                    <Button Classes="float-text"
-                            HorizontalAlignment="Center"
-                            Command="{Binding FinishEditCommand}"
-                            CommandParameter="FINISH">
-                        <TextBlock Text="Ok" />
-                    </Button>
-                </UniformGrid>
-            </StackPanel>
+
+                <Button Grid.Row="1"
+                        Grid.Column="0"
+                        Classes="float-text"
+                        HorizontalAlignment="Center"
+                        Background="Gold"
+                        IsCancel="True"
+                        Command="{Binding FinishEditCommand}"
+                        CommandParameter="CANCEL">
+                    <TextBlock Foreground="Black"
+                               Text="Cancel" />
+                </Button>
+                <Button Grid.Row="1"
+                        Grid.Column="1"
+                        Classes="float-text"
+                        HorizontalAlignment="Center"
+                        Background="DarkRed"
+                        Command="{Binding FinishEditCommand}"
+                        CommandParameter="DELETE">
+                    <Classes.hide>
+                        <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                            <Binding Path="IsDefault" />
+                            <Binding Path="IsNew" />
+                        </MultiBinding>
+                    </Classes.hide>
+                    <TextBlock ClipToBounds="False"
+                               Text="Delete" />
+                </Button>
+                <Button Grid.Row="1"
+                        Grid.Column="2"
+                        Classes="float-text"
+                        HorizontalAlignment="Center"
+                        IsDefault="True"
+                        Command="{Binding FinishEditCommand}"
+                        CommandParameter="FINISH">
+                    <TextBlock Text="Ok" />
+                </Button>
+            </Grid>
         </controls:ColorZone>
     </dlg:DialogHost>
 </UserControl>

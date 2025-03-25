@@ -1,5 +1,4 @@
 using System;
-using MonkeyPaste.Common;
 using Newtonsoft.Json;
 
 namespace Calcuchord {
@@ -22,8 +21,7 @@ namespace Calcuchord {
             bookmarkGroup.Id = Guid.NewGuid().ToString();
             bookmarkGroup.TuningId = tuning.Id;
             bookmarkGroup.PatternType = pt;
-            bookmarkGroup.ColorId = colorId < 0 ? MpRandom.Rand.Next(ThemeViewModel.Instance.BookmarkColors.Length) :
-                colorId;
+            bookmarkGroup.ColorId = colorId < 0 ? 0 : colorId;
             bookmarkGroup.Name = name;
             bookmarkGroup.IsDefault = isDefault;
             return bookmarkGroup;
@@ -84,6 +82,16 @@ namespace Calcuchord {
 
         public bool IsTuningBookmark(Tuning tuning) {
             return TuningId == tuning.Id;
+        }
+
+        public BookmarkGroup Clone() {
+            BookmarkGroup clone = new BookmarkGroup();
+            clone.Id = Guid.NewGuid().ToString();
+            clone.TuningId = TuningId;
+            clone.PatternType = PatternType;
+            clone.ColorId = ColorId;
+            clone.Name = Name;
+            return clone;
         }
 
         #endregion

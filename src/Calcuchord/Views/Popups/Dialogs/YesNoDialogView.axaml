@@ -33,14 +33,14 @@
                         IsCancel="True"
                         HorizontalAlignment="Left"
                         Command="{Binding CancelCommand}">
-                    No
+                    <TextBlock Text="No" />
                 </Button>
                 <Button x:Name="YesButton"
                         Width="70"
                         IsDefault="True"
                         HorizontalAlignment="Right"
                         Command="{Binding OkCommand}">
-                    Yes
+                    <TextBlock Text="Yes" />
                 </Button>
             </StackPanel>
         </StackPanel>

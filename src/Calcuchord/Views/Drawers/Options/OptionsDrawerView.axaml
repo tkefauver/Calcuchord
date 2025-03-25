@@ -227,6 +227,30 @@
             <Setter Property="IsVisible"
                     Value="True" />
         </Style>
+        <Style Selector="local|BookmarkGroupItemView">
+            <Setter Property="Background"
+                    Value="Transparent" />
+        </Style>
+        <Style Selector="local|BookmarkGroupItemView.sel">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="{DynamicResource FgColor}"
+                                     Opacity="0.17" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style Selector="local|BookmarkGroupItemView.drag">
+            <Setter Property="BorderBrush"
+                    Value="Magenta" />
+        </Style>
+        <Style Selector="local|BookmarkGroupItemView.drag.drag-valid">
+            <Setter Property="BorderBrush"
+                    Value="Cyan" />
+        </Style>
+        <Style Selector="local|BookmarkGroupItemView.drag.drag-valid.drag-copy">
+            <Setter Property="BorderBrush"
+                    Value="Yellow" />
+        </Style>
     </UserControl.Styles>
     <controls:ColorZone Mode="Accent"
                         Foreground="{DynamicResource Fg}">
@@ -314,7 +338,7 @@
                         <local:HintView>
                             <ToolTip.Tip>
                                 <controls:ColorZone Classes="tt">
-                                    <TextBlock Text="Double tap to edit" />
+                                    <TextBlock Text="Long-press or double tap to edit" />
                                 </controls:ColorZone>
                             </ToolTip.Tip>
                         </local:HintView>
@@ -323,30 +347,44 @@
                                    x:DataType="local:MainViewModel">
                         <ScrollViewer DataContext="{Binding SelectedTuning}"
                                       MaxHeight="300">
-                            <ListBox x:DataType="local:TuningViewModel"
-                                     SelectedItems="{Binding SelectedBookmarkGroups}"
-                                     SelectionMode="Toggle,Multiple"
-                                     ItemsSource="{Binding AvailableBookmarkGroups}">
-                                <ListBox.ItemsPanel>
+                            <ItemsControl x:Name="BookmarkGroupsItemsControl"
+                                          x:DataType="local:TuningViewModel"
+                                          ItemsSource="{Binding AvailableBookmarkGroups}">
+                                <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <UniformGrid Columns="{Binding BookmarkColumnCount}" />
                                     </ItemsPanelTemplate>
-                                </ListBox.ItemsPanel>
-                                <ListBox.ItemTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="local:BookmarkGroupViewModel">
-                                        <Button Margin="0"
-                                                Padding="0"
-                                                Background="Transparent"
-                                                CornerRadius="0"
-                                                Tapped="InputElement_OnTapped"
-                                                DoubleTapped="InputElement_OnDoubleTapped">
-                                            <local:BookmarkGroupItemView Margin="0,5,5,5"
-                                                                         Width="85"
-                                                                         Cursor="Hand" />
-                                        </Button>
+                                        <ListBoxItem>
+
+                                            <Grid>
+                                                <local:BookmarkGroupItemView
+                                                    Loaded="BookmarkGroupContainerButton_OnLoaded"
+                                                    Classes.sel="{Binding IsSelected}"
+                                                    Classes.drag="{Binding IsDragging}"
+                                                    Classes.drag-valid="{Binding IsDragValid}"
+                                                    Classes.drag-copy="{Binding IsDragCopy}"
+                                                    Width="85"
+                                                    Cursor="Hand" />
+                                                <Border x:Name="DropLeftBorder"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Stretch"
+                                                        Width="1"
+                                                        Classes.hide="{Binding !IsDropOverLeft}"
+                                                        Background="{DynamicResource Fg}" />
+                                                <Border x:Name="DropRightBorder"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Stretch"
+                                                        Width="1"
+                                                        Classes.hide="{Binding !IsDropOverRight}"
+                                                        Background="{DynamicResource Fg}" />
+                                            </Grid>
+                                        </ListBoxItem>
                                     </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </ScrollViewer>
                     </controls:Card>
 

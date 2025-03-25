@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -51,9 +52,24 @@ namespace Calcuchord {
 
         #region State
 
+        public bool IsSelected =>
+            Parent.SelectedBookmarkGroups.Contains(this);
+
+        public bool IsDropOverLeft { get; set; }
+        public bool IsDropOverRight { get; set; }
+        public bool IsDragging { get; set; }
+        public bool IsDragValid { get; set; }
+        public bool IsDragCopy { get; set; }
+        public DateTime? LastPressDt { get; set; }
+
         public bool IsEditing { get; set; }
 
         public bool IsAddGroupPlaceholder => BookmarkGroup == null;
+
+        public bool IsNew =>
+            !Parent.BookmarkGroups.Contains(this);
+
+        public int MaxNameLength => 10;
 
         #endregion
 
@@ -63,7 +79,7 @@ namespace Calcuchord {
             get => BookmarkGroup == null ? int.MaxValue : BookmarkGroup.SortOrderIdx;
             set {
                 if(SortOrderIdx != value) {
-                    SortOrderIdx = value;
+                    BookmarkGroup.SortOrderIdx = value;
                     OnPropertyChanged();
                 }
             }
@@ -89,8 +105,8 @@ namespace Calcuchord {
         public string GroupName {
             get => BookmarkGroup == null ? "Add" : BookmarkGroup.Name;
             set {
-                if(GroupName != value && BookmarkGroup != null) {
-                    BookmarkGroup.Name = value;
+                if(value != null && GroupName != value && BookmarkGroup != null) {
+                    BookmarkGroup.Name = value.Substring(0,Math.Min(value.Length,MaxNameLength));
                     OnPropertyChanged();
                 }
             }
@@ -142,8 +158,10 @@ namespace Calcuchord {
                     // shouldn't happen
                 }
 
+
                 if(finish_type == "FINISH") {
                     if(!Parent.BookmarkGroups.Contains(this)) {
+                        SortOrderIdx = Parent.AvailableBookmarkGroups.Count - 2;
                         Parent.BookmarkGroups.Add(this);
                     }
 
@@ -151,6 +169,8 @@ namespace Calcuchord {
                         // only occurs for a new group
                         TogglePatternCommand.Execute(_patternToAdd);
                     }
+
+                    Parent.UpdateAvailableSortOrder(true);
 
                     Prefs.Instance.Save();
                 } else if(finish_type == "DELETE") {
@@ -176,18 +196,20 @@ namespace Calcuchord {
                     if(!confirmed.Value) {
                         _patternToAdd = null;
                         _preEditBookmarkGroupJson = null;
+                        IsEditing = false;
                         return;
                     }
 
                     Parent.BookmarkGroups.Remove(this);
                     Parent.SelectedBookmarkGroups.Remove(this);
+                    Parent.AvailableBookmarkGroups.Where(x => !x.IsAddGroupPlaceholder && x.SortOrderIdx > SortOrderIdx)
+                        .ForEach(x => x.SortOrderIdx--);
                     foreach(NotePattern assoc_pattern in Parent.Tuning.Collections.SelectMany(x => x.Value)
                                 .SelectMany(x => x.Patterns).Where(x => x.IsInBookmarkGroup(BookmarkGroup))) {
                         assoc_pattern.RemoveFromBookmarkGroup(BookmarkGroup);
                     }
 
-                    Parent.AvailableBookmarkGroups.ForEach(
-                        (x,idx) => x.SortOrderIdx = x.IsAddGroupPlaceholder ? int.MaxValue : idx);
+                    Parent.UpdateAvailableSortOrder(true);
 
                     Prefs.Instance.Save();
                 } else {
@@ -201,12 +223,10 @@ namespace Calcuchord {
                 _preEditBookmarkGroupJson = null;
                 IsEditing = false;
 
-
                 DialogHost.Close(MainViewModel.Instance.MainDialogHostName);
             });
 
-
-        public ICommand DoubleTapCommand => new MpCommand<object>(
+        public ICommand BeginEditCommand => new MpCommand<object>(
             (args) => {
                 BookmarkGroupViewModel to_edit_bmgvm = this;
                 if(IsAddGroupPlaceholder) {
@@ -217,8 +237,8 @@ namespace Calcuchord {
                     }
 
                     BookmarkGroup new_bmg = BookmarkGroup.Create(
-                        Parent.Tuning,MainViewModel.Instance.SelectedPatternType);
-                    new_bmg.SortOrderIdx = Parent.AvailableBookmarkGroups.Count() - 1;
+                        Parent.Tuning,MainViewModel.Instance.SelectedPatternType,
+                        colorId: Parent.GetNewBookmarkColorId());
                     to_edit_bmgvm = new BookmarkGroupViewModel(Parent,new_bmg);
                 }
 
