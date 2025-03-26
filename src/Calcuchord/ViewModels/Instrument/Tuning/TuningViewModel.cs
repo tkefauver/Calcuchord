@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -59,9 +60,9 @@ namespace Calcuchord {
 
         public ObservableCollection<BookmarkGroupViewModel> SelectedBookmarkGroups { get; set; } = [];
         public ObservableCollection<BookmarkGroupViewModel> BookmarkGroups { get; } = [];
+        public ObservableCollection<BookmarkGroupViewModel> BoundBookmarkGroups { get; private set; } = [];
 
-        public ObservableCollection<BookmarkGroupViewModel> AvailableBookmarkGroups { get; private set; } = [];
-
+        public IReadOnlyList<BookmarkGroupViewModel> AvailableBookmarkGroups { get; private set; } = [];
 
         public BookmarkGroupViewModel DefaultBookmarkGroup =>
             AvailableBookmarkGroups.FirstOrDefault(x => x.IsDefault);
@@ -102,9 +103,9 @@ namespace Calcuchord {
         #region Layout
 
         public int BookmarkColumnCount =>
-            AvailableBookmarkGroups.Count <= 2 ?
+            BoundBookmarkGroups.Count <= 2 ?
                 1 :
-                AvailableBookmarkGroups.Count <= 3 ?
+                BoundBookmarkGroups.Count <= 3 ?
                     2 : 3;
 
         #endregion
@@ -269,7 +270,7 @@ namespace Calcuchord {
                     // add legacy bookmarks to default groups
                     foreach(NotePattern lb in legacy_bookmarks) {
                         if(BookmarkGroups.FirstOrDefault(x => x.PatternType == lb.PatternType) is { } def_pt_bmgvm) {
-                            def_pt_bmgvm.TogglePatternCommand.Execute(lb);
+                            def_pt_bmgvm.ToggleLinkedWithPatternCommand.Execute(lb);
                         }
                     }
 
@@ -358,23 +359,24 @@ namespace Calcuchord {
 
         public void UpdateAvailableSortOrder(bool byModel) {
             if(byModel) {
-                AvailableBookmarkGroups = new ObservableCollection<BookmarkGroupViewModel>(
+                BoundBookmarkGroups = new ObservableCollection<BookmarkGroupViewModel>(
                     BookmarkGroups
                         .Where(x => x.PatternType == MainViewModel.Instance.SelectedPatternType)
                         .OrderBy(x => x.SortOrderIdx));
-                return;
+            } else {
+                BoundBookmarkGroups.ForEach(
+                    (x,idx) => x.SortOrderIdx = x.IsAddGroupPlaceholder ? int.MaxValue : idx);
+                OnPropertyChanged(nameof(BoundBookmarkGroups));
             }
 
-            AvailableBookmarkGroups.ForEach(
-                (x,idx) => x.SortOrderIdx = x.IsAddGroupPlaceholder ? int.MaxValue : idx);
-            OnPropertyChanged(nameof(AvailableBookmarkGroups));
+            AvailableBookmarkGroups = BoundBookmarkGroups.SkipLast(1).ToList();
         }
 
         public int GetNewBookmarkColorId() {
             return Enumerable.Range(0,ThemeViewModel.Instance.BookmarkColors.Length)
                 .Select(
                     x =>
-                        (x,AvailableBookmarkGroups.Count(y => y.BookmarkGroup != null && y.BookmarkGroup.ColorId == x)))
+                        (x,AvailableBookmarkGroups.Count(y => y.BookmarkGroup.ColorId == x)))
                 .OrderBy(x => x.Item2)
                 .Select(x => x.Item1)
                 .FirstOrDefault();
@@ -491,29 +493,9 @@ namespace Calcuchord {
         }
 
         void SelectedBookmarkGroups_CollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
-            if(SelectedBookmarkGroups.Contains(AddNewPlaceholderGroup)) {
-                AddNewPlaceholderGroup.BeginEditCommand.Execute("SELECTED");
-            }
+            Debug.Assert(
+                SelectedBookmarkGroups.None(x => x.IsAddGroupPlaceholder),"Placeholder group shouldn't be selected");
 
-            Dispatcher.UIThread.Post(
-                async () => {
-                    // prevent collection modified exception
-                    await Task.Delay(100);
-                    SelectedBookmarkGroups.Remove(AddNewPlaceholderGroup);
-
-                    AvailableBookmarkGroups.ForEach(x => x.RaisePropertyChanged(nameof(x.IsSelected)));
-
-                    MainViewModel.Instance.RaisePropertyChanged(nameof(MainViewModel.Instance.IsAnyBookmarksSelected));
-
-                    if(BookmarkGroups.Any(x => x.IsEditing)) {
-                        return;
-                    }
-
-                    if(MainViewModel.Instance.IsBookmarkModeSelected) {
-                        MainViewModel.Instance.UpdateMatchesAsync(MatchUpdateSource.BookmarkToggle)
-                            .FireAndForgetSafeAsync(DispatcherPriority.Background);
-                    }
-                });
         }
 
         async Task AdjustCapoAsync(int capoDelta) {
@@ -697,6 +679,17 @@ namespace Calcuchord {
         public ICommand CancelPatternGenCommand => new MpCommand(
             () => {
                 PatternGenCts?.Cancel();
+            });
+
+
+        public ICommand AddNewBookmarkGroupCommand => new MpCommand<object>(
+            (args) => {
+                BookmarkGroup new_bmg = BookmarkGroup.Create(
+                    Tuning,MainViewModel.Instance.SelectedPatternType,
+                    colorId: GetNewBookmarkColorId());
+                BookmarkGroupViewModel new_bmg_vm = new BookmarkGroupViewModel(this,new_bmg);
+                // NOTE args may be a note pattern when from match menu
+                new_bmg_vm.BeginEditCommand.Execute(args);
             });
 
         #endregion

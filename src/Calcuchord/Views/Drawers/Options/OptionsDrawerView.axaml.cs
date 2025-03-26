@@ -7,9 +7,9 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Material.Ripple;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Avalonia;
-using Org.BouncyCastle.Crypto.Operators;
 using PropertyChanged;
 
 namespace Calcuchord {
@@ -83,10 +83,11 @@ namespace Calcuchord {
                 return;
             }
 
+            DateTime? last_press_dt = null;
             string BOOKMARK_DND_ID = "bookmarkGroupItemView";
-            DragDropEffects? result = null;
-            FakeDragEventArgs fake_e = null;
-            bool is_mobile = ThemeViewModel.Instance.IsMobile;
+            double MIN_DRAG_DIST = 10;
+            TimeSpan DOUBLE_TAP_SPAN = TimeSpan.FromMilliseconds(500);
+            TimeSpan HOLD_SPAN = DOUBLE_TAP_SPAN * 2;
 
             DragDrop.SetAllowDrop(anchorControl,true);
 
@@ -106,239 +107,201 @@ namespace Calcuchord {
                 anchorControl.RemoveHandler(DragDrop.DropEvent,Anchor_Drop);
             }
 
-            async void Anchor_PointerPressed(object sender,PointerPressedEventArgs e) {
-                //e.Handled = true;
-                result = null;
+            async void Anchor_PointerPressed(object sender_press,PointerPressedEventArgs e_press) {
+                e_press.Pointer.Capture(anchorControl);
+
+                bool can_drag = anchor_bmgvm.CanDrag && e_press.Pointer.Type == PointerType.Mouse;
+                bool can_edit = anchor_bmgvm.CanEdit;
+
+                bool is_ready_to_handle_release = true;
+                bool handle_release = true;
 
                 DateTime press_dt = DateTime.Now;
-                bool is_dbl_tap =
-                    anchor_bmgvm.LastPressDt.HasValue &&
-                    press_dt - anchor_bmgvm.LastPressDt.Value <= TimeSpan.FromMilliseconds(500);
-                anchor_bmgvm.LastPressDt = press_dt;
-                bool was_selected = anchor_bmgvm.IsSelected;
 
-                bool was_released = false;
+                bool is_dbl_tap_press =
+                    last_press_dt.HasValue &&
+                    press_dt - last_press_dt.Value <= TimeSpan.FromMilliseconds(500);
+                last_press_dt = press_dt;
 
-                anchorControl.PointerReleased += AnchorControlOnPointerReleased;
+                bool is_still_down = true;
+                Point down_loc = e_press.GetPosition(anchorControl);
+                double drag_dist = 0;
 
-                void AnchorControlOnPointerReleased(object o,PointerReleasedEventArgs pointerReleasedEventArgs) {
-                    was_released = true;
+                anchorControl.PointerReleased += AnchorControl_PointerReleased;
+                anchorControl.PointerMoved += AnchorControl_PointerMoved;
+
+                void AnchorControl_PointerMoved(object sender_move,PointerEventArgs e_move) {
+                    drag_dist = down_loc.Distance(e_move.GetPosition(anchorControl));
+                }
+
+                async void AnchorControl_PointerReleased(object sender_release,PointerReleasedEventArgs e_release) {
+                    e_press.Pointer.Capture(null);
+                    if(anchorControl.GetVisualDescendant<RippleEffect>() is { } re) {
+                        // BUG Ripple not being notified of losing pointer capture and freezes up
+                        
+                        re.GetPrivateMethod("PointerReleasedHandler").Invoke(re, [sender_release,e_release]);
+                    }
+                    is_still_down = false;
                     anchor_bmgvm.IsDragging = false;
                     anchor_bmgvm.IsDragCopy = false;
-                    anchorControl.PointerReleased -= AnchorControlOnPointerReleased;
-                    if(fake_e != null) {
-                        fake_e.RealE = pointerReleasedEventArgs;
-                        HandleDrop(o,fake_e);
-                        result = fake_e.DragEffects;
-                    }
-                }
+                    anchorControl.PointerReleased -= AnchorControl_PointerReleased;
+                    anchorControl.PointerMoved -= AnchorControl_PointerMoved;
 
-                if(is_dbl_tap) {
-                    anchor_bmgvm.BeginEditCommand.Execute(null);
-                    return;
-                }
-
-                await Task.Delay(500);
-                if(anchor_bmgvm.LastPressDt != press_dt) {
-                    // dbl tap, ignore
-                    return;
-                }
-
-
-                if(!was_released) {
-                    if(is_mobile) {
-                        fake_e = new FakeDragEventArgs() { RealE = e };
-                        fake_e.Data.Set(BOOKMARK_DND_ID,anchor_bmgvm);
-                        
-                        this.BookmarkGroupsItemsControl.AddHandler(PointerMovedEvent,BookmarkItemsControl_PointerMoved,RoutingStrategies.Tunnel,true);
-                        this.BookmarkGroupsItemsControl.AddHandler(PointerReleasedEvent,BookmarkGroupsItemsControlOnPointerReleased,RoutingStrategies.Tunnel,true);
-                       
-
-                        void BookmarkGroupsItemsControlOnPointerReleased(object o,PointerReleasedEventArgs pointerReleasedEventArgs) {
-                            fake_e.RealE = pointerReleasedEventArgs;
-                            if(tvm.AvailableBookmarkGroups.None(x => x.IsDragging) ||
-                               this.BookmarkGroupsItemsControl.GetVisualDescendants<BookmarkGroupItemView>() is not {} bkivl ||
-                               bkivl.FirstOrDefault(x=>x.Bounds.Contains(e.GetPosition(x))) is not {} over_bkv ||
-                               over_bkv.DataContext is not {} over_bkvm) {
-                                return;
-                            }
-
-                            tvm.AvailableBookmarkGroups.Where(x => x != over_bkvm).ForEach(
-                                x => {
-                                    x.IsDropOverLeft = false;
-                                    x.IsDropOverRight = false;
-                                });
-                            HandleDrop(over_bkvm,fake_e);
-                            result = fake_e.DragEffects;
-                            
-                            
-                            this.BookmarkGroupsItemsControl.PointerMoved -= BookmarkItemsControl_PointerMoved;
-                            this.BookmarkGroupsItemsControl.PointerReleased -= BookmarkGroupsItemsControlOnPointerReleased;
-                        }
-
-                        void BookmarkItemsControl_PointerMoved(object sender3,PointerEventArgs e3) {
-                            fake_e.RealE = e3;
-                            if(tvm.AvailableBookmarkGroups.None(x => x.IsDragging) ||
-                               this.BookmarkGroupsItemsControl.GetVisualDescendants<BookmarkGroupItemView>() is not {} bkivl ||
-                               bkivl.FirstOrDefault(x=>x.Bounds.Contains(e.GetPosition(x))) is not {} over_bkv ||
-                               over_bkv.DataContext is not {} over_bkvm) {
-                                return;
-                            }
-
-                            tvm.AvailableBookmarkGroups.Where(x => x != over_bkvm).ForEach(
-                                x => {
-                                    x.IsDropOverLeft = false;
-                                    x.IsDropOverRight = false;
-                                });
-                            HandleOver(over_bkvm,fake_e);
+                    bool is_over_anchor = anchorControl.Bounds.Contains(e_release.GetPosition(anchorControl));
+                    Stopwatch sw = Stopwatch.StartNew();
+                    // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
+                    while(!is_ready_to_handle_release) {
+                        await Task.Delay(10);
+                        if(sw.Elapsed >= TimeSpan.FromSeconds(30)) {
+                            // timeout (who knows what could happen)
+                            break;
                         }
                     }
 
-                    DataObject drag_data = new DataObject();
-                    drag_data.Set(BOOKMARK_DND_ID,anchor_bmgvm);
+                    if(handle_release &&
+                       is_over_anchor) {
+                        // only handle release when over anchor and not part of a gesture
+                        anchor_bmgvm.ToggleSelectedCommand.Execute(null);
+                    }
 
-                    anchor_bmgvm.IsDragging = true;
-                    result = await DragDrop.DoDragDrop(e,drag_data,DragDropEffects.Move | DragDropEffects.Copy);
-                    if(is_mobile) {
-                        while(result == null) {
-                            await Task.Delay(100);
-                        }
+                }
+
+                if(can_edit) {
+                    if(is_dbl_tap_press) {
+                        handle_release = false;
+                        anchor_bmgvm.BeginEditCommand.Execute(null);
+                        return;
+                    }
+
+                    is_ready_to_handle_release = false;
+                    await Task.Delay(DOUBLE_TAP_SPAN);
+                    if(last_press_dt != press_dt) {
+                        // new press occured ie dbl tap, ignore
+                        handle_release = false;
+                        is_ready_to_handle_release = true;
+                        return;
                     }
                 }
 
-                bool will_select = !was_selected;
-                if(anchor_bmgvm.IsEditing || (result.HasValue && result != DragDropEffects.None)) {
-                    will_select = was_selected;
-                }
+                if(is_still_down) {
+                    // check for hold
+                    is_ready_to_handle_release = false;
+                    bool is_hold = false;
+                    while(true) {
+                        if(!is_still_down) {
+                            break;
+                        }
 
-                if(will_select) {
-                    if(!anchor_bmgvm.Parent.SelectedBookmarkGroups.Contains(anchor_bmgvm)) {
-                        anchor_bmgvm.Parent.SelectedBookmarkGroups.Add(anchor_bmgvm);
+                        if(drag_dist >= MIN_DRAG_DIST) {
+                            break;
+                        }
+
+                        if(DateTime.Now - press_dt >= HOLD_SPAN) {
+                            is_hold = true;
+                            break;
+                        }
+
+                        await Task.Delay(5);
+                    }
+
+                    if(is_hold) {
+                        handle_release = false;
+                        is_ready_to_handle_release = true;
+                        anchor_bmgvm.BeginEditCommand.Execute(null);
+                        return;
+                    }
+
+                    is_ready_to_handle_release = true;
+
+                    if(can_drag && is_still_down) {
+                        DataObject drag_data = new DataObject();
+                        drag_data.Set(BOOKMARK_DND_ID,anchor_bmgvm);
+
+                        anchor_bmgvm.IsDragging = true;
+                        DragDropEffects result = await DragDrop.DoDragDrop(
+                            e_press,drag_data,DragDropEffects.Move | DragDropEffects.Copy);
+                        handle_release = result == DragDropEffects.None;
                     }
                 } else {
-                    anchor_bmgvm.Parent.SelectedBookmarkGroups.Remove(anchor_bmgvm);
+                    is_ready_to_handle_release = true;
                 }
             }
 
-
-            void HandleLeave(object sender,object args) {
-                dynamic e = args as DragEventArgs;
-                if(e == null) {
-                    e = args as FakeDragEventArgs;
-                }
-
-                if(sender is not Control c ||
-                   c.DataContext is not BookmarkGroupViewModel bmgvm) {
-                    return;
-                }
-
-                bmgvm.IsDropOverLeft = false;
-                bmgvm.IsDropOverRight = false;
-                PlatformWrapper.Services.Logger.WriteLine($"Drag Leave: '{bmgvm.GroupName}'");
+            void Anchor_DragLeave(object sender_leave,DragEventArgs e_leave) {
+                anchor_bmgvm.IsDropOverLeft = false;
+                anchor_bmgvm.IsDropOverRight = false;
+                PlatformWrapper.Services.Logger.WriteLine($"Drag Leave: '{anchor_bmgvm.GroupName}'");
             }
 
-
-            void HandleOver(object sender,object args) {
-                BookmarkGroupViewModel bmgvm = null;
-                BookmarkGroupViewModel drop_bmgvm = null;
-                dynamic e = args as DragEventArgs;
-
-                if(e == null) {
-                    e = args as FakeDragEventArgs;
-                    drop_bmgvm = anchor_bmgvm;
-                    bmgvm = sender as BookmarkGroupViewModel;//tvm.AvailableBookmarkGroups.FirstOrDefault(x => x.IsDropOverLeft || x.IsDropOverRight);
-
-                } else {
-                    drop_bmgvm = e.Data.Get(BOOKMARK_DND_ID);
-                    if(sender is Control c) {
-                        bmgvm = c.DataContext as BookmarkGroupViewModel;
-                    }
-                }
-
-                if(bmgvm == null ||
-                   drop_bmgvm == null) {
+            void Anchor_DragOver(object sender_over,DragEventArgs e_over) {
+                if(e_over.Data.Get(BOOKMARK_DND_ID) is not BookmarkGroupViewModel drop_bmgvm) {
                     return;
                 }
 
-                if(drop_bmgvm == bmgvm) {
-                    e.DragEffects = DragDropEffects.None;
+                if(drop_bmgvm == anchor_bmgvm) {
+                    e_over.DragEffects = DragDropEffects.None;
                     return;
                 }
 
-                drop_bmgvm.IsDragCopy = e.KeyModifiers.HasFlag(KeyModifiers.Control) ||
-                                        e.KeyModifiers.HasFlag(KeyModifiers.Alt) ||
-                                        e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+                drop_bmgvm.IsDragCopy = e_over.KeyModifiers.HasFlag(KeyModifiers.Control) ||
+                                        e_over.KeyModifiers.HasFlag(KeyModifiers.Alt) ||
+                                        e_over.KeyModifiers.HasFlag(KeyModifiers.Shift);
 
-                if(bmgvm.IsAddGroupPlaceholder ||
-                   (!drop_bmgvm.IsDragCopy && drop_bmgvm == bmgvm)) {
-                    e.DragEffects = DragDropEffects.None;
+                if(anchor_bmgvm.IsAddGroupPlaceholder ||
+                   (!drop_bmgvm.IsDragCopy && drop_bmgvm == anchor_bmgvm)) {
+                    e_over.DragEffects = DragDropEffects.None;
                     drop_bmgvm.IsDragValid = false;
                     PlatformWrapper.Services.Logger.WriteLine("Drag Invalid");
                     return;
                 }
 
                 drop_bmgvm.IsDragValid = true;
-                bmgvm.IsDropOverLeft = e.GetPosition(this).X / Bounds.Width <= 0.5;
-                bmgvm.IsDropOverRight = !bmgvm.IsDropOverLeft;
+                anchor_bmgvm.IsDropOverLeft = e_over.GetPosition(anchorControl).X / anchorControl.Bounds.Width <= 0.5;
+                anchor_bmgvm.IsDropOverRight = !anchor_bmgvm.IsDropOverLeft;
 
                 if(drop_bmgvm.IsDragCopy) {
-                    e.DragEffects = DragDropEffects.Copy;
+                    e_over.DragEffects = DragDropEffects.Copy;
                 } else {
-                    int drop_idx = bmgvm.SortOrderIdx + (bmgvm.IsDropOverRight ? 1 : 0);
+                    int drop_idx = anchor_bmgvm.SortOrderIdx + (anchor_bmgvm.IsDropOverRight ? 1 : 0);
                     if(drop_bmgvm.SortOrderIdx == drop_idx) {
                         // invalidate self drop
-                        bmgvm.IsDropOverLeft = false;
-                        bmgvm.IsDropOverRight = false;
+                        anchor_bmgvm.IsDropOverLeft = false;
+                        anchor_bmgvm.IsDropOverRight = false;
                         drop_bmgvm.IsDragValid = false;
-                        e.DragEffects = DragDropEffects.None;
+                        e_over.DragEffects = DragDropEffects.None;
                     } else {
-                        e.DragEffects = DragDropEffects.Move;
+                        e_over.DragEffects = DragDropEffects.Move;
                     }
                 }
 
-                PlatformWrapper.Services.Logger.WriteLine($"Drag Over: '{bmgvm.GroupName}' Flags: {e.DragEffects}");
+                PlatformWrapper.Services.Logger.WriteLine(
+                    $"Drag Over: '{anchor_bmgvm.GroupName}' Flags: {e_over.DragEffects}");
             }
 
-            void HandleDrop(object sender,object args) {
-                BookmarkGroupViewModel bmgvm = null;
-                BookmarkGroupViewModel drop_bmgvm = null;
-                dynamic e = args as DragEventArgs;
-
-                if(e == null) {
-                    e = args as FakeDragEventArgs;
-                    drop_bmgvm = anchor_bmgvm;
-                    bmgvm = sender as BookmarkGroupViewModel;
-
-                } else {
-                    drop_bmgvm = e.Data.Get(BOOKMARK_DND_ID);
-                    if(sender is Control c) {
-                        bmgvm = c.DataContext as BookmarkGroupViewModel;
-                    }
-                }
-
-                if(bmgvm == null ||
-                   drop_bmgvm == null) {
+            void Anchor_Drop(object sender_drop,DragEventArgs e_drop) {
+                if(e_drop.Data.Get(BOOKMARK_DND_ID) is not BookmarkGroupViewModel drop_bmgvm) {
                     return;
                 }
 
 
-                if(e.DragEffects == DragDropEffects.None) {
+                if(e_drop.DragEffects == DragDropEffects.None) {
                     return;
                 }
 
-                bool is_copy = e.KeyModifiers.HasFlag(KeyModifiers.Control) ||
-                               e.KeyModifiers.HasFlag(KeyModifiers.Alt) ||
-                               e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+                bool is_copy = e_drop.KeyModifiers.HasFlag(KeyModifiers.Control) ||
+                               e_drop.KeyModifiers.HasFlag(KeyModifiers.Alt) ||
+                               e_drop.KeyModifiers.HasFlag(KeyModifiers.Shift);
 
-                e.DragEffects = is_copy ? DragDropEffects.Copy : DragDropEffects.Move;
+                e_drop.DragEffects = is_copy ? DragDropEffects.Copy : DragDropEffects.Move;
 
                 Dispatcher.UIThread.Post(
                     () => {
 
-                        PlatformWrapper.Services.Logger.WriteLine($"Drop: '{bmgvm.GroupName}' ");
+                        PlatformWrapper.Services.Logger.WriteLine($"Drop: '{anchor_bmgvm.GroupName}' ");
 
-                        int drop_idx = tvm.AvailableBookmarkGroups.IndexOf(bmgvm) + (bmgvm.IsDropOverRight ? 1 : 0);
-                        var avail_group_vml = tvm.AvailableBookmarkGroups.ToList();
+                        int drop_idx = tvm.BoundBookmarkGroups.IndexOf(anchor_bmgvm) +
+                                       (anchor_bmgvm.IsDropOverRight ? 1 : 0);
+                        var avail_group_vml = tvm.BoundBookmarkGroups.ToList();
                         if(is_copy) {
                             // clone drag group and link it w/ all assoc drops linked patterns
                             BookmarkGroup copied_bmg = drop_bmgvm.BookmarkGroup.Clone();
@@ -349,11 +312,11 @@ namespace Calcuchord {
 
                             // add clone and prepare it for sort
                             drop_bmgvm = new BookmarkGroupViewModel(tvm,copied_bmg);
-                            drop_bmgvm.SortOrderIdx = tvm.AvailableBookmarkGroups.Count - 2;
+                            drop_bmgvm.SortOrderIdx = tvm.BoundBookmarkGroups.Count - 2;
                             tvm.BookmarkGroups.Add(drop_bmgvm);
                             avail_group_vml.Insert(drop_idx,drop_bmgvm);
                         } else {
-                            avail_group_vml.Move(tvm.AvailableBookmarkGroups.IndexOf(drop_bmgvm),drop_idx);
+                            avail_group_vml.Move(tvm.BoundBookmarkGroups.IndexOf(drop_bmgvm),drop_idx);
                         }
 
                         foreach((BookmarkGroupViewModel avail_bgvm,int idx) in avail_group_vml.WithIndex()) {
@@ -368,19 +331,6 @@ namespace Calcuchord {
 
                         Prefs.Instance.Save();
                     });
-
-            }
-
-            void Anchor_DragLeave(object sender,DragEventArgs e) {
-                HandleLeave(sender,e);
-            }
-
-            void Anchor_DragOver(object sender,DragEventArgs e) {
-                HandleOver(sender,e);
-            }
-
-            void Anchor_Drop(object sender,DragEventArgs e) {
-                HandleDrop(sender,e);
             }
 
 
@@ -388,19 +338,5 @@ namespace Calcuchord {
 
         #endregion
 
-    }
-
-    internal class FakeDragEventArgs {
-        public PointerEventArgs RealE { get; set; }
-        public DragDropEffects DragEffects { get; set; }
-        public KeyModifiers KeyModifiers { get; } = KeyModifiers.None;
-        public DataObject Data { get; } = new DataObject();
-
-        public Point GetPosition(Visual v) {
-            if(RealE is not { } e) {
-                return new();
-            }
-            return e.GetPosition(v);
-        }
     }
 }

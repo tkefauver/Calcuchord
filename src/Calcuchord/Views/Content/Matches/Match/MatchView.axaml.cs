@@ -100,16 +100,16 @@ namespace Calcuchord {
                 return;
             }
 
-            if(stvm.AvailableBookmarkGroups.Count() <= 2) {
+            if(stvm.BoundBookmarkGroups.Count() <= 2) {
                 // auto toggle default
-                stvm.DefaultBookmarkGroup.TogglePatternCommand.Execute(mtvm.NotePattern);
+                stvm.DefaultBookmarkGroup.ToggleLinkedWithPatternCommand.Execute(mtvm.NotePattern);
                 Extensions.CloseFlyout(BookmarkButton);
                 return;
             }
 
             cm.Items.Clear();
 
-            foreach(BookmarkGroupViewModel avail_bmvm in stvm.AvailableBookmarkGroups) {
+            foreach(BookmarkGroupViewModel avail_bmvm in stvm.BoundBookmarkGroups) {
                 MenuItem mi = new MenuItem
                 {
                     // BorderBrush = ThemeViewModel.Instance.P[PaletteColorType.Fg].ToAvBrush(),
@@ -133,8 +133,9 @@ namespace Calcuchord {
                                 IsVisible = mtvm.NotePattern.IsInBookmarkGroup(avail_bmvm.BookmarkGroup),
                             },
                         },
-                    Command = avail_bmvm.IsAddGroupPlaceholder ? avail_bmvm.BeginEditCommand :
-                        avail_bmvm.TogglePatternCommand,
+                    Command = avail_bmvm.IsAddGroupPlaceholder ?
+                        stvm.AddNewBookmarkGroupCommand :
+                        avail_bmvm.ToggleLinkedWithPatternCommand,
                     CommandParameter = mtvm.NotePattern,
                 };
                 cm.Items.Add(mi);

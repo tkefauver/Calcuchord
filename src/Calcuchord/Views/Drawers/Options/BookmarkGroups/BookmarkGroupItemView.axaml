@@ -57,27 +57,8 @@
                        Classes.add-new="{Binding IsAddGroupPlaceholder}"
                        HorizontalAlignment="Stretch"
                        VerticalAlignment="Center"
-                       Foreground="{DynamicResource Fg}"
+                       Foreground="Black"
                        Text="{Binding GroupName}" />
         </Grid>
     </Border>
-    <!-- <StackPanel x:Name="ContainerPanel" -->
-    <!--             Classes.add-new="{Binding IsAddGroupPlaceholder}" -->
-    <!--             Orientation="Horizontal"> -->
-    <!--     <Border x:Name="GroupColorBorder" -->
-    <!--             CornerRadius="5" -->
-    <!--             Width="25" -->
-    <!--             Height="25" -->
-    <!--             Margin="3" -->
-    <!--             Background="{Binding HexColor, Converter={x:Static local:HexToBrushOrColorConverter.Instance}}" /> -->
-    <!--     <avalonia:MaterialIcon x:Name="AddNewIcon" -->
-    <!--                            Foreground="ForestGreen" -->
-    <!--                            Kind="Add" -->
-    <!--                            Margin="3" -->
-    <!--                            Width="25" -->
-    <!--                            Height="25" /> -->
-    <!--     <TextBlock VerticalAlignment="Center" -->
-    <!--                Foreground="{DynamicResource Fg}" -->
-    <!--                Text="{Binding GroupName}" /> -->
-    <!-- </StackPanel> -->
 </UserControl>

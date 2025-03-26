@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Threading;
 using DialogHostAvalonia;
 using MonkeyPaste.Common;
 using MonkeyPaste.Common.Plugin;
@@ -55,12 +57,13 @@ namespace Calcuchord {
         public bool IsSelected =>
             Parent.SelectedBookmarkGroups.Contains(this);
 
+        public bool CanEdit => !IsAddGroupPlaceholder;
+        public bool CanDrag => !IsAddGroupPlaceholder;
         public bool IsDropOverLeft { get; set; }
         public bool IsDropOverRight { get; set; }
         public bool IsDragging { get; set; }
         public bool IsDragValid { get; set; }
         public bool IsDragCopy { get; set; }
-        public DateTime? LastPressDt { get; set; }
 
         public bool IsEditing { get; set; }
 
@@ -148,26 +151,53 @@ namespace Calcuchord {
 
         #region Commands
 
+        public ICommand ToggleSelectedCommand => new MpCommand<object>(
+            (args) => {
+                if(IsAddGroupPlaceholder) {
+                    Parent.AddNewBookmarkGroupCommand.Execute(args);
+                    return;
+                }
+
+                if(IsSelected) {
+                    Parent.SelectedBookmarkGroups.Remove(this);
+                } else {
+                    Parent.SelectedBookmarkGroups.Add(this);
+                }
+
+                OnPropertyChanged(nameof(IsSelected));
+
+                if(MainViewModel.Instance is not { } mvm) {
+                    return;
+                }
+
+                mvm.RaisePropertyChanged(nameof(mvm.IsAnyBookmarksSelected));
+
+                if(mvm.IsBookmarkModeSelected) {
+                    mvm.UpdateMatchesAsync(MatchUpdateSource.BookmarkToggle)
+                        .FireAndForgetSafeAsync(DispatcherPriority.Background);
+                }
+
+
+            });
+
+
         public ICommand FinishEditCommand => new MpCommand<object>(
             async (args) => {
+                Debug.Assert(CanEdit,"Cannot edit placeholder group");
+
                 if(args is not string finish_type) {
                     return;
                 }
 
-                if(IsAddGroupPlaceholder) {
-                    // shouldn't happen
-                }
-
-
                 if(finish_type == "FINISH") {
                     if(!Parent.BookmarkGroups.Contains(this)) {
-                        SortOrderIdx = Parent.AvailableBookmarkGroups.Count - 2;
+                        SortOrderIdx = Parent.AvailableBookmarkGroups.Count;
                         Parent.BookmarkGroups.Add(this);
                     }
 
                     if(_patternToAdd != null) {
                         // only occurs for a new group
-                        TogglePatternCommand.Execute(_patternToAdd);
+                        ToggleLinkedWithPatternCommand.Execute(_patternToAdd);
                     }
 
                     Parent.UpdateAvailableSortOrder(true);
@@ -202,14 +232,15 @@ namespace Calcuchord {
 
                     Parent.BookmarkGroups.Remove(this);
                     Parent.SelectedBookmarkGroups.Remove(this);
-                    Parent.AvailableBookmarkGroups.Where(x => !x.IsAddGroupPlaceholder && x.SortOrderIdx > SortOrderIdx)
-                        .ForEach(x => x.SortOrderIdx--);
+                    Parent.BoundBookmarkGroups.Remove(this);
+                    // Parent.BoundBookmarkGroups.Where(x => !x.IsAddGroupPlaceholder && x.SortOrderIdx > SortOrderIdx)
+                    //     .ForEach(x => x.SortOrderIdx--);
                     foreach(NotePattern assoc_pattern in Parent.Tuning.Collections.SelectMany(x => x.Value)
                                 .SelectMany(x => x.Patterns).Where(x => x.IsInBookmarkGroup(BookmarkGroup))) {
                         assoc_pattern.RemoveFromBookmarkGroup(BookmarkGroup);
                     }
 
-                    Parent.UpdateAvailableSortOrder(true);
+                    Parent.UpdateAvailableSortOrder(false);
 
                     Prefs.Instance.Save();
                 } else {
@@ -228,31 +259,19 @@ namespace Calcuchord {
 
         public ICommand BeginEditCommand => new MpCommand<object>(
             (args) => {
-                BookmarkGroupViewModel to_edit_bmgvm = this;
-                if(IsAddGroupPlaceholder) {
-                    if(args is not NotePattern &&
-                       args is not string) {
-                        // actual double tap, ignore for add group (handled from initial click when selected
-                        return;
-                    }
+                Debug.Assert(CanEdit,"Cannot edit placeholder group");
 
-                    BookmarkGroup new_bmg = BookmarkGroup.Create(
-                        Parent.Tuning,MainViewModel.Instance.SelectedPatternType,
-                        colorId: Parent.GetNewBookmarkColorId());
-                    to_edit_bmgvm = new BookmarkGroupViewModel(Parent,new_bmg);
-                }
-
-                to_edit_bmgvm._preEditBookmarkGroupJson = to_edit_bmgvm.BookmarkGroup.SerializeObject();
+                _preEditBookmarkGroupJson = BookmarkGroup.SerializeObject();
                 if(args is NotePattern np) {
                     // add new from match bookmark flyout
-                    to_edit_bmgvm._patternToAdd = np;
+                    _patternToAdd = np;
                 }
 
-                to_edit_bmgvm.IsEditing = true;
+                IsEditing = true;
 
                 EditBookmarkGroupView edit_bmv = new EditBookmarkGroupView
                 {
-                    DataContext = to_edit_bmgvm,
+                    DataContext = this,
                 };
                 DialogHost.Show(edit_bmv,MainViewModel.Instance.MainDialogHostName);
 
@@ -271,7 +290,7 @@ namespace Calcuchord {
                 OnPropertyChanged(nameof(HexColor));
             });
 
-        public ICommand TogglePatternCommand => new MpCommand<object>(
+        public ICommand ToggleLinkedWithPatternCommand => new MpCommand<object>(
             (args) => {
                 if(args is not NotePattern np ||
                    np.PatternType != PatternType) {

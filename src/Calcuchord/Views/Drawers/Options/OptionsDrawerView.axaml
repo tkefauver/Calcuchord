@@ -227,17 +227,9 @@
             <Setter Property="IsVisible"
                     Value="True" />
         </Style>
-        <Style Selector="local|BookmarkGroupItemView">
-            <Setter Property="Background"
-                    Value="Transparent" />
-        </Style>
-        <Style Selector="local|BookmarkGroupItemView.sel">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <SolidColorBrush Color="{DynamicResource FgColor}"
-                                     Opacity="0.17" />
-                </Setter.Value>
-            </Setter>
+        <Style Selector="ItemsControl#BookmarkGroupsItemsControl ListBoxItem.sel">
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource Fg}" />
         </Style>
         <Style Selector="local|BookmarkGroupItemView.drag">
             <Setter Property="BorderBrush"
@@ -349,7 +341,7 @@
                                       MaxHeight="300">
                             <ItemsControl x:Name="BookmarkGroupsItemsControl"
                                           x:DataType="local:TuningViewModel"
-                                          ItemsSource="{Binding AvailableBookmarkGroups}">
+                                          ItemsSource="{Binding BoundBookmarkGroups}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <UniformGrid Columns="{Binding BookmarkColumnCount}" />
@@ -357,17 +349,16 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="local:BookmarkGroupViewModel">
-                                        <ListBoxItem>
-
-                                            <Grid>
-                                                <local:BookmarkGroupItemView
-                                                    Loaded="BookmarkGroupContainerButton_OnLoaded"
-                                                    Classes.sel="{Binding IsSelected}"
-                                                    Classes.drag="{Binding IsDragging}"
-                                                    Classes.drag-valid="{Binding IsDragValid}"
-                                                    Classes.drag-copy="{Binding IsDragCopy}"
-                                                    Width="85"
-                                                    Cursor="Hand" />
+                                        <ListBoxItem Margin="1,0"
+                                                     BorderThickness="0.5"
+                                                     Cursor="Hand"
+                                                     Loaded="BookmarkGroupContainerButton_OnLoaded"
+                                                     Classes.drag="{Binding IsDragging}"
+                                                     Classes.drag-valid="{Binding IsDragValid}"
+                                                     Classes.drag-copy="{Binding IsDragCopy}"
+                                                     Classes.sel="{Binding IsSelected}">
+                                            <Grid IsHitTestVisible="False">
+                                                <local:BookmarkGroupItemView Width="85" />
                                                 <Border x:Name="DropLeftBorder"
                                                         HorizontalAlignment="Left"
                                                         VerticalAlignment="Stretch"

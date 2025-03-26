@@ -178,11 +178,28 @@
     <!--             Value="{Binding $parent[Button].(Gestures.IsHoldWithMouseEnabled)}" /> -->
     <!-- </Style> -->
 
-    <Style Selector="Button.float">
+    <Style Selector="Button.outline">
+        <Setter Property="Theme"
+                Value="{StaticResource MaterialOutlineButton}" />
+    </Style>
+    <Style Selector="ToggleButton.outline">
+        <Setter Property="Theme"
+                Value="{StaticResource MaterialOutlineToggleButton}" />
+    </Style>
+
+    <Style Selector="Button.flat">
         <Setter Property="Theme"
                 Value="{StaticResource MaterialFlatButton}" />
     </Style>
-    <Style Selector="ToggleButton.float">
+    <Style Selector="ToggleButton.flat">
+        <Setter Property="Theme"
+                Value="{StaticResource MaterialFlatToggleButton}" />
+    </Style>
+    <Style Selector="Button.float:not(.outline):not(.flat)">
+        <Setter Property="Theme"
+                Value="{StaticResource MaterialFlatButton}" />
+    </Style>
+    <Style Selector="ToggleButton.float:not(.outline):not(.flat)">
         <Setter Property="Theme"
                 Value="{StaticResource MaterialFlatToggleButton}" />
     </Style>
