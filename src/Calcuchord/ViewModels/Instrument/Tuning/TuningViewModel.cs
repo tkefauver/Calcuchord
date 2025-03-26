@@ -103,10 +103,8 @@ namespace Calcuchord {
         #region Layout
 
         public int BookmarkColumnCount =>
-            BoundBookmarkGroups.Count <= 2 ?
-                1 :
-                BoundBookmarkGroups.Count <= 3 ?
-                    2 : 3;
+            BoundBookmarkGroups.Count <= 3 ?
+                2 : 3;
 
         #endregion
 

@@ -227,21 +227,25 @@
             <Setter Property="IsVisible"
                     Value="True" />
         </Style>
-        <Style Selector="ItemsControl#BookmarkGroupsItemsControl ListBoxItem.sel">
-            <Setter Property="BorderBrush"
-                    Value="{DynamicResource Fg}" />
-        </Style>
-        <Style Selector="local|BookmarkGroupItemView.drag">
-            <Setter Property="BorderBrush"
-                    Value="Magenta" />
-        </Style>
-        <Style Selector="local|BookmarkGroupItemView.drag.drag-valid">
-            <Setter Property="BorderBrush"
-                    Value="Cyan" />
-        </Style>
-        <Style Selector="local|BookmarkGroupItemView.drag.drag-valid.drag-copy">
-            <Setter Property="BorderBrush"
-                    Value="Yellow" />
+        <!-- <Style Selector="ItemsControl#BookmarkGroupsItemsControl Border#GroupColorBorder" -->
+        <!--        x:DataType="local:BookmarkGroupViewModel"> -->
+        <!--     <Setter Property="BorderBrush" -->
+        <!--             Value="{Binding HexColor, Converter={x:Static local:HexToBrushOrColorConverter.Instance}}" /> -->
+        <!-- </Style> -->
+        <!-- -->
+        <!-- <Style Selector="ItemsControl#BookmarkGroupsItemsControl ListBoxItem:pointerover Border#GroupColorBorder" -->
+        <!--        x:DataType="local:BookmarkGroupViewModel"> -->
+        <!--     <Setter Property="BorderBrush" -->
+        <!--             Value="{DynamicResource Fg}" /> -->
+        <!-- </Style> -->
+        <Style Selector="ItemsControl#BookmarkGroupsItemsControl ListBoxItem.sel"
+               x:DataType="local:BookmarkGroupViewModel">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="{DynamicResource FgColor}"
+                                     Opacity="0.05" />
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Styles>
     <controls:ColorZone Mode="Accent"
@@ -329,8 +333,16 @@
                                    Text="Groups" />
                         <local:HintView>
                             <ToolTip.Tip>
-                                <controls:ColorZone Classes="tt">
-                                    <TextBlock Text="Long-press or double tap to edit" />
+                                <controls:ColorZone Classes="tt"
+                                                    Mode="Inverted"
+                                                    Foreground="{DynamicResource Bg}">
+                                    <StackPanel Spacing="10">
+                                        <TextBlock Text="◦ Long-press or double tap to edit" />
+                                        <TextBlock
+                                            IsVisible="{Binding !IsMobile, Source={x:Static local:ThemeViewModel.Instance}}"
+                                            Text="◦ Shift + Drag to duplicate" />
+                                    </StackPanel>
+
                                 </controls:ColorZone>
                             </ToolTip.Tip>
                         </local:HintView>
@@ -349,8 +361,7 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="local:BookmarkGroupViewModel">
-                                        <ListBoxItem Margin="1,0"
-                                                     BorderThickness="0.5"
+                                        <ListBoxItem BorderThickness="0"
                                                      Cursor="Hand"
                                                      Loaded="BookmarkGroupContainerButton_OnLoaded"
                                                      Classes.drag="{Binding IsDragging}"
@@ -358,7 +369,8 @@
                                                      Classes.drag-copy="{Binding IsDragCopy}"
                                                      Classes.sel="{Binding IsSelected}">
                                             <Grid IsHitTestVisible="False">
-                                                <local:BookmarkGroupItemView Width="85" />
+                                                <local:BookmarkGroupItemView BorderThickness="1"
+                                                                             Width="85" />
                                                 <Border x:Name="DropLeftBorder"
                                                         HorizontalAlignment="Left"
                                                         VerticalAlignment="Stretch"

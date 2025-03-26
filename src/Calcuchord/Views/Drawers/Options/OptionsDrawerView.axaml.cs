@@ -7,9 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using Material.Ripple;
 using MonkeyPaste.Common;
-using MonkeyPaste.Common.Avalonia;
 using PropertyChanged;
 
 namespace Calcuchord {
@@ -108,8 +106,6 @@ namespace Calcuchord {
             }
 
             async void Anchor_PointerPressed(object sender_press,PointerPressedEventArgs e_press) {
-                e_press.Pointer.Capture(anchorControl);
-
                 bool can_drag = anchor_bmgvm.CanDrag && e_press.Pointer.Type == PointerType.Mouse;
                 bool can_edit = anchor_bmgvm.CanEdit;
 
@@ -129,23 +125,25 @@ namespace Calcuchord {
 
                 anchorControl.PointerReleased += AnchorControl_PointerReleased;
                 anchorControl.PointerMoved += AnchorControl_PointerMoved;
+                anchorControl.PointerExited += AnchorControl_PointerExited;
+
+                void AnchorControl_PointerExited(object sender,PointerEventArgs e) {
+                    anchorControl.PointerReleased -= AnchorControl_PointerReleased;
+                    anchorControl.PointerMoved -= AnchorControl_PointerMoved;
+                    anchorControl.PointerExited -= AnchorControl_PointerExited;
+                }
 
                 void AnchorControl_PointerMoved(object sender_move,PointerEventArgs e_move) {
                     drag_dist = down_loc.Distance(e_move.GetPosition(anchorControl));
                 }
 
                 async void AnchorControl_PointerReleased(object sender_release,PointerReleasedEventArgs e_release) {
-                    e_press.Pointer.Capture(null);
-                    if(anchorControl.GetVisualDescendant<RippleEffect>() is { } re) {
-                        // BUG Ripple not being notified of losing pointer capture and freezes up
-                        
-                        re.GetPrivateMethod("PointerReleasedHandler").Invoke(re, [sender_release,e_release]);
-                    }
                     is_still_down = false;
                     anchor_bmgvm.IsDragging = false;
                     anchor_bmgvm.IsDragCopy = false;
                     anchorControl.PointerReleased -= AnchorControl_PointerReleased;
                     anchorControl.PointerMoved -= AnchorControl_PointerMoved;
+                    anchorControl.PointerExited -= AnchorControl_PointerExited;
 
                     bool is_over_anchor = anchorControl.Bounds.Contains(e_release.GetPosition(anchorControl));
                     Stopwatch sw = Stopwatch.StartNew();

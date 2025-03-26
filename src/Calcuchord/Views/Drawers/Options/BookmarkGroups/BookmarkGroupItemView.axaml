@@ -18,17 +18,6 @@
             <Setter Property="IsVisible"
                     Value="False" />
         </Style>
-
-        <Style Selector="StackPanel.add-new avalonia|MaterialIcon#AddNewIcon">
-            <Setter Property="IsVisible"
-                    Value="True" />
-        </Style>
-
-        <Style Selector="StackPanel.add-new Border#GroupColorBorder">
-            <Setter Property="IsVisible"
-                    Value="False" />
-        </Style>
-
         <Style Selector="TextBlock">
             <Setter Property="TextAlignment"
                     Value="Center" />
