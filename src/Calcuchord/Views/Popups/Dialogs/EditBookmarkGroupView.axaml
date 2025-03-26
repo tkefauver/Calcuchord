@@ -125,7 +125,8 @@
                         </Button.Flyout>
                     </Button>
                     <!-- NAME -->
-                    <TextBox Grid.Row="1"
+                    <TextBox x:Name="GroupNameTextBox"
+                             Grid.Row="1"
                              Grid.Column="1"
                              Grid.ColumnSpan="2"
                              Height="30"

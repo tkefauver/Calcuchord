@@ -17,5 +17,11 @@ namespace Calcuchord {
 
             Extensions.CloseFlyout(this.ColorButton);
         }
+
+        protected override void OnLoaded(RoutedEventArgs e) {
+            base.OnLoaded(e);
+            GroupNameTextBox.Focus();
+            GroupNameTextBox.SelectAll();
+        }
     }
 }
