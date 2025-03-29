@@ -24,7 +24,7 @@ namespace Calcuchord {
 
         #region Constants
 
-        const string DEFAULT_BOOKMARK_GROUP_NAME = "Favorites";
+        const string DEFAULT_BOOKMARK_GROUP_NAME = "Group1";
 
         #endregion
 

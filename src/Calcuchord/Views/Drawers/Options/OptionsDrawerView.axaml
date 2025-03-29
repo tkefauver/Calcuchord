@@ -331,7 +331,7 @@
                         <TextBlock Classes="header resettable groups"
                                    PointerReleased="InputElement_OnPointerReleased"
                                    Text="Groups" />
-                        <local:HintView>
+                        <local:HintView Classes="groups">
                             <ToolTip.Tip>
                                 <controls:ColorZone Classes="tt"
                                                     Mode="Inverted"
