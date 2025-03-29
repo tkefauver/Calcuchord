@@ -150,24 +150,29 @@
 
             <Grid RowDefinitions="Auto,*,Auto">
                 <!-- TITLE -->
-                <TextBlock x:Name="MatchTitleTextBlock"
-                           HorizontalAlignment="Center"
-                           TextAlignment="Center"
-                           VerticalAlignment="Center">
-                    <TextBlock.Inlines>
-                        <Run Text="{Binding Label1}"
-                             Classes="bold"
-                             FontSize="48" />
-                        <Run Text="{Binding Label2}"
-                             FontSize="36" />
-                        <Run Text="{Binding Label3}"
-                             FontSize="24"
-                             BaselineAlignment="TextBottom" />
-                        <Run Text="{Binding Label4}"
-                             FontSize="24"
-                             BaselineAlignment="TextTop" />
-                    </TextBlock.Inlines>
-                </TextBlock>
+                <Viewbox x:Name="MatchTitleContainer"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Width="190"
+                         Height="70"
+                         Stretch="Uniform">
+                    <TextBlock 
+                               TextAlignment="Center">
+                        <TextBlock.Inlines>
+                            <Run Text="{Binding Label1}"
+                                 Classes="bold"
+                                 FontSize="48" />
+                            <Run Text="{Binding Label2}"
+                                 FontSize="36" />
+                            <Run Text="{Binding Label3}"
+                                 FontSize="24"
+                                 BaselineAlignment="TextBottom" />
+                            <Run Text="{Binding Label4}"
+                                 FontSize="24"
+                                 BaselineAlignment="TextTop" />
+                        </TextBlock.Inlines>
+                    </TextBlock>
+                </Viewbox>
 
 
                 <Svg x:Name="MatchSvg"
@@ -207,7 +212,7 @@
 
                 <UniformGrid x:Name="MatchButtonStripPanel"
                              Grid.Row="2"
-                             Height="{Binding Bounds.Height, ElementName=MatchTitleTextBlock}"
+                             Height="70"
                              Classes="fade"
                              Columns="3">
                     <UniformGrid.Styles>
