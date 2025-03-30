@@ -2,8 +2,6 @@
 
 <p style="text-align: center;"><img style="width: 77%" src="ss.png" /></p>
 
-[Try it out here! (its **much** slower than native platforms :/)](https://tkefauver.github.io/Calcuchord/)
-
 ## Features
 
 - 11 built-in tuning templates (guitar, ukulele, piano, bass, violin and more!)
@@ -15,11 +13,13 @@
 - export to midi, pdf and html
 - translate any pattern (chord, scale or mode) to any other tuning or instrument
 
-## Requirements
+## Releases
 
-For windows midi playback you need to install [fluidsynth](https://github.com/FluidSynth/fluidsynth)
-
-Desktop & mobile versions coming soon!
+- [Web](https://tkefauver.github.io/Calcuchord/)
+- [Mac App Store](https://apps.apple.com/us/app/calcuchord/id6742661582)
+- [iOS App Store](https://apps.apple.com/us/app/calcuchord/id6742661582)
+- [Windows Store](https://www.microsoft.com/store/apps/9MTMVS3TP34P)
+- [Google Play Store](https://play.google.com/apps/testing/com.thomaskefauver.Calcuchord) - Early access & need testers!
 
 
 
