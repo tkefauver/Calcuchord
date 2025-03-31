@@ -5,11 +5,7 @@
              mc:Ignorable="d"
              d:DesignWidth="360"
              d:DesignHeight="240"
-             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
-             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:TuningViewModel"
              x:Class="Calcuchord.FretboardView">
     <Design.DataContext>
@@ -43,7 +39,7 @@
             <Setter Property="Opacity"
                     Value="1" />
         </Style>
-        <Style Selector="local|FretView.muted:not(.nut)">
+        <Style Selector="local|FretView.muted:not(.open-note)">
             <Setter Property="IsHitTestVisible"
                     Value="False" />
         </Style>
@@ -91,15 +87,22 @@
                                         <DataTemplate x:DataType="local:NoteViewModel">
                                             <local:FretView Classes="note-btn"
                                                             Classes.input="{Binding IsEnabled}"
-                                                            Classes.muted="{Binding IsRowMuted}"
                                                             Classes.nut="{Binding IsNutFret}"
+                                                            Classes.open-note="{Binding IsOpenNote}"
                                                             Classes.str-label="{Binding IsRowKeyLabel}"
                                                             Classes.num-label="{Binding IsNoteNumLabel}"
                                                             Classes.selected="{Binding IsSelected}"
                                                             Classes.hover="{Binding IsHovering}"
                                                             Background="{DynamicResource HttTransparent}"
                                                             Loaded="FretView_Loaded"
-                                                            Unloaded="FretView_Unloaded" />
+                                                            Unloaded="FretView_Unloaded">
+                                                <Classes.muted>
+                                                    <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                                                        <Binding Path="IsRowMuted" />
+                                                        <Binding Path="IsFretMuted" />
+                                                    </MultiBinding>
+                                                </Classes.muted>
+                                            </local:FretView>
 
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>

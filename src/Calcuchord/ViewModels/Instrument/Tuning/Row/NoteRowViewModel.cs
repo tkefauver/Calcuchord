@@ -5,308 +5,273 @@ using System.Linq;
 using System.Windows.Input;
 using MonkeyPaste.Common;
 
-namespace Calcuchord {
-    public partial class NoteRowViewModel : ViewModelBase<TuningViewModel> {
+namespace Calcuchord;
 
-        #region Private Variables
+public class NoteRowViewModel : ViewModelBase<TuningViewModel> {
+    #region Constructors
 
-        #endregion
+    public NoteRowViewModel(TuningViewModel parent,InstrumentNote baseNote) : base(parent) {
+        PropertyChanged += NoteRowViewModel_OnPropertyChanged;
+        BaseNote = baseNote;
+        int min_fret_num = IsKeyboard ? 0 : -1;
 
-        #region Constants
+        Notes.AddRange(
+            Enumerable.Range(min_fret_num,Parent.LogicalFretCount)
+                .Select(x => CreateNoteViewModel(x)));
 
-        #endregion
+        ResetSelection();
+    }
 
-        #region Statics
+    #endregion
 
-        #endregion
+    #region Properties
 
-        #region Interfaces
+    #region View Models
 
-        #endregion
+    TuningViewModel TuningVm =>
+        Parent;
 
-        #region Properties
+    InstrumentViewModel InstrumentVm =>
+        TuningVm.Parent;
 
-        #region Members
+    public ObservableCollection<NoteViewModel> Notes { get; } = [];
 
-        #endregion
+    public NoteViewModel SelectedNote {
+        get => SelectedNotes.FirstOrDefault();
+        set {
+            Notes.ForEach(x => x.IsSelected = x == value);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SelectedNotes));
+        }
+    }
 
-        #region View Models
+    public IEnumerable<NoteViewModel> SelectedNotes {
+        get => Notes.Where(x => x.IsSelected);
+        set {
+            Notes.ForEach(x => x.IsSelected = value == null ? false : value.Contains(x));
+            OnPropertyChanged(nameof(SelectedNote));
+            OnPropertyChanged();
+        }
+    }
 
-        TuningViewModel TuningVm =>
-            Parent;
+    public NoteViewModel OpenNote =>
+        Notes.FirstOrDefault(x => x.NoteNum == 0);
 
-        InstrumentViewModel InstrumentVm =>
-            TuningVm.Parent;
 
-        public ObservableCollection<NoteViewModel> Notes { get; } = [];
+    NoteViewModel DefaultNote =>
+        null; //!IsEnabled || IsKeyboard ? null : Notes.FirstOrDefault(x => x.ColNum == 0);
 
-        public NoteViewModel SelectedNote {
-            get => SelectedNotes.FirstOrDefault();
-            set {
-                Notes.ForEach(x => x.IsSelected = x == value);
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(SelectedNotes));
-            }
+    #endregion
+
+    #region State
+
+    public bool IsWoundSteel =>
+        InstrumentVm.IsSteel &&
+        BaseNote != null &&
+        BaseNote.Key.IsWoundSteel(BaseNote.Register);
+
+    public int BaseNoteNum =>
+        Parent.CapoNum;
+
+    bool IsEnabled =>
+        RowNum >= 0;
+
+    public bool IsMuted =>
+        CanMute &&
+        SelectedNote != null &&
+        SelectedNote.IsInMuteState;
+
+    bool CanMute =>
+        MainViewModel.Instance.SelectedPatternType == MusicPatternType.Chords;
+
+    bool IsKeyboard =>
+        Parent.Parent.IsKeyboard;
+
+    bool IsSingleSelect =>
+        !IsKeyboard && MainViewModel.Instance.SelectedPatternType == MusicPatternType.Chords;
+
+    public bool IsDefaultSelection =>
+        (DefaultNote == null && SelectedNote == null) ||
+        (DefaultNote != null && SelectedNotes.All(x => x == DefaultNote));
+
+    public int RowNum =>
+        BaseNote == null ? -1 : BaseNote.RowNum;
+
+    #endregion
+
+    #region Model
+
+    public InstrumentNote BaseNote { get; set; }
+
+    #endregion
+
+    #endregion
+
+    #region Public Methods
+
+    public void ResetSelection() {
+        if(DefaultNote is { } dn) {
+            SelectedNotes = [dn];
+        } else {
+            SelectedNotes = [];
         }
 
-        public IEnumerable<NoteViewModel> SelectedNotes {
-            get => Notes.Where(x => x.IsSelected);
-            set {
-                Notes.ForEach(x => x.IsSelected = value == null ? false : value.Contains(x));
-                OnPropertyChanged(nameof(SelectedNote));
-                OnPropertyChanged();
-            }
+        Notes.ForEach(x => x.Reset());
+    }
+
+    public override string ToString() {
+        return BaseNote == null ? base.ToString() : "Row " + BaseNote;
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    void NoteRowViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
+        switch (e.PropertyName) {
+            case nameof(IsMuted):
+                Notes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsRowMuted)));
+                Notes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsEnabled)));
+                break;
+            case nameof(SelectedNote):
+            case nameof(SelectedNotes):
+                MainViewModel.Instance.RaisePropertyChanged(nameof(MainViewModel.Instance.IsDefaultSelection));
+                break;
+        }
+    }
+
+    NoteViewModel CreateNoteViewModel(int fretNum) {
+        InstrumentNote inn = null;
+        if(fretNum == 0 && BaseNote != null) {
+            inn = BaseNote;
+        } else {
+            inn = InstrumentNote.Create(fretNum,RowNum,BaseNote?.Offset(fretNum));
         }
 
-        public NoteViewModel OpenNote =>
-            Notes.FirstOrDefault(x => x.NoteNum == 0);
+        return new NoteViewModel(this,inn);
+    }
 
+    NoteMarkerState GetNoteMarkerState(NoteViewModel nvm) {
+        return
+            nvm.IsSelectedKey && nvm.IsSelected ? NoteMarkerState.Root :
+            nvm.IsSelected ? NoteMarkerState.On :
+            NoteMarkerState.Off;
+    }
 
-        NoteViewModel DefaultNote =>
-            null; //!IsEnabled || IsKeyboard ? null : Notes.FirstOrDefault(x => x.ColNum == 0);
-
-        #endregion
-
-        #region Appearance
-
-        #endregion
-
-        #region Layout
-
-        #endregion
-
-        #region State
-
-        public bool IsWoundSteel =>
-            InstrumentVm.IsSteel &&
-            BaseNote != null &&
-            BaseNote.Key.IsWoundSteel(BaseNote.Register);
-
-        public int BaseNoteNum =>
-            Parent.CapoNum;
-
-        bool IsEnabled =>
-            RowNum >= 0;
-
-        public bool IsMuted =>
-            CanMute &&
-            SelectedNote != null &&
-            SelectedNote.IsInMuteState;
-
-        bool CanMute =>
-            MainViewModel.Instance.SelectedPatternType == MusicPatternType.Chords;
-
-        bool IsKeyboard =>
-            Parent.Parent.IsKeyboard;
-
-        bool IsSingleSelect =>
-            !IsKeyboard && MainViewModel.Instance.SelectedPatternType == MusicPatternType.Chords;
-
-        public bool IsDefaultSelection =>
-            (DefaultNote == null && SelectedNote == null) ||
-            (DefaultNote != null && SelectedNotes.All(x => x == DefaultNote));
-
-        public int RowNum =>
-            BaseNote == null ? -1 : BaseNote.RowNum;
-
-        #endregion
-
-        #region Model
-
-        public InstrumentNote BaseNote { get; set; }
-
-        #endregion
-
-        #endregion
-
-        #region Events
-
-        #endregion
-
-        #region Constructors
-
-        public NoteRowViewModel(TuningViewModel parent,InstrumentNote baseNote) : base(parent) {
-            PropertyChanged += NoteRowViewModel_OnPropertyChanged;
-            BaseNote = baseNote;
-            int min_fret_num = IsKeyboard ? 0 : -1;
-
-            Notes.AddRange(
-                Enumerable.Range(min_fret_num,Parent.LogicalFretCount)
-                    .Select(x => CreateNoteViewModel(x)));
-
-            ResetSelection();
+    void SetNoteMarkerState(NoteViewModel nvm,NoteMarkerState newState,bool root) {
+        // cases:
+        // off->on
+        // off->root
+        // on->off
+        // on->root
+        // root->on
+        // root->off
+        if(GetNoteMarkerState(nvm) == newState ||
+           MainViewModel.Instance is not { } mvm) {
+            return;
         }
 
-        #endregion
+        if(nvm.IsSelectedKey &&
+           (root || Parent.AllNotes.Where(x => x.IsSelected).None(x => x != nvm && x.IsSelectedKey))) {
+            mvm.SetSelectedKey(null);
+        } else if(newState == NoteMarkerState.Root) {
+            mvm.SetSelectedKey(nvm.InstrumentNote.Key);
+        }
 
-        #region Public Methods
-
-        public void ResetSelection() {
-            if(DefaultNote is { } dn) {
-                SelectedNotes = [dn];
+        if(newState == NoteMarkerState.Off) {
+            nvm.IsSelected = false;
+        } else {
+            if(IsSingleSelect) {
+                SelectedNote = nvm;
             } else {
-                SelectedNotes = [];
+                nvm.IsSelected = true;
+            }
+        }
+    }
+
+    public void ToggleSelected(NoteViewModel nvm,bool root) {
+        if(MainViewModel.Instance is not { } mvm) {
+            return;
+        }
+
+        var last_sel = SelectedNotes.ToList();
+        var last_root = mvm.SelectedKey;
+        var cur_state = GetNoteMarkerState(nvm);
+        var next_state = cur_state;
+
+        if(!root &&
+           nvm.IsSelected &&
+           nvm.IsOpenNote &&
+           CanMute) {
+            if(nvm.IsInMuteState) {
+                nvm.WorkingNoteNum = nvm.NoteNum;
+            } else {
+                nvm.WorkingNoteNum = NoteViewModel.MUTE_FRET_NUM;
             }
 
-            Notes.ForEach(x => x.Reset());
-        }
-
-        public override string ToString() {
-            return BaseNote == null ? base.ToString() : "Row " + BaseNote;
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        #endregion
-
-        #region Private Methods
-
-        void NoteRowViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
-            switch(e.PropertyName) {
-                case nameof(IsMuted):
-                    Notes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsRowMuted)));
-                    Notes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsEnabled)));
+            OnPropertyChanged(nameof(IsMuted));
+            if(nvm.WorkingNoteNum == nvm.NoteNum) {
+                SetNoteMarkerState(nvm,NoteMarkerState.Off,false);
+            }
+        } else {
+            switch (cur_state) {
+                case NoteMarkerState.Off:
+                    next_state = root ? NoteMarkerState.Root : NoteMarkerState.On;
                     break;
-                case nameof(SelectedNote):
-                case nameof(SelectedNotes):
-                    MainViewModel.Instance.RaisePropertyChanged(nameof(MainViewModel.Instance.IsDefaultSelection));
+                case NoteMarkerState.On:
+                    next_state = root ? NoteMarkerState.Root : NoteMarkerState.Off;
+                    break;
+                case NoteMarkerState.Root:
+                    next_state = root ? NoteMarkerState.On : NoteMarkerState.Off;
                     break;
             }
+
+            SetNoteMarkerState(nvm,next_state,root);
         }
 
-        NoteViewModel CreateNoteViewModel(int fretNum) {
-            InstrumentNote inn = null;
-            if(fretNum == 0 && BaseNote != null) {
-                inn = BaseNote;
-            } else {
-                inn = InstrumentNote.Create(fretNum,RowNum,BaseNote?.Offset(fretNum));
-            }
-
-            return new NoteViewModel(this,inn);
+        if(SelectedNotes.Difference(last_sel).Any()) {
+            Notes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsSelected)));
         }
 
-        NoteMarkerState GetNoteMarkerState(NoteViewModel nvm) {
-            return
-                nvm.IsSelectedKey && nvm.IsSelected ?
-                    NoteMarkerState.Root :
-                    nvm.IsSelected ?
-                        NoteMarkerState.On :
-                        NoteMarkerState.Off;
+        bool was_root = mvm.SelectedKey != last_root &&
+                        last_root != null &&
+                        Parent.AllNotes.Where(x => x.IsSelected).All(x => !x.IsSelectedKey);
+
+        if(root || was_root) {
+            Parent.AllNotes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsSelectedKey)));
         }
 
-        void SetNoteMarkerState(NoteViewModel nvm,NoteMarkerState newState,bool root) {
-            // cases:
-            // off->on
-            // off->root
-            // on->off
-            // on->root
-            // root->on
-            // root->off
-            if(GetNoteMarkerState(nvm) == newState ||
-               MainViewModel.Instance is not { } mvm) {
-                return;
-            }
-
-            if(nvm.IsSelectedKey &&
-               (root || Parent.AllNotes.Where(x => x.IsSelected).None(x => x != nvm && x.IsSelectedKey))) {
-                mvm.SetSelectedKey(null);
-            } else if(newState == NoteMarkerState.Root) {
-                mvm.SetSelectedKey(nvm.InstrumentNote.Key);
-            }
-
-            if(newState == NoteMarkerState.Off) {
-                nvm.IsSelected = false;
-            } else {
-                if(IsSingleSelect) {
-                    SelectedNote = nvm;
-                } else {
-                    nvm.IsSelected = true;
-                }
-            }
+        if(MainViewModel.Instance.SelectedTuning == Parent) {
+            Parent.LastNotePatternType = MainViewModel.Instance.SelectedPatternType;
         }
-
-        public void ToggleSelected(NoteViewModel nvm,bool root) {
-            if(MainViewModel.Instance is not { } mvm) {
-                return;
-            }
-
-            var last_sel = SelectedNotes.ToList();
-            var last_root = mvm.SelectedKey;
-            NoteMarkerState cur_state = GetNoteMarkerState(nvm);
-            NoteMarkerState next_state = cur_state;
-
-            if(!root &&
-               nvm.IsSelected &&
-               nvm.IsOpenNote &&
-               CanMute) {
-                nvm.WorkingNoteNum--;
-                OnPropertyChanged(nameof(IsMuted));
-                if(nvm.WorkingNoteNum == 0) {
-                    SetNoteMarkerState(nvm,NoteMarkerState.Off,false);
-                }
-            } else {
-                switch(cur_state) {
-                    case NoteMarkerState.Off:
-                        next_state = root ? NoteMarkerState.Root : NoteMarkerState.On;
-                        break;
-                    case NoteMarkerState.On:
-                        next_state = root ? NoteMarkerState.Root : NoteMarkerState.Off;
-                        break;
-                    case NoteMarkerState.Root:
-                        next_state = root ? NoteMarkerState.On : NoteMarkerState.Off;
-                        break;
-                }
-
-                SetNoteMarkerState(nvm,next_state,root);
-            }
-
-            if(SelectedNotes.Difference(last_sel).Any()) {
-                Notes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsSelected)));
-            }
-
-            bool was_root = mvm.SelectedKey != last_root &&
-                            last_root != null &&
-                            Parent.AllNotes.Where(x => x.IsSelected).All(x => !x.IsSelectedKey);
-
-            if(root || was_root) {
-                Parent.AllNotes.ForEach(x => x.RaisePropertyChanged(nameof(x.IsSelectedKey)));
-            }
-
-            if(MainViewModel.Instance.SelectedTuning == Parent) {
-                Parent.LastNotePatternType = MainViewModel.Instance.SelectedPatternType;
-            }
-
-        }
-
-        #endregion
-
-        #region Commands
-
-        public ICommand ToggleNoteSelectedCommand => new MpCommand<object>(
-            args => {
-                if(args is not NoteViewModel nvm ||
-                   !nvm.IsEnabled) {
-                    return;
-                }
-
-                ToggleSelected(nvm,false);
-                MainViewModel.Instance.UpdateMatchesAsync(MatchUpdateSource.NoteToggle).FireAndForgetSafeAsync();
-            });
-
-        public ICommand ToggleNoteAsDesiredRootCommand => new MpCommand<object>(
-            args => {
-                if(args is not NoteViewModel nvm ||
-                   !nvm.IsEnabled) {
-                    return;
-                }
-
-                ToggleSelected(nvm,true);
-                MainViewModel.Instance.UpdateMatchesAsync(MatchUpdateSource.RootToggle).FireAndForgetSafeAsync();
-            });
-
-        #endregion
 
     }
+
+    #endregion
+
+    #region Commands
+
+    public ICommand ToggleNoteSelectedCommand => new MpCommand<object>(
+        args => {
+            if(args is not NoteViewModel nvm ||
+               !nvm.IsEnabled) {
+                return;
+            }
+
+            ToggleSelected(nvm,false);
+            MainViewModel.Instance.UpdateMatchesAsync(MatchUpdateSource.NoteToggle).FireAndForgetSafeAsync();
+        });
+
+    public ICommand ToggleNoteAsDesiredRootCommand => new MpCommand<object>(
+        args => {
+            if(args is not NoteViewModel nvm ||
+               !nvm.IsEnabled) {
+                return;
+            }
+
+            ToggleSelected(nvm,true);
+            MainViewModel.Instance.UpdateMatchesAsync(MatchUpdateSource.RootToggle).FireAndForgetSafeAsync();
+        });
+
+    #endregion
 }

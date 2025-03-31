@@ -5,11 +5,7 @@
              mc:Ignorable="d"
              d:DesignWidth="800"
              d:DesignHeight="450"
-             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
-             xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:NoteViewModel"
              x:Class="Calcuchord.FretView">
     <UserControl.Resources>
@@ -18,6 +14,20 @@
                     Source="/Assets/Images/stringchunk_10x6.png"
                     DestinationRect="0 0 3 3"
                     TileMode="Tile" />
+        <!-- NUT -->
+        <LinearGradientBrush x:Key="CapoBrush"
+                             StartPoint="0%,0%"
+                             EndPoint="100%,0%"
+                             SpreadMethod="Reflect">
+            <GradientStops>
+                <GradientStop Color="Black"
+                              Offset="0" />
+                <GradientStop Color="Black" Offset="0.65" />
+                <GradientStop Color="Silver" Offset="0.7" />
+                <GradientStop Color="Black" Offset="1" />
+            </GradientStops>
+        </LinearGradientBrush>
+
         <!-- NUT -->
         <LinearGradientBrush x:Key="NutBrush"
                              StartPoint="0%,0%"
@@ -272,6 +282,27 @@
                     Value="0,0,1,7" />
         </Style>
 
+        <Style Selector="Border#Capo">
+            <Setter Property="Background"
+                    Value="{StaticResource CapoBrush}" />
+        </Style>
+        <Style Selector="Border#Capo.top">
+            <Setter Property="BorderBrush"
+                    Value="Black" />
+            <Setter Property="CornerRadius"
+                    Value="7,7,0,0" />
+            <Setter Property="BorderThickness"
+                    Value="0,5,0,0" />
+        </Style>
+        <Style Selector="Border#Capo.bottom">
+            <Setter Property="BorderBrush"
+                    Value="Black" />
+            <Setter Property="CornerRadius"
+                    Value="0,0,7,7" />
+            <Setter Property="BorderThickness"
+                    Value="0,0,0,5" />
+        </Style>
+
 
     </UserControl.Styles>
     <Grid Classes.dark="{Binding IsDark, Source={x:Static local:ThemeViewModel.Instance}}"
@@ -389,15 +420,6 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch" />
 
-        <!-- CAPO -->
-
-        <Border x:Name="Capo"
-                IsVisible="{Binding IsCapoFret}"
-                Background="DarkOrange"
-                Margin="10,0"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch" />
-
 
         <!-- NUT -->
 
@@ -469,15 +491,31 @@
             </Border.Background>
         </Border>
 
+
+        <!-- CAPO -->
+
+        <Border x:Name="Capo"
+                IsVisible="{Binding IsCapoFret}"
+                Classes.top="{Binding IsTopFret}"
+                Classes.bottom="{Binding IsBottomFret}"
+                Effect="drop-shadow(3 0 10 black)"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Stretch" />
+
         <!-- FRET MARKER -->
 
         <Border x:Name="FretMarker"
                 Classes="note-marker"
                 Classes.desired-root="{Binding IsSelectedKey}"
-                Classes.nut="{Binding IsNutFret}"
                 Width="{Binding $self.Bounds.Height}"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Stretch">
+            <Classes.nut>
+                <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                    <Binding Path="IsNutFret" />
+                    <Binding Path="IsCapoFret" />
+                </MultiBinding>
+            </Classes.nut>
             <TextBlock HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Text="{Binding MarkerLabel}" />

@@ -7,7 +7,6 @@
              d:DesignHeight="450"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:InstrumentViewModel"
@@ -150,35 +149,22 @@
                                 </Grid>
                             </Expander.Header>
                             <Expander.Content>
-                                <Grid Margin="10"
-                                      RowDefinitions="0.5*,0.5*"
-                                      ColumnDefinitions="Auto,*">
-
-                                    <!-- CAPO LABEL -->
-                                    <TextBlock Grid.Row="0"
-                                               Grid.Column="0"
-                                               Margin="0,0,10,0"
-                                               IsVisible="False"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               Classes="Body2"
-                                               Text="Capo" />
-
+                                <StackPanel Margin="10"
+                                            Spacing="5"
+                                            Orientation="Horizontal">
                                     <!-- CAPO NUM BTN -->
 
-                                    <Button Grid.Row="0"
-                                            Grid.Column="1"
-                                            IsVisible="False"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Classes="input-box"
-                                            IsEnabled="{Binding IsPatternEditable}"
-                                            Padding="0"
-                                            Theme="{StaticResource MaterialFlatButton}">
+                                    <Button
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Classes="input-box"
+                                        IsEnabled="{Binding IsPatternEditable}"
+                                        Padding="0"
+                                        CornerRadius="0"
+                                        Theme="{StaticResource MaterialFlatButton}">
                                         <Button.Flyout>
                                             <Flyout>
                                                 <!-- PITCH BTNS -->
-
                                                 <controls:Card HorizontalAlignment="Right"
                                                                VerticalAlignment="Center">
                                                     <StackPanel Orientation="Horizontal">
@@ -200,32 +186,25 @@
                                             </Flyout>
 
                                         </Button.Flyout>
-                                        <TextBlock VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"
-                                                   TextAlignment="Center"
-                                                   Classes="bold"
-                                                   FontSize="16"
-                                                   Text="{Binding CapoNum}" />
+                                        <Grid>
+                                            <TextBlock VerticalAlignment="Top"
+                                                       HorizontalAlignment="Center"
+                                                       TextAlignment="Center"
+                                                       FontSize="9"
+                                                       RenderTransform="translate(0,-7px)"
+                                                       Text="CAPO" />
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       TextAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="{Binding CapoNum}" />
+                                        </Grid>
                                     </Button>
 
-                                    <!-- TUNING LABEL -->
-
-                                    <TextBlock Grid.Row="1"
-                                               Grid.Column="0"
-                                               IsVisible="False"
-                                               Margin="0,0,10,0"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               Classes="Body2"
-                                               TextWrapping="WrapWithOverflow"
-                                               Text="" />
 
                                     <!-- OPEN NOTE STRIP -->
 
                                     <ListBox x:Name="OpenNoteStripListBox"
-                                             Grid.Row="1"
-                                             Grid.Column="1"
-                                             Margin="0,10,0,0"
                                              HorizontalAlignment="Center"
                                              VerticalAlignment="Center"
                                              IsEnabled="{Binding IsPatternEditable}"
@@ -243,6 +222,7 @@
                                                         Theme="{StaticResource MaterialFlatButton}">
                                                     <Button.Flyout>
                                                         <Flyout>
+
                                                             <!-- PITCH BTNS -->
 
                                                             <controls:Card
@@ -280,8 +260,7 @@
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
-
-                                </Grid>
+                                </StackPanel>
                             </Expander.Content>
                         </Expander>
                     </DataTemplate>

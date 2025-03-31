@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,267 +7,222 @@ using Avalonia.Svg.Skia;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
 
-namespace Calcuchord {
-    public partial class MatchViewModel : ViewModelBase {
+namespace Calcuchord;
 
-        #region Private Variables
+public class MatchViewModel : ViewModelBase {
+    #region Public Methods
 
-        #endregion
+    public void RefreshSvg() {
+        OnPropertyChanged(nameof(NotePattern));
+        // _svgSource = null;
+        // OnPropertyChanged(nameof(SvgSource));
+    }
 
-        #region Constants
+    #endregion
 
-        #endregion
+    #region Private Methods
 
-        #region Statics
-
-        #endregion
-
-        #region Interfaces
-
-        #endregion
-
-        #region Properties
-
-        #region Members
-
-        #endregion
-
-        #region View Models
-
-        #endregion
-
-        #region Appearance
-
-        public string BookmarkIcon =>
-            IsBookmarked ?
-                "Bookmark" :
-                "BookmarkOutline";
-
-        public string PlaybackIcon =>
-            IsMatchPlaying ?
-                "Pause" :
-                "Play";
-
-        public string Label1 =>
-            NotePattern.Key.ToDisplayValue();
-
-        public string Label2 =>
-            NotePattern.SuffixDisplayValue;
-
-        public string Label3 =>
-            NotePattern.Position == 0 ?
-                string.Empty :
-                NotePattern.Position.ToString();
-
-        public string Label4 =>
-            NotePattern.SubPosition == 0 ?
-                string.Empty :
-                NotePattern.SubPosition.ToString();
+    void PlayGroupMidi() {
+        if(PlatformWrapper.Services is not { } ps ||
+           ps.MidiPlayer is not { } mp ||
+           NotePattern.GetToneGroups() is not { } tgl) {
+            return;
+        }
 
 
-        public int DiagramColCount =>
-            PatternType == MusicPatternType.Chords ?
-                NotePattern.Parent.Parent.Parent.RowCount + 1 :
-                PatternGen.PATTERN_FRET_SPAN + 2;
-
-        public int DiagramRowCount =>
-            PatternType == MusicPatternType.Chords ?
-                PatternGen.PATTERN_FRET_SPAN + 2 :
-                NotePattern.Parent.Parent.Parent.RowCount + 1;
-
-        #endregion
-
-        #region Layout
-
-        #endregion
-
-        #region State
-
-        SvgSource _svgSource;
-
-        public SvgSource SvgSource {
-            get {
-
-                if(_svgSource == null &&
-                   PatternToSvgConverter.Instance.Convert(
-                       NotePattern,typeof(string),"styled",CultureInfo.CurrentCulture) is string svg_xml) {
-                    _svgSource = SvgSource.LoadFromSvg(svg_xml);
+        Dispatcher.UIThread.Post(
+            () => {
+                if(PatternType == MusicPatternType.Chords) {
+                    mp.PlayChord(tgl);
+                } else {
+                    mp.PlayScale(tgl);
                 }
+            },DispatcherPriority.Background);
+    }
 
-                return _svgSource;
+    #endregion
+
+    #region Properties
+
+    #region Appearance
+
+    public string BookmarkIcon =>
+        IsBookmarked ? "Bookmark" : "BookmarkOutline";
+
+    public string PlaybackIcon =>
+        IsMatchPlaying ? "Pause" : "Play";
+
+    public string Label1 =>
+        NotePattern.Key.ToDisplayValue();
+
+    public string Label2 =>
+        NotePattern.SuffixDisplayValue;
+
+    public string Label3 =>
+        NotePattern.Position == 0 ? string.Empty : NotePattern.Position.ToString();
+
+    public string Label4 =>
+        NotePattern.SubPosition == 0 ? string.Empty : NotePattern.SubPosition.ToString();
+
+
+    public int DiagramColCount =>
+        PatternType == MusicPatternType.Chords
+            ? NotePattern.Parent.Parent.Parent.RowCount + 1
+            : PatternGen.PATTERN_FRET_SPAN + 2;
+
+    public int DiagramRowCount =>
+        PatternType == MusicPatternType.Chords
+            ? PatternGen.PATTERN_FRET_SPAN + 2
+            : NotePattern.Parent.Parent.Parent.RowCount + 1;
+
+    #endregion
+
+    #region State
+
+    SvgSource _svgSource;
+
+    public SvgSource SvgSource {
+        get {
+
+            if(_svgSource == null &&
+               PatternToSvgConverter.Instance.Convert(
+                   NotePattern,typeof(string),"styled",CultureInfo.CurrentCulture) is string svg_xml) {
+                _svgSource = SvgSource.LoadFromSvg(svg_xml);
             }
+
+            return _svgSource;
         }
+    }
 
-        public string ShareTitle =>
-            NotePattern.FullName.Replace("#","Sharp").Replace(" ","_");
+    public string ShareTitle =>
+        NotePattern.FullName.Replace("#","Sharp").Replace(" ","_");
 
-        public bool IsMatchPlaying { get; set; }
+    public bool IsMatchPlaying { get; set; }
 
-        public MusicPatternType PatternType { get; protected set; }
+    public MusicPatternType PatternType { get; protected set; }
 
-        public bool IsTranslateSourceMatch =>
-            MainViewModel.Instance.TranslateSourceMatchViewModel == this;
+    public bool IsTranslateSourceMatch =>
+        MainViewModel.Instance.TranslateSourceMatchViewModel == this;
 
-        public bool IsSelected { get; set; }
+    public bool IsSelected { get; set; }
 
-        #endregion
+    #endregion
 
-        #region Model
+    #region Model
 
-        public bool IsBookmarked =>
-            MainViewModel.Instance.SelectedTuning is not null &&
-            MainViewModel.Instance.SelectedTuning.AvailableBookmarkGroups.Any(
-                x => NotePattern.IsInBookmarkGroup(x.BookmarkGroup));
+    public bool IsBookmarked =>
+        MainViewModel.Instance.SelectedTuning is not null &&
+        MainViewModel.Instance.SelectedTuning.AvailableBookmarkGroups.Any(
+            x => NotePattern.IsInBookmarkGroup(x.BookmarkGroup));
 
-        public double Score { get; set; }
+    public double Score { get; set; }
 
-        public NotePattern NotePattern { get; set; }
+    public NotePattern NotePattern { get; set; }
 
-        #endregion
+    #endregion
 
-        #endregion
+    #endregion
 
-        #region Events
+    #region Constructors
 
-        #endregion
+    public MatchViewModel() {
+    }
 
-        #region Constructors
+    public MatchViewModel(MusicPatternType patternType,NotePattern notePattern,double score) {
+        PatternType = patternType;
+        NotePattern = notePattern;
+        Score = score;
+    }
 
-        public MatchViewModel() {
-        }
+    #endregion
 
-        public MatchViewModel(MusicPatternType patternType,NotePattern notePattern,double score) {
-            PatternType = patternType;
-            NotePattern = notePattern;
-            Score = score;
-        }
+    #region Commands
 
-        #endregion
-
-        #region Public Methods
-
-        public void RefreshSvg() {
-            OnPropertyChanged(nameof(NotePattern));
-            // _svgSource = null;
-            // OnPropertyChanged(nameof(SvgSource));
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        #endregion
-
-        #region Private Methods
-
-        void PlayGroupMidi() {
+    public ICommand ToggleMatchPlaybackCommand => new MpCommand(
+        () => {
             if(PlatformWrapper.Services is not { } ps ||
-               ps.MidiPlayer is not { } mp ||
-               NotePattern.GetToneGroups() is not { } tgl) {
+               ps.MidiPlayer is not { } mp) {
                 return;
             }
 
-
-            Dispatcher.UIThread.Post(
-                () => {
-                    if(PatternType == MusicPatternType.Chords) {
-                        mp.PlayChord(tgl);
-                    } else {
-                        mp.PlayScale(tgl);
-                    }
-                },DispatcherPriority.Background);
-        }
-
-        #endregion
-
-        #region Commands
-
-        public ICommand ToggleMatchPlaybackCommand => new MpCommand(
-            () => {
-                if(PlatformWrapper.Services is not { } ps ||
-                   ps.MidiPlayer is not { } mp) {
-                    return;
-                }
-
 #if DEBUG
-                if(ThemeViewModel.Instance.IsDesktop &&
-                   TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
-                   tl.Clipboard is { } cb &&
-                   PatternToSvgConverter.Instance.Convert(NotePattern,null,"styled",null) is string svg) {
-                    cb.SetTextAsync(svg.ToPrettyPrintXml()).FireAndForgetSafeAsync();
-                }
+            if(ThemeViewModel.Instance.IsDesktop &&
+               TopLevel.GetTopLevel(MainView.Instance) is { } tl &&
+               tl.Clipboard is { } cb &&
+               PatternToSvgConverter.Instance.Convert(NotePattern,null,"styled",null) is string svg) {
+                cb.SetTextAsync(svg.ToPrettyPrintXml()).FireAndForgetSafeAsync();
+            }
 #endif
 
-                if(!mp.CanPlay) {
-                    // TODO should probably show something here when can't play about local storage 
+            if(!mp.CanPlay) {
+                // TODO should probably show something here when can't play about local storage 
 
-                    return;
+                return;
+            }
+
+            PlayGroupMidi();
+        });
+
+    public MpIAsyncCommand SetMatchToInstrumentCommand => new MpAsyncCommand(
+        async () => {
+            if(MainViewModel.Instance is not { } mvm ||
+               mvm.SelectedTuning is not { } stvm) {
+                return;
+            }
+
+            stvm.ResetSelection();
+            //await Task.Delay(300);
+
+            foreach (var nvm in stvm.AllNotes.Where(x => x.IsRealNote)) {
+                if(NotePattern.Notes.FirstOrDefault(
+                       x => x.RowNum == nvm.RowNum &&
+                            (
+                                (x.ColNum < 0 && nvm.IsOpenNote) ||
+                                (x.ColNum >= 0 && x.ColNum == nvm.NoteNum))) is not { } ng_match) {
+                    continue;
                 }
 
-                PlayGroupMidi();
-            });
-
-        public MpIAsyncCommand SetMatchToInstrumentCommand => new MpAsyncCommand(
-            async () => {
-                if(MainViewModel.Instance is not { } mvm ||
-                   mvm.SelectedTuning is not { } stvm) {
-                    return;
-                }
-
-                stvm.ResetSelection();
-                //await Task.Delay(300);
-
-                foreach(NoteViewModel nvm in stvm.AllNotes.Where(x => x.IsRealNote)) {
-                    if(NotePattern.Notes.FirstOrDefault(
-                           x => x.RowNum == nvm.RowNum && Math.Max(0,x.ColNum) == nvm.NoteNum) is not
-                       { } ng_match) {
-                        continue;
-                    }
-
+                nvm.Parent.ToggleSelected(nvm,false);
+                if(ng_match.IsMute) {
+                    // toggle to mute
                     nvm.Parent.ToggleSelected(nvm,false);
-                    if(ng_match.IsMute) {
-                        // toggle to mute
-                        nvm.Parent.ToggleSelected(nvm,false);
-                    }
                 }
+            }
 
-                if(!mvm.IsSearchModeSelected) {
-                    // switch to search mode
-                    mvm.SelectOptionCommand.Execute(mvm.SearchOptionViewModel);
+            if(!mvm.IsSearchModeSelected) {
+                // switch to search mode
+                mvm.SelectOptionCommand.Execute(mvm.SearchOptionViewModel);
 
-                    // wait for inst to load...
-                    //await Task.Delay(500);
-                }
+                // wait for inst to load...
+                //await Task.Delay(500);
+            }
 
-                while(InstrumentView.Instance == null ||
-                      !InstrumentView.Instance.IsArrangeValid) {
-                    await Task.Delay(100);
-                }
-                //await Task.Delay(250);
+            while(InstrumentView.Instance == null ||
+                  !InstrumentView.Instance.IsArrangeValid) {
+                await Task.Delay(100);
+            }
 
-                InstrumentView.Instance.ScrollSelectionIntoView();
+            InstrumentView.Instance.ScrollSelectionIntoView();
 
-                mvm.UpdateMatchesAsync(MatchUpdateSource.FindClick).FireAndForgetSafeAsync();
+            mvm.UpdateMatchesAsync(MatchUpdateSource.FindClick).FireAndForgetSafeAsync();
 
-            });
+        });
 
-        public ICommand RefingerChordCommand => new MpCommand(
-            () => {
+    public ICommand RefingerChordCommand => new MpCommand(
+        () => {
 
-            });
+        });
 
-        public ICommand SelectMatchCommand => new MpCommand(
-            () => {
-                if(MainViewModel.Instance is not { } mvm) {
-                    return;
-                }
+    public ICommand SelectMatchCommand => new MpCommand(
+        () => {
+            if(MainViewModel.Instance is not { } mvm) {
+                return;
+            }
 
-                mvm.SelectedMatch = this;
+            mvm.SelectedMatch = this;
 
-                MatchesView.Instance.ScrollItemIntoView(this);
-            });
+            MatchesView.Instance.ScrollItemIntoView(this);
+        });
 
-        #endregion
-
-    }
+    #endregion
 }

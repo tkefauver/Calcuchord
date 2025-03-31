@@ -18,7 +18,7 @@ namespace Calcuchord;
 public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
     #region Constants
 
-    private const string DEFAULT_BOOKMARK_GROUP_NAME = "Group1";
+    const string DEFAULT_BOOKMARK_GROUP_NAME = "Group1";
 
     #endregion
 
@@ -34,7 +34,7 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
 
     #region Members
 
-    private CancellationTokenSource PatternGenCts { get; set; }
+    CancellationTokenSource PatternGenCts { get; set; }
 
     #endregion
 
@@ -65,16 +65,17 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
     public IEnumerable<NoteViewModel> AllNotes =>
         NoteRows.SelectMany(x => x.Notes).OrderBy(x => x.RowNum).ThenBy(x => x.NoteNum);
 
-    public IEnumerable<NoteViewModel> SelectedNotes
-    {
+    public IEnumerable<NoteViewModel> SelectedNotes {
         get => AllNotes.Where(x => x.IsSelected);
-        set
-        {
+        set {
             AllNotes.ForEach(
                 x => x.IsSelected = value == null ? false : value.Contains(x));
             OnPropertyChanged();
         }
     }
+
+    public IEnumerable<NoteViewModel> ScrollToNotes =>
+        SelectedNotes.Any() ? SelectedNotes : AllNotes.Where(x => x.NoteNum == CapoNum + MinVisibleFretSpan);
 
     public ObservableCollection<NoteViewModel> OpenNotes { get; } = [];
 
@@ -91,6 +92,8 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
     #endregion
 
     #region Layout
+
+    public int MinVisibleFretSpan => 4;
 
     public int BookmarkColumnCount =>
         BoundBookmarkGroups.Count <= 3 ? 2 : 3;
@@ -118,7 +121,7 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
     public int ScalesCount { get; private set; }
     public int ModesCount { get; private set; }
 
-    private bool HasFretNumRow =>
+    bool HasFretNumRow =>
         Parent.InstrumentType != InstrumentType.Piano;
 
     public int SelectedOpenNoteIndex { get; set; } = 0;
@@ -132,29 +135,27 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
 
     #region Model
 
-    public bool IsSelected
-    {
+    public bool IsSelected {
         get => Tuning.IsSelected;
-        set
-        {
-            if (IsSelected != value) {
+        set {
+            if(IsSelected != value) {
                 Tuning.IsSelected = value;
-                if (IsSelected)
+                if(IsSelected)
                     // only trigger save when seleted to avoid a million writes
                     //HasModelChanged = true;
+                {
                     Prefs.Instance.Save();
+                }
 
                 OnPropertyChanged();
             }
         }
     }
 
-    public int CapoNum
-    {
+    public int CapoNum {
         get => Tuning.CapoFretNum;
-        set
-        {
-            if (CapoNum != value) {
+        set {
+            if(CapoNum != value) {
                 Tuning.CapoFretNum = value;
                 OnPropertyChanged();
             }
@@ -166,12 +167,10 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
 
     public bool IsReadOnly => Tuning.IsReadOnly;
 
-    public string Name
-    {
+    public string Name {
         get => Tuning.Name;
-        set
-        {
-            if (Name != value) {
+        set {
+            if(Name != value) {
                 Tuning.Name = value;
                 OnPropertyChanged();
             }
@@ -201,18 +200,22 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
     #region Public Methods
 
     public async Task<bool> InitAsync(Tuning tuning) {
-        var success = true;
+        bool success = true;
         Tuning = tuning;
         Tuning.SetParent(Parent.Instrument);
 
-        if (string.IsNullOrEmpty(Tuning.Id)) Tuning.CreateId();
+        if(string.IsNullOrEmpty(Tuning.Id)) {
+            Tuning.CreateId();
+        }
 
         NoteRows.Clear();
 
-        Tuning.OpenNotes.OrderBy(x => x.RowNum).ForEach(x => NoteRows.Add(new NoteRowViewModel(this, x)));
-        if (HasFretNumRow)
+        Tuning.OpenNotes.OrderBy(x => x.RowNum).ForEach(x => NoteRows.Add(new NoteRowViewModel(this,x)));
+        if(HasFretNumRow)
             // add fret num row
-            NoteRows.Insert(0, new NoteRowViewModel(this, null));
+        {
+            NoteRows.Insert(0,new NoteRowViewModel(this,null));
+        }
 
         OpenNotes.Clear();
         OpenNotes.AddRange(
@@ -226,38 +229,40 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
         BookmarkGroups.AddRange(
             Prefs.Instance.BookmarkGroups
                 .Where(x => x.IsTuningBookmark(Tuning))
-                .Select(x => new BookmarkGroupViewModel(this, x)));
-        if (BookmarkGroups.None()) {
+                .Select(x => new BookmarkGroupViewModel(this,x)));
+        if(BookmarkGroups.None()) {
             // initial tuning init, add default bookmark groups
             BookmarkGroups.AddRange(
-                Enumerable.Range(0, Enum.GetNames(typeof(MusicPatternType)).Length)
+                Enumerable.Range(0,Enum.GetNames(typeof(MusicPatternType)).Length)
                     .Select(
                         x => new BookmarkGroupViewModel(
                             this,
                             BookmarkGroup.Create(
-                                Tuning, (MusicPatternType)x, DEFAULT_BOOKMARK_GROUP_NAME, isDefault: true))));
-            if (Tuning.Collections
-                        .SelectMany(x => x.Value).SelectMany(x => x.Patterns).Where(x => x.IsBookmarked) is
-                    { } legacy_bookmarks &&
-                legacy_bookmarks.Any()) {
+                                Tuning,(MusicPatternType)x,DEFAULT_BOOKMARK_GROUP_NAME,isDefault: true))));
+            if(Tuning.Collections
+                       .SelectMany(x => x.Value).SelectMany(x => x.Patterns).Where(x => x.IsBookmarked) is
+                   { } legacy_bookmarks &&
+               legacy_bookmarks.Any()) {
                 // add legacy bookmarks to default groups
                 foreach (var lb in legacy_bookmarks)
-                    if (BookmarkGroups.FirstOrDefault(x => x.PatternType == lb.PatternType) is { } def_pt_bmgvm)
+                    if(BookmarkGroups.FirstOrDefault(x => x.PatternType == lb.PatternType) is { } def_pt_bmgvm) {
                         def_pt_bmgvm.ToggleLinkedWithPatternCommand.Execute(lb);
+                    }
 
                 Prefs.Instance.Save();
             }
         }
 
-        AddNewPlaceholderGroup = new BookmarkGroupViewModel(this, null);
+        AddNewPlaceholderGroup = new BookmarkGroupViewModel(this,null);
         BookmarkGroups.Add(AddNewPlaceholderGroup);
         BookmarkGroups.CollectionChanged += BookmarkGroups_CollectionChanged;
         SelectedBookmarkGroups.CollectionChanged += SelectedBookmarkGroups_CollectionChanged;
 
 
-        if (!IsLoaded &&
-            (!Parent.IsEditModeEnabled || IsCurGenTuning))
+        if(!IsLoaded &&
+           (!Parent.IsEditModeEnabled || IsCurGenTuning)) {
             success = await LoadPatternsAsync();
+        }
 
         Parent.Instrument.RefreshModelTree();
 
@@ -282,34 +287,44 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
         List<string> avail_suffixes = [];
         var mrl = new List<MatchViewModel>();
         foreach (var pkc in Tuning.Collections[pattern_type]) {
-            var omitted_key = target_key is { } tk2 && tk2 != pkc.Key;
+            bool omitted_key = target_key is { } tk2 && tk2 != pkc.Key;
 
             foreach (var np in pkc.Patterns) {
-                var omitted_suff = target_suffixes.Any() && !target_suffixes.Contains(np.SuffixKey);
-                var valid = false;
+                bool omitted_suff = target_suffixes.Any() && !target_suffixes.Contains(np.SuffixKey);
+                bool valid = false;
                 double score = 1;
-                if (mode_type == DisplayModeType.Search) {
-                    score = GetScore(np, sel_notes, score_method);
-                    if (score > 0 || sel_notes.Length == 0) valid = true;
-                }
-                else if (mode_type == DisplayModeType.Bookmarks) {
-                    if (SelectedBookmarkGroups.Any(x => np.IsInBookmarkGroup(x.BookmarkGroup))) valid = true;
-                }
-                else {
+                if(mode_type == DisplayModeType.Search) {
+                    score = GetScore(np,sel_notes,score_method);
+                    if(score > 0 || sel_notes.Length == 0) {
+                        valid = true;
+                    }
+                } else if(mode_type == DisplayModeType.Bookmarks) {
+                    if(SelectedBookmarkGroups.Any(x => np.IsInBookmarkGroup(x.BookmarkGroup))) {
+                        valid = true;
+                    }
+                } else {
                     valid = true;
                 }
 
-                if (!valid) continue;
+                if(!valid) {
+                    continue;
+                }
 
-                if (!avail_keys.Contains(np.Key)) avail_keys.Add(np.Key);
+                if(!avail_keys.Contains(np.Key)) {
+                    avail_keys.Add(np.Key);
+                }
 
-                if (!avail_suffixes.Contains(np.SuffixKey)) avail_suffixes.Add(np.SuffixKey);
+                if(!avail_suffixes.Contains(np.SuffixKey)) {
+                    avail_suffixes.Add(np.SuffixKey);
+                }
 
-                if (!omitted_key &&
-                    !omitted_suff &&
-                    (mode_type != DisplayModeType.Search || score > 0))
+                if(!omitted_key &&
+                   !omitted_suff &&
+                   (mode_type != DisplayModeType.Search || score > 0))
                     //yield return mvm;
-                    mrl.Add(new MatchViewModel(pattern_type, np, score));
+                {
+                    mrl.Add(new MatchViewModel(pattern_type,np,score));
+                }
             }
         }
 
@@ -319,15 +334,14 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
     }
 
     public void UpdateAvailableSortOrder(bool byModel) {
-        if (byModel) {
+        if(byModel) {
             BoundBookmarkGroups = new ObservableCollection<BookmarkGroupViewModel>(
                 BookmarkGroups
                     .Where(x => x.PatternType == MainViewModel.Instance.SelectedPatternType)
                     .OrderBy(x => x.SortOrderIdx));
-        }
-        else {
+        } else {
             BoundBookmarkGroups.ForEach(
-                (x, idx) => x.SortOrderIdx = x.IsAddGroupPlaceholder ? int.MaxValue : idx);
+                (x,idx) => x.SortOrderIdx = x.IsAddGroupPlaceholder ? int.MaxValue : idx);
             OnPropertyChanged(nameof(BoundBookmarkGroups));
         }
 
@@ -335,10 +349,10 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
     }
 
     public int GetNewBookmarkColorId() {
-        return Enumerable.Range(0, ThemeViewModel.Instance.BookmarkColors.Length)
+        return Enumerable.Range(0,ThemeViewModel.Instance.BookmarkColors.Length)
             .Select(
                 x =>
-                    (x, AvailableBookmarkGroups.Count(y => y.BookmarkGroup.ColorId == x)))
+                    (x,AvailableBookmarkGroups.Count(y => y.BookmarkGroup.ColorId == x)))
             .OrderBy(x => x.Item2)
             .Select(x => x.Item1)
             .FirstOrDefault();
@@ -352,84 +366,89 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
 
     #region Private Methods
 
-    private void InstrumentTuningViewModel_OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+    void InstrumentTuningViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
         switch (e.PropertyName) {
             case nameof(Name):
-                if (IsSelected) Parent.RaisePropertyChanged(nameof(Parent.Subtitle));
+                if(IsSelected) {
+                    Parent.RaisePropertyChanged(nameof(Parent.Subtitle));
+                }
 
                 break;
             case nameof(IsSelected):
-                if (IsSelected)
+                if(IsSelected) {
                     Dispatcher.UIThread.Invoke(
-                        () =>
-                        {
-                            if (Parent.SelectedTuning != this) Parent.SelectedTuning = this;
+                        () => {
+                            if(Parent.SelectedTuning != this) {
+                                Parent.SelectedTuning = this;
+                            }
 
                             //ResetSelection();
-                            if (!Parent.IsSelected ||
-                                Parent.IsEditModeEnabled ||
-                                Parent.Parent.LastSelectedTuning == this)
+                            if(!Parent.IsSelected ||
+                               Parent.IsEditModeEnabled ||
+                               Parent.Parent.LastSelectedTuning == this) {
                                 return;
+                            }
 
                             MainViewModel.Instance.RaisePropertyChanged(
                                 nameof(MainViewModel.Instance.SelectedTuning));
 
                             UpdateAvailableSortOrder(true);
 
-                            if (Design.IsDesignMode ||
-                                !MainViewModel.Instance.IsLoaded ||
-                                MainView.Instance is not { } mv ||
-                                mv.DlgHost is not { } mdh ||
-                                !mdh.IsLoaded)
+                            if(Design.IsDesignMode ||
+                               !MainViewModel.Instance.IsLoaded ||
+                               MainView.Instance is not { } mv ||
+                               mv.DlgHost is not { } mdh ||
+                               !mdh.IsLoaded) {
                                 return;
+                            }
 
-                            var sel_msg = $"{FullName} selected";
+                            string sel_msg = $"{FullName} selected";
                             SnackbarHost.Post(
                                 sel_msg,
                                 MainView.SnackbarHostName,
                                 DispatcherPriority.Background);
-                        }, DispatcherPriority.Background);
+                        },DispatcherPriority.Background);
+                }
 
                 break;
         }
     }
 
-    private async Task<bool> LoadPatternsAsync() {
-        var success = false;
+    async Task<bool> LoadPatternsAsync() {
+        bool success = false;
 
-        while (true) {
-            if (MainView.Instance is not { } mv ||
-                !mv.DlgHost.IsLoaded)
+        while(true) {
+            if(MainView.Instance is not { } mv ||
+               !mv.DlgHost.IsLoaded) {
                 await Task.Delay(100);
+            }
 
             break;
         }
 
         var pg = new PatternGen(this);
         Dispatcher.UIThread.Post(
-            () =>
-            {
-                if (!MainViewModel.Instance.IsLoaded)
+            () => {
+                if(!MainViewModel.Instance.IsLoaded)
                     // initial startup gen
+                {
                     DialogManager.Close(MainViewModel.Instance.MainDialogHostName);
+                }
 
                 var pv = new TuningGenProgressView { DataContext = pg };
                 DialogManager.ShowAsync(
-                        pv, MainViewModel.Instance.MainDialogHostName)
+                        pv,MainViewModel.Instance.MainDialogHostName)
                     .FireAndForgetSafeAsync();
             });
-
 
         PatternGenCts = new CancellationTokenSource();
         try {
             await Task.Run(
-                async () =>
-                {
+                async () => {
                     var patterns = await pg.GenerateAsync(PatternGenCts.Token);
-                    
                     Tuning.Collections.Keys.ForEach(x => Tuning.Collections[x].AddRange(patterns[x]));
                     success = true;
-                }, PatternGenCts.Token);
+                },PatternGenCts.Token);
         }
         catch {
             // canceled
@@ -440,64 +459,72 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
         return success;
     }
 
-    private void BookmarkGroups_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+    void BookmarkGroups_CollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
         OnPropertyChanged(nameof(BookmarkColumnCount));
     }
 
-    private void SelectedBookmarkGroups_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+    void SelectedBookmarkGroups_CollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
         Debug.Assert(
-            SelectedBookmarkGroups.None(x => x.IsAddGroupPlaceholder), "Placeholder group shouldn't be selected");
+            SelectedBookmarkGroups.None(x => x.IsAddGroupPlaceholder),"Placeholder group shouldn't be selected");
 
     }
 
-    private async Task AdjustCapoAsync(int capoDelta) {
-        CapoNum += capoDelta;
-        Tuning.OpenNotes.ForEach(x => x.Adjust(capoDelta));
-        // var new_open_notes = Tuning.OpenNotes.Select((x,idx) => new InstrumentNote(0,idx,x.Offset(capoDelta)))
-        //     .ToList();
-        // Tuning.OpenNotes.Clear();
-        // Tuning.OpenNotes.AddRange(new_open_notes);
-        await InitAsync(Tuning);
-    }
-
-    private double GetScore(NotePattern pattern, InstrumentNote[] matchNotes, MatchScoreMethodType scoring) {
-        double score = 0;
-        if (pattern.ToString() == "C minor_1_1" ||
-            pattern.ToString() == "C major_1_4") {
-            //bls
+    void ApplyCapoOffset(int capoOffset,
+        Dictionary<MusicPatternType,IEnumerable<PatternKeyCollection>> patterns) {
+        if(capoOffset == 0) {
+            return;
         }
 
-        var score_matrix = new double[pattern.Parent.Parent.Parent.RowCount, matchNotes.Length];
-        for (var p = 0; p < pattern.Parent.Parent.Parent.RowCount; p++) {
-            if (scoring == MatchScoreMethodType.Exact) {
-                if (matchNotes.FirstOrDefault(x => x.RowNum == p) is not { } match_row_note) continue;
+        Tuning.OpenNotes.ForEach(x => x.Adjust(capoOffset));
+        _ = patterns.Values
+            .SelectMany(x => x)
+            .SelectMany(x => x.Patterns)
+            .SelectMany(x => x.Notes)
+            .Where(x => !x.IsMute);
+    }
 
-                var exact_score = pattern.Notes[p].SimilarityScore(match_row_note, scoring);
-                if (exact_score == 0) return 0;
+    double GetScore(NotePattern pattern,InstrumentNote[] matchNotes,MatchScoreMethodType scoring) {
+        double score = 0;
+
+        double[,] score_matrix = new double[pattern.Parent.Parent.Parent.RowCount,matchNotes.Length];
+        for (int p = 0; p < pattern.Parent.Parent.Parent.RowCount; p++) {
+            if(scoring == MatchScoreMethodType.Exact) {
+                if(matchNotes.FirstOrDefault(x => x.RowNum == p) is not { } match_row_note) {
+                    continue;
+                }
+
+                double exact_score = pattern.Notes[p].SimilarityScore(match_row_note,scoring);
+                if(exact_score == 0) {
+                    return 0;
+                }
 
                 score += exact_score;
                 continue;
             }
 
-            for (var m = 0; m < matchNotes.Length; m++)
-                score_matrix[p, m] = pattern.Notes[p].SimilarityScore(matchNotes[m], scoring);
+            for (int m = 0; m < matchNotes.Length; m++)
+                score_matrix[p,m] = pattern.Notes[p].SimilarityScore(matchNotes[m],scoring);
         }
 
-        if (scoring != MatchScoreMethodType.Exact) {
+        if(scoring != MatchScoreMethodType.Exact) {
             var used_pattern_note_idxl = new List<int>();
-            for (var m = 0; m < matchNotes.Length; m++) {
+            for (int m = 0; m < matchNotes.Length; m++) {
                 double max_match_score = 0;
-                var max_match_pattern_idx = -1;
-                for (var p = 0; p < pattern.Notes.Count; p++) {
-                    if (used_pattern_note_idxl.Contains(p)) continue;
+                int max_match_pattern_idx = -1;
+                for (int p = 0; p < pattern.Notes.Count; p++) {
+                    if(used_pattern_note_idxl.Contains(p)) {
+                        continue;
+                    }
 
-                    if (score_matrix[p, m] > max_match_score) {
-                        max_match_score = score_matrix[p, m];
+                    if(score_matrix[p,m] > max_match_score) {
+                        max_match_score = score_matrix[p,m];
                         max_match_pattern_idx = p;
                     }
                 }
 
-                if (max_match_pattern_idx < 0) continue;
+                if(max_match_pattern_idx < 0) {
+                    continue;
+                }
 
                 score += max_match_score;
                 used_pattern_note_idxl.Add(max_match_pattern_idx);
@@ -528,53 +555,67 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
     #region Commands
 
     public ICommand DeleteThisTuningCommand => new MpCommand<object>(
-        async args =>
-        {
+        async args => {
             Extensions.CloseFlyout(args);
 
             bool? confirmed = null;
-            var dlg_v = new YesNoDialogView
-            {
-                DataContext = new DialogViewModel
-                {
+            var dlg_v = new YesNoDialogView {
+                DataContext = new DialogViewModel {
                     Label = $"Are you sure you want to delete '{Name}'?",
                     OkCommand = new MpCommand(
-                        () => { confirmed = true; }),
+                        () => {
+                            confirmed = true;
+                        }),
                     CancelCommand = new MpCommand(
-                        () => { confirmed = false; })
+                        () => {
+                            confirmed = false;
+                        })
                 }
             };
-            DialogManager.ShowAsync(dlg_v, MainViewModel.Instance.InstEditDialogHostName).FireAndForgetSafeAsync();
+            DialogManager.ShowAsync(dlg_v,MainViewModel.Instance.InstEditDialogHostName).FireAndForgetSafeAsync();
 
-            while (!confirmed.HasValue) await Task.Delay(100);
+            while(!confirmed.HasValue) {
+                await Task.Delay(100);
+            }
 
             DialogManager.Close(MainViewModel.Instance.InstEditDialogHostName);
 
-            if (!confirmed.Value) return;
+            if(!confirmed.Value) {
+                return;
+            }
 
             Parent.RemoveTuningCommand.Execute(this);
-        }, args => { return CanDelete; });
+        },
+        args => {
+            return CanDelete;
+        });
 
     public ICommand DuplicateThisTuningCommand => new MpCommand<object>(
-        args =>
-        {
+        args => {
             Extensions.CloseFlyout(args);
             var dup_tuning = Tuning.Clone();
             dup_tuning.IsReadOnly = false;
-            dup_tuning.Name = Parent.GetUniqueTuningName(Name, []);
+            dup_tuning.Name = Parent.GetUniqueTuningName(Name,[]);
             Parent.AddTuningCommand.Execute(dup_tuning);
         });
 
-    public ICommand IncreaseCapoFretCommand => new MpAsyncCommand(
-        async () => { await AdjustCapoAsync(1); }, () => { return TotalFretCount > Parent.MinEditableFretCount; });
+    public ICommand IncreaseCapoFretCommand => new MpCommand(
+        () => {
+            CapoNum++;
+        },() => {
+            return TotalFretCount > Parent.MinEditableFretCount;
+        });
 
-    public ICommand DecreaseCapoFretCommand => new MpAsyncCommand(
-        async () => { await AdjustCapoAsync(-1); }, () => { return CapoNum > 0; });
+    public ICommand DecreaseCapoFretCommand => new MpCommand(
+        () => {
+            CapoNum--;
+        },() => {
+            return CapoNum > 0;
+        });
 
 
     public ICommand ShowStatsCommand => new MpCommand<object>(
-        args =>
-        {
+        args => {
             Extensions.CloseFlyout(args);
             ChordsCount = Tuning.Chords.SelectMany(x => x.Patterns).Count();
             ScalesCount = Tuning.Scales.SelectMany(x => x.Patterns).Count();
@@ -585,31 +626,35 @@ public class TuningViewModel : ViewModelBase<InstrumentViewModel> {
                     .SelectMany(x => x.Patterns)
                     .Count(x => x.IsBookmarked);
 
-            var stats_view = new TuningStatsView
-            {
+            var stats_view = new TuningStatsView {
                 DataContext = this
             };
             stats_view.OkButton.Command = new MpCommand(
-                () => { DialogManager.Close(MainViewModel.Instance.InstEditDialogHostName); });
+                () => {
+                    DialogManager.Close(MainViewModel.Instance.InstEditDialogHostName);
+                });
 
-            DialogManager.ShowAsync(stats_view, MainViewModel.Instance.InstEditDialogHostName);
+            DialogManager.ShowAsync(stats_view,MainViewModel.Instance.InstEditDialogHostName);
 
         });
 
     public ICommand SelectThisTuningCommand => new MpCommand(
-        () => { Parent.SelectedTuning = this; });
+        () => {
+            Parent.SelectedTuning = this;
+        });
 
     public ICommand CancelPatternGenCommand => new MpCommand(
-        () => { PatternGenCts?.Cancel(); });
+        () => {
+            PatternGenCts?.Cancel();
+        });
 
 
     public ICommand AddNewBookmarkGroupCommand => new MpCommand<object>(
-        args =>
-        {
+        args => {
             var new_bmg = BookmarkGroup.Create(
-                Tuning, MainViewModel.Instance.SelectedPatternType,
+                Tuning,MainViewModel.Instance.SelectedPatternType,
                 colorId: GetNewBookmarkColorId());
-            var new_bmg_vm = new BookmarkGroupViewModel(this, new_bmg);
+            var new_bmg_vm = new BookmarkGroupViewModel(this,new_bmg);
             // NOTE args may be a note pattern when from match menu
             new_bmg_vm.BeginEditCommand.Execute(args);
         });

@@ -26,7 +26,6 @@ namespace Calcuchord {
             }
 
             mtvm.SelectMatchCommand.Execute(null);
-            presenter.BringIntoView();
         }
 
         void TranslateFlyoutBase_OnOpening(object sender,EventArgs e) {

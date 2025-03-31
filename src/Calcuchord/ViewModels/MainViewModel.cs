@@ -62,10 +62,10 @@ public class MainViewModel : ViewModelBase {
 
     #region Private Variables
 
-    private readonly object _matchCreateLock = new();
+    readonly object _matchCreateLock = new();
 
-    private string _editInstrumentInitialStateJson;
-    private string _translateOptionInitialStateJson;
+    string _editInstrumentInitialStateJson;
+    string _translateOptionInitialStateJson;
 
     #endregion
 
@@ -84,14 +84,12 @@ public class MainViewModel : ViewModelBase {
 
     public MatchViewModel TranslateSourceMatchViewModel { get; private set; }
     public ObservableCollection<MatchViewModel> Matches { get; } = [];
-    private MatchViewModel[] AllResults { get; set; } = [];
-    private IEnumerable<NoteViewModel> LastNotes { get; set; } = [];
+    MatchViewModel[] AllResults { get; set; } = [];
+    IEnumerable<NoteViewModel> LastNotes { get; set; } = [];
 
-    public MatchViewModel SelectedMatch
-    {
+    public MatchViewModel SelectedMatch {
         get => Matches.FirstOrDefault(x => x.IsSelected);
-        set
-        {
+        set {
             Matches.ForEach(x => x.IsSelected = value == x);
             OnPropertyChanged();
         }
@@ -101,20 +99,18 @@ public class MainViewModel : ViewModelBase {
 
     #region Instrument
 
-    private TuningViewModel TranslateSourceTuning { get; set; }
-    private TuningViewModel TranslateTargetTuning { get; set; }
+    TuningViewModel TranslateSourceTuning { get; set; }
+    TuningViewModel TranslateTargetTuning { get; set; }
     public InstrumentViewModel EditModeInstrument { get; private set; }
 
     public ObservableCollection<InstrumentViewModel> Instruments { get; } = [];
 
-    public InstrumentViewModel SelectedInstrument
-    {
+    public InstrumentViewModel SelectedInstrument {
         get => TranslateTargetTuning == null
             ? Instruments.FirstOrDefault(x => x.IsSelected)
             : TranslateTargetTuning.Parent;
-        set
-        {
-            if (SelectedInstrument != value) {
+        set {
+            if(SelectedInstrument != value) {
                 Instruments.ForEach(x => x.IsSelected = x == value);
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedTuning));
@@ -145,7 +141,7 @@ public class MainViewModel : ViewModelBase {
     public ObservableCollection<OptionViewModel> DisplayModeOptions =>
         OptionLookup[OptionType.DisplayMode];
 
-    private OptionViewModel SelectedDisplayModeOption =>
+    OptionViewModel SelectedDisplayModeOption =>
         DisplayModeOptions.FirstOrDefault(x => x.IsChecked);
 
     #endregion
@@ -155,7 +151,7 @@ public class MainViewModel : ViewModelBase {
     public ObservableCollection<OptionViewModel> PatternOptions =>
         OptionLookup[OptionType.Pattern];
 
-    private OptionViewModel SelectedPatternOption =>
+    OptionViewModel SelectedPatternOption =>
         PatternOptions.FirstOrDefault(x => x.IsChecked);
 
     #endregion
@@ -165,7 +161,7 @@ public class MainViewModel : ViewModelBase {
     public ObservableCollection<OptionViewModel> KeyOptions =>
         OptionLookup[OptionType.Key];
 
-    private Dictionary<NoteType, OptionViewModel> KeyOptLookup { get; set; } = [];
+    Dictionary<NoteType,OptionViewModel> KeyOptLookup { get; set; } = [];
 
     #endregion
 
@@ -212,7 +208,7 @@ public class MainViewModel : ViewModelBase {
     public IEnumerable<OptionViewModel> SuffixOptions =>
         OptionLookup[CurSuffixOptionType];
 
-    private Dictionary<string, OptionViewModel> SuffixOptLookup { get; set; } = [];
+    Dictionary<string,OptionViewModel> SuffixOptLookup { get; set; } = [];
 
     #endregion
 
@@ -223,25 +219,24 @@ public class MainViewModel : ViewModelBase {
 
     #endregion
 
-    public Dictionary<OptionType, ObservableCollection<OptionViewModel>> OptionLookup { get; } =
-        new()
-        {
-            { OptionType.DisplayMode, [] },
-            { OptionType.Pattern, [] },
-            { OptionType.Key, [] },
-            { OptionType.Degree, [] },
+    public Dictionary<OptionType,ObservableCollection<OptionViewModel>> OptionLookup { get; } =
+        new() {
+            { OptionType.DisplayMode,[] },
+            { OptionType.Pattern,[] },
+            { OptionType.Key,[] },
+            { OptionType.Degree,[] },
 
-            { OptionType.ModeSuffix, [] },
-            { OptionType.ChordSuffix, [] },
-            { OptionType.ScaleSuffix, [] },
+            { OptionType.ModeSuffix,[] },
+            { OptionType.ChordSuffix,[] },
+            { OptionType.ScaleSuffix,[] },
 
-            { OptionType.ModeSort, [] },
-            { OptionType.ChordSort, [] },
-            { OptionType.ScaleSort, [] },
+            { OptionType.ModeSort,[] },
+            { OptionType.ChordSort,[] },
+            { OptionType.ScaleSort,[] },
 
-            { OptionType.ChordSvg, [] },
-            { OptionType.ScaleSvg, [] },
-            { OptionType.ModeSvg, [] }
+            { OptionType.ChordSvg,[] },
+            { OptionType.ScaleSvg,[] },
+            { OptionType.ModeSvg,[] }
         };
 
     #endregion
@@ -256,7 +251,7 @@ public class MainViewModel : ViewModelBase {
         SelectedPatternType.ToString();
 
     public string PatternSingularName =>
-        PatternName.Substring(0, PatternName.Length - 1).ToLower();
+        PatternName.Substring(0,PatternName.Length - 1).ToLower();
 
     #endregion
 
@@ -280,46 +275,50 @@ public class MainViewModel : ViewModelBase {
 
     public bool IsBusy { get; private set; }
 
-    private int PageCacheCount => 2;
+    int PageCacheCount => 2;
     public int LoadMoreCount { get; private set; } = 20;
     public bool IsAutoLoadMoreEnabled => false;
     public bool IsTranslateModeEnabled => false;
     public bool CanLoadMore => Matches.Count < AllResults.Length;
 
 
-    public MainContentFlags ContentFlags
-    {
-        get
-        {
+    public MainContentFlags ContentFlags {
+        get {
             var cf = MainContentFlags.None;
-            if (IsSearchModeSelected)
+            if(IsSearchModeSelected) {
                 cf |= MainContentFlags.Search;
-            else if (IsBookmarkModeSelected)
+            } else if(IsBookmarkModeSelected) {
                 cf |= MainContentFlags.Bookmarks;
-            else
+            } else {
                 cf |= MainContentFlags.Index;
+            }
 
-            if (ThemeViewModel.Instance.IsLandscape) cf |= MainContentFlags.Landscape;
+            if(ThemeViewModel.Instance.IsLandscape) {
+                cf |= MainContentFlags.Landscape;
+            }
 
-            if (IsTranslateMode) cf |= MainContentFlags.Translate;
+            if(IsTranslateMode) {
+                cf |= MainContentFlags.Translate;
+            }
 
             return cf;
         }
     }
 
-    public InstrumentContentFlags InstrumentFlags
-    {
-        get
-        {
+    public InstrumentContentFlags InstrumentFlags {
+        get {
             var icf = InstrumentContentFlags.None;
-            if (SelectedInstrument is { } sivm) {
-                if (sivm.IsKeyboard)
+            if(SelectedInstrument is { } sivm) {
+                if(sivm.IsKeyboard) {
                     icf |= InstrumentContentFlags.Keyboard;
-                else
+                } else {
                     icf |= InstrumentContentFlags.Fretboard;
+                }
             }
 
-            if (IsTranslateMode) icf |= InstrumentContentFlags.Translate;
+            if(IsTranslateMode) {
+                icf |= InstrumentContentFlags.Translate;
+            }
 
             // nothing
             return icf;
@@ -363,17 +362,17 @@ public class MainViewModel : ViewModelBase {
     public bool IsIndexModeSelected =>
         SelectedDisplayMode == DisplayModeType.Index;
 
-    private OptionType CurSvgOptionType =>
+    OptionType CurSvgOptionType =>
         SelectedPatternType == MusicPatternType.Chords ? OptionType.ChordSvg :
         SelectedPatternType == MusicPatternType.Scales ? OptionType.ScaleSvg :
         OptionType.ModeSvg;
 
-    private OptionType CurSuffixOptionType =>
+    OptionType CurSuffixOptionType =>
         SelectedPatternType == MusicPatternType.Chords ? OptionType.ChordSuffix :
         SelectedPatternType == MusicPatternType.Scales ? OptionType.ScaleSuffix :
         OptionType.ModeSuffix;
 
-    private OptionType CurSortOptionType =>
+    OptionType CurSortOptionType =>
         SelectedPatternType == MusicPatternType.Chords ? OptionType.ChordSort :
         SelectedPatternType == MusicPatternType.Scales ? OptionType.ScaleSort :
         OptionType.ModeSort;
@@ -412,15 +411,15 @@ public class MainViewModel : ViewModelBase {
         EditModeInstrument != null &&
         EditModeInstrument.Tunings.Any();
 
-    public int SelectedInstrumentIndex
-    {
+    public int SelectedInstrumentIndex {
         get => Instruments.IndexOf(SelectedInstrument);
         set => Dispatcher.UIThread.Post(
             () => {
-                if (value >= 0 && value < Instruments.Count)
+                if(value >= 0 && value < Instruments.Count) {
                     SelectedInstrument = Instruments[value];
-                else
+                } else {
                     SelectedInstrument = null;
+                }
 
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedInstrument));
@@ -433,7 +432,7 @@ public class MainViewModel : ViewModelBase {
     public bool IsPianoSelected =>
         SelectedInstrumentType == InstrumentType.Piano;
 
-    private ChordKeyDegreeType SelectedKeyDegree { get; set; } = ChordKeyDegreeType.I;
+    ChordKeyDegreeType SelectedKeyDegree { get; set; } = ChordKeyDegreeType.I;
 
     public bool IsDefaultSelection =>
         SelectedTuning == null ? true : SelectedTuning.NoteRows.All(x => x.IsDefaultSelection);
@@ -443,21 +442,21 @@ public class MainViewModel : ViewModelBase {
     #region Matches
 
     public int MatchColCount { get; private set; } = DEFAULT_MATCH_COL_COUNT;
-    private int MaxMatchColCount => 8;
+    int MaxMatchColCount => 8;
 
     //IEnumerable<ChordKeyDegreeType> AvailableDegrees { get; set; } = [];
-    private IEnumerable<NoteType> AvailableKeys { get; } = [];
+    IEnumerable<NoteType> AvailableKeys { get; } = [];
 
-    private NoteType? LastSelectedKey { get; set; }
+    NoteType? LastSelectedKey { get; set; }
 
     public NoteType? SelectedKey { get; private set; }
 
-    private IEnumerable<string> AvailableSuffixes { get; } = [];
+    IEnumerable<string> AvailableSuffixes { get; } = [];
 
-    private IEnumerable<string> SelectedSuffixes { get; set; } = [];
+    IEnumerable<string> SelectedSuffixes { get; set; } = [];
 
-    private IEnumerable<(MatchSortType, bool)> SelectedMatchSort =>
-        SortOptions.Select(x => (x.OptionValue.ToEnum<MatchSortType>(), x.IsChecked));
+    IEnumerable<(MatchSortType,bool)> SelectedMatchSort =>
+        SortOptions.Select(x => (x.OptionValue.ToEnum<MatchSortType>(),x.IsChecked));
 
     public bool CanIncreaseMatchColumnCount =>
         true; //MatchColCount < Matches.Count;
@@ -474,20 +473,23 @@ public class MainViewModel : ViewModelBase {
     public bool IsMatchesEmpty { get; private set; } = true;
 
 
-    public bool IsSearchButtonVisible
-    {
-        get
-        {
-            if (!IsSearchModeSelected) return false;
+    public bool IsSearchButtonVisible {
+        get {
+            if(!IsSearchModeSelected) {
+                return false;
+            }
 
-            if (!IsBusy &&
-                !IsSearchInitiating &&
-                !IsDefaultSelection &&
-                SelectedTuning != null &&
-                SelectedTuning.SelectedNotes.Difference(LastNotes).Any())
+            if(!IsBusy &&
+               !IsSearchInitiating &&
+               !IsDefaultSelection &&
+               SelectedTuning != null &&
+               SelectedTuning.SelectedNotes.Difference(LastNotes).Any()) {
                 return true;
+            }
 
-            if (SelectedKey != LastSelectedKey) return true;
+            if(SelectedKey != LastSelectedKey) {
+                return true;
+            }
 
             return false;
         }
@@ -501,22 +503,25 @@ public class MainViewModel : ViewModelBase {
 
     #region Public Methods
 
-    public string GetUniqueInstrumentName(string desiredName, InstrumentViewModel[] ignored) {
-        var unique_name = desiredName;
+    public string GetUniqueInstrumentName(string desiredName,InstrumentViewModel[] ignored) {
+        string unique_name = desiredName;
         var other_instl = Instruments.Where(x => !ignored.Contains(x));
 
-        var suffix = 1;
-        while (other_instl.Any(x => string.Equals(x.Name, unique_name, StringComparison.CurrentCultureIgnoreCase)))
+        int suffix = 1;
+        while(other_instl.Any(x => string.Equals(x.Name,unique_name,StringComparison.CurrentCultureIgnoreCase))) {
             unique_name = $"{desiredName}{suffix++}";
+        }
 
         return unique_name;
     }
 
     public void SetSelectedKey(NoteType? nt) {
-        if (SelectedKey == nt) return;
+        if(SelectedKey == nt) {
+            return;
+        }
 
         var key = nt ?? SelectedKey.Value;
-        object[] args = ["dummy", KeyOptions.FirstOrDefault(x => x.OptionValue == key.ToString())];
+        object[] args = ["dummy",KeyOptions.FirstOrDefault(x => x.OptionValue == key.ToString())];
         SelectOptionCommand.Execute(args);
     }
 
@@ -524,26 +529,30 @@ public class MainViewModel : ViewModelBase {
 
     #region Private Methods
 
-    private void MainViewModel_OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+    void MainViewModel_OnPropertyChanged(object sender,PropertyChangedEventArgs e) {
         switch (e.PropertyName) {
             case nameof(IsBookmarkModeSelected):
-                if (IsBookmarkModeSelected &&
-                    SelectedTuning is not null &&
-                    SelectedTuning.SelectedBookmarkGroups.None())
+                if(IsBookmarkModeSelected &&
+                   SelectedTuning is not null &&
+                   SelectedTuning.SelectedBookmarkGroups.None()) {
                     SelectedTuning.SelectedBookmarkGroups.Add(SelectedTuning.DefaultBookmarkGroup);
+                }
 
                 break;
             case nameof(SelectedInstrument):
                 OnPropertyChanged(nameof(InstrumentFlags));
                 break;
             case nameof(MatchesContainerRect):
-                if (IsLoaded) UpdatePageCount();
+                if(IsLoaded) {
+                    UpdatePageCount();
+                }
 
                 break;
             case nameof(SelectedKey):
-                if (SelectedTuning is { } st &&
-                    st.SelectedNotes is { } sn)
+                if(SelectedTuning is { } st &&
+                   st.SelectedNotes is { } sn) {
                     sn.ForEach(x => x.RaisePropertyChanged(nameof(x.IsSelectedKey)));
+                }
 
                 break;
             case nameof(MatchColCount):
@@ -554,32 +563,43 @@ public class MainViewModel : ViewModelBase {
 
                 break;
             case nameof(EditModeInstrument):
-                if (EditModeInstrument is { } em_ivm) em_ivm.RaisePropertyChanged(nameof(em_ivm.IsEditModeEnabled));
+                if(EditModeInstrument is { } em_ivm) {
+                    em_ivm.RaisePropertyChanged(nameof(em_ivm.IsEditModeEnabled));
+                }
 
                 break;
             case nameof(IsDrawerOpen):
-                if (MatchesView.Instance is not { } mtv ||
-                    SelectedMatch == null)
+                if(MatchesView.Instance is not { } mtv ||
+                   SelectedMatch == null) {
                     break;
+                }
 
-                if (!IsDrawerOpen)
+                if(!IsDrawerOpen)
                     // always show opts when drawer opens (if available)
+                {
                     ForwardCommand.Execute(null);
+                }
 
                 mtv.ScrollItemIntoView(SelectedMatch);
                 break;
             case nameof(SelectedTuning):
-                if (SelectedTuning == LastSelectedTuning) break;
+                if(SelectedTuning == LastSelectedTuning) {
+                    break;
+                }
 
                 LastSelectedTuning = SelectedTuning;
-                if (IsInEditInstrumentMode || IsTranslateMode) break;
+                if(IsInEditInstrumentMode || IsTranslateMode) {
+                    break;
+                }
 
                 InitInstrumentAsync(InstrumentInitSource.TuningChanged)
                     .FireAndForgetSafeAsync(DispatcherPriority.Background);
                 break;
             case nameof(SelectedInstrumentIndex):
                 OnPropertyChanged(nameof(SelectedInstrument));
-                if (!IsLoaded) ForwardCommand.Execute(null);
+                if(!IsLoaded) {
+                    ForwardCommand.Execute(null);
+                }
                 //ForwardCommand.Execute(null);
 
 
@@ -590,7 +610,9 @@ public class MainViewModel : ViewModelBase {
                 OnPropertyChanged(nameof(IsChordsSelected));
                 OnPropertyChanged(nameof(IsScalesSelected));
                 OnPropertyChanged(nameof(IsModesSelected));
-                if (SelectedTuning is { } stvm) stvm.UpdateAvailableSortOrder(true);
+                if(SelectedTuning is { } stvm) {
+                    stvm.UpdateAvailableSortOrder(true);
+                }
 
                 break;
             case nameof(SelectedDisplayMode):
@@ -601,11 +623,13 @@ public class MainViewModel : ViewModelBase {
                 break;
             case nameof(IsSearchInitiating):
                 //OnPropertyChanged(nameof(IsMatchesEmpty));
-                if (!IsSearchInitiating &&
-                    MatchesView.Instance is { } matchesView &&
-                    matchesView.MatchItemsRepeater is { } mir)
+                if(!IsSearchInitiating &&
+                   MatchesView.Instance is { } matchesView &&
+                   matchesView.MatchItemsRepeater is { } mir)
                     // BUG items repeater overlaps items on load intermittently
+                {
                     mir.InvalidateMeasure();
+                }
 
                 break;
             case nameof(IsBusy):
@@ -615,7 +639,7 @@ public class MainViewModel : ViewModelBase {
                 // }
                 //
                 // mcbo.IsVisible = IsBusy;
-                if (IsBusy) {
+                if(IsBusy) {
 
 
                 }
@@ -626,22 +650,24 @@ public class MainViewModel : ViewModelBase {
         }
     }
 
-    private void Matches_OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+    void Matches_OnCollectionChanged(object sender,NotifyCollectionChangedEventArgs e) {
         //OnPropertyChanged(nameof(IsMatchesEmpty));
         //OnPropertyChanged(nameof(CanIncreaseMatchColumnCount));F
     }
 
-    private void ThemeInstance_OnOrientationChanged(object sender, EventArgs e) {
+    void ThemeInstance_OnOrientationChanged(object sender,EventArgs e) {
         OnPropertyChanged(nameof(ContentFlags));
     }
 
-    private async Task InitAsync(IEnumerable<Instrument> instl = null) {
-        var is_reset = instl != null;
+    async Task InitAsync(IEnumerable<Instrument> instl = null) {
+        bool is_reset = instl != null;
         IsBusy = !is_reset;
 
         await Task.Delay(500);
 
-        while (!Prefs.IsLoaded) await Task.Delay(100);
+        while(!Prefs.IsLoaded) {
+            await Task.Delay(100);
+        }
 
         instl = instl ?? Prefs.Instance.Instruments;
 
@@ -649,7 +675,7 @@ public class MainViewModel : ViewModelBase {
         MatchColCount = Prefs.Instance.MatchColCount;
         IsExactMatchOnly = Prefs.Instance.IsExactMatchOnly;
 
-        if (!instl.Any()) {
+        if(!instl.Any()) {
             IsBusy = false;
             ResetToDefaultsCommand.Execute(null);
             return;
@@ -661,57 +687,65 @@ public class MainViewModel : ViewModelBase {
             Instruments.Add(ivm);
         }
 
-        await InitInstrumentAsync(InstrumentInitSource.Startup, is_reset);
+        await InitInstrumentAsync(InstrumentInitSource.Startup,is_reset);
 
-        if (is_reset) Prefs.Instance.Save();
+        if(is_reset) {
+            Prefs.Instance.Save();
+        }
 
         IsBusy = false;
 
         Dispatcher.UIThread.Post(
             async () => {
-                while (true) {
-                    if (MainView.Instance is not { } mv ||
-                        !mv.IsLoaded ||
-                        !mv.IsArrangeValid ||
-                        !mv.IsInitialized)
+                while(true) {
+                    if(MainView.Instance is not { } mv ||
+                       !mv.IsLoaded ||
+                       !mv.IsArrangeValid ||
+                       !mv.IsInitialized) {
                         await Task.Delay(300);
+                    }
 
                     break;
                 }
 
                 IsLoaded = true;
+                InstrumentView.Instance.ScrollSelectionIntoView();
 
-            }, DispatcherPriority.Background);
+            },DispatcherPriority.Background);
     }
 
     public MpIAsyncCommand DoIntroCommand => new MpAsyncCommand(
         async () => {
             IsDoingIntro = true;
 
-            while (true) {
-                if (MainView.Instance is { } mv &&
-                    mv.IsLoaded)
+            while(true) {
+                if(MainView.Instance is { } mv &&
+                   mv.IsLoaded) {
                     break;
+                }
 
                 await Task.Delay(100);
             }
 
             // show welcome message
-            while (true) {
-                if (MainView.Instance is { } mv &&
-                    mv.DlgHost is { } mdh &&
-                    mdh.IsLoaded)
+            while(true) {
+                if(MainView.Instance is { } mv &&
+                   mv.DlgHost is { } mdh &&
+                   mdh.IsLoaded) {
                     break;
+                }
 
                 await Task.Delay(100);
             }
 
-            await DialogManager.ShowAsync(new WelcomeView(), Instance.MainDialogHostName);
+            await DialogManager.ShowAsync(new WelcomeView(),Instance.MainDialogHostName);
 
             // show inst builder
             await AddInstrumentCommand.ExecuteAsync();
 
-            while (EditModeInstrument != null) await Task.Delay(100);
+            while(EditModeInstrument != null) {
+                await Task.Delay(100);
+            }
 
             await Task.Delay(300);
 
@@ -730,22 +764,25 @@ public class MainViewModel : ViewModelBase {
 
     public async Task UpdateMatchesAsync(MatchUpdateSource source) {
         PlatformWrapper.Services.Logger.WriteLine($"Updating matches. Source: '{source}'");
-        if (IsTranslateMode &&
-            source != MatchUpdateSource.FindClick &&
-            source != MatchUpdateSource.FilterToggle &&
-            !(source == MatchUpdateSource.TabChanged && IsSearchModeSelected))
+        if(IsTranslateMode &&
+           source != MatchUpdateSource.FindClick &&
+           source != MatchUpdateSource.FilterToggle &&
+           !(source == MatchUpdateSource.TabChanged && IsSearchModeSelected)) {
             FinishTranslateCommand.Execute(null);
+        }
 
-        if (SelectedTuning == null ||
-            source is
-                MatchUpdateSource.NoteToggle or
-                MatchUpdateSource.RootToggle ||
-            (source is MatchUpdateSource.FilterToggle &&
-             IsSearchModeSelected &&
-             (IsDefaultSelection || IsSearchButtonVisible))) {
+        if(SelectedTuning == null ||
+           source is
+               MatchUpdateSource.NoteToggle or
+               MatchUpdateSource.RootToggle ||
+           (source is MatchUpdateSource.FilterToggle &&
+            IsSearchModeSelected &&
+            (IsDefaultSelection || IsSearchButtonVisible))) {
             // dont search when notes clicked or
             // toggling options when instrument has empty selection
-            if (source is not MatchUpdateSource.FilterToggle) ResetOptAvailability();
+            if(source is not MatchUpdateSource.FilterToggle) {
+                ResetOptAvailability();
+            }
 
             UpdateViewProps();
             IsSearchInitiating = false;
@@ -765,7 +802,7 @@ public class MainViewModel : ViewModelBase {
                     catch {
                         // ignored
                     }
-                }, MatchCts.Token);
+                },MatchCts.Token);
         }
         catch {
             //ignored
@@ -774,7 +811,7 @@ public class MainViewModel : ViewModelBase {
         IsLoadingMatches = false;
     }
 
-    private void UpdateViewProps() {
+    void UpdateViewProps() {
         OnPropertyChanged(nameof(CanLoadMore));
 
         OnPropertyChanged(nameof(SelectedPatternType));
@@ -796,7 +833,7 @@ public class MainViewModel : ViewModelBase {
         OnPropertyChanged(nameof(ContentFlags));
     }
 
-    private void UpdateFilters() {
+    void UpdateFilters() {
         //DegreeOptions.ForEach(x => x.IsEnabled = AvailableDegrees.Any(y => y.ToString() == x.OptionValue));
         KeyOptions.ForEach(x => x.IsEnabled = AvailableKeys.Any(y => y.ToString() == x.OptionValue));
         SuffixOptions.ForEach(x => x.IsEnabled = AvailableSuffixes.Contains(x.OptionValue));
@@ -813,13 +850,15 @@ public class MainViewModel : ViewModelBase {
         SvgOptions.ForEach(x => x.RaisePropertyChanged(nameof(x.IsChecked)));
     }
 
-    private IEnumerable<MatchViewModel> GetMatchResults(NoteViewModel[] sel_note_vml) {
-        if (SelectedTuning is not { } stvm) return [];
+    IEnumerable<MatchViewModel> GetMatchResults(NoteViewModel[] sel_note_vml) {
+        if(SelectedTuning is not { } stvm) {
+            return [];
+        }
 
         var score_method = IsExactMatchOnly ? MatchScoreMethodType.Exact : MatchScoreMethodType.Voicing;
         var sel_notes = sel_note_vml.Select(x => x.IsInMuteState ? InstrumentNote.Mute(x.RowNum) : x.InstrumentNote)
             .ToArray();
-        if (IsTranslateMode) {
+        if(IsTranslateMode) {
             score_method = MatchScoreMethodType.Translation;
             sel_notes = TranslateSourceMatchViewModel.NotePattern.Notes.Cast<InstrumentNote>().ToArray();
         }
@@ -827,11 +866,13 @@ public class MainViewModel : ViewModelBase {
         // prefer desired root over key?
         var target_key = SelectedKey;
 
-        if (IsChordsSelected &&
-            target_key is { } tk &&
-            SelectedKeyDegree is { } td)
+        if(IsChordsSelected &&
+           target_key is { } tk &&
+           SelectedKeyDegree is { } td)
             // shift to sel degree
+        {
             target_key = tk.ToDegree(td);
+        }
 
         var mrl = stvm.GetMatchResults(
             sel_notes,
@@ -840,28 +881,28 @@ public class MainViewModel : ViewModelBase {
             SelectedPatternType,
             target_key,
             SelectedSuffixes,
-            out var avail_keyl,
-            out var avail_suffl);
+            out string[] avail_keyl,
+            out string[] avail_suffl);
 
         Dispatcher.UIThread.Invoke(
             () => {
                 KeyOptions.ForEach(x => x.IsEnabled = avail_keyl.Contains(x.OptionValue));
                 SuffixOptions.ForEach(x => x.IsEnabled = avail_suffl.Contains(x.OptionValue));
-            }, DispatcherPriority.Normal, MatchCts.Token);
+            },DispatcherPriority.Normal,MatchCts.Token);
 
         return mrl;
     }
 
-    private void ResetOptAvailability() {
+    void ResetOptAvailability() {
         KeyOptions.ForEach(x => x.IsEnabled = true);
         SuffixOptions.ForEach(x => x.IsEnabled = true);
     }
 
-    private void LoadMatches(MatchUpdateSource source) {
+    void LoadMatches(MatchUpdateSource source) {
         Dispatcher.UIThread.Invoke(
             () => {
                 IsSearchInitiating = true;
-            }, DispatcherPriority.Normal, MatchCts.Token);
+            },DispatcherPriority.Normal,MatchCts.Token);
 
         var sel_notes = SelectedTuning.SelectedNotes.ToArray();
         LastNotes = sel_notes.ToList();
@@ -877,37 +918,40 @@ public class MainViewModel : ViewModelBase {
                 Matches.Clear();
                 LoadMore();
 
-                if (source == MatchUpdateSource.FindClick ||
-                    source == MatchUpdateSource.FilterToggle ||
-                    (source == MatchUpdateSource.TabChanged && !IsSearchModeSelected) ||
-                    (source == MatchUpdateSource.InstrumentInit && !IsSearchModeSelected))
+                if(source == MatchUpdateSource.FindClick ||
+                   source == MatchUpdateSource.FilterToggle ||
+                   (source == MatchUpdateSource.TabChanged && !IsSearchModeSelected) ||
+                   (source == MatchUpdateSource.InstrumentInit && !IsSearchModeSelected)) {
                     AvSnackbarHost.Post(
                         $"{AllResults.Length:n0} found",
                         MainView.SnackbarHostName,
                         DispatcherPriority.Normal);
+                }
 
                 SelectedMatch = AllResults.FirstOrDefault();
-                if (MatchesView.Instance is { } mv) mv.MatchesScrollViewer.ScrollToHome();
+                if(MatchesView.Instance is { } mv) {
+                    mv.MatchesScrollViewer.ScrollToHome();
+                }
 
                 OnPropertyChanged(nameof(CanIncreaseMatchColumnCount));
                 OnPropertyChanged(nameof(CanDecreaseMatchColumnCount));
 
                 IsMatchesEmpty = AllResults.None();
                 IsSearchInitiating = false;
-            }, DispatcherPriority.Background, MatchCts.Token);
+            },DispatcherPriority.Background,MatchCts.Token);
     }
 
-    private IEnumerable<MatchViewModel> SortMatches(IEnumerable<MatchViewModel> matches) {
+    IEnumerable<MatchViewModel> SortMatches(IEnumerable<MatchViewModel> matches) {
         var sorts = SelectedMatchSort.ToList();
         var result = matches
-            .OrderBy(x => GetSortOptionValue(sorts[0], x))
-            .ThenBy(x => GetSortOptionValue(sorts[1], x))
-            .ThenBy(x => GetSortOptionValue(sorts[2], x))
-            .ThenBy(x => GetSortOptionValue(sorts[3], x));
+            .OrderBy(x => GetSortOptionValue(sorts[0],x))
+            .ThenBy(x => GetSortOptionValue(sorts[1],x))
+            .ThenBy(x => GetSortOptionValue(sorts[2],x))
+            .ThenBy(x => GetSortOptionValue(sorts[3],x));
         return result;
 
 
-        double GetSortOptionValue((MatchSortType field, bool desc) sort, MatchViewModel match) {
+        double GetSortOptionValue((MatchSortType field,bool desc) sort,MatchViewModel match) {
             double score = 0;
             switch (sort.field) {
                 case MatchSortType.Key:
@@ -930,11 +974,10 @@ public class MainViewModel : ViewModelBase {
 
     }
 
-    private void CancelMatchFilter() {
-        if (MatchCts == null) {
+    void CancelMatchFilter() {
+        if(MatchCts == null) {
             MatchCts = new CancellationTokenSource();
-        }
-        else {
+        } else {
             MatchCts.Cancel();
             MatchCts.Dispose();
             MatchCts = new CancellationTokenSource();
@@ -950,73 +993,88 @@ public class MainViewModel : ViewModelBase {
 
         sb.AppendLine("text { font-family: Mono; }");
 
-        if (SelectedSvgOptionTypes.Contains(SvgOptionType.Frets))
+        if(SelectedSvgOptionTypes.Contains(SvgOptionType.Frets)) {
             sb.AppendLine(".fret-marker { display:none; }");
-        else
+        } else {
             sb.AppendLine(".fret-labels { display:none; }");
+        }
 
-        if (SelectedSvgOptionTypes.Contains(SvgOptionType.Roots)) {
+        if(SelectedSvgOptionTypes.Contains(SvgOptionType.Roots)) {
             sb.AppendLine(".root-open { stroke-width: 1.25; }");
             sb.AppendLine(".root-circle { display: none; }");
-            if (SelectedInstrumentType == InstrumentType.Piano)
+            if(SelectedInstrumentType == InstrumentType.Piano)
                 // TODO should have better organization of these svg classes,
                 // this breaks conventions w/ chord svg
+            {
                 sb.AppendLine(".user-fill { display: none; }");
+            }
 
-        }
-        else {
+        } else {
             sb.AppendLine(".root-box { display:none; }");
             sb.AppendLine(".root-open { stroke-width: 0.25; }");
         }
 
-        if (!SelectedSvgOptionTypes.Contains(SvgOptionType.Tuning)) sb.AppendLine(".string-tuning { display:none; }");
+        if(!SelectedSvgOptionTypes.Contains(SvgOptionType.Tuning)) {
+            sb.AppendLine(".string-tuning { display:none; }");
+        }
 
-        if (!SelectedSvgOptionTypes.Contains(SvgOptionType.Fingers)) sb.AppendLine(".fingers-text { display:none; }");
+        if(!SelectedSvgOptionTypes.Contains(SvgOptionType.Fingers)) {
+            sb.AppendLine(".fingers-text { display:none; }");
+        }
 
-        if (!SelectedSvgOptionTypes.Contains(SvgOptionType.Colors))
+        if(!SelectedSvgOptionTypes.Contains(SvgOptionType.Colors)) {
             sb.AppendLine($".fingers-fill {{ fill: {ThemeViewModel.Instance.P[PaletteColorType.RootFretBg]}; }}");
+        }
 
-        if (!SelectedSvgOptionTypes.Contains(SvgOptionType.Matches)) sb.AppendLine(".user-fill { fill: transparent; }");
+        if(!SelectedSvgOptionTypes.Contains(SvgOptionType.Matches)) {
+            sb.AppendLine(".user-fill { fill: transparent; }");
+        }
 
-        if (!SelectedSvgOptionTypes.Contains(SvgOptionType.Notes)) sb.AppendLine(".notes-text { display:none; }");
+        if(!SelectedSvgOptionTypes.Contains(SvgOptionType.Notes)) {
+            sb.AppendLine(".notes-text { display:none; }");
+        }
 
-        if (!SelectedSvgOptionTypes.Contains(SvgOptionType.Shadows)) sb.AppendLine(".shadow-elm { display:none; }");
+        if(!SelectedSvgOptionTypes.Contains(SvgOptionType.Shadows)) {
+            sb.AppendLine(".shadow-elm { display:none; }");
+        }
 
-        if (!SelectedSvgOptionTypes.Contains(SvgOptionType.Barres)) sb.AppendLine(".barre-elm { display:none; }");
+        if(!SelectedSvgOptionTypes.Contains(SvgOptionType.Barres)) {
+            sb.AppendLine(".barre-elm { display:none; }");
+        }
 
         MatchSvgCss = sb.ToString();
         //ResetMatchSvg();
     }
 
     public void ResetMatchSvg() {
-        if (MatchesView.Instance is { } mv &&
-            mv.MatchItemsRepeater is { } mir &&
-            mir.GetVisualDescendants<MatchView>() is { } mvl &&
-            mvl.Select(x => x.DataContext).OfType<MatchViewModel>() is { } mtvml)
+        if(MatchesView.Instance is { } mv &&
+           mv.MatchItemsRepeater is { } mir &&
+           mir.GetVisualDescendants<MatchView>() is { } mvl &&
+           mvl.Select(x => x.DataContext).OfType<MatchViewModel>() is { } mtvml) {
             mtvml.ForEach(x => x.RefreshSvg());
+        }
         //Matches.ForEach(x => x.RefreshSvg());
     }
 
-    private IEnumerable<OptionViewModel> CreateDefaultOptions() {
+    IEnumerable<OptionViewModel> CreateDefaultOptions() {
         var all_opts = new List<OptionViewModel>();
-        var opt_lookup = new Dictionary<OptionType, (Type, int)>
-        {
-            { OptionType.Pattern, (typeof(MusicPatternType), 0) },
-            { OptionType.DisplayMode, (typeof(DisplayModeType), 0) },
-            { OptionType.ChordSuffix, (typeof(ChordSuffixType), -1) },
-            { OptionType.ScaleSuffix, (typeof(ScaleSuffixType), -1) },
-            { OptionType.ModeSuffix, (typeof(ModeSuffixType), -1) },
-            { OptionType.Key, (typeof(NoteType), -1) },
-            { OptionType.ChordSvg, (typeof(SvgOptionType), -1) },
-            { OptionType.ScaleSvg, (typeof(SvgOptionType), -1) },
-            { OptionType.ModeSvg, (typeof(SvgOptionType), -1) },
-            { OptionType.ChordSort, (typeof(MatchSortType), -1) },
-            { OptionType.ScaleSort, (typeof(MatchSortType), -1) },
-            { OptionType.ModeSort, (typeof(MatchSortType), -1) },
-            { OptionType.Degree, (typeof(ChordKeyDegreeType), 0) }
+        var opt_lookup = new Dictionary<OptionType,(Type,int)> {
+            { OptionType.Pattern,(typeof(MusicPatternType),0) },
+            { OptionType.DisplayMode,(typeof(DisplayModeType),0) },
+            { OptionType.ChordSuffix,(typeof(ChordSuffixType),-1) },
+            { OptionType.ScaleSuffix,(typeof(ScaleSuffixType),-1) },
+            { OptionType.ModeSuffix,(typeof(ModeSuffixType),-1) },
+            { OptionType.Key,(typeof(NoteType),-1) },
+            { OptionType.ChordSvg,(typeof(SvgOptionType),-1) },
+            { OptionType.ScaleSvg,(typeof(SvgOptionType),-1) },
+            { OptionType.ModeSvg,(typeof(SvgOptionType),-1) },
+            { OptionType.ChordSort,(typeof(MatchSortType),-1) },
+            { OptionType.ScaleSort,(typeof(MatchSortType),-1) },
+            { OptionType.ModeSort,(typeof(MatchSortType),-1) },
+            { OptionType.Degree,(typeof(ChordKeyDegreeType),0) }
         };
 
-        string GetOptionLabel(OptionType opt, string key) {
+        string GetOptionLabel(OptionType opt,string key) {
             switch (opt) {
                 case OptionType.Key:
                     return key.ToEnum<NoteType>().ToDisplayValue();
@@ -1036,8 +1094,7 @@ public class MainViewModel : ViewModelBase {
             opt_lookup.SelectMany(
                 x =>
                     Enum.GetNames(x.Value.Item1).Select(
-                        (y, idx) => new OptionViewModel
-                        {
+                        (y,idx) => new OptionViewModel {
                             OptionType = x.Key,
                             OptionValue = y,
                             Label = GetOptionLabel(
@@ -1058,14 +1115,14 @@ public class MainViewModel : ViewModelBase {
         return all_opts;
     }
 
-    private bool VerifyOptions(List<OptionViewModel> opts) {
-        if (!Prefs.Instance.WasOptionsOutOfDateOnStartup) {
+    bool VerifyOptions(List<OptionViewModel> opts) {
+        if(!Prefs.Instance.WasOptionsOutOfDateOnStartup) {
             // options up to date
             PlatformWrapper.Services.Logger.WriteLine("Options up-to-date");
             return true;
         }
 
-        if (Prefs.Instance.IsOptionsRequireReset) {
+        if(Prefs.Instance.IsOptionsRequireReset) {
             // just reset them..
             PlatformWrapper.Services.Logger.WriteLine(
                 $"Options expired! This Version: {Prefs.Instance.LastPrefsVersion} Needed Version: {Prefs.Instance.LastOptionsUpdatedPrefsVersion}");
@@ -1080,7 +1137,7 @@ public class MainViewModel : ViewModelBase {
         return true;
     }
 
-    private void SetOptions(IEnumerable<OptionViewModel> opts) {
+    void SetOptions(IEnumerable<OptionViewModel> opts) {
         foreach (var kvp in OptionLookup) {
             kvp.Value.Clear();
             kvp.Value.AddRange(opts.Where(x => x.OptionType == kvp.Key));
@@ -1088,15 +1145,17 @@ public class MainViewModel : ViewModelBase {
         }
     }
 
-    private void InitOptions(bool reset) {
+    void InitOptions(bool reset) {
         var all_opts = Prefs.Instance.Options;
-        if (all_opts.None())
+        if(all_opts.None())
             // initial startup case
+        {
             all_opts.AddRange(CreateDefaultOptions());
+        }
 
-        if (OptionLookup.Values.SelectMany(x => x).None()) {
+        if(OptionLookup.Values.SelectMany(x => x).None()) {
             // startup
-            if (!VerifyOptions(all_opts) && !string.IsNullOrEmpty(Prefs.Instance.LastPrefsVersion)) {
+            if(!VerifyOptions(all_opts) && !string.IsNullOrEmpty(Prefs.Instance.LastPrefsVersion)) {
                 // out of date (and not initial startup)
 #if DEBUG
                 Debugger.Break();
@@ -1108,7 +1167,7 @@ public class MainViewModel : ViewModelBase {
             SetOptions(all_opts);
         }
 
-        if (reset)
+        if(reset) {
             foreach (var ovm in OptionLookup.Values.SelectMany(x => x))
                 switch (ovm.OptionType) {
                     case OptionType.ChordSort:
@@ -1127,9 +1186,10 @@ public class MainViewModel : ViewModelBase {
                         break;
 
                 }
+        }
 
-        KeyOptLookup = KeyOptions.ToDictionary(x => x.OptionValue.ToEnum<NoteType>(), x => x);
-        SuffixOptLookup = SuffixOptions.ToDictionary(x => x.OptionValue, x => x);
+        KeyOptLookup = KeyOptions.ToDictionary(x => x.OptionValue.ToEnum<NoteType>(),x => x);
+        SuffixOptLookup = SuffixOptions.ToDictionary(x => x.OptionValue,x => x);
         SvgOptions.ForEach(
             x => x.IsEnabled = SelectedInstrument == null
                 ? false
@@ -1138,21 +1198,25 @@ public class MainViewModel : ViewModelBase {
                     SelectedPatternType,
                     SelectedDisplayMode));
 
-        if (KeyOptions.FirstOrDefault(x => x.IsChecked) is { } sel_key_opt)
+        if(KeyOptions.FirstOrDefault(x => x.IsChecked) is { } sel_key_opt) {
             SelectedKey = sel_key_opt.OptionValue.ToEnum<NoteType>();
-        else
+        } else {
             SelectedKey = null;
+        }
 
-        if (SuffixOptions.Where(x => x.IsChecked) is { } sel_suff_optl)
+        if(SuffixOptions.Where(x => x.IsChecked) is { } sel_suff_optl) {
             SelectedSuffixes = sel_suff_optl.Select(x => x.OptionValue);
+        }
 
-        if (SvgOptions.Where(x => x.IsChecked) is { } sel_svg_optl)
+        if(SvgOptions.Where(x => x.IsChecked) is { } sel_svg_optl) {
             SelectedSvgOptionTypes = sel_svg_optl.Select(x => x.OptionValue.ToEnum<SvgOptionType>());
+        }
 
-        if (DegreeOptions.FirstOrDefault(x => x.IsChecked) is { } sel_deg_opt)
+        if(DegreeOptions.FirstOrDefault(x => x.IsChecked) is { } sel_deg_opt) {
             SelectedKeyDegree = sel_deg_opt.OptionValue.ToEnum<ChordKeyDegreeType>();
-        else
+        } else {
             SelectedKeyDegree = ChordKeyDegreeType.I;
+        }
 
         OnPropertyChanged(nameof(DisplayModeOptions));
         OnPropertyChanged(nameof(PatternOptions));
@@ -1180,42 +1244,48 @@ public class MainViewModel : ViewModelBase {
 
     #region Instruments
 
-    private async Task<InstrumentViewModel> CreateInstrumentAsync(Instrument instrument) {
+    async Task<InstrumentViewModel> CreateInstrumentAsync(Instrument instrument) {
         var ivm = new InstrumentViewModel(this);
         await ivm.InitAsync(instrument);
         return ivm;
     }
 
-    private async Task InitInstrumentAsync(InstrumentInitSource source, bool isStartupReset = false) {
+    async Task InitInstrumentAsync(InstrumentInitSource source,bool isStartupReset = false) {
         // NOTE isStartupReset prevents double spinners on initial startup...
         PlatformWrapper.Services.Logger.WriteLine($"Init instrument. Source: {source}");
-        var busy = !(isStartupReset && source == InstrumentInitSource.Startup);
+        bool busy = !(isStartupReset && source == InstrumentInitSource.Startup);
         Dispatcher.UIThread.Invoke(
             () => {
                 IsBusy = busy;
-            }, DispatcherPriority.Render);
+            },DispatcherPriority.Render);
 
 
         Matches.Clear();
 
-        if (SelectedTuning is { } sel_tvm &&
-            sel_tvm.LastNotePatternType != SelectedPatternType)
+        if(SelectedTuning is { } sel_tvm &&
+           sel_tvm.LastNotePatternType != SelectedPatternType) {
             // only reset selection if different than current pattern
             sel_tvm.ResetSelection();
+        }
 
         LastSelectedTuning = SelectedTuning;
 
-        var reset_opts = source == InstrumentInitSource.Startup &&
-                         SelectedDisplayMode == DisplayModeType.Search;
+        bool reset_opts = source == InstrumentInitSource.Startup &&
+                          SelectedDisplayMode == DisplayModeType.Search;
 
-        if (SelectedTuning != null) InitOptions(reset_opts);
+        if(SelectedTuning != null) {
+            InitOptions(reset_opts);
+        }
 
         UpdateViewProps();
 
-        if (SelectedTuning is { } st) {
-            if (IsSearchModeSelected)
-                while (!InstrumentView.Instance.MeasureInstrument())
+        if(SelectedTuning is { } st) {
+            if(IsSearchModeSelected) {
+                while(!InstrumentView.Instance.MeasureInstrument()) {
                     await Task.Delay(300);
+                }
+            }
+
             //Debug.WriteLine("remeasuring...");
             st.RaisePropertyChanged(nameof(st.IsSelected));
         }
@@ -1233,49 +1303,55 @@ public class MainViewModel : ViewModelBase {
     public ICommand ExportMatchesCommand => new MpCommand<object>(
         async args => {
             await Task.Delay(1);
-            if (args.ToString() is not { } exp_type) return;
+            if(args.ToString() is not { } exp_type) {
+                return;
+            }
 
-            if (exp_type == "MIDI") {
-                if (PlatformWrapper.Services.ShareMidi is { } sm)
+            if(exp_type == "MIDI") {
+                if(PlatformWrapper.Services.ShareMidi is { } sm) {
                     await sm.ShareMidiAsync(
                         SelectedMatch.NotePattern.GetToneGroups(),
                         SelectedMatch.NotePattern.PatternType != MusicPatternType.Chords,
                         SelectedMatch.ShareTitle);
+                }
 
                 return;
             }
 
-            if (exp_type == "PDF") {
-                if (PlatformWrapper.Services.SharePdf is { } sp &&
-                    SelectedMatch is { } sm &&
-                    PatternToSvgConverter.Instance.Convert(
-                        sm.NotePattern, typeof(string), "styled|titled",
-                        CultureInfo.CurrentCulture) is string sel_svg_str)
-                    if (Extensions.ToPdfBytes(
-                            sel_svg_str,
-                            ThemeViewModel.Instance.IsDark ? SKColors.Black : SKColors.White,
-                            1) is { } svg_bytes)
-                        await sp.SharePdfAsync(svg_bytes, SelectedMatch.ShareTitle);
+            if(exp_type == "PDF") {
+                if(PlatformWrapper.Services.SharePdf is { } sp &&
+                   SelectedMatch is { } sm &&
+                   PatternToSvgConverter.Instance.Convert(
+                       sm.NotePattern,typeof(string),"styled|titled",
+                       CultureInfo.CurrentCulture) is string sel_svg_str) {
+                    if(Extensions.ToPdfBytes(
+                           sel_svg_str,
+                           ThemeViewModel.Instance.IsDark ? SKColors.Black : SKColors.White,
+                           1) is { } svg_bytes) {
+                        await sp.SharePdfAsync(svg_bytes,SelectedMatch.ShareTitle);
+                    }
+                }
 
                 return;
             }
 
-            if (Matches.FirstOrDefault() is not { } first_match ||
-                first_match.NotePattern is not { } np ||
-                PatternToSvgConverter.Instance.GetBuilder(np, false) is not { } builder)
+            if(Matches.FirstOrDefault() is not { } first_match ||
+               first_match.NotePattern is not { } np ||
+               PatternToSvgConverter.Instance.GetBuilder(np,false) is not { } builder) {
                 return;
+            }
 
 
-            var is_done = false;
+            bool is_done = false;
             var batch_cts = new CancellationTokenSource();
             var cancel_cmd = new MpCommand(
                 () => {
                     batch_cts?.Cancel();
                     is_done = true;
                 });
-            var view_title = $"{PatternSingularName.ToTitleCase()} Export";
-            var export_title = SelectedTuning.FullName.RemoveInvalidPathChars().Replace("-", string.Empty)
-                .Replace(" ", string.Empty);
+            string view_title = $"{PatternSingularName.ToTitleCase()} Export";
+            string export_title = SelectedTuning.FullName.RemoveInvalidPathChars().Replace("-",string.Empty)
+                .Replace(" ",string.Empty);
             var tfdv = new TextFieldDialogView();
             tfdv.TitleTextBlock.Text = view_title;
             tfdv.InputLabelTextBlock.Text = "Title:";
@@ -1283,19 +1359,22 @@ public class MainViewModel : ViewModelBase {
             tfdv.CancelButton.Command = cancel_cmd;
             tfdv.OkButton.Command = new MpCommand(
                 () => {
-                    if (tfdv.InputTextBox.Text.RemoveInvalidPathChars() is { } final_title &&
-                        !string.IsNullOrEmpty(final_title))
+                    if(tfdv.InputTextBox.Text.RemoveInvalidPathChars() is { } final_title &&
+                       !string.IsNullOrEmpty(final_title)) {
                         export_title = final_title;
+                    }
 
                     is_done = true;
                 });
 
-            DialogManager.ShowAsync(tfdv, MainDialogHostName).FireAndForgetSafeAsync();
+            DialogManager.ShowAsync(tfdv,MainDialogHostName).FireAndForgetSafeAsync();
 
-            while (!is_done) await Task.Delay(300);
+            while(!is_done) {
+                await Task.Delay(300);
+            }
 
             DialogManager.Close(MainDialogHostName);
-            if (batch_cts.IsCancellationRequested) {
+            if(batch_cts.IsCancellationRequested) {
                 batch_cts.Dispose();
                 return;
             }
@@ -1308,40 +1387,41 @@ public class MainViewModel : ViewModelBase {
             busy_view.CancelButton.IsVisible = true;
             busy_view.CancelButton.Command = cancel_cmd;
 
-            DialogManager.ShowAsync(busy_view, MainDialogHostName).FireAndForgetSafeAsync();
-            var matches_per_page = GetMatchesPerPage();
+            DialogManager.ShowAsync(busy_view,MainDialogHostName).FireAndForgetSafeAsync();
+            int matches_per_page = GetMatchesPerPage();
 
             try {
                 _ = Task.Run(
                     async () => {
                         var export_items = AllResults;
 
-                        if (exp_type == "HTML" && PlatformWrapper.Services.ShareHtml is { } shtml) {
+                        if(exp_type == "HTML" && PlatformWrapper.Services.ShareHtml is { } shtml) {
                             Dispatcher.UIThread.Post(
                                 () => {
                                     busy_view.ProgressDetailTextBlock.IsVisible = false;
                                     busy_view.ProgressCtrl.IsVisible = false;
                                     busy_view.Spinner.IsVisible = true;
                                 });
-                            var html = builder.GetBatchHtml(
-                                export_title, export_items.Select(x => x.NotePattern).ToArray());
-                            await shtml.ShareHtmlAsync(html, export_title);
-                        }
-                        else if (exp_type == "FULLPDF" && PlatformWrapper.Services.SharePdf is { } spdf) {
-                            var page_count = (int)Math.Ceiling(export_items.Length / (double)matches_per_page);
-                            var compl_count = 0;
+                            string html = builder.GetBatchHtml(
+                                export_title,export_items.Select(x => x.NotePattern).ToArray());
+                            await shtml.ShareHtmlAsync(html,export_title);
+                        } else if(exp_type == "FULLPDF" && PlatformWrapper.Services.SharePdf is { } spdf) {
+                            int page_count = (int)Math.Ceiling(export_items.Length / (double)matches_per_page);
+                            int compl_count = 0;
 
                             //A4 2480 pixels wide by 3508 
-                            var scale = 1240d / (MatchColCount * MatchFixedWidth);
+                            double scale = 1240d / (MatchColCount * MatchFixedWidth);
                             var start_dt = DateTime.Now;
 
                             TimeSpan? page_dur = null;
 
                             void CompletePage() {
                                 compl_count++;
-                                if (page_dur is null) page_dur = DateTime.Now - start_dt;
+                                if(page_dur is null) {
+                                    page_dur = DateTime.Now - start_dt;
+                                }
 
-                                var remaining = page_count - compl_count;
+                                int remaining = page_count - compl_count;
                                 var remaining_dur = page_dur.Value * remaining;
                                 Dispatcher.UIThread.Post(
                                     () => {
@@ -1351,34 +1431,36 @@ public class MainViewModel : ViewModelBase {
                                     });
                             }
 
-                            async Task<(byte[], int)> CreatePagePdfAsync(IEnumerable<NotePattern> items,
+                            async Task<(byte[],int)> CreatePagePdfAsync(IEnumerable<NotePattern> items,
                                 int pageNum) {
-                                var svg_html = builder.GetBatchSvg(
+                                string svg_html = builder.GetBatchSvg(
                                     items,
                                     MatchColCount,
                                     pageNum == 0,
                                     pageNum == page_count - 1,
                                     pageNum == 0 ? export_title : string.Empty);
-                                var bytes = Extensions.ToPdfBytes(
+                                byte[] bytes = Extensions.ToPdfBytes(
                                     svg_html,
                                     ThemeViewModel.Instance.IsDark ? SKColors.Black : SKColors.White,
                                     (float)scale);
                                 await Task.Delay(1);
                                 CompletePage();
-                                return (bytes, pageNum);
+                                return (bytes,pageNum);
                             }
 
                             var pages = new List<IEnumerable<NotePattern>>();
-                            for (var i = 0; i < page_count; i++) {
-                                var sidx = i * matches_per_page;
+                            for (int i = 0; i < page_count; i++) {
+                                int sidx = i * matches_per_page;
                                 var items = export_items.Select(x => x.NotePattern).Skip(sidx)
                                     .Take(matches_per_page);
-                                if (items.None()) break;
+                                if(items.None()) {
+                                    break;
+                                }
 
                                 pages.Add(items);
                             }
 
-                            var results = await Task.WhenAll(pages.Select((x, idx) => CreatePagePdfAsync(x, idx)));
+                            var results = await Task.WhenAll(pages.Select((x,idx) => CreatePagePdfAsync(x,idx)));
                             Dispatcher.UIThread.Post(
                                 () => {
                                     busy_view.ProgressCtrl.IsVisible = false;
@@ -1389,10 +1471,10 @@ public class MainViewModel : ViewModelBase {
 
                             using var stream = new MemoryStream();
                             using var document = new Document();
-                            using var pdfCopy = new PdfCopy(document, stream);
+                            using var pdfCopy = new PdfCopy(document,stream);
                             pdfCopy.CloseStream = false;
                             document.Open();
-                            foreach (var pdf_page_bytes in results.OrderBy(x => x.Item2).Select(x => x.Item1)) {
+                            foreach (byte[] pdf_page_bytes in results.OrderBy(x => x.Item2).Select(x => x.Item1)) {
                                 using var pdfReader = new PdfReader(pdf_page_bytes);
                                 pdfCopy.AddDocument(pdfReader);
                                 pdfReader.Close();
@@ -1400,19 +1482,21 @@ public class MainViewModel : ViewModelBase {
 
                             document?.Close();
                             pdfCopy.CloseStream = true;
-                            await spdf.SharePdfAsync(stream.ToArray(), export_title);
+                            await spdf.SharePdfAsync(stream.ToArray(),export_title);
 
                         }
 
                         is_done = true;
-                    }, batch_cts.Token);
+                    },batch_cts.Token);
             }
             catch (Exception ex) {
                 // canceled
                 ex.Dump();
             }
 
-            while (!is_done) await Task.Delay(100);
+            while(!is_done) {
+                await Task.Delay(100);
+            }
 
             DialogManager.Close(MainDialogHostName);
         });
@@ -1426,65 +1510,76 @@ public class MainViewModel : ViewModelBase {
 
     public MpIAsyncCommand FinishEditInstrumentCommand => new MpAsyncCommand(
         async () => {
-            if (EditModeInstrument is not { } emi_vm ||
-                !emi_vm.IsValid)
+            if(EditModeInstrument is not { } emi_vm ||
+               !emi_vm.IsValid) {
                 return;
+            }
 
             // close inst editor
             DialogManager.Close(MainDialogHostName);
 
-            if (IsDoingIntro)
+            if(IsDoingIntro)
                 // show welcome2
-                await DialogManager.ShowAsync(new WelcomeView2(), MainDialogHostName);
+            {
+                await DialogManager.ShowAsync(new WelcomeView2(),MainDialogHostName);
+            }
 
             await Task.Delay(300);
 
-            var is_new = !emi_vm.IsActivated;
-            if (is_new)
+            bool is_new = !emi_vm.IsActivated;
+            if(is_new)
                 // add new inst to list
+            {
                 Instruments.Add(emi_vm);
+            }
 
-            if (emi_vm.Tunings.Where(x => !x.IsLoaded) is { } new_tuning_vms &&
-                new_tuning_vms.Any())
+            if(emi_vm.Tunings.Where(x => !x.IsLoaded) is { } new_tuning_vms &&
+               new_tuning_vms.Any())
                 // gen any new tuning patterns
+            {
                 foreach (var new_tuning_vm in new_tuning_vms) {
                     emi_vm.CurGenTuning = new_tuning_vm;
-                    var success = await new_tuning_vm.InitAsync(new_tuning_vm.Tuning);
+                    bool success = await new_tuning_vm.InitAsync(new_tuning_vm.Tuning);
                     emi_vm.CurGenTuning = null;
-                    if (!success)
+                    if(!success)
                         // gen was canceled, restore edit view
+                    {
                         return;
+                    }
                 }
+            }
 
             CompleteEditInstrumentAsync(false).FireAndForgetSafeAsync();
         });
 
-    private async Task CompleteEditInstrumentAsync(bool canceled) {
-        if (EditModeInstrument is not { } emi) return;
+    async Task CompleteEditInstrumentAsync(bool canceled) {
+        if(EditModeInstrument is not { } emi) {
+            return;
+        }
 
-        var no_changes =
+        bool no_changes =
             JsonConvert.SerializeObject(EditModeInstrument.Instrument) == _editInstrumentInitialStateJson;
         EditModeInstrument = null;
 
-        if (no_changes) return;
+        if(no_changes) {
+            return;
+        }
 
-        if (canceled) {
-            if (_editInstrumentInitialStateJson != null) {
+        if(canceled) {
+            if(_editInstrumentInitialStateJson != null) {
                 var inst_to_restore =
                     JsonConvert.DeserializeObject<Instrument>(_editInstrumentInitialStateJson);
                 inst_to_restore.RefreshModelTree();
-                var inst_idx = Instruments.IndexOf(emi);
-                if (inst_idx >= 0) {
+                int inst_idx = Instruments.IndexOf(emi);
+                if(inst_idx >= 0) {
                     Instruments[inst_idx] = await CreateInstrumentAsync(inst_to_restore);
                     OnPropertyChanged(nameof(SelectedInstrument));
                     emi = Instruments[inst_idx];
-                }
-                else {
+                } else {
                     // shouldn't really happen
                     emi = null;
                 }
-            }
-            else {
+            } else {
                 // new inst cancel
                 emi = null;
             }
@@ -1495,7 +1590,7 @@ public class MainViewModel : ViewModelBase {
         _editInstrumentInitialStateJson = null;
 
         EditModeInstrument = null;
-        if (emi != null) {
+        if(emi != null) {
             SelectedInstrument = emi;
             SelectedInstrument.RaisePropertyChanged(nameof(SelectedInstrument.SelectedTuning));
             OnPropertyChanged(nameof(SelectedTuning));
@@ -1507,9 +1602,11 @@ public class MainViewModel : ViewModelBase {
 
     public MpIAsyncCommand<object> BeginEditInstrumentCommand => new MpAsyncCommand<object>(
         async args => {
-            if (args is not Control c ||
-                c.DataContext is not InstrumentViewModel edit_inst_vm) {
-                if (args is not InstrumentViewModel ivm) return;
+            if(args is not Control c ||
+               c.DataContext is not InstrumentViewModel edit_inst_vm) {
+                if(args is not InstrumentViewModel ivm) {
+                    return;
+                }
 
                 edit_inst_vm = ivm;
             }
@@ -1522,26 +1619,24 @@ public class MainViewModel : ViewModelBase {
             edit_inst_vm.SelectedTuning ??= edit_inst_vm.Tunings.FirstOrDefault();
 
             EditModeInstrument = edit_inst_vm;
-            if (EditModeInstrument.IsActivated) {
+            if(EditModeInstrument.IsActivated) {
                 EditModeInstrument.IsInstrumentTabSelected = false;
                 EditModeInstrument.IsTuningTabSelected = true;
-            }
-            else {
+            } else {
                 EditModeInstrument.IsInstrumentTabSelected = true;
                 EditModeInstrument.IsTuningTabSelected = false;
             }
 
             await DialogManager.ShowAsync(
-                new InstrumentEditorView { DataContext = edit_inst_vm }, Instance.MainDialogHostName);
+                new InstrumentEditorView { DataContext = edit_inst_vm },Instance.MainDialogHostName);
         });
 
     public MpIAsyncCommand AddInstrumentCommand => new MpAsyncCommand(
         async () => {
-            EditModeInstrument = new InstrumentViewModel(this)
-            {
+            EditModeInstrument = new InstrumentViewModel(this) {
                 Instrument = Instrument.CreateByType(InstrumentType.Guitar)
             };
-            EditModeInstrument.Name = GetUniqueInstrumentName(EditModeInstrument.Name, []);
+            EditModeInstrument.Name = GetUniqueInstrumentName(EditModeInstrument.Name,[]);
             await EditModeInstrument.InitAsync(EditModeInstrument.Instrument);
             await BeginEditInstrumentCommand.ExecuteAsync(EditModeInstrument);
         });
@@ -1552,22 +1647,30 @@ public class MainViewModel : ViewModelBase {
 
             Dispatcher.UIThread.InvokeAsync(
                     () => {
-                        var delta = 1;
-                        if (args is not null) delta = -1;
+                        int delta = 1;
+                        if(args is not null) {
+                            delta = -1;
+                        }
 
-                        var new_col_count = Math.Clamp(MatchColCount + delta, 1, MaxMatchColCount);
-                        if (new_col_count == MatchColCount) return;
+                        int new_col_count = Math.Clamp(MatchColCount + delta,1,MaxMatchColCount);
+                        if(new_col_count == MatchColCount) {
+                            return;
+                        }
 
                         MatchColCount = new_col_count;
-                    }, DispatcherPriority.Background)
+                    },DispatcherPriority.Background)
                 .FireAndForgetSafeAsync();
             Dispatcher.UIThread.Post(
                 async () => {
-                    while (!MatchesView.Instance.MatchItemsRepeater.IsArrangeValid) await Task.Delay(100);
+                    while(!MatchesView.Instance.MatchItemsRepeater.IsArrangeValid) {
+                        await Task.Delay(100);
+                    }
 
                     await Task.Delay(300);
 
-                    if (SelectedMatch is { } sel_mtvm) MatchesView.Instance.ScrollItemIntoView(sel_mtvm);
+                    if(SelectedMatch is { } sel_mtvm) {
+                        MatchesView.Instance.ScrollItemIntoView(sel_mtvm);
+                    }
 
                     IsBusy = false;
                 });
@@ -1587,22 +1690,21 @@ public class MainViewModel : ViewModelBase {
 
             UpdateViewProps();
 
-            InstrumentView.Instance.ScrollSelectionIntoView();
+            InstrumentView.Instance.MeasureInstrument();
         });
 
     public ICommand RemoveInstrumentCommand => new MpCommand<object>(
         async args => {
-            if (args is not Control c ||
-                c.DataContext is not InstrumentViewModel to_remove_ivm)
+            if(args is not Control c ||
+               c.DataContext is not InstrumentViewModel to_remove_ivm) {
                 return;
+            }
 
             Extensions.CloseFlyout(args);
 
             bool? confirmed = null;
-            var dlg_v = new YesNoDialogView
-            {
-                DataContext = new DialogViewModel
-                {
+            var dlg_v = new YesNoDialogView {
+                DataContext = new DialogViewModel {
                     Label = $"Are you sure you want to delete '{to_remove_ivm.Name}'?",
                     OkCommand = new MpCommand(
                         () => {
@@ -1614,15 +1716,19 @@ public class MainViewModel : ViewModelBase {
                         })
                 }
             };
-            DialogManager.ShowAsync(dlg_v, Instance.MainDialogHostName).FireAndForgetSafeAsync();
+            DialogManager.ShowAsync(dlg_v,Instance.MainDialogHostName).FireAndForgetSafeAsync();
 
-            while (!confirmed.HasValue) await Task.Delay(100);
+            while(!confirmed.HasValue) {
+                await Task.Delay(100);
+            }
 
             DialogManager.Close(Instance.MainDialogHostName);
 
-            if (!confirmed.Value)
+            if(!confirmed.Value)
                 // canceled
+            {
                 return;
+            }
 
             Instruments.Remove(to_remove_ivm);
 
@@ -1648,7 +1754,7 @@ public class MainViewModel : ViewModelBase {
                     IsDrawerOpen = false;
                     break;
             }
-        }, () => {
+        },() => {
             return !IsTranslateMode;
         });
 
@@ -1661,23 +1767,27 @@ public class MainViewModel : ViewModelBase {
                     CurrentDrawerPage = DrawerPageType.Options;
                     break;
             }
-        }, () => {
+        },() => {
             return SelectedTuning != null;
         });
 
     public ICommand ShowAboutCommand => new MpCommand(
         () => {
-            var needs_window = ThemeViewModel.Instance.IsDesktopOs;
-            if (TopLevel.GetTopLevel(MainView.Instance) is not { } tl) return;
+            bool needs_window = ThemeViewModel.Instance.IsDesktopOs;
+            if(TopLevel.GetTopLevel(MainView.Instance) is not { } tl) {
+                return;
+            }
 
-            void TopLevel_OnPointerPressed(object sender2, PointerPressedEventArgs e2) {
-                if (e2.Source is Control c && c.GetSelfAndVisualAncestors().OfType<AboutView>().Any())
+            void TopLevel_OnPointerPressed(object sender2,PointerPressedEventArgs e2) {
+                if(e2.Source is Control c && c.GetSelfAndVisualAncestors().OfType<AboutView>().Any())
                     // allow  about view click
+                {
                     return;
+                }
 
                 e2.Handled = true;
 
-                tl.RemoveHandler(InputElement.PointerPressedEvent, TopLevel_OnPointerPressed);
+                tl.RemoveHandler(InputElement.PointerPressedEvent,TopLevel_OnPointerPressed);
                 try {
                     DialogManager.Close(Instance.MainDialogHostName);
                 }
@@ -1686,19 +1796,17 @@ public class MainViewModel : ViewModelBase {
                 }
             }
 
-            var about_view = new AboutView
-            {
+            var about_view = new AboutView {
                 DataContext = new AboutViewModel()
             };
 
-            if (needs_window && about_view.Content is Control abc) {
+            if(needs_window && about_view.Content is Control abc) {
                 // desktop only
                 about_view.CloseButton.IsVisible = true;
 
                 about_view.Width = about_view.Height = double.NaN;
                 abc.Margin = new Thickness();
-                var about_win = new Window
-                {
+                var about_win = new Window {
                     Background = Brushes.Transparent,
                     Content = about_view,
                     SizeToContent = SizeToContent.WidthAndHeight,
@@ -1708,39 +1816,39 @@ public class MainViewModel : ViewModelBase {
                     WindowStartupLocation = WindowStartupLocation.CenterScreen
                 };
                 about_win.Show();
-                MoveWindowExtension.SetIsEnabled(about_win, true);
+                MoveWindowExtension.SetIsEnabled(about_win,true);
                 return;
             }
 
-            tl.AddHandler(InputElement.PointerPressedEvent, TopLevel_OnPointerPressed, RoutingStrategies.Tunnel, true);
-            DialogManager.ShowAsync(about_view, Instance.MainDialogHostName).FireAndForgetSafeAsync();
+            tl.AddHandler(InputElement.PointerPressedEvent,TopLevel_OnPointerPressed,RoutingStrategies.Tunnel,true);
+            DialogManager.ShowAsync(about_view,Instance.MainDialogHostName).FireAndForgetSafeAsync();
 
         });
 
     public ICommand SelectOptionCommand => new MpCommand<object>(
         args => {
-            var suppress_action = IsSearchButtonVisible;
-            if (args is not OptionViewModel ovm) {
-                if (args is object[] arg_parts &&
-                    arg_parts.FirstOrDefault() is OptionViewModel sort_ovm) {
+            bool suppress_action = IsSearchButtonVisible;
+            if(args is not OptionViewModel ovm) {
+                if(args is object[] arg_parts &&
+                   arg_parts.FirstOrDefault() is OptionViewModel sort_ovm) {
                     ovm = sort_ovm;
 
-                }
-                else if (args is object[] arg_parts2 &&
-                         arg_parts2.Length == 2 &&
-                         arg_parts2[0] is string dummy &&
-                         arg_parts2[1] is OptionViewModel key_ovm) {
+                } else if(args is object[] arg_parts2 &&
+                          arg_parts2.Length == 2 &&
+                          arg_parts2[0] is string dummy &&
+                          arg_parts2[1] is OptionViewModel key_ovm) {
                     // suppress
                     ovm = key_ovm;
                     suppress_action = true;
 
-                }
-                else {
+                } else {
                     return;
                 }
             }
 
-            if (!ovm.OptionType.TryToEnum(out OptionType optionType)) return;
+            if(!ovm.OptionType.TryToEnum(out OptionType optionType)) {
+                return;
+            }
 
             switch (optionType) {
                 case OptionType.DisplayMode:
@@ -1756,11 +1864,13 @@ public class MainViewModel : ViewModelBase {
                                     UpdatePageCount();
                                     await Task.Delay(100);
                                     IsBusy = false;
-                                    if (suppress_action) return;
+                                    if(suppress_action) {
+                                        return;
+                                    }
 
                                     UpdateMatchesAsync(MatchUpdateSource.TabChanged)
                                         .FireAndForgetSafeAsync();
-                                }, DispatcherPriority.Background);
+                                },DispatcherPriority.Background);
                         });
 
                     break;
@@ -1776,25 +1886,29 @@ public class MainViewModel : ViewModelBase {
                                     InitOptions(false);
                                     UpdateViewProps();
                                     IsBusy = false;
-                                    if (suppress_action) return;
+                                    if(suppress_action) {
+                                        return;
+                                    }
 
                                     UpdateMatchesAsync(MatchUpdateSource.PatternChanged).FireAndForgetSafeAsync();
-                                }, DispatcherPriority.Background);
+                                },DispatcherPriority.Background);
                         });
 
                     break;
                 case OptionType.Key:
-                    if (ovm.IsChecked)
+                    if(ovm.IsChecked) {
                         OptionLookup[optionType].ForEach(x => x.IsChecked = false);
-                    else
+                    } else {
                         OptionLookup[optionType].ForEach(x => x.IsChecked = x == ovm);
+                    }
 
-                    if (OptionLookup[optionType].FirstOrDefault(x => x.IsChecked) is { } sel_key_ovm)
+                    if(OptionLookup[optionType].FirstOrDefault(x => x.IsChecked) is { } sel_key_ovm) {
                         SelectedKey = sel_key_ovm.OptionValue.ToEnum<NoteType>();
-                    else
+                    } else {
                         SelectedKey = null;
+                    }
 
-                    if (suppress_action) {
+                    if(suppress_action) {
                         PlatformWrapper.Services.Logger.WriteLine("query suppressed");
                         UpdateViewProps();
                         return;
@@ -1804,16 +1918,20 @@ public class MainViewModel : ViewModelBase {
 
                     break;
                 case OptionType.Degree:
-                    if (ovm.IsChecked)
+                    if(ovm.IsChecked) {
                         OptionLookup[optionType].ForEach(
                             x => x.IsChecked = x.OptionValue == ChordKeyDegreeType.I.ToString());
-                    else
+                    } else {
                         OptionLookup[optionType].ForEach(x => x.IsChecked = x == ovm);
+                    }
 
-                    if (OptionLookup[optionType].FirstOrDefault(x => x.IsChecked) is { } sel_deg_ovm)
+                    if(OptionLookup[optionType].FirstOrDefault(x => x.IsChecked) is { } sel_deg_ovm) {
                         SelectedKeyDegree = sel_deg_ovm.OptionValue.ToEnum<ChordKeyDegreeType>();
+                    }
 
-                    if (suppress_action) break;
+                    if(suppress_action) {
+                        break;
+                    }
 
                     UpdateMatchesAsync(MatchUpdateSource.FilterToggle).FireAndForgetSafeAsync();
 
@@ -1824,23 +1942,28 @@ public class MainViewModel : ViewModelBase {
                     ovm.IsChecked = !ovm.IsChecked;
                     SelectedSuffixes = SuffixOptions.Where(x => x.IsChecked).Select(x => x.OptionValue);
 
-                    if (suppress_action) break;
+                    if(suppress_action) {
+                        break;
+                    }
 
                     UpdateMatchesAsync(MatchUpdateSource.FilterToggle).FireAndForgetSafeAsync();
                     break;
                 case OptionType.ChordSvg:
                 case OptionType.ScaleSvg:
                 case OptionType.ModeSvg:
-                    if (!ovm.OptionValue.TryToEnum(out SvgOptionType flag)) break;
+                    if(!ovm.OptionValue.TryToEnum(out SvgOptionType flag)) {
+                        break;
+                    }
 
                     ovm.IsChecked = !ovm.IsChecked;
-                    if (ovm.IsChecked &&
-                        (flag == SvgOptionType.Fingers || flag == SvgOptionType.Notes)) {
+                    if(ovm.IsChecked &&
+                       (flag == SvgOptionType.Fingers || flag == SvgOptionType.Notes)) {
                         var otherOptionType =
                             flag == SvgOptionType.Fingers ? SvgOptionType.Notes : SvgOptionType.Fingers;
-                        if (SvgOptions.FirstOrDefault(x => x.OptionValue == otherOptionType.ToString()) is
-                            { } other_ovm)
+                        if(SvgOptions.FirstOrDefault(x => x.OptionValue == otherOptionType.ToString()) is
+                           { } other_ovm) {
                             other_ovm.IsChecked = false;
+                        }
                     }
 
                     SelectedSvgOptionTypes = SvgOptions.Where(x => x.IsChecked)
@@ -1850,37 +1973,39 @@ public class MainViewModel : ViewModelBase {
                         () => {
                             MatchesView.Instance.DoBusyCheckAsync(500).FireAndForgetSafeAsync();
                             UpdateMatchCss();
-                            if (SelectedInstrument != null &&
-                                flag.RequiresReset(SelectedInstrument.InstrumentType, SelectedPatternType))
+                            if(SelectedInstrument != null &&
+                               flag.RequiresReset(SelectedInstrument.InstrumentType,SelectedPatternType))
                                 // requires reset it changes svg size
+                            {
                                 ResetMatchSvg();
+                            }
 
 
-                        }, DispatcherPriority.Background);
+                        },DispatcherPriority.Background);
 
 
                     break;
                 case OptionType.ChordSort:
                 case OptionType.ScaleSort:
                 case OptionType.ModeSort:
-                    if (args is not object[] arg_parts ||
-                        arg_parts.Length < 2)
+                    if(args is not object[] arg_parts ||
+                       arg_parts.Length < 2) {
                         break;
-
-                    var suppress = arg_parts.Length == 3 || suppress_action;
-
-                    var is_secondary = arg_parts[1] is bool;
-                    if (is_secondary) {
-                        ovm.IsChecked = !ovm.IsChecked;
                     }
-                    else {
+
+                    bool suppress = arg_parts.Length == 3 || suppress_action;
+
+                    bool is_secondary = arg_parts[1] is bool;
+                    if(is_secondary) {
+                        ovm.IsChecked = !ovm.IsChecked;
+                    } else {
                         var sort_source_ovm = arg_parts[0] as OptionViewModel;
                         var sort_target_ovm = arg_parts[1] as OptionViewModel;
-                        var s0_idx = SortOptions.IndexOf(sort_source_ovm);
-                        var e0_idx = SortOptions.IndexOf(sort_target_ovm);
-                        SortOptions.Move(s0_idx, e0_idx);
-                        var e1_idx = SortOptions.IndexOf(sort_target_ovm);
-                        SortOptions.Move(e1_idx, s0_idx);
+                        int s0_idx = SortOptions.IndexOf(sort_source_ovm);
+                        int e0_idx = SortOptions.IndexOf(sort_target_ovm);
+                        SortOptions.Move(s0_idx,e0_idx);
+                        int e1_idx = SortOptions.IndexOf(sort_target_ovm);
+                        SortOptions.Move(e1_idx,s0_idx);
 
                         OnPropertyChanged(nameof(SortOption1));
                         OnPropertyChanged(nameof(SortOption2));
@@ -1889,9 +2014,11 @@ public class MainViewModel : ViewModelBase {
                         //await Task.Delay(SortAnimDelayMs);
                     }
 
-                    if (suppress)
+                    if(suppress)
                         // translate resort
+                    {
                         break;
+                    }
 
                     UpdateMatchesAsync(MatchUpdateSource.SortToggle).FireAndForgetSafeAsync();
 
@@ -1934,15 +2061,16 @@ public class MainViewModel : ViewModelBase {
             }
 
             try {
-                while (true) {
-                    if (MainView.Instance is not { } mv ||
-                        !mv.DlgHost.IsLoaded)
+                while(true) {
+                    if(MainView.Instance is not { } mv ||
+                       !mv.DlgHost.IsLoaded) {
                         await Task.Delay(100);
+                    }
 
                     break;
                 }
 
-                DialogManager.ShowAsync(lv, MainDialogHostName).FireAndForgetSafeAsync();
+                DialogManager.ShowAsync(lv,MainDialogHostName).FireAndForgetSafeAsync();
                 await Task.Delay(1_000);
                 PlatformWrapper.Services.Logger.WriteLine("Clearing instruments");
                 Instruments.Clear();
@@ -1951,7 +2079,7 @@ public class MainViewModel : ViewModelBase {
                     () => {
                         List<Instrument> instl = null;
                         try {
-                            var def_json =
+                            string def_json =
                                 MpAvFileIo.ReadTextFromResource("avares://Calcuchord/Assets/Text/def.json");
                             instl = Prefs.Parse(def_json).Instruments;
 
@@ -1964,7 +2092,7 @@ public class MainViewModel : ViewModelBase {
                                     catch (Exception ex) {
                                         FallbackReset(ex);
                                     }
-                                }, DispatcherPriority.Background);
+                                },DispatcherPriority.Background);
                         }
                         catch (Exception ex) {
                             Dispatcher.UIThread.Post(
@@ -1985,24 +2113,28 @@ public class MainViewModel : ViewModelBase {
 
     public ICommand OpenAppInstallerCommand => new MpCommand(
         () => {
-            if (ThemeViewModel.Instance.IsDesktop) {
+            if(ThemeViewModel.Instance.IsDesktop) {
             }
         });
 
     public ICommand ToggleSearchTypeCommand => new MpCommand<object>(
         args => {
-            if ((IsExactMatchOnly && args.ToString() == "EXACT") ||
-                (!IsExactMatchOnly && args.ToString() == "VOICE"))
+            if((IsExactMatchOnly && args.ToString() == "EXACT") ||
+               (!IsExactMatchOnly && args.ToString() == "VOICE"))
                 // ignore
+            {
                 return;
+            }
 
             IsExactMatchOnly = !IsExactMatchOnly;
-            if (IsSearchButtonVisible) return;
+            if(IsSearchButtonVisible) {
+                return;
+            }
 
             UpdateMatchesAsync(MatchUpdateSource.FilterToggle).FireAndForgetSafeAsync();
         });
 
-    private int GetMatchesPerPage(bool actualPage = true) {
+    int GetMatchesPerPage(bool actualPage = true) {
         // double outer_item_w = MatchesContainerRect.Width / MatchColCount;
         // double item_scale = outer_item_w / MatchWidth;
         // double outer_item_h = MatchFixedHeight * item_scale;
@@ -2020,7 +2152,7 @@ public class MainViewModel : ViewModelBase {
         // }
         //
         // return viewport_items;
-        var def_count = 0;
+        int def_count = 0;
         switch (MatchColCount) {
             case 1:
                 def_count = 1;
@@ -2054,17 +2186,21 @@ public class MainViewModel : ViewModelBase {
         return def_count * 2;
     }
 
-    private void UpdatePageCount() {
-        var last_count = LoadMoreCount;
+    void UpdatePageCount() {
+        int last_count = LoadMoreCount;
         LoadMoreCount = GetMatchesPerPage() * PageCacheCount;
-        LoadMore(Math.Max(0, LoadMoreCount - last_count));
+        LoadMore(Math.Max(0,LoadMoreCount - last_count));
     }
 
-    private void LoadMore(int? forceCount = null) {
-        var loadCount = forceCount ?? LoadMoreCount;
-        if (loadCount == 0) return;
+    void LoadMore(int? forceCount = null) {
+        int loadCount = forceCount ?? LoadMoreCount;
+        if(loadCount == 0) {
+            return;
+        }
 
-        while ((Matches.Count + loadCount) % MatchColCount != 0) loadCount++;
+        while((Matches.Count + loadCount) % MatchColCount != 0) {
+            loadCount++;
+        }
 
         //PlatformWrapper.Services.Logger.WriteLine($"Loading {loadCount + col_diff} items. Cur Count: {Matches.Count} Col Count: {MatchColCount} Col Diff: {col_diff}");
         var items_to_add = AllResults.Skip(Matches.Count).Take(loadCount);
@@ -2075,11 +2211,13 @@ public class MainViewModel : ViewModelBase {
     public ICommand LoadMoreCommand => new MpCommand(
         () => {
             IsBusy = true;
-            Dispatcher.UIThread.InvokeAsync(() => LoadMore(), DispatcherPriority.Background)
+            Dispatcher.UIThread.InvokeAsync(() => LoadMore(),DispatcherPriority.Background)
                 .FireAndForgetSafeAsync();
             Dispatcher.UIThread.Post(
                 async () => {
-                    while (!MatchesView.Instance.MatchItemsRepeater.IsArrangeValid) await Task.Delay(100);
+                    while(!MatchesView.Instance.MatchItemsRepeater.IsArrangeValid) {
+                        await Task.Delay(100);
+                    }
 
                     IsBusy = false;
                 });
@@ -2087,10 +2225,11 @@ public class MainViewModel : ViewModelBase {
 
     public ICommand TranslatePatternCommand => new MpCommand<object>(
         args => {
-            if (args is not object[] arg_parts ||
-                arg_parts[0] is not MatchViewModel mtvm ||
-                arg_parts[1] is not TuningViewModel tvm)
+            if(args is not object[] arg_parts ||
+               arg_parts[0] is not MatchViewModel mtvm ||
+               arg_parts[1] is not TuningViewModel tvm) {
                 return;
+            }
 
             PlatformWrapper.Services.Logger.WriteLine(
                 $"Translate mode activated: source: '{mtvm}' target: '{tvm}'");
@@ -2103,12 +2242,11 @@ public class MainViewModel : ViewModelBase {
             OnPropertyChanged(nameof(InstrumentFlags));
 
             // set score to primary sort
-            object[] cmd1_args = [SortOption1, SortOptionScore, "SUPPRESS"];
+            object[] cmd1_args = [SortOption1,SortOptionScore,"SUPPRESS"];
             SelectOptionCommand.Execute(cmd1_args);
 
             // set key to translate source pattern key
-            object[] cmd2_args =
-            [
+            object[] cmd2_args = [
                 "SUPPRESS",
                 KeyOptions.FirstOrDefault(
                     x => x.OptionValue == TranslateSourceMatchViewModel.NotePattern.Key.ToString())
@@ -2116,25 +2254,23 @@ public class MainViewModel : ViewModelBase {
             SelectOptionCommand.Execute(cmd2_args);
 
             // set suffix to translate source pattern suffix
-            object[] cmd3_args =
-            [
+            object[] cmd3_args = [
                 "SUPPRESS",
                 SuffixOptions.FirstOrDefault(
                     x => x.OptionValue == TranslateSourceMatchViewModel.NotePattern.SuffixKey)
             ];
             SelectOptionCommand.Execute(cmd3_args);
 
-            if (IsChordsSelected) {
+            if(IsChordsSelected) {
                 // reset degree
-                object[] cmd4_args =
-                [
-                    "SUPPRESS", DegreeOptions.FirstOrDefault(x => x.OptionValue == ChordKeyDegreeType.I.ToString())
+                object[] cmd4_args = [
+                    "SUPPRESS",DegreeOptions.FirstOrDefault(x => x.OptionValue == ChordKeyDegreeType.I.ToString())
                 ];
                 SelectOptionCommand.Execute(cmd4_args);
             }
 
-            var needs_query = true;
-            if (!IsSearchModeSelected) {
+            bool needs_query = true;
+            if(!IsSearchModeSelected) {
                 // go to search mode
                 needs_query = false;
                 SelectOptionCommand.Execute(SearchOptionViewModel);
@@ -2149,21 +2285,22 @@ public class MainViewModel : ViewModelBase {
                 nameof(TranslateSourceMatchViewModel.IsTranslateSourceMatch));
 
             OnPropertyChanged(nameof(IsTranslateMode));
-            if (needs_query) UpdateMatchesAsync(MatchUpdateSource.FindClick).FireAndForgetSafeAsync();
+            if(needs_query) {
+                UpdateMatchesAsync(MatchUpdateSource.FindClick).FireAndForgetSafeAsync();
+            }
         });
 
     public ICommand FinishTranslateCommand => new MpCommand(
         () => {
             PlatformWrapper.Services.Logger.WriteLine("Translate mode deactivated");
-            if (_translateOptionInitialStateJson.DeserializeObject<List<OptionViewModel>>() is { } ovml_to_restore) {
+            if(_translateOptionInitialStateJson.DeserializeObject<List<OptionViewModel>>() is { } ovml_to_restore) {
                 SetOptions(ovml_to_restore);
                 InitOptions(false);
                 _translateOptionInitialStateJson = null;
             }
 
-            object[] cmd_args =
-            [
-                "SUPPRESS", DisplayModeOptions.FirstOrDefault(x => x.OptionValue == SelectedDisplayMode.ToString())
+            object[] cmd_args = [
+                "SUPPRESS",DisplayModeOptions.FirstOrDefault(x => x.OptionValue == SelectedDisplayMode.ToString())
             ];
             SelectOptionCommand.Execute(cmd_args);
 
@@ -2181,16 +2318,18 @@ public class MainViewModel : ViewModelBase {
                     await UpdateMatchesAsync(MatchUpdateSource.TabChanged);
 
                     MatchViewModel mtvm_to_select = null;
-                    while (true) {
+                    while(true) {
                         mtvm_to_select = Matches.FirstOrDefault(x => x.NotePattern == source_pattern);
-                        if (mtvm_to_select is not null) break;
+                        if(mtvm_to_select is not null) {
+                            break;
+                        }
 
                         LoadMore();
                     }
 
                     mtvm_to_select.SelectMatchCommand.Execute(null);
 
-                }, DispatcherPriority.Background);
+                },DispatcherPriority.Background);
 
         });
 

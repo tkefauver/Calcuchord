@@ -7,7 +7,6 @@
              d:DesignHeight="240"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:dlg="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:local="clr-namespace:Calcuchord"
              xmlns:common="clr-namespace:MonkeyPaste.Common.Avalonia;assembly=MonkeyPaste.Common.Avalonia"
              x:DataType="local:MainViewModel"
@@ -68,7 +67,7 @@
             <Setter Property="Foreground"
                     Value="{DynamicResource RootFretFg}" />
         </Style>
-        <Style Selector=":is(UserControl).note-btn.muted.nut Border.note-marker">
+        <Style Selector=":is(UserControl).note-btn.muted.open-note Border.note-marker">
             <Setter Property="Background"
                     Value="{DynamicResource MutedFretBg}" />
         </Style>
@@ -331,7 +330,8 @@
                         Cursor="Hand"
                         Opacity="{Binding !IsDefaultSelection, ConverterParameter=1|0, Converter={x:Static common:MpAvBoolToDoubleConverter.Instance}}"
                         Command="{Binding ResetInstrumentCommand}">
-                    <TextBlock Text="Reset" />
+                    <TextBlock Foreground="{DynamicResource Bg}"
+                               Text="Reset" />
                 </Button>
 
                 <controls:Card DockPanel.Dock="Right"

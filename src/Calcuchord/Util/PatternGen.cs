@@ -7,664 +7,610 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using MonkeyPaste.Common;
 
-namespace Calcuchord {
+namespace Calcuchord;
 
-    public partial class PatternGen : ViewModelBase {
+public class PatternGen : ViewModelBase {
+    #region Constants
 
-        #region Private Variables
+    public const int PATTERN_FRET_SPAN = 4;
 
-        #endregion
+    #endregion
 
-        #region Constants
+    #region Constructors
 
-        public const int PATTERN_FRET_SPAN = 4;
+    public PatternGen(TuningViewModel tuning) {
+        TuningVm = tuning;
+        PatternOpenFretSpan = PATTERN_FRET_SPAN; //GuessRealisticFretSpan(Tuning);
+    }
 
-        #endregion
+    #endregion
 
 
-        #region Interfaces
+    #region Interfaces
 
-        #region IProgressIndicator Implementation
+    #region IProgressIndicator Implementation
 
-        int TotalChordProgressCount { get; set; }
-        int TotalScaleProgressCount { get; set; }
-        int TotalModeProgressCount { get; set; }
+    int TotalChordProgressCount { get; set; }
+    int TotalScaleProgressCount { get; set; }
+    int TotalModeProgressCount { get; set; }
 
-        int CurChordProgressCount { get; set; }
-        int CurScaleProgressCount { get; set; }
-        int CurModeProgressCount { get; set; }
-        int TotalProgressCount => TotalChordProgressCount + TotalScaleProgressCount + TotalModeProgressCount;
-        public int CurrentProgressCount => CurChordProgressCount + CurScaleProgressCount + CurModeProgressCount;
-        public int CurItemCount { get; set; }
+    int CurChordProgressCount { get; set; }
+    int CurScaleProgressCount { get; set; }
+    int CurModeProgressCount { get; set; }
+    int TotalProgressCount => TotalChordProgressCount + TotalScaleProgressCount + TotalModeProgressCount;
+    public int CurrentProgressCount => CurChordProgressCount + CurScaleProgressCount + CurModeProgressCount;
+    public int CurItemCount { get; set; }
 
-        #endregion
+    public string ProgressTitle =>
+        $"Calculating {Tuning.FullName}...";
 
-        #endregion
+    public string GenProgressLabel { get; private set; } = "Preparing...";
 
-        #region Properties
+    public double GenProgress { get; private set; }
 
-        Dictionary<ChordSuffixType,int[]> Chords { get; } = new Dictionary<ChordSuffixType,int[]>
-        {
-            { ChordSuffixType.Num5,[0,7] },
-            { ChordSuffixType.major,[0,4,3] },
-            { ChordSuffixType.minor,[0,3,4] },
-            { ChordSuffixType.dim,[0,3,3] },
-            { ChordSuffixType.aug,[0,4,4] },
-            { ChordSuffixType.sus2,[0,2,5] },
-            { ChordSuffixType.sus4,[0,5,2] },
-            { ChordSuffixType.maj7,[0,4,3,4] },
-            { ChordSuffixType.m7,[0,3,4,3] },
-            { ChordSuffixType.Num7,[0,4,3,3] },
-            { ChordSuffixType.m7b5,[0,3,3,4] },
-            { ChordSuffixType.dim7,[0,3,3,3] },
-            { ChordSuffixType.Num9,[0,4,3,3,4] },
-            { ChordSuffixType.maj9,[0,4,3,4,3] },
-            { ChordSuffixType.m9,[0,3,4,3,4] },
-            { ChordSuffixType.Num11,[0,4,3,3,4,3] },
-            { ChordSuffixType.maj11,[0,4,3,4,3,3] },
-            { ChordSuffixType.m11,[0,3,4,3,4,3] },
-        };
+    #endregion
 
-        Dictionary<ScaleSuffixType,int[]> Scales { get; } = new Dictionary<ScaleSuffixType,int[]>
-        {
-            { ScaleSuffixType.Major,[0,2,2,1,2,2,2,1] },
-            { ScaleSuffixType.NaturalMinor,[0,2,1,2,2,1,2,2] },
-            { ScaleSuffixType.HarmonicMinor,[0,2,1,2,2,1,3,1] },
-            { ScaleSuffixType.MelodicMinor,[0,2,1,2,2,2,2,2] },
-            { ScaleSuffixType.MinorPentatonic,[0,3,2,2,3,2] },
-            { ScaleSuffixType.Pentatonic,[0,2,2,3,2,3] },
-            { ScaleSuffixType.Blues,[0,3,2,1,1,3] },
-        };
+    #endregion
 
-        Dictionary<ModeSuffixType,int[]> Modes { get; } = new Dictionary<ModeSuffixType,int[]>
-        {
-            { ModeSuffixType.Dorian,[0,2,1,2,2,2,1,2] },
-            { ModeSuffixType.Phrygian,[0,1,2,2,2,1,2,2] },
-            { ModeSuffixType.Lydian,[0,2,2,2,1,2,2,1] },
-            { ModeSuffixType.Mixolydian,[0,2,2,1,2,2,1,2] },
-            { ModeSuffixType.Locrian,[0,1,2,2,1,2,2,2] },
-            { ModeSuffixType.AhavaRaba,[0,1,3,1,2,1,2,2] },
-        };
+    #region Properties
 
-        Dictionary<MusicPatternType,Dictionary<string,int[]>> _patterns;
+    Dictionary<ChordSuffixType,int[]> Chords { get; } = new() {
+        { ChordSuffixType.Num5,[0,7] },
+        { ChordSuffixType.major,[0,4,3] },
+        { ChordSuffixType.minor,[0,3,4] },
+        { ChordSuffixType.dim,[0,3,3] },
+        { ChordSuffixType.aug,[0,4,4] },
+        { ChordSuffixType.sus2,[0,2,5] },
+        { ChordSuffixType.sus4,[0,5,2] },
+        { ChordSuffixType.maj7,[0,4,3,4] },
+        { ChordSuffixType.m7,[0,3,4,3] },
+        { ChordSuffixType.Num7,[0,4,3,3] },
+        { ChordSuffixType.m7b5,[0,3,3,4] },
+        { ChordSuffixType.dim7,[0,3,3,3] },
+        { ChordSuffixType.Num9,[0,4,3,3,4] },
+        { ChordSuffixType.maj9,[0,4,3,4,3] },
+        { ChordSuffixType.m9,[0,3,4,3,4] },
+        { ChordSuffixType.Num11,[0,4,3,3,4,3] },
+        { ChordSuffixType.maj11,[0,4,3,4,3,3] },
+        { ChordSuffixType.m11,[0,3,4,3,4,3] }
+    };
 
-        Dictionary<MusicPatternType,Dictionary<string,int[]>> PatternsLookup {
-            get {
-                if(_patterns == null) {
-                    _patterns = new()
+    Dictionary<ScaleSuffixType,int[]> Scales { get; } = new() {
+        { ScaleSuffixType.Major,[0,2,2,1,2,2,2,1] },
+        { ScaleSuffixType.NaturalMinor,[0,2,1,2,2,1,2,2] },
+        { ScaleSuffixType.HarmonicMinor,[0,2,1,2,2,1,3,1] },
+        { ScaleSuffixType.MelodicMinor,[0,2,1,2,2,2,2,2] },
+        { ScaleSuffixType.MinorPentatonic,[0,3,2,2,3,2] },
+        { ScaleSuffixType.Pentatonic,[0,2,2,3,2,3] },
+        { ScaleSuffixType.Blues,[0,3,2,1,1,3] }
+    };
+
+    Dictionary<ModeSuffixType,int[]> Modes { get; } = new() {
+        { ModeSuffixType.Dorian,[0,2,1,2,2,2,1,2] },
+        { ModeSuffixType.Phrygian,[0,1,2,2,2,1,2,2] },
+        { ModeSuffixType.Lydian,[0,2,2,2,1,2,2,1] },
+        { ModeSuffixType.Mixolydian,[0,2,2,1,2,2,1,2] },
+        { ModeSuffixType.Locrian,[0,1,2,2,1,2,2,2] },
+        { ModeSuffixType.AhavaRaba,[0,1,3,1,2,1,2,2] }
+    };
+
+    Dictionary<MusicPatternType,Dictionary<string,int[]>> _patterns;
+
+    Dictionary<MusicPatternType,Dictionary<string,int[]>> PatternsLookup {
+        get {
+            if(_patterns == null) {
+                _patterns = new Dictionary<MusicPatternType,Dictionary<string,int[]>> {
                     {
-                        {
-                            MusicPatternType.Chords,
-                            Chords.ToDictionary(x => x.Key.ToString(),x => x.Value)
-                        },
-                        {
-                            MusicPatternType.Scales,
-                            Scales.ToDictionary(x => x.Key.ToString(),x => x.Value)
-                        },
-                        {
-                            MusicPatternType.Modes,
-                            Modes.ToDictionary(x => x.Key.ToString(),x => x.Value)
-                        },
-                    };
-                }
-
-                return _patterns;
+                        MusicPatternType.Chords,
+                        Chords.ToDictionary(x => x.Key.ToString(),x => x.Value)
+                    }, {
+                        MusicPatternType.Scales,
+                        Scales.ToDictionary(x => x.Key.ToString(),x => x.Value)
+                    }, {
+                        MusicPatternType.Modes,
+                        Modes.ToDictionary(x => x.Key.ToString(),x => x.Value)
+                    }
+                };
             }
+
+            return _patterns;
+        }
+    }
+
+    public MusicPatternType PatternType { get; private set; }
+
+    bool IsKeyboard =>
+        Tuning.Parent.InstrumentType == InstrumentType.Piano;
+
+    InstrumentNote[] OpenNotes =>
+        Tuning.OpenNotes.ToArray();
+
+    int CapoNum =>
+        Tuning.CapoFretNum;
+
+    int FretCount =>
+        Tuning.Parent.ColCount;
+
+    int PatternOpenFretSpan { get; }
+
+    int StringCount =>
+        OpenNotes.Length;
+
+    Tuning Tuning =>
+        TuningVm.Tuning;
+
+    public TuningViewModel TuningVm { get; }
+
+    CancellationToken Ct { get; set; }
+
+    #endregion
+
+    #region Public Methods
+
+    public async Task<Dictionary<MusicPatternType,IEnumerable<PatternKeyCollection>>> GenerateAsync(
+        CancellationToken ct) {
+        var dt = new DispatcherTimer {
+            Interval = TimeSpan.FromMilliseconds(500)
+        };
+        dt.Tick += DtOnTick;
+
+        void DtOnTick(object sender,EventArgs e) {
+            UpdateProgress();
         }
 
-        public MusicPatternType PatternType { get; private set; }
-
-        bool IsKeyboard =>
-            Tuning.Parent.InstrumentType == InstrumentType.Piano;
-
-        InstrumentNote[] OpenNotes =>
-            Tuning.OpenNotes.ToArray();
-
-        int FretCount =>
-            Tuning.Parent.ColCount;
-
-        int PatternOpenFretSpan { get; }
-
-        int StringCount =>
-            OpenNotes.Length;
-
-        Tuning Tuning =>
-            TuningVm.Tuning;
-
-        public TuningViewModel TuningVm { get; }
-
-        CancellationToken Ct { get; set; }
-
-        public string ProgressTitle =>
-            $"Calculating {Tuning.FullName}...";
-
-        public string GenProgressLabel { get; private set; } = "Preparing...";
-
-        public double GenProgress { get; private set; }
-
-        #endregion
-
-        #region Events
-
-        #endregion
-
-        #region Constructors
-
-        public PatternGen(TuningViewModel tuning) {
-            TuningVm = tuning;
-            PatternOpenFretSpan = PATTERN_FRET_SPAN; //GuessRealisticFretSpan(Tuning);
+        dt.Start();
+        var result = new Dictionary<MusicPatternType,IEnumerable<PatternKeyCollection>>();
+        var patterns = new[]
+            { MusicPatternType.Modes,MusicPatternType.Scales,MusicPatternType.Chords };
+        try {
+            foreach (var pattern in patterns) {
+                PatternType = pattern;
+                result.Add(pattern,await GenerateAsync_internal(ct));
+            }
         }
-
-        #endregion
-
-        #region Public Methods
-
-        public async Task<Dictionary<MusicPatternType,IEnumerable<PatternKeyCollection>>> GenerateAsync(
-            CancellationToken ct) {
-            DispatcherTimer dt = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(500),
-            };
-            dt.Tick += DtOnTick;
-
-            void DtOnTick(object sender,EventArgs e) {
-                UpdateProgress();
-            }
-
-            dt.Start();
-            var result = new Dictionary<MusicPatternType,IEnumerable<PatternKeyCollection>>();
-            var patterns = new[]
-                { MusicPatternType.Modes,MusicPatternType.Scales,MusicPatternType.Chords };
-            try {
-                foreach(MusicPatternType pattern in patterns) {
-                    PatternType = pattern;
-                    result.Add(pattern,await GenerateAsync_internal(ct));
-                }
-            } catch(Exception) {
-                dt.Tick -= DtOnTick;
-                throw;
-            }
-
+        catch (Exception) {
             dt.Tick -= DtOnTick;
+            throw;
+        }
+
+        dt.Tick -= DtOnTick;
+        return result;
+    }
+
+    async Task<IEnumerable<PatternKeyCollection>> GenerateAsync_internal(CancellationToken ct) {
+        var sw = Stopwatch.StartNew();
+        Ct = ct;
+
+        try {
+            IEnumerable<PatternKeyCollection> result = null;
+            if(IsKeyboard) {
+                result = await GenKeyboardPatternAsync();
+            } else {
+                result = await GenFretboardPatternAsync();
+            }
+
+            foreach (var ngc in result) {
+                ngc.Patterns.ForEach(x => x.CreateId(null));
+                ngc.SetParent(Tuning);
+            }
+
+            if(PatternType == MusicPatternType.Chords) {
+                PlatformWrapper.Services.Logger.WriteLine(
+                    $"Chord Gen complete. Total time: {sw.ElapsedMilliseconds} ms. {result.SelectMany(x => x.Patterns).Count()} groups.");
+            }
+
+
             return result;
         }
-
-        async Task<IEnumerable<PatternKeyCollection>> GenerateAsync_internal(CancellationToken ct) {
-            Stopwatch sw = Stopwatch.StartNew();
-            Ct = ct;
-
-            try {
-                IEnumerable<PatternKeyCollection> result = null;
-                if(IsKeyboard) {
-                    result = await GenKeyboardPatternAsync();
-                } else {
-                    result = await GenFretboardPatternAsync();
-                }
-
-                foreach(PatternKeyCollection ngc in result) {
-                    ngc.Patterns.ForEach(x => x.CreateId(null));
-                    ngc.SetParent(Tuning);
-                }
-
-                if(PatternType == MusicPatternType.Chords) {
-                    PlatformWrapper.Services.Logger.WriteLine(
-                        $"Chord Gen complete. Total time: {sw.ElapsedMilliseconds} ms. {result.SelectMany(x => x.Patterns).Count()} groups.");
-                }
-
-
-                return result;
-            } catch(Exception ex) {
-                ex.Dump();
-            }
-
-            return [];
+        catch (Exception ex) {
+            ex.Dump();
         }
 
-        #endregion
+        return [];
+    }
 
-        #region Protected Methods
+    #endregion
 
-        #endregion
+    #region Private Methods
 
-        #region Private Methods
+    #region Keyboard
 
-        #region Keyboard
-
-        async Task<IEnumerable<PatternKeyCollection>> GenKeyboardPatternAsync() {
-            await Task.Delay(1,Ct);
-            var patterns = PatternsLookup[PatternType];
-            var ngcl = new List<PatternKeyCollection>();
-            foreach(string suffix in patterns.Select(x => x.Key)) {
-                for(int cur_key_val = 0; cur_key_val < 12; cur_key_val++) {
-                    NoteType cur_key = (NoteType)cur_key_val;
-                    var pattern = GenPattern(cur_key,suffix);
-                    var all_pattern_inst_notes = GenNotes(pattern);
-                    PatternKeyCollection ngc = PatternKeyCollection.Create(PatternType,cur_key,suffix);
-                    var all_pattern_notes =
-                        all_pattern_inst_notes
-                            .Select(x => PatternNote.Create(0,x));
-                    var cur_pattern = new List<PatternNote>();
-                    foreach((PatternNote pn,int idx) in all_pattern_notes.WithIndex()) {
-                        cur_pattern.Add(pn);
-                        if(PatternType == MusicPatternType.Chords) {
-                            if(cur_pattern.Count == pattern.Length) {
-                                ngc.Patterns.Add(new NotePattern(ngc,ngc.Patterns.Count - 1,cur_pattern.ToList()));
-                                cur_pattern.Clear();
-                            }
-                        } else {
-                            if(cur_pattern.Count == pattern.Length + 1 || pn == all_pattern_notes.Last()) {
-                                ngc.Patterns.Add(new NotePattern(ngc,0,cur_pattern));
-                                break;
-                            }
+    async Task<IEnumerable<PatternKeyCollection>> GenKeyboardPatternAsync() {
+        await Task.Delay(1,Ct);
+        var patterns = PatternsLookup[PatternType];
+        var ngcl = new List<PatternKeyCollection>();
+        foreach (string suffix in patterns.Select(x => x.Key))
+            for (int cur_key_val = 0; cur_key_val < 12; cur_key_val++) {
+                var cur_key = (NoteType)cur_key_val;
+                var pattern = GenPattern(cur_key,suffix);
+                var all_pattern_inst_notes = GenNotes(pattern);
+                var ngc = PatternKeyCollection.Create(PatternType,cur_key,suffix);
+                var all_pattern_notes =
+                    all_pattern_inst_notes
+                        .Select(x => PatternNote.Create(0,x));
+                var cur_pattern = new List<PatternNote>();
+                foreach ((var pn,int idx) in all_pattern_notes.WithIndex()) {
+                    cur_pattern.Add(pn);
+                    if(PatternType == MusicPatternType.Chords) {
+                        if(cur_pattern.Count == pattern.Length) {
+                            ngc.Patterns.Add(new NotePattern(ngc,ngc.Patterns.Count - 1,cur_pattern.ToList()));
+                            cur_pattern.Clear();
+                        }
+                    } else {
+                        if(cur_pattern.Count == pattern.Length + 1 || pn == all_pattern_notes.Last()) {
+                            ngc.Patterns.Add(new NotePattern(ngc,0,cur_pattern));
+                            break;
                         }
                     }
-
-
-                    ngcl.Add(ngc);
-                }
-            }
-
-            return ngcl;
-        }
-
-        #endregion
-
-        #region Fretboard
-
-        async Task<IEnumerable<PatternKeyCollection>> GenFretboardPatternAsync() {
-            if(PatternType == MusicPatternType.Chords) {
-                return await GetFretboardChordsAsync();
-            }
-
-            return await GetFretboardScalesAsync();
-        }
-
-        #region Scales/Modes
-
-        async Task<IEnumerable<PatternKeyCollection>> GetFretboardScalesAsync() {
-            await Task.Delay(1,Ct);
-            var patterns = PatternsLookup[PatternType];
-            var ngcl = new List<PatternKeyCollection>();
-            CurItemCount = 0;
-
-            foreach(string suffix in patterns.Select(x => x.Key)) {
-                for(int cur_key_val = 0; cur_key_val < 12; cur_key_val++) {
-                    NoteType cur_key = (NoteType)cur_key_val;
-                    var pattern = GenPattern(cur_key,suffix);
-                    var pattern_inst_notes = GenNotes(pattern);
-                    var blocks = pattern_inst_notes
-                        .GroupBy(x => Math.Floor((x.ColNum + 0) / (double)PatternOpenFretSpan));
-                    PatternKeyCollection ngc = PatternKeyCollection.Create(PatternType,cur_key,suffix);
-                    ngc.Patterns.AddRange(
-                        blocks.Select(
-                            (x,idx) => new NotePattern(ngc,idx,AddScaleFingering(x))));
-                    CurItemCount += ngc.Patterns.Count;
-                    if(PatternType == MusicPatternType.Modes) {
-                        CurModeProgressCount++;
-                    } else {
-                        CurScaleProgressCount++;
-                    }
-
-                    ngcl.Add(ngc);
                 }
 
-                if(OperatingSystem.IsBrowser()) {
-                    await Task.Delay(1,Ct);
+
+                ngcl.Add(ngc);
+            }
+
+        return ngcl;
+    }
+
+    #endregion
+
+    #region Fretboard
+
+    async Task<IEnumerable<PatternKeyCollection>> GenFretboardPatternAsync() {
+        if(PatternType == MusicPatternType.Chords) {
+            return await GetFretboardChordsAsync();
+        }
+
+        return await GetFretboardScalesAsync();
+    }
+
+    #region Scales/Modes
+
+    async Task<IEnumerable<PatternKeyCollection>> GetFretboardScalesAsync() {
+        await Task.Delay(1,Ct);
+        var patterns = PatternsLookup[PatternType];
+        var ngcl = new List<PatternKeyCollection>();
+        CurItemCount = 0;
+
+        foreach (string suffix in patterns.Select(x => x.Key)) {
+            for (int cur_key_val = 0; cur_key_val < 12; cur_key_val++) {
+                var cur_key = (NoteType)cur_key_val;
+                var pattern = GenPattern(cur_key,suffix);
+                var pattern_inst_notes = GenNotes(pattern);
+                var ngc = PatternKeyCollection.Create(PatternType,cur_key,suffix);
+                int cur_min_group_col = CapoNum;
+                int max_min_group_col = FretCount - PatternOpenFretSpan;
+                // var blocks = pattern_inst_notes
+                //     .Where(x => x.ColNum >= CapoNum)
+                //     .GroupBy(x => Math.Floor(x.ColNum / (double)PatternOpenFretSpan))
+                //     .Where(x => x.Any());
+                var blocks = new List<List<InstrumentNote>>();
+                for (; cur_min_group_col <= max_min_group_col; cur_min_group_col += (PatternOpenFretSpan+1)) {
+                    int cur_max_group_col = cur_min_group_col + PatternOpenFretSpan;
+                    blocks.Add(pattern_inst_notes.Where(x=>x.ColNum >= cur_min_group_col && x.ColNum <= cur_max_group_col).ToList());
                 }
-
-                //UpdateProgress();
-            }
-
-            return ngcl;
-        }
-
-        #endregion
-
-        #region Chords
-
-        bool RejectExists(IEnumerable<InstrumentNote> notes,IEnumerable<IEnumerable<InstrumentNote>> existing) {
-            return existing.Any(x => x.Difference(notes).None());
-        }
-
-        bool RejectNotEnoughNotes(IEnumerable<InstrumentNote> notes,NoteType[] pattern) {
-            return notes.Count() < pattern.Length;
-        }
-
-        bool RejectNotAllNotes(IEnumerable<InstrumentNote> notes,NoteType[] pattern) {
-            return pattern.Any(x => notes.All(y => y.Key != x));
-        }
-
-        bool RejectNotStartOnRoot(IEnumerable<InstrumentNote> notes,NoteType[] pattern) {
-            if(notes.OrderBy(x => x.RowNum).ThenBy(x => x.ColNum).FirstOrDefault() is { } root_note) {
-                return root_note.Key != pattern[0];
-            }
-
-            return true;
-        }
-
-        bool RejectNotesOnSameString(IEnumerable<InstrumentNote> notes,NoteType[] pattern) {
-            return notes.GroupBy(x => x.RowNum).Any(x => x.Count() > 1);
-        }
-
-        bool IsValidCombo(IEnumerable<InstrumentNote> notes,NoteType[] pattern) {
-            Func<IEnumerable<InstrumentNote>,NoteType[],bool>[] reject_funcs =
-            [
-                RejectNotEnoughNotes,
-                RejectNotAllNotes,
-                RejectNotStartOnRoot,
-                RejectNotesOnSameString,
-            ];
-            foreach(var reject_func in reject_funcs) {
-                if(reject_func.Invoke(notes,pattern)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-
-        async Task<IEnumerable<PatternKeyCollection>> GetFretboardChordsAsync() {
-            var patterns = PatternsLookup[MusicPatternType.Chords];
-            InitProgress(patterns.Count * 12);
-            CurItemCount = 0;
-            Stopwatch tsw = Stopwatch.StartNew();
-            IEnumerable<PatternKeyCollection> ngcl = ngcl = await Task.WhenAll(
-                patterns.SelectMany(
-                    x =>
-                        Enumerable.Range(0,12)
-                            .Select(
-                                y =>
-                                    GetChordGroupAsync(x.Key,(NoteType)y,true))));
-
-            PlatformWrapper.Services.Logger.WriteLine(
-                $"{CurItemCount} total chords for '{Tuning}' in {tsw.ElapsedMilliseconds}ms");
-            return ngcl;
-        }
-
-
-        async Task<PatternKeyCollection> GetChordGroupAsync(
-            string suffix,
-            NoteType cur_key,
-            bool is_parallel = false) {
-            int min_fret_num = 0;
-            int max_min_fret_num = FretCount - PatternOpenFretSpan - 1;
-            //int cut_off_fret_num = Math.Min(min_fret_num + 11,max_min_fret_num);
-            int cut_off_fret_num = max_min_fret_num;
-
-            var pattern = GenPattern(cur_key,suffix);
-            var pattern_inst_notes = GenNotes(pattern);
-            var valid_combos = new List<IEnumerable<InstrumentNote>>();
-            PatternKeyCollection ngc = PatternKeyCollection.Create(PatternType,cur_key,suffix);
-
-            // find all patterns in minimum octave range
-            for(; min_fret_num <= cut_off_fret_num; min_fret_num++) {
-                int max_fret_num = (min_fret_num + PatternOpenFretSpan) - 1;
-
-                var block_notes = pattern_inst_notes.Where(
-                    x => x.ColNum >= min_fret_num && x.ColNum <= max_fret_num);
-
-                var combos = block_notes.PowerSet().Where(x => x.Length >= pattern.Length);
-                foreach(var combo in combos) {
-                    if(!IsValidCombo(combo,pattern) ||
-                       RejectExists(combo,valid_combos) ||
-                       AddChordFingerings(combo) is not { } fingered_pattern) {
+                int position = 0;
+                foreach (var block in blocks) {
+                    if(AddScaleFingering(block) is not { } block_pattern ||
+                       block_pattern.None()) {
                         continue;
                     }
 
-                    valid_combos.Add(combo);
-                    ngc.Patterns.Add(
-                        new NotePattern(ngc,0,fingered_pattern.OrderBy(x => x.RowNum).ThenBy(x => x.ColNum)));
-                    CurItemCount++;
+                    ngc.Patterns.Add(new NotePattern(ngc,position++,block_pattern));
                 }
 
-                if(is_parallel) {
-                    await Task.Delay(5,Ct);
+                CurItemCount += ngc.Patterns.Count;
+                if(PatternType == MusicPatternType.Modes) {
+                    CurModeProgressCount++;
+                } else {
+                    CurScaleProgressCount++;
                 }
+
+                ngcl.Add(ngc);
             }
 
-            // clone,shift and trim base octave patterns into higher available intervals
-            // int octave_offset = 12;
-            // while(true) {
-            //     bool found_pattern = false;
-            //
-            //     foreach(var base_combo in valid_combos) {
-            //         var octave_combo = base_combo.Select(x => x.Clone());
-            //         bool is_valid = true;
-            //         foreach(InstrumentNote inn in octave_combo) {
-            //             if(inn.IsMute) {
-            //                 continue;
-            //             }
-            //
-            //             inn.Adjust(octave_offset);
-            //             if(inn.ColNum >= FretCount) {
-            //                 is_valid = false;
-            //                 break;
-            //             }
-            //         }
-            //
-            //         if(is_valid) {
-            //             if(!IsValidCombo(octave_combo,pattern) ||
-            //                RejectExists(octave_combo,valid_combos) ||
-            //                AddChordFingerings(octave_combo) is not { } octave_pattern) {
-            //                 continue;
-            //             }
-            //
-            //             found_pattern = true;
-            //             ngc.Patterns.Add(
-            //                 new NotePattern(ngc,0,octave_pattern.OrderBy(x => x.RowNum).ThenBy(x => x.ColNum)));
-            //             CurItemCount++;
-            //         }
-            //     }
-            //
-            //     if(found_pattern) {
-            //         octave_offset += 12;
-            //         if(octave_offset >= FretCount) {
-            //             break;
-            //         }
-            //
-            //         continue;
-            //     }
-            //
-            //     break;
-            // }
+            if(OperatingSystem.IsBrowser()) {
+                await Task.Delay(1,Ct);
+            }
 
-            // set pattern position by lowest note
-            ngc.SetPositions();
-            CurChordProgressCount++;
-            return ngc;
+            //UpdateProgress();
         }
 
+        return ngcl;
+    }
 
-        IEnumerable<PatternNote> AddChordFingerings(
-            IEnumerable<InstrumentNote> notes,
-            int initialFinger = 1,
-            bool fingerPerFretMode = true) {
-            /*
-             1. Go from lowest to highest fret and lowest
-             to highest string using fingers from lowest to highest.
+    #endregion
 
-             2. If multiple notes at cur fret and higher frets have
-             notes, barre current finger at current fret&
+    #region Chords
 
-             3. If no notes on a fret after a fret w note(s)
-             then skip that finger (like a power chord)&
+    bool RejectExists(IEnumerable<InstrumentNote> notes,IEnumerable<IEnumerable<InstrumentNote>> existing) {
+        return existing.Any(x => x.Difference(notes).None());
+    }
 
-             4. Fill in missing strings with mutes
-             */
-            var pnl = new List<PatternNote>();
-            var fingered_fret_note_lookup =
-                notes
-                    .Where(x => x.ColNum > 0)
-                    .GroupBy(x => x.ColNum)
-                    .OrderBy(x => x.Key)
-                    .ToDictionary(x => x.Key,x => x.OrderBy(y => y.RowNum).Select(y => y));
-            if(fingered_fret_note_lookup.Count != 0) {
-                int min_fingered_fret = fingered_fret_note_lookup.Keys.Min();
-                int max_fingered_fret = fingered_fret_note_lookup.Keys.Max();
-                int cur_finger = initialFinger;
-                for(int cur_fret_num = min_fingered_fret;
-                    cur_fret_num <= max_fingered_fret;
-                    cur_fret_num++) {
-                    bool incr_finger = true;
-                    if(fingered_fret_note_lookup.TryGetValue(cur_fret_num,out var cur_fret_notes)) {
-                        // fret has notes
+    bool RejectNotEnoughNotes(IEnumerable<InstrumentNote> notes,NoteType[] pattern) {
+        return notes.Count() < pattern.Length;
+    }
 
-                        int min_fret_str = cur_fret_notes.Min(x => x.RowNum);
-                        int max_fret_str = cur_fret_notes.Max(x => x.RowNum);
-                        bool do_bar = cur_fret_notes.Skip(1).Any() &&
-                                      fingered_fret_note_lookup.Keys.Any(x => x > cur_fret_num);
-                        // check if any lower frets in str range have notes (then can't barre)
-                        bool can_bar = do_bar &&
-                                       !notes
-                                           .Any(
-                                               x => x.ColNum >= 0 &&
-                                                    x.ColNum < cur_fret_num &&
-                                                    x.RowNum >= min_fret_str &&
-                                                    x.RowNum <= max_fret_str);
-                        foreach(InstrumentNote cur_fret_note in cur_fret_notes) {
-                            if(cur_finger > 4) {
-                                // reject
-                                return null;
-                            }
+    bool RejectNotAllNotes(IEnumerable<InstrumentNote> notes,NoteType[] pattern) {
+        return pattern.Any(x => notes.All(y => y.Key != x));
+    }
 
-                            pnl.Add(PatternNote.Create(cur_finger,cur_fret_note));
-                            if(!can_bar) {
-                                cur_finger++;
-                                incr_finger = false;
-                            }
+    bool RejectNotStartOnRoot(IEnumerable<InstrumentNote> notes,NoteType[] pattern) {
+        if(notes.OrderBy(x => x.RowNum).ThenBy(x => x.ColNum).FirstOrDefault() is { } root_note) {
+            return root_note.Key != pattern[0];
+        }
+
+        return true;
+    }
+
+    bool RejectNotesOnSameString(IEnumerable<InstrumentNote> notes,NoteType[] pattern) {
+        return notes.GroupBy(x => x.RowNum).Any(x => x.Count() > 1);
+    }
+
+    bool IsValidCombo(IEnumerable<InstrumentNote> notes,NoteType[] pattern) {
+        Func<IEnumerable<InstrumentNote>,NoteType[],bool>[] reject_funcs = [
+            RejectNotEnoughNotes,
+            RejectNotAllNotes,
+            RejectNotStartOnRoot,
+            RejectNotesOnSameString
+        ];
+        foreach (var reject_func in reject_funcs)
+            if(reject_func.Invoke(notes,pattern)) {
+                return false;
+            }
+
+        return true;
+    }
+
+
+    async Task<IEnumerable<PatternKeyCollection>> GetFretboardChordsAsync() {
+        var patterns = PatternsLookup[MusicPatternType.Chords];
+        InitProgress();
+        CurItemCount = 0;
+        var tsw = Stopwatch.StartNew();
+        IEnumerable<PatternKeyCollection> ngcl = ngcl = await Task.WhenAll(
+            patterns.SelectMany(
+                x =>
+                    Enumerable.Range(0,12)
+                        .Select(
+                            y =>
+                                GetChordGroupAsync(x.Key,(NoteType)y,true))));
+
+        PlatformWrapper.Services.Logger.WriteLine(
+            $"{CurItemCount} total chords for '{Tuning}' in {tsw.ElapsedMilliseconds}ms");
+        return ngcl;
+    }
+
+
+    async Task<PatternKeyCollection> GetChordGroupAsync(
+        string suffix,
+        NoteType cur_key,
+        bool is_parallel = false) {
+        int min_fret_num = CapoNum;
+        int max_min_fret_num = FretCount - PatternOpenFretSpan - 1;
+        var pattern = GenPattern(cur_key,suffix);
+        var pattern_inst_notes = GenNotes(pattern);
+        var valid_combos = new List<IEnumerable<InstrumentNote>>();
+        var ngc = PatternKeyCollection.Create(PatternType,cur_key,suffix);
+
+        // find all patterns in minimum octave range
+        for (; min_fret_num <= max_min_fret_num; min_fret_num++) {
+            int max_fret_num = min_fret_num + PatternOpenFretSpan - 1;
+
+            var block_notes = pattern_inst_notes.Where(
+                x => x.ColNum >= min_fret_num && x.ColNum <= max_fret_num);
+
+            var combos = block_notes.PowerSet().Where(x => x.Length >= pattern.Length);
+            foreach (var combo in combos) {
+                if(!IsValidCombo(combo,pattern) ||
+                   RejectExists(combo,valid_combos) ||
+                   AddChordFingerings(combo) is not { } fingered_pattern) {
+                    continue;
+                }
+
+                valid_combos.Add(combo);
+                ngc.Patterns.Add(
+                    new NotePattern(ngc,0,fingered_pattern.OrderBy(x => x.RowNum).ThenBy(x => x.ColNum)));
+                CurItemCount++;
+            }
+
+            if(is_parallel) {
+                await Task.Delay(5,Ct);
+            }
+        }
+
+        // set pattern position by lowest note
+        ngc.SetPositions();
+        CurChordProgressCount++;
+        return ngc;
+    }
+
+
+    IEnumerable<PatternNote> AddChordFingerings(
+        IEnumerable<InstrumentNote> notes,
+        int initialFinger = 1,
+        bool fingerPerFretMode = true) {
+        /*
+         1. Go from lowest to highest fret and lowest
+         to highest string using fingers from lowest to highest.
+
+         2. If multiple notes at cur fret and higher frets have
+         notes, barre current finger at current fret&
+
+         3. If no notes on a fret after a fret w note(s)
+         then skip that finger (like a power chord)&
+
+         4. Fill in missing strings with mutes
+         */
+        var pnl = new List<PatternNote>();
+        var fingered_fret_note_lookup =
+            notes
+                .Where(x => x.ColNum > CapoNum)
+                .GroupBy(x => x.ColNum)
+                .OrderBy(x => x.Key)
+                .ToDictionary(x => x.Key,x => x.OrderBy(y => y.RowNum).Select(y => y));
+        if(fingered_fret_note_lookup.Count != 0) {
+            int min_fingered_fret = fingered_fret_note_lookup.Keys.Min();
+            int max_fingered_fret = fingered_fret_note_lookup.Keys.Max();
+            int cur_finger = initialFinger;
+            for (int cur_fret_num = min_fingered_fret;
+                 cur_fret_num <= max_fingered_fret;
+                 cur_fret_num++) {
+                bool incr_finger = true;
+                if(fingered_fret_note_lookup.TryGetValue(cur_fret_num,out var cur_fret_notes)) {
+                    // fret has notes
+
+                    int min_fret_str = cur_fret_notes.Min(x => x.RowNum);
+                    int max_fret_str = cur_fret_notes.Max(x => x.RowNum);
+                    bool do_bar = cur_fret_notes.Skip(1).Any() &&
+                                  fingered_fret_note_lookup.Keys.Any(x => x > cur_fret_num);
+                    // check if any lower frets in str range have notes (then can't barre)
+                    bool can_bar = do_bar &&
+                                   !notes
+                                       .Any(
+                                           x => x.ColNum >= CapoNum &&
+                                                x.ColNum < cur_fret_num &&
+                                                x.RowNum >= min_fret_str &&
+                                                x.RowNum <= max_fret_str);
+                    foreach (var cur_fret_note in cur_fret_notes) {
+                        if(cur_finger > 4)
+                            // reject
+                        {
+                            return null;
+                        }
+
+                        pnl.Add(PatternNote.Create(cur_finger,cur_fret_note));
+                        if(!can_bar) {
+                            cur_finger++;
+                            incr_finger = false;
                         }
                     }
-
-                    if(incr_finger) {
-                        cur_finger++;
-                    }
-                }
-            }
-
-            // add opens
-            notes.Where(x => x.ColNum == 0).ForEach(x => pnl.Add(PatternNote.Create(0,x)));
-            // add mutes
-            Enumerable
-                .Range(0,StringCount).Where(x => notes.All(y => y.RowNum != x))
-                .ForEach(x => pnl.Add(PatternNote.Create(-1,InstrumentNote.Mute(x))));
-
-            return pnl;
-        }
-
-        string GetSignature(IEnumerable<InstrumentNote> notes) {
-            return string.Join(" ",notes.OrderBy(x => x.RowNum).Select(x => x.ColNum.ToString()));
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Progress
-
-        void InitProgress(int totalCount) {
-            TotalChordProgressCount = Chords.Count * 12;
-            TotalScaleProgressCount = Scales.Count * 12;
-            TotalModeProgressCount = Modes.Count * 12;
-        }
-
-        void UpdateProgress() {
-            if(Ct.IsCancellationRequested) {
-                throw new OperationCanceledException();
-            }
-
-            GenProgress = CurrentProgressCount / (double)TotalProgressCount;
-            GenProgressLabel =
-                $"Generating {PatternType.ToString().ToLower()}...{CurItemCount:n0} found";
-
-            PlatformWrapper.Services.Logger.WriteLine(
-                $"Gen Progress: [{(int)(GenProgress * 100)}%] Count: {CurrentProgressCount}");
-        }
-
-        #endregion
-
-        #region Helpers
-
-        int GuessRealisticFretSpan(Tuning tuning) {
-            // from https://www.statcrunch.com/reports/view?reportid=5152&tab=preview
-            // The spread of the male hands was 7 in-11 in,
-            // which is a lager average than the girl's span of 6.5 in-9.5 in.
-            // The center for the females is shorter than the males.
-            // The male's center is between 8.5 inches and 9.5 inches and the
-            // female center is somewhere around 7.5-8 inches.
-
-            // male avg: 9
-            // female avg: 8
-            // avg: 8.5
-            // avg finger span (half): 4.25 
-            return 4;
-        }
-
-        bool IsOrderedTuning() {
-            for(int i = 1; i < OpenNotes.Length; i++) {
-                if(OpenNotes[i].NoteId < OpenNotes[i - 1].NoteId) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        IEnumerable<PatternNote> AddScaleFingering(IEnumerable<InstrumentNote> notes) {
-            int min_fret = notes.Where(x => x.ColNum > 0).Min(x => x.ColNum);
-            int max_fret = notes.Where(x => x.ColNum > 0).Max(x => x.ColNum);
-            var pnl = new List<PatternNote>();
-            foreach(InstrumentNote note in notes) {
-                int finger = 0;
-                if(note.ColNum >= min_fret) {
-                    finger = Math.Min(4,(note.ColNum - min_fret) + 1);
                 }
 
-                pnl.Add(PatternNote.Create(finger,note));
-            }
-
-            return pnl;
-        }
-
-        IEnumerable<InstrumentNote> GenNotes(NoteType[] pattern) {
-            var innl = new List<InstrumentNote>();
-            foreach(InstrumentNote open_note in OpenNotes) {
-                InstrumentNote cur_note = open_note; //.Clone();
-                while(cur_note.ColNum <= FretCount) {
-                    if(pattern.Contains(cur_note.Key)) {
-                        innl.Add(cur_note);
-                    }
-
-                    cur_note = cur_note.Next;
+                if(incr_finger) {
+                    cur_finger++;
                 }
             }
-
-            return innl;
         }
 
-        NoteType[] GenPattern(NoteType key,string suffix) {
-            int[] offsets = PatternsLookup[PatternType][suffix];
-            var ntl = new List<NoteType>();
-            int note_val = (int)key;
-            for(int i = 0; i < offsets.Length; i++) {
-                note_val += offsets[i % offsets.Length];
-                if(note_val >= 12) {
-                    note_val = note_val - 12;
-                }
+        // add opens
+        notes.Where(x => x.ColNum == CapoNum).ForEach(x => pnl.Add(PatternNote.Create(0,x)));
+        // add mutes
+        Enumerable
+            .Range(0,StringCount).Where(x => notes.All(y => y.RowNum != x))
+            .ForEach(x => pnl.Add(PatternNote.Create(-1,InstrumentNote.Mute(x))));
 
-                ntl.Add((NoteType)note_val);
-            }
-
-            return ntl.ToArray();
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Commands
-
-        #endregion
-
+        return pnl;
     }
+
+    string GetSignature(IEnumerable<InstrumentNote> notes) {
+        return string.Join(" ",notes.OrderBy(x => x.RowNum).Select(x => x.ColNum.ToString()));
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Progress
+
+    void InitProgress() {
+        TotalChordProgressCount = Chords.Count * 12;
+        TotalScaleProgressCount = Scales.Count * 12;
+        TotalModeProgressCount = Modes.Count * 12;
+    }
+
+    void UpdateProgress() {
+        if(Ct.IsCancellationRequested) {
+            throw new OperationCanceledException();
+        }
+
+        GenProgress = CurrentProgressCount / (double)TotalProgressCount;
+        GenProgressLabel =
+            $"Generating {PatternType.ToString().ToLower()}...{CurItemCount:n0} found";
+
+        PlatformWrapper.Services.Logger.WriteLine(
+            $"Gen Progress: [{(int)(GenProgress * 100)}%] Count: {CurrentProgressCount}");
+    }
+
+    #endregion
+
+    #region Helpers
+
+    int GuessRealisticFretSpan(Tuning tuning) {
+        // from https://www.statcrunch.com/reports/view?reportid=5152&tab=preview
+        // The spread of the male hands was 7 in-11 in,
+        // which is a lager average than the girl's span of 6.5 in-9.5 in.
+        // The center for the females is shorter than the males.
+        // The male's center is between 8.5 inches and 9.5 inches and the
+        // female center is somewhere around 7.5-8 inches.
+
+        // male avg: 9
+        // female avg: 8
+        // avg: 8.5
+        // avg finger span (half): 4.25 
+        return 4;
+    }
+
+    bool IsOrderedTuning() {
+        for (int i = 1; i < OpenNotes.Length; i++)
+            if(OpenNotes[i].NoteId < OpenNotes[i - 1].NoteId) {
+                return false;
+            }
+
+        return true;
+    }
+
+    IEnumerable<PatternNote> AddScaleFingering(IEnumerable<InstrumentNote> notes) {
+        if(notes.Where(x => x.ColNum > CapoNum).None()) {
+            return [];
+        }
+
+        int min_fret = notes.Where(x => x.ColNum > CapoNum).Min(x => x.ColNum);
+        var pnl = new List<PatternNote>();
+        foreach (var note in notes) {
+            int finger = 0;
+            if(note.ColNum >= min_fret) {
+                finger = Math.Min(4,note.ColNum - min_fret + 1);
+            }
+
+            pnl.Add(PatternNote.Create(finger,note));
+        }
+
+        return pnl;
+    }
+
+    IEnumerable<InstrumentNote> GenNotes(NoteType[] pattern) {
+        var innl = new List<InstrumentNote>();
+        foreach (var open_note in OpenNotes) {
+            var cur_note = open_note;
+            while(cur_note.ColNum <= FretCount) {
+                if(pattern.Contains(cur_note.Key)) {
+                    innl.Add(cur_note);
+                }
+
+                cur_note = cur_note.Next;
+            }
+        }
+
+        return innl;
+    }
+
+    NoteType[] GenPattern(NoteType key,string suffix) {
+        int[] offsets = PatternsLookup[PatternType][suffix];
+        var ntl = new List<NoteType>();
+        int note_val = (int)key;
+        for (int i = 0; i < offsets.Length; i++) {
+            note_val += offsets[i % offsets.Length];
+            if(note_val >= 12) {
+                note_val = note_val - 12;
+            }
+
+            ntl.Add((NoteType)note_val);
+        }
+
+        return ntl.ToArray();
+    }
+
+    #endregion
+
+    #endregion
 }
