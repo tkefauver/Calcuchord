@@ -24,12 +24,8 @@ function initStorage() {
 async function readPrefsAsync() {
     initStorage();
     try {
-        const value = await localforage.getItem('prefs');
-        // This code runs once the value has been loaded
-        // from the offline store.
-        return value;
+        return await localforage.getItem('prefs');
     } catch (err) {
-        // This code runs if there were any errors.
         console.log(err);
     }
     return '';
@@ -39,11 +35,8 @@ function writePrefsAsync(prefsJson) {
     initStorage();
 
     localforage.setItem('prefs', prefsJson).then(function (value) {
-        // Do other things once the value has been saved.
         console.log('saved:')
-        //console.log(value);
     }).catch(function (err) {
-        // This code runs if there were any errors
         console.log('save error:');
         console.log(err);
         alert(err);

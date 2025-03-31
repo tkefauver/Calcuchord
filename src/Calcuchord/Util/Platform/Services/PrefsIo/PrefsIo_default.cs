@@ -2,48 +2,73 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Calcuchord {
+namespace Calcuchord;
 
-    public class PrefsIo_default : IPrefsIo {
+public class PrefsIo_default : IPrefsIo {
+    private const string PREFS_FILE_NAME = "appstate.json";
+    private const string PREFS_BACKUP_FILE_NAME = "appstate.backup.json";
 
+    private string _prefsBackupFilePath;
 
-        string _prefsFilePath;
+    private string _prefsFilePath;
 
-        protected string PrefsFilePath {
-            get {
-                if(_prefsFilePath == null &&
-                   PlatformWrapper.Services is { } ps &&
-                   ps.StorageHelper is { } sh &&
-                   sh.StorageDir is { } sd) {
-                    string fn = "appstate.json";
-                    _prefsFilePath = Path.Combine(sd,fn);
-                }
+    protected string PrefsBackupFilePath
+    {
+        get
+        {
+            if (_prefsBackupFilePath == null &&
+                PlatformWrapper.Services is { } ps &&
+                ps.StorageHelper is { } sh &&
+                sh.StorageDir is { } sd)
+                _prefsBackupFilePath = Path.Combine(sd, PREFS_BACKUP_FILE_NAME);
 
-                return _prefsFilePath;
-            }
+            return _prefsBackupFilePath;
         }
+    }
 
-        public virtual async Task<string> ReadPrefsAsync() {
-            if(!File.Exists(PrefsFilePath)) {
+    protected string PrefsFilePath
+    {
+        get
+        {
+            if (_prefsFilePath == null &&
+                PlatformWrapper.Services is { } ps &&
+                ps.StorageHelper is { } sh &&
+                sh.StorageDir is { } sd)
+                _prefsFilePath = Path.Combine(sd, PREFS_FILE_NAME);
+
+            return _prefsFilePath;
+        }
+    }
+
+    public virtual async Task<string> ReadPrefsAsync() {
+        if (!File.Exists(PrefsFilePath))
+            if (!File.Exists(PrefsBackupFilePath))
                 return string.Empty;
-            }
 
+        try {
+            return await File.ReadAllTextAsync(PrefsFilePath);
+        }
+        catch (Exception e) {
+            e.Dump();
             try {
-                return await File.ReadAllTextAsync(PrefsFilePath);
-            } catch(Exception e) {
-                e.Dump();
-
+                return await File.ReadAllTextAsync(PrefsBackupFilePath);
             }
-
-            return string.Empty;
+            catch (Exception e2) {
+                e2.Dump();
+            }
         }
 
-        public virtual async Task WritePrefsAsync(string prefsJson) {
-            try {
-                await File.WriteAllTextAsync(PrefsFilePath,prefsJson);
-            } catch(Exception e) {
-                e.Dump();
-            }
+        return string.Empty;
+    }
+
+
+    public virtual async Task WritePrefsAsync(string prefsJson) {
+        try {
+            await File.WriteAllTextAsync(PrefsFilePath, prefsJson);
+            await File.WriteAllTextAsync(PrefsBackupFilePath, prefsJson);
+        }
+        catch (Exception e) {
+            e.Dump();
         }
     }
 }
